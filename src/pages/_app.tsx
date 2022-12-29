@@ -1,8 +1,9 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
+import { trpc } from '../utils/trpc';
 
-export default function App(props: AppProps) {
+function App(props: AppProps) {
   const { Component, pageProps } = props;
 
   return (
@@ -28,3 +29,5 @@ export default function App(props: AppProps) {
     </>
   );
 }
+
+export default trpc.withTRPC(App);
