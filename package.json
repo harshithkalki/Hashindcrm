@@ -22,6 +22,9 @@
     "@trpc/react-query": "^10.0.0",
     "@trpc/server": "^10.0.0",
     "@types/react-redux": "^7.1.24",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.8.2",
     "formik": "^2.2.9",
     "next": "13.1.1",
     "react": "18.2.0",
@@ -29,9 +32,12 @@
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
     "superjson": "1.9.1",
+    "trpc-playground": "^1.0.4",
     "zod": "^3.18.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
