@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { env } from '@/env/server.mjs';
 
+mongoose.set('strictQuery', true);
+
 declare global {
   // eslint-disable-next-line no-var
   var mongooseCli: {
@@ -17,13 +19,13 @@ if (!cached) {
 
 const { MONGODB_URI } = env;
 
-async function dbConnect() {
+export default async function connectDB() {
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI, {}).then((mongoose) => {
       return mongoose;
     });
   }
@@ -31,5 +33,3 @@ async function dbConnect() {
 
   return cached.conn;
 }
-
-export default dbConnect;
