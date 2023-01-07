@@ -4,7 +4,7 @@ import connectDb from '@/server/db';
 import getServerAuthSession from '../common/get-server-auth-session';
 
 type user = {
-  userId: string;
+  clientId: string;
 };
 
 /**
@@ -36,7 +36,7 @@ export const createContext = async (opts: CreateNextContextOptions) => {
   const id = await getServerAuthSession(opts.req);
   return {
     ...(await createContextInner({
-      session: id ? { userId: id } : null,
+      session: id ? { clientId: id } : null,
     })),
     req: opts.req,
     res: opts.res,

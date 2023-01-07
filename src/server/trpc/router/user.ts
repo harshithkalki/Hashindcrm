@@ -40,7 +40,6 @@ export const userRouter = router({
 
       return {
         success: true,
-        token,
       };
     }),
 });
