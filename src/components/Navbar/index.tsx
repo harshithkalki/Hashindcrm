@@ -8,6 +8,7 @@ import {
 import type { NavData } from "../CollapsibleLink";
 import LinksGroup from "../CollapsibleLink";
 import { useState } from "react";
+import { UserMenu } from "../UserMenu";
 // import { UserMenu } from '../UserMenu';
 
 const AdminData: NavData["links"] = [
@@ -18,12 +19,15 @@ const CompanyData: NavData["links"] = [
   { label: "Manage companies", link: "/company" },
   { label: "Create company", link: "/company/new" },
 ];
-
+const RolesData: NavData["links"] = [
+  { label: "All Roles", link: "/roles" },
+  { label: "Create Role", link: "/roles/new" },
+];
 const mockdata: NavData[] = [
   { links: "/dashboard", label: "DashBoard", icon: IconFileAnalytics },
   { links: CompanyData, label: "Companies", icon: IconBuildingStore },
-  //   { links: "/invoices", label: "Invoices", icon: IconFileInvoice },
   { links: AdminData, label: "Admins", icon: IconUser },
+  { links: RolesData, label: "Roles", icon: IconReceipt2 },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 
@@ -97,7 +101,7 @@ export default function NavbarNested({ hide }: Props) {
       </Navbar.Section>
 
       <Navbar.Section className={classes.footer}>
-        {/* <UserMenu /> */}
+        <UserMenu />
       </Navbar.Section>
     </Navbar>
   );

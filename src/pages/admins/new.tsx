@@ -1,4 +1,4 @@
-import { Container, Title, Button, Group } from "@mantine/core";
+import { Container, Title, Button } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { Formik, Form } from "formik";
 import React from "react";
@@ -17,26 +17,26 @@ interface CreateAdmin {
   firstname: string;
   lastname: string;
   username: string;
-  age: number | undefined;
+  // age: number | undefined;
   password: string;
-  confirmpassword: string;
+  confirmPassword: string;
   email: string;
   phn: string;
-  gender: "male" | "female" | undefined;
-  companyname: string;
+  // gender: "male" | "female" | undefined;
+  // companyname: string;
 }
 
 const formInputs: CreateAdmin = {
   firstname: "",
   lastname: "",
   username: "",
-  age: undefined,
+  // age: undefined,
   email: "",
   password: "",
-  confirmpassword: "",
+  confirmPassword: "",
   phn: "",
-  gender: undefined,
-  companyname: "",
+  // gender: undefined,
+  // companyname: "",
 };
 
 const app = () => {
@@ -123,7 +123,7 @@ const app = () => {
               <FormikPass
                 label="Confirm"
                 placeholder="Confirm"
-                name="confirmpassword"
+                name="confirmPassword"
                 withAsterisk
                 mb={"sm"}
               />
