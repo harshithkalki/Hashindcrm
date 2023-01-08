@@ -1,14 +1,32 @@
+import FormInput from "@/components/FormikCompo/FormikInput";
+import FormikPass from "@/components/FormikCompo/FormikPass";
+import { trpc } from "@/utils/trpc";
 import {
   Paper,
   createStyles,
-  TextInput,
-  PasswordInput,
-  Checkbox,
   Button,
   Title,
   Text,
   Anchor,
 } from "@mantine/core";
+import { Formik, Form } from "formik";
+import { z } from "zod";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+
+interface Login {
+  email: string;
+  password: string;
+}
+const onSubmit = async (values: Login, actions: any) => {
+  console.log(values);
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  actions.resetForm();
+};
+
+const formInputs: Login = {
+  email: "",
+  password: "",
+};
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -47,6 +65,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function AuthenticationImage() {
   const { classes } = useStyles();
+  const loginUser = trpc.userRouter.login.useMutation();
   return (
     <div className={classes.wrapper}>
       <Paper className={classes.form} radius={0} p={30}>
@@ -60,21 +79,49 @@ export default function AuthenticationImage() {
           Welcome!
         </Title>
 
-        <TextInput
-          label="Email address"
-          placeholder="hello@gmail.com"
-          size="md"
-        />
-        <PasswordInput
-          label="Password"
-          placeholder="Your password"
-          mt="md"
-          size="md"
-        />
-        <Checkbox label="Keep me logged in" mt="xl" size="md" />
-        <Button fullWidth mt="xl" size="md">
-          Login
-        </Button>
+        <Formik
+          initialValues={formInputs}
+          validationSchema={toFormikValidationSchema(
+            z.object({
+              email: z.string().email({ message: "Please enter valid email" }),
+              password: z.string(),
+            })
+          )}
+          onSubmit={(value) => {
+            return loginUser.mutateAsync(value).then(() => {
+              console.log("success");
+            });
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <FormInput
+                label="Email"
+                placeholder="Enter your email"
+                name="email"
+                withAsterisk
+                mb={"sm"}
+              />
+              <FormikPass
+                label="Password"
+                placeholder="Password"
+                name="password"
+                withAsterisk
+                mb={"sm"}
+              />
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                // onClick={() => {
+                //   console.log(values);
+                // }}
+                mt={"md"}
+              >
+                login
+              </Button>
+            </Form>
+          )}
+        </Formik>
 
         <Text align="center" mt="md">
           Don&apos;t have an account?{" "}

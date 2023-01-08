@@ -10,7 +10,6 @@ import {
 import { Provider } from "react-redux";
 import store from "../store";
 import { trpc } from "../utils/trpc";
-// import NavbarSimple from "../components/Navbar";
 import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import NavbarNested from "../components/Navbar";
