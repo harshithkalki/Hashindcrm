@@ -1,4 +1,4 @@
-import UserModel from '@/models/User';
+import UserModel from '@/models/userModel';
 import RoleModel from '@/models/Role';
 import type { Permissions } from '@/constants';
 
