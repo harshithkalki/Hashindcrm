@@ -6,6 +6,7 @@ import { z } from "zod";
 import FormInput from "../../components/FormikCompo/FormikInput";
 import FormikCheck from "@/components/FormikCompo/FormikCheckBox";
 import { useMediaQuery } from "@mantine/hooks";
+import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
 
 const onSubmit = async (values: CreateRole, actions: any) => {
   console.log(values);
@@ -37,6 +38,7 @@ const permissionsDemo: Permission = [
 interface CreateRole {
   rolename: string;
   displayname: string;
+  description: string;
   permissions: Permission;
 }
 type Permission = {
@@ -52,6 +54,7 @@ type Permission = {
 const formInputs: CreateRole = {
   rolename: "",
   displayname: "",
+  description: "",
   permissions: permissionsDemo,
 };
 
@@ -71,6 +74,7 @@ const app = () => {
             z.object({
               rolename: z.string(),
               displayname: z.string(),
+              description: z.string(),
               permissions: z.array(
                 z.object({
                   name: z.string().nonempty(),
@@ -99,6 +103,13 @@ const app = () => {
                 label="Display Name"
                 placeholder="Display name"
                 name="displayname"
+                withAsterisk
+                mb={"sm"}
+              />
+              <Formiktextarea
+                label="Description"
+                placeholder="Description"
+                name="description"
                 withAsterisk
                 mb={"sm"}
               />
