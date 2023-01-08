@@ -1,9 +1,11 @@
 import { Menu, Group, useMantineTheme } from "@mantine/core";
 import { IconLogout } from "@tabler/icons";
 import UserButton from "../UserButton";
+import { useRouter } from "next/router";
 
 export function UserMenu() {
   const theme = useMantineTheme();
+  const router = useRouter();
   return (
     <Group position="center">
       <Menu withArrow width={300} position="bottom" transition="pop">
@@ -18,7 +20,7 @@ export function UserMenu() {
           <Menu.Item
             icon={<IconLogout size={14} stroke={1.5} />}
             onClick={() => {
-              return;
+              router.push("/login");
             }}
           >
             Logout
