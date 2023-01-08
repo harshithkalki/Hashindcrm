@@ -6,7 +6,19 @@ import crypto from 'crypto';
 import { env } from '@/env/server.mjs';
 
 export interface User {
-  name: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  phoneNumber: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+  role: mongoose.ObjectId;
+  linkedTo?: mongoose.ObjectId;
+  companyId?: mongoose.ObjectId;
   email: string;
   password: string;
   createdAt: Date;
@@ -22,10 +34,22 @@ type UserModel = Model<User, Record<string, never>, UserMethods>;
 
 const UserSchema: Schema = new Schema<User, UserModel, UserMethods>(
   {
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    middleName: { type: String, required: false },
+    lastName: { type: String, required: true },
+    phoneNumber: { type: String, required: true, unique: true },
+    addressLine1: { type: String, required: true },
+    addressLine2: { type: String, required: false },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    country: { type: String, required: true },
+    pincode: { type: String, required: true },
+    role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
+    linkedTo: { type: Schema.Types.ObjectId, ref: 'User' },
+    companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
   },
   {
     versionKey: false,
@@ -41,7 +65,7 @@ UserSchema.pre('save', async function encryptPassword(next) {
 });
 
 UserSchema.method('getJWTToken', function getJWTToken() {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
+  return jwt.sign({ id: this._id }, env.JWT_SECRET as string, {
     expiresIn: env.JWT_EXPIRE,
   });
 });
