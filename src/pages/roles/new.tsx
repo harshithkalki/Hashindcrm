@@ -7,6 +7,8 @@ import FormInput from "../../components/FormikCompo/FormikInput";
 import FormikCheck from "@/components/FormikCompo/FormikCheckBox";
 import { useMediaQuery } from "@mantine/hooks";
 import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
+import { trpc } from "@/utils/trpc";
+import { Permissions } from "@/constants";
 
 const onSubmit = async (values: CreateRole, actions: any) => {
   console.log(values);
@@ -16,19 +18,19 @@ const onSubmit = async (values: CreateRole, actions: any) => {
 
 const permissionsDemo: Permission = [
   {
-    name: "User",
-    options: {
-      view: false,
-      edit: false,
+    permissionName: "COMPANY",
+    crud: {
+      read: false,
+      update: false,
       delete: false,
       create: false,
     },
   },
   {
-    name: "Admin",
-    options: {
-      view: false,
-      edit: false,
+    permissionName: "USER",
+    crud: {
+      read: false,
+      update: false,
       delete: false,
       create: false,
     },
@@ -36,24 +38,24 @@ const permissionsDemo: Permission = [
 ];
 
 interface CreateRole {
-  rolename: string;
-  displayname: string;
+  name: string;
+  displayName: string;
   description: string;
   permissions: Permission;
 }
 type Permission = {
-  name: string;
-  options: {
-    view?: boolean;
-    edit?: boolean;
+  permissionName: typeof Permissions[number];
+  crud: {
+    read?: boolean;
+    update?: boolean;
     delete?: boolean;
     create?: boolean;
   };
 }[];
 
 const formInputs: CreateRole = {
-  rolename: "",
-  displayname: "",
+  name: "",
+  displayName: "",
   description: "",
   permissions: permissionsDemo,
 };
@@ -61,6 +63,7 @@ const formInputs: CreateRole = {
 const app = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const matches = useMediaQuery("(max-width: 800px)");
+  const AddRole = trpc.userRouter.createRole.useMutation();
 
   return (
     <>
@@ -72,15 +75,15 @@ const app = () => {
           initialValues={formInputs}
           validationSchema={toFormikValidationSchema(
             z.object({
-              rolename: z.string(),
-              displayname: z.string(),
+              name: z.string(),
+              displayName: z.string(),
               description: z.string(),
               permissions: z.array(
                 z.object({
-                  name: z.string().nonempty(),
-                  options: z.object({
-                    view: z.boolean(),
-                    edit: z.boolean(),
+                  permissionName: z.enum(Permissions),
+                  crud: z.object({
+                    read: z.boolean(),
+                    update: z.boolean(),
                     delete: z.boolean(),
                     create: z.boolean(),
                   }),
@@ -88,21 +91,24 @@ const app = () => {
               ),
             })
           )}
-          onSubmit={onSubmit}
+          // onSubmit={onSubmit}
+          onSubmit={(values) => {
+            return AddRole.mutateAsync(values);
+          }}
         >
           {({ isSubmitting }) => (
             <Form>
               <FormInput
                 label="Role Name"
                 placeholder="Role name"
-                name="rolename"
+                name="name"
                 withAsterisk
                 mb={"sm"}
               />
               <FormInput
                 label="Display Name"
                 placeholder="Display name"
-                name="displayname"
+                name="displayName"
                 withAsterisk
                 mb={"sm"}
               />
@@ -115,37 +121,40 @@ const app = () => {
               />
               {permissionsDemo.map((permission, index) => (
                 <div key={index}>
-                  <Text mt={"xs"} mb={"sm"}>{`${permission.name}`}</Text>
+                  <Text
+                    mt={"xs"}
+                    mb={"sm"}
+                  >{`${permission.permissionName}`}</Text>
                   <Group>
-                    {permission.options.view === true ||
-                      (permission.options.view === false && (
+                    {permission.crud.read === true ||
+                      (permission.crud.read === false && (
                         <FormikCheck
                           label={"view"}
-                          name={`permissions.${index}.options.view`}
+                          name={`permissions.${index}.crud.read`}
                           mb={"sm"}
                         />
                       ))}
-                    {permission.options.edit === true ||
-                      (permission.options.edit === false && (
+                    {permission.crud.create === true ||
+                      (permission.crud.create === false && (
                         <FormikCheck
                           label={"create"}
-                          name={`permissions.${index}.options.create`}
+                          name={`permissions.${index}.crud.create`}
                           mb={"sm"}
                         />
                       ))}
-                    {permission.options.delete === true ||
-                      (permission.options.delete === false && (
+                    {permission.crud.update === true ||
+                      (permission.crud.update === false && (
                         <FormikCheck
                           label={"edit"}
-                          name={`permissions.${index}.options.edit`}
+                          name={`permissions.${index}.crud.update`}
                           mb={"sm"}
                         />
                       ))}
-                    {permission.options.create === true ||
-                      (permission.options.create === false && (
+                    {permission.crud.delete === true ||
+                      (permission.crud.delete === false && (
                         <FormikCheck
                           label={"delete"}
-                          name={`permissions.${index}.options.delete`}
+                          name={`permissions.${index}.crud.delete`}
                           mb={"sm"}
                         />
                       ))}

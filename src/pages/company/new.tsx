@@ -5,6 +5,7 @@ import React from "react";
 import { z } from "zod";
 import FormInput from "../../components/FormikCompo/FormikInput";
 import Formiktextarea from "../../components/FormikCompo/FormikTextarea";
+import { Company } from "@/models/Company";
 
 const onSubmit = async (values: CreateCompany, actions: any) => {
   console.log(values);
