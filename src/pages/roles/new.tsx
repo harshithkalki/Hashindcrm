@@ -1,11 +1,11 @@
-import { Button, Container, Title, TransferList } from "@mantine/core";
+import { Button, Container, Group, Text, Title } from "@mantine/core";
 import { Form, Formik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import React from "react";
 import { z } from "zod";
 import FormInput from "../../components/FormikCompo/FormikInput";
-// import Formiktextarea from "../../components/FormikCompo/FormikTextarea";
-import type { TransferListData } from "@mantine/core";
+import FormikCheck from "@/components/FormikCompo/FormikCheckBox";
+import { useMediaQuery } from "@mantine/hooks";
 
 const onSubmit = async (values: CreateRole, actions: any) => {
   console.log(values);
@@ -13,42 +13,55 @@ const onSubmit = async (values: CreateRole, actions: any) => {
   actions.resetForm();
 };
 
+const permissionsDemo: Permission = [
+  {
+    name: "User",
+    options: {
+      view: false,
+      edit: false,
+      delete: false,
+      create: false,
+    },
+  },
+  {
+    name: "Admin",
+    options: {
+      view: false,
+      edit: false,
+      delete: false,
+      create: false,
+    },
+  },
+];
+
 interface CreateRole {
   rolename: string;
-  permissions: TransferListData;
+  displayname: string;
+  permissions: Permission;
 }
+type Permission = {
+  name: string;
+  options: {
+    view?: boolean;
+    edit?: boolean;
+    delete?: boolean;
+    create?: boolean;
+  };
+}[];
 
-const permissionsZodtype = z.object({
-  value: z.string(),
-  label: z.string(),
-});
-
-const permissionValues: TransferListData = [
-  [
-    { value: "react", label: "React" },
-    { value: "ng", label: "Angular" },
-    { value: "next", label: "Next.js" },
-    { value: "blitz", label: "Blitz.js" },
-    { value: "gatsby", label: "Gatsby.js" },
-    { value: "vue", label: "Vue" },
-    { value: "jq", label: "jQuery" },
-    { value: "sv", label: "Svelte" },
-    { value: "rw", label: "Redwood" },
-    { value: "np", label: "NumPy" },
-    { value: "dj", label: "Django" },
-    { value: "fl", label: "Flask" },
-  ],
-  [],
-];
 const formInputs: CreateRole = {
   rolename: "",
-  permissions: permissionValues,
+  displayname: "",
+  permissions: permissionsDemo,
 };
 
 const app = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const matches = useMediaQuery("(max-width: 800px)");
+
   return (
     <>
-      <Container w={"50%"} mt={"5vh"}>
+      <Container w={matches ? "80" : "50%"} mt={"5vh"}>
         <Title fz={"xxl"} fw={"400"} mb={"5vh"}>
           Add Role
         </Title>
@@ -57,12 +70,23 @@ const app = () => {
           validationSchema={toFormikValidationSchema(
             z.object({
               rolename: z.string(),
-              permissions: z.array(permissionsZodtype),
+              displayname: z.string(),
+              permissions: z.array(
+                z.object({
+                  name: z.string().nonempty(),
+                  options: z.object({
+                    view: z.boolean(),
+                    edit: z.boolean(),
+                    delete: z.boolean(),
+                    create: z.boolean(),
+                  }),
+                })
+              ),
             })
           )}
           onSubmit={onSubmit}
         >
-          {({ setFieldValue, values, isSubmitting }) => (
+          {({ isSubmitting }) => (
             <Form>
               <FormInput
                 label="Role Name"
@@ -71,22 +95,59 @@ const app = () => {
                 withAsterisk
                 mb={"sm"}
               />
-              <TransferList
-                value={values.permissions}
-                onChange={(value) => {
-                  setFieldValue("permissions", value, true);
-                }}
-                searchPlaceholder="Search..."
-                nothingFound="Nothing here"
-                titles={["Available", "Given"]}
-                breakpoint="sm"
-                mt={"md"}
+              <FormInput
+                label="Display Name"
+                placeholder="Display name"
+                name="displayname"
+                withAsterisk
+                mb={"sm"}
               />
+              {permissionsDemo.map((permission, index) => (
+                <div key={index}>
+                  <Text mt={"xs"} mb={"sm"}>{`${permission.name}`}</Text>
+                  <Group>
+                    {permission.options.view === true ||
+                      (permission.options.view === false && (
+                        <FormikCheck
+                          label={"view"}
+                          name={`permissions.${index}.options.view`}
+                          mb={"sm"}
+                        />
+                      ))}
+                    {permission.options.edit === true ||
+                      (permission.options.edit === false && (
+                        <FormikCheck
+                          label={"create"}
+                          name={`permissions.${index}.options.create`}
+                          mb={"sm"}
+                        />
+                      ))}
+                    {permission.options.delete === true ||
+                      (permission.options.delete === false && (
+                        <FormikCheck
+                          label={"edit"}
+                          name={`permissions.${index}.options.edit`}
+                          mb={"sm"}
+                        />
+                      ))}
+                    {permission.options.create === true ||
+                      (permission.options.create === false && (
+                        <FormikCheck
+                          label={"delete"}
+                          name={`permissions.${index}.options.delete`}
+                          mb={"sm"}
+                        />
+                      ))}
+                    {/* </Checkbox.Group> */}
+                  </Group>
+                </div>
+              ))}
+
               <Button
                 disabled={isSubmitting}
                 type="submit"
                 onClick={() => {
-                  console.log(values);
+                  //   console.log(values);
                 }}
                 mt={"md"}
               >
