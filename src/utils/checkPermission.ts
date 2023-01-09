@@ -1,30 +1,31 @@
-import UserModel from '@/models/userModel';
 import RoleModel from '@/models/Role';
 import type { Permissions } from '@/constants';
+import type { User } from '@/models/userModel';
 
 const checkPermission = async (
-  clientId: string,
   access: typeof Permissions[number],
-  curd: 'create' | 'read' | 'update' | 'delete'
+  curd: 'create' | 'read' | 'update' | 'delete',
+  client: User,
+  checkAny?: boolean
 ) => {
-  const client = await UserModel.findById(clientId);
-  if (!client) {
-    return false;
-  }
-
   const role = await RoleModel.findById(client.role);
 
-  const permission = role?.permissions.find(
-    (permission) => permission.permissionName === access
-  );
+  const permission = role?.permissions.find((p) => (p.permissionName = access));
 
   if (!permission) {
     return false;
   }
 
-  if (permission.crud[curd]) {
-    return client;
+  if (checkAny) {
+    return (
+      permission.crud.create ||
+      permission.crud.delete ||
+      permission.crud.update ||
+      permission.crud.read
+    );
   }
+
+  return permission.crud[curd];
 };
 
 export default checkPermission;
