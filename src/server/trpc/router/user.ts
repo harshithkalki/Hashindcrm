@@ -277,4 +277,31 @@ export const userRouter = router({
 
       return user;
     }),
+
+  getAllRoles: protectedProcedure.query(async ({ ctx }) => {
+    const client = await UserModel.findById(ctx.userId);
+
+    if (!client) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a user',
+      });
+    }
+
+    const isPermitted = await checkPermission(
+      'ROLE',
+      'read',
+      client?.toObject(),
+      true
+    );
+
+    if (!isPermitted) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a user',
+      });
+    }
+
+    return RoleModel.find();
+  }),
 });
