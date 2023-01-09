@@ -1,33 +1,11 @@
-import {
-  SimpleGrid,
-  Title,
-  Avatar,
-  createStyles,
-  LoadingOverlay,
-  Loader,
-  Grid,
-  MultiSelect,
-  Button,
-} from "@mantine/core";
+import { SimpleGrid, Title, createStyles, Grid, Button } from "@mantine/core";
 import { Formik, Form } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import FormInput from "@/components/FormikCompo/FormikInput";
 import { z } from "zod";
+// import { trpc } from "@/utils/trpc";
 // import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
-import FormikSelect from "@/components/FormikCompo/FormikSelect";
-
-const rolesOptions = [
-  { label: "Admin", value: "admin" },
-  { label: "User", value: "user" },
-  { label: "Guest", value: "guest" },
-];
-
-const companyOptions = [
-  { label: "Company 1", value: "company1" },
-  { label: "Company 2", value: "company2" },
-  { label: "Company 3", value: "company3" },
-];
-
+// import FormikSelect from "@/components/FormikCompo/FormikSelect";
 const useStyles = createStyles((theme) => ({
   wrapper: {
     background: "dark",
@@ -46,36 +24,30 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export interface UserFormType {
-  firstname: string;
-  lastname: string;
-  middlename: string;
-  phone: string;
+export interface Company {
+  companyName: string;
   email: string;
-  addressline1: string;
-  addressline2: string;
+  addressLine1: string;
+  addressLine2: string;
   city: string;
   state: string;
-  country: string;
   pincode: string;
-  role: string;
-  linkedto?: string;
+  country: string;
 }
 
-const onSubmit = async (values: UserFormType, actions: any) => {
-  console.log(values);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  actions.resetForm();
-};
+// const onSubmit = async (values: Company, actions: any) => {
+//   console.log(values);
+//   await new Promise((resolve) => setTimeout(resolve, 1000));
+//   actions.resetForm();
+// };
 
 interface Props {
   title: string;
-  //   onSubmit: (inputs: UserFormType) => Promise<void>;
-  formInputs: UserFormType;
+  onSubmit: (inputs: Company) => Promise<void>;
+  formInputs: Company;
 }
 
-const UserForm = ({ title, formInputs }: Props) => {
-  //   const createUser = trpc.user.createUser.useMutation();
+const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
   const { classes, cx } = useStyles();
 
   return (
@@ -85,21 +57,14 @@ const UserForm = ({ title, formInputs }: Props) => {
         initialValues={formInputs}
         validationSchema={toFormikValidationSchema(
           z.object({
-            firstname: z.string(),
-            middlename: z.string().optional(),
-            lastname: z.string(),
+            companyName: z.string(),
             email: z.string().email({ message: "Please enter valid email" }),
-            phone: z
-              .string()
-              .length(10, "Phone number should be only 10 digits"),
-            addressline1: z.string(),
-            addressline2: z.string(),
+            addressLine1: z.string(),
+            addressLine2: z.string(),
             city: z.string(),
             state: z.string(),
             country: z.string(),
             pincode: z.string(),
-            role: z.string(),
-            linkedTo: z.string().optional(),
           })
         )}
         // onSubmit={(values, { setSubmitting }) => {
@@ -107,77 +72,32 @@ const UserForm = ({ title, formInputs }: Props) => {
         // }}
         onSubmit={onSubmit}
       >
-        {({ setFieldValue, values, isSubmitting }) => {
+        {({ isSubmitting }) => {
           return (
             <Form>
               <SimpleGrid
                 m={"md"}
-                cols={3}
+                cols={2}
                 className={classes.wrapper}
                 breakpoints={[
-                  { maxWidth: "md", cols: 3, spacing: "md" },
+                  { maxWidth: "md", cols: 2, spacing: "md" },
                   { maxWidth: "sm", cols: 2, spacing: "sm" },
                   { maxWidth: "xs", cols: 1, spacing: "sm" },
                 ]}
               >
                 <FormInput
-                  label="First name"
-                  placeholder="First name"
-                  name="firstname"
+                  label="Company Name"
+                  placeholder="Company Name"
+                  name="companyName"
                   withAsterisk
                 />
                 <FormInput
-                  label="middle name"
-                  placeholder="middle name"
-                  name="middlename"
-                />
-                <FormInput
-                  label="Last name"
-                  placeholder="Last name"
-                  name="lastname"
-                  withAsterisk
-                />
-                <FormInput
-                  label="Phone number"
-                  placeholder="Ex: 1234567890"
-                  name="phone"
-                  withAsterisk
-                />
-                <FormInput
-                  label="Email"
-                  placeholder="Ex: name@gmail.com"
+                  label="email"
+                  placeholder="email"
                   name="email"
                   withAsterisk
                 />
               </SimpleGrid>
-              <Grid
-                m={"md"}
-                className={cx(classes.wrapper, {
-                  [classes.addressWrapper]: true,
-                })}
-                columns={4}
-              >
-                <Grid.Col>
-                  <Title order={4}>Roles & companies</Title>
-                </Grid.Col>
-                <Grid.Col lg={1} sm={4}>
-                  <FormikSelect
-                    label="Select a Role"
-                    data={rolesOptions}
-                    placeholder="Pick one role"
-                    name="role"
-                    withAsterisk
-                  />
-                </Grid.Col>
-                <Grid.Col lg={1} sm={4}>
-                  <FormikSelect
-                    label="Linked to"
-                    data={rolesOptions}
-                    placeholder="Pick one role"
-                    name="linkedto"
-                  />
-                </Grid.Col>
-              </Grid>
               {/* addess form */}
               <Grid
                 m={"md"}
@@ -193,7 +113,7 @@ const UserForm = ({ title, formInputs }: Props) => {
                   <FormInput
                     label="Address line 1"
                     placeholder="Address line 1"
-                    name="addressline1"
+                    name="addressLine1"
                     withAsterisk
                   />
                 </Grid.Col>
@@ -201,7 +121,7 @@ const UserForm = ({ title, formInputs }: Props) => {
                   <FormInput
                     label="Address line 2"
                     placeholder="Address line 2"
-                    name="addressline2"
+                    name="addressLine2"
                     withAsterisk
                   />
                 </Grid.Col>
@@ -259,4 +179,4 @@ const UserForm = ({ title, formInputs }: Props) => {
   );
 };
 
-export default UserForm;
+export default CompanyForm;

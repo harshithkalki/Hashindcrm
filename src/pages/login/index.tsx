@@ -10,6 +10,7 @@ import {
   Anchor,
 } from "@mantine/core";
 import { Formik, Form } from "formik";
+import { useRouter } from "next/router";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
@@ -66,6 +67,7 @@ const useStyles = createStyles((theme) => ({
 export default function AuthenticationImage() {
   const { classes } = useStyles();
   const loginUser = trpc.userRouter.login.useMutation();
+  const router = useRouter();
   return (
     <div className={classes.wrapper}>
       <Paper className={classes.form} radius={0} p={30}>
@@ -90,6 +92,7 @@ export default function AuthenticationImage() {
           onSubmit={(value) => {
             return loginUser.mutateAsync(value).then(() => {
               console.log("success");
+              router.push("/");
             });
           }}
         >

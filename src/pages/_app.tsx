@@ -13,12 +13,14 @@ import { trpc } from "../utils/trpc";
 import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import NavbarNested from "../components/Navbar";
+import { useRouter } from "next/router";
 
 function App(props: AppProps) {
   const { Component, pageProps } = props;
   const [opened, setOpened] = useState(false);
   const theme = useMantineTheme();
   const matches = useMediaQuery("(max-width: 800px)");
+  const router = useRouter();
 
   return (
     <>
@@ -40,6 +42,7 @@ function App(props: AppProps) {
         <AppShell
           padding="md"
           navbar={<NavbarNested hide={!opened} />}
+          hidden={router.pathname === "/login"}
           header={
             matches ? (
               <Header p="md" height={50}>
