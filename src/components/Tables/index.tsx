@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { GroupProps } from "@mantine/core";
+import { useState } from 'react';
+import type { GroupProps } from '@mantine/core';
 import {
   createStyles,
   Table,
@@ -8,14 +8,14 @@ import {
   TextInput,
   ActionIcon,
   Group,
-} from "@mantine/core";
-import { IconPencil, IconSearch, IconTrash } from "@tabler/icons";
-import { keys } from "@mantine/utils";
+} from '@mantine/core';
+import { IconPencil, IconSearch, IconTrash } from '@tabler/icons';
+import { keys } from '@mantine/utils';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
     backgroundColor:
-      theme.colorScheme === "dark"
+      theme.colorScheme === 'dark'
         ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           theme.fn.rgba(theme.colors[theme.primaryColor]![7], 0.2)
         : theme.colors[theme.primaryColor]?.[0],
@@ -25,6 +25,7 @@ const useStyles = createStyles((theme) => ({
 type Data<T> = T & {
   id: string;
 };
+
 interface TableSelectionProps<T> {
   data: Data<T>[];
   isDeleteColumn?: boolean;
@@ -38,7 +39,7 @@ interface TableSelectionProps<T> {
 }
 
 type KeysAndLabels<T> = {
-  [K in keyof T]: string;
+  [K in keyof T]?: string;
 };
 
 export default function TableSelection<T>({
@@ -52,7 +53,7 @@ export default function TableSelection<T>({
 }: TableSelectionProps<T>) {
   const { classes, cx } = useStyles();
   const [filteredData, setFilteredData] = useState(data);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [selection, setSelection] = useState<string[]>([]);
   const toggleRow = (id: string) => {
     if (selection.includes(id)) {
@@ -99,8 +100,8 @@ export default function TableSelection<T>({
           <td
             key={`${item[key]}`}
             style={{
-              whiteSpace: "nowrap",
-              textAlign: "center",
+              whiteSpace: 'nowrap',
+              textAlign: 'center',
             }}
           >
             {item[key] as string}
@@ -119,7 +120,7 @@ export default function TableSelection<T>({
             )}
             {isDeleteColumn && (
               <ActionIcon
-                color="red"
+                color='red'
                 onClick={() => {
                   onDelete && onDelete(item.id);
                 }}
@@ -136,8 +137,8 @@ export default function TableSelection<T>({
   return (
     <>
       <TextInput
-        placeholder="Search by any field"
-        mb="md"
+        placeholder='Search by any field'
+        mb='md'
         icon={<IconSearch size={14} stroke={1.5} />}
         value={search}
         onChange={handleSearchChange}
@@ -145,10 +146,10 @@ export default function TableSelection<T>({
 
       <ScrollArea
         style={{
-          height: "100%",
+          height: '100%',
         }}
       >
-        <Table sx={{ minWidth: "100%" }} verticalSpacing="sm">
+        <Table sx={{ minWidth: '100%' }} verticalSpacing='sm'>
           <thead>
             <tr>
               <th>
@@ -164,7 +165,7 @@ export default function TableSelection<T>({
               {keys(keysandlabels)?.map((item) => (
                 <th
                   key={item.toString()}
-                  style={{ whiteSpace: "nowrap", textAlign: "center" }}
+                  style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
                 >
                   {keysandlabels[item]}
                 </th>
