@@ -302,6 +302,13 @@ export const userRouter = router({
       });
     }
 
-    return RoleModel.find();
+    return await (
+      await RoleModel.find()
+    ).map((val) => {
+      return {
+        ...val,
+        id: val._id.toHexString(),
+      };
+    });
   }),
 });
