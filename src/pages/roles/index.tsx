@@ -1,18 +1,21 @@
-import TableSelection from '@/components/Tables';
-import React from 'react';
-import type { RouterOutputs } from '@/utils/trpc';
-import { trpc } from '@/utils/trpc';
-import type { GetServerSideProps } from 'next';
+import TableSelection from "@/components/Tables";
+import React from "react";
+import type { RouterOutputs } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
+import type { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 
-type Roles = RouterOutputs['userRouter']['getAllRoles'];
+type Roles = RouterOutputs["userRouter"]["getAllRoles"];
 
 interface props {
   data: Roles;
 }
 
-const index = () => {
+const Index = () => {
   const getAllRoles = trpc.userRouter.getAllRoles.useQuery();
-  const Data = getAllRoles.data;
+  const tabData = getAllRoles.data;
+  const Data = tabData;
+  const router = useRouter();
 
   return (
     Data && (
@@ -22,10 +25,11 @@ const index = () => {
           isDeleteColumn={true}
           isEditColumn={true}
           onDelete={(id) => console.log(id)}
-          onEdit={(id) => console.log(id)}
+          onEdit={(id) => router.push("/roles/edit/" + id)}
           keysandlabels={{
-            id: 'Id',
-            name: 'Name',
+            // displayName: "Display Name",
+            id: "ID",
+            name: "Name",
           }}
         />
       </div>
@@ -33,7 +37,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 // export const getServerSideProps: GetServerSideProps<
 //   { data: Roles },

@@ -1,11 +1,11 @@
-import { z } from 'zod';
-import { router, publicProcedure, protectedProcedure } from '../trpc';
-import UserModel from '@/models/userModel';
-import RoleModel from '@/models/Role';
-import CompanyModel from '@/models/Company';
-import { TRPCError } from '@trpc/server';
-import checkPermission from '@/utils/checkPermission';
-import { Permissions } from '@/constants';
+import { z } from "zod";
+import { router, publicProcedure, protectedProcedure } from "../trpc";
+import UserModel from "@/models/userModel";
+import RoleModel from "@/models/Role";
+import CompanyModel from "@/models/Company";
+import { TRPCError } from "@trpc/server";
+import checkPermission from "@/utils/checkPermission";
+import { Permissions } from "@/constants";
 
 export const userRouter = router({
   login: publicProcedure
@@ -20,8 +20,8 @@ export const userRouter = router({
 
       if (!user) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid credentials',
+          code: "BAD_REQUEST",
+          message: "Invalid credentials",
         });
       }
 
@@ -29,14 +29,14 @@ export const userRouter = router({
 
       if (!isMatch) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid credentials',
+          code: "BAD_REQUEST",
+          message: "Invalid credentials",
         });
       }
 
       const token = user.getJWTToken();
       ctx.res.setHeader(
-        'Set-Cookie',
+        "Set-Cookie",
         `token=${token}; expires=${new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
         )}; httpOnly; path=/`
@@ -49,7 +49,7 @@ export const userRouter = router({
 
   logout: publicProcedure.mutation(async ({ ctx }) => {
     ctx.res.setHeader(
-      'Set-Cookie',
+      "Set-Cookie",
       `token
       =; expires=${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)}
       ; httpOnly; path=/`
@@ -85,17 +85,17 @@ export const userRouter = router({
 
       if (!client) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a user",
         });
       }
 
-      const isPermitted = await checkPermission('ROLE', 'create', client);
+      const isPermitted = await checkPermission("ROLE", "create", client);
 
       if (!isPermitted) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a role',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a role",
         });
       }
 
@@ -132,16 +132,16 @@ export const userRouter = router({
 
       if (!client) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update a role',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to update a role",
         });
       }
-      const isPermitted = await checkPermission('ROLE', 'update', client);
+      const isPermitted = await checkPermission("ROLE", "update", client);
 
       if (!isPermitted) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update a role',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to update a role",
         });
       }
 
@@ -151,7 +151,7 @@ export const userRouter = router({
   getRole: protectedProcedure
     .input(
       z.object({
-        roleName: z.string(),
+        id: z.string(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -159,27 +159,27 @@ export const userRouter = router({
 
       if (!client) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a user",
         });
       }
 
       const isPermitted = await checkPermission(
-        'ROLE',
-        'read',
+        "ROLE",
+        "read",
         client.toObject(),
         true
       );
 
       if (!isPermitted) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a company',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a company",
         });
       }
 
       return RoleModel.findOne({
-        name: input.roleName,
+        id: input.id,
       });
     }),
 
@@ -200,21 +200,21 @@ export const userRouter = router({
 
       if (!client) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a user",
         });
       }
 
       const isPermitted = await checkPermission(
-        'COMPANY',
-        'create',
+        "COMPANY",
+        "create",
         client?.toObject()
       );
 
       if (!isPermitted) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a company',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a company",
         });
       }
 
@@ -246,28 +246,28 @@ export const userRouter = router({
 
       if (!client) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a user",
         });
       }
 
       const isPermitted = await checkPermission(
-        'COMPANY',
-        'create',
+        "COMPANY",
+        "create",
         client?.toObject()
       );
 
       if (!isPermitted) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
+          code: "BAD_REQUEST",
+          message: "You are not permitted to create a user",
         });
       }
 
       const user = await UserModel.create({
         ...input,
         companyId: client.companyId,
-        password: '123456',
+        password: "123456",
       });
 
       await RoleModel.updateOne(
@@ -283,22 +283,22 @@ export const userRouter = router({
 
     if (!client) {
       throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
+        code: "BAD_REQUEST",
+        message: "You are not permitted to create a user",
       });
     }
 
     const isPermitted = await checkPermission(
-      'ROLE',
-      'read',
+      "ROLE",
+      "read",
       client?.toObject(),
       true
     );
 
     if (!isPermitted) {
       throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
+        code: "BAD_REQUEST",
+        message: "You are not permitted to create a user",
       });
     }
 
@@ -306,7 +306,7 @@ export const userRouter = router({
       await RoleModel.find()
     ).map((val) => {
       return {
-        ...val,
+        ...val.toObject(),
         id: val._id.toHexString(),
       };
     });

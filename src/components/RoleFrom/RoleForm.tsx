@@ -9,35 +9,37 @@ import { useMediaQuery } from "@mantine/hooks";
 import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
 // import { trpc } from "@/utils/trpc";
 import { Permissions } from "@/constants";
+import { trpc } from "@/utils/trpc";
 
-// const onSubmit = async (values: CreateRole, actions: any) => {
-//   console.log(values);
-//   await new Promise((resolve) => setTimeout(resolve, 1000));
-//   actions.resetForm();
-// };
+const onSubmit = async (values: CreateRole, actions: any) => {
+  console.log(values);
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  actions.resetForm();
+};
 
-const permissionsDemo: Permission = [
-  {
-    permissionName: "COMPANY",
-    crud: {
-      read: false,
-      update: false,
-      delete: false,
-      create: false,
-    },
-  },
-  {
-    permissionName: "USER",
-    crud: {
-      read: false,
-      update: false,
-      delete: false,
-      create: false,
-    },
-  },
-];
+// const permissionsDemo: Permission = [
+//   {
+//     permissionName: "COMPANY",
+//     crud: {
+//       read: false,
+//       update: false,
+//       delete: false,
+//       create: false,
+//     },
+//   },
+//   {
+//     permissionName: "USER",
+//     crud: {
+//       read: false,
+//       update: false,
+//       delete: false,
+//       create: false,
+//     },
+//   },
+// ];
 
 interface CreateRole {
+  id: string;
   name: string;
   displayName: string;
   description: string;
@@ -62,6 +64,12 @@ interface props {
 const RoleForm = ({ formInputs, onSubmit, title }: props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const matches = useMediaQuery("(max-width: 800px)");
+  const formpermissions: Permission = formInputs.permissions;
+  console.log(formInputs);
+
+  function setChecked(checked: boolean): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <>
@@ -73,9 +81,10 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           initialValues={formInputs}
           validationSchema={toFormikValidationSchema(
             z.object({
+              id: z.string().optional(),
               name: z.string(),
               displayName: z.string(),
-              description: z.string(),
+              description: z.string().optional(),
               permissions: z.array(
                 z.object({
                   permissionName: z.enum(Permissions),
@@ -91,7 +100,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           )}
           onSubmit={onSubmit}
         >
-          {({ isSubmitting }) => (
+          {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <FormInput
                 label="Role Name"
@@ -114,45 +123,41 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                 withAsterisk
                 mb={"sm"}
               />
-              {permissionsDemo.map((permission, index) => (
+              {formpermissions.map((permission, index) => (
                 <div key={index}>
                   <Text
                     mt={"xs"}
                     mb={"sm"}
                   >{`${permission.permissionName}`}</Text>
                   <Group>
-                    {permission.crud.read === true ||
-                      (permission.crud.read === false && (
-                        <FormikCheck
-                          label={"view"}
-                          name={`permissions.${index}.crud.read`}
-                          mb={"sm"}
-                        />
-                      ))}
-                    {permission.crud.create === true ||
-                      (permission.crud.create === false && (
-                        <FormikCheck
-                          label={"create"}
-                          name={`permissions.${index}.crud.create`}
-                          mb={"sm"}
-                        />
-                      ))}
-                    {permission.crud.update === true ||
-                      (permission.crud.update === false && (
-                        <FormikCheck
-                          label={"edit"}
-                          name={`permissions.${index}.crud.update`}
-                          mb={"sm"}
-                        />
-                      ))}
-                    {permission.crud.delete === true ||
-                      (permission.crud.delete === false && (
-                        <FormikCheck
-                          label={"delete"}
-                          name={`permissions.${index}.crud.delete`}
-                          mb={"sm"}
-                        />
-                      ))}
+                    <FormikCheck
+                      label={"view"}
+                      defaultChecked={permission.crud.read}
+                      name={`permissions.${index}.crud.read`}
+                      mb={"sm"}
+                    />
+
+                    <FormikCheck
+                      label={"create"}
+                      defaultChecked={permission.crud.create}
+                      name={`permissions.${index}.crud.create`}
+                      mb={"sm"}
+                    />
+
+                    <FormikCheck
+                      label={"edit"}
+                      defaultChecked={permission.crud.update}
+                      name={`permissions.${index}.crud.update`}
+                      mb={"sm"}
+                    />
+
+                    <FormikCheck
+                      label={"delete"}
+                      defaultChecked={permission.crud.delete}
+                      name={`permissions.${index}.crud.delete`}
+                      mb={"sm"}
+                    />
+
                     {/* </Checkbox.Group> */}
                   </Group>
                 </div>
