@@ -191,9 +191,8 @@ export const userRouter = router({
           message: 'You are not permitted to create a company',
         });
       }
-
       return RoleModel.findOne({
-        name: input.roleId,
+        _id: input.id,
       });
     }),
 
