@@ -9,7 +9,6 @@ import { useMediaQuery } from "@mantine/hooks";
 import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
 // import { trpc } from "@/utils/trpc";
 import { Permissions } from "@/constants";
-import { trpc } from "@/utils/trpc";
 
 const onSubmit = async (values: CreateRole, actions: any) => {
   console.log(values);

@@ -33,6 +33,7 @@ const mockdata: NavData[] = [
   { links: AdminData, label: "Admins", icon: IconUser },
   { links: UserData, label: "users", icon: IconUser },
   { links: RolesData, label: "Roles", icon: IconReceipt2 },
+  { links: "/workflow", label: "WorkFlow", icon: IconFileAnalytics },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 

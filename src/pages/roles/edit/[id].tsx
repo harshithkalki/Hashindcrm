@@ -13,34 +13,40 @@ type Permission = {
     create?: boolean;
   };
 }[];
-const permissionsDemo: Permission = [
-  {
-    permissionName: "COMPANY",
-    crud: {
-      read: false,
-      update: false,
-      delete: false,
-      create: false,
-    },
-  },
-  {
-    permissionName: "USER",
-    crud: {
-      read: false,
-      update: false,
-      delete: false,
-      create: false,
-    },
-  },
-];
+
+// const permissionsDemo: Permission = [
+//   {
+//     permissionName: "COMPANY",
+//     crud: {
+//       read: false,
+//       update: false,
+//       delete: false,
+//       create: false,
+//     },
+//   },
+//   {
+//     permissionName: "USER",
+//     crud: {
+//       read: false,
+//       update: false,
+//       delete: false,
+//       create: false,
+//     },
+//   },
+// ];
+
+// https://decision-tree-lxlo.vercel.app/
+// https://decision-tree-lxlo.vercel.app/workspace
 
 const App = () => {
   const UpdateRole = trpc.userRouter.updateRole.useMutation();
   const router = useRouter();
   const { id } = router.query;
-  const getRole = trpc.userRouter.getRole.useQuery({ id: id as string });
+  const getRole = trpc.userRouter.getRole.useQuery(
+    { id: id as string },
+    { refetchOnWindowFocus: false }
+  );
   const role = getRole.data;
-  console.log(role);
   return (
     role && (
       <div>
