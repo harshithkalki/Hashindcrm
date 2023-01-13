@@ -155,7 +155,7 @@ export const workflowRouter = router({
     type Status = {
       id: string;
       name: string;
-      linkedStatus: string[];
+      linkedStatuses: { name: string; value: string }[];
       initialStatus: boolean;
     };
 
@@ -189,10 +189,68 @@ export const workflowRouter = router({
         id: val._id.toString(),
         initialStatus: val.initialStatus,
         name: val.name,
-        linkedStatus: val.linkedStatuses,
+        linkedStatuses: val.linkedStatuses.map((id) => {
+          const result = statuses.find((val) => val._id.toString() === id);
+          if (result)
+            return { name: result.name, value: result._id.toString() };
+          return { name: '', value: '' };
+        }),
       };
     });
 
     return workflow;
   }),
+
+  removeLink: protectedProcedure
+    .input(
+      z.object({
+        target: z.string(),
+        linkedStatus: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const client = await UserModel.findById(ctx.userId);
+
+      if (!client) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create a link',
+        });
+      }
+
+      const isPermitted = await checkPermission(
+        'WORKFLOW',
+        'create',
+        client?.toObject()
+      );
+
+      if (!isPermitted) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create a link',
+        });
+      }
+
+      const target = await StatusModel.findById(input.target);
+      const status2 = await StatusModel.findById(input.linkedStatus);
+
+      const targetStatuses = new Set(target?.linkedStatuses);
+
+      const linkedStatus2 = new Set(status2?.linkedStatuses);
+
+      if (status2 && target) {
+        targetStatuses.delete(status2?._id.toString());
+        linkedStatus2.delete(target._id.toString());
+
+        target.linkedStatuses = [...targetStatuses];
+        await target.save();
+        status2.linkedStatuses = [...linkedStatus2];
+        await status2.save();
+      }
+
+      return {
+        success: true,
+        message: 'New linked added successfully',
+      };
+    }),
 });

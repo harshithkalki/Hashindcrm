@@ -1,8 +1,8 @@
-import RoleForm from "@/components/RoleFrom/RoleForm";
-import { trpc } from "@/utils/trpc";
-import React from "react";
-import type { Permissions } from "@/constants";
-import { useRouter } from "next/router";
+import RoleForm from '@/components/RoleFrom/RoleForm';
+import { trpc } from '@/utils/trpc';
+import React from 'react';
+import type { Permissions } from '@/constants';
+import { useRouter } from 'next/router';
 
 type Permission = {
   permissionName: typeof Permissions[number];
@@ -43,7 +43,7 @@ const App = () => {
   const router = useRouter();
   const { id } = router.query;
   const getRole = trpc.userRouter.getRole.useQuery(
-    { id: id as string },
+    { roleId: id as string },
     { refetchOnWindowFocus: false }
   );
   const role = getRole.data;
@@ -55,7 +55,7 @@ const App = () => {
             id: id as string,
             name: role.name,
             displayName: role.displayName,
-            description: "",
+            description: '',
             permissions: role.permissions,
           }}
           onSubmit={(inputs) => {
@@ -63,7 +63,7 @@ const App = () => {
               console.log(res);
             });
           }}
-          title="Edit Role"
+          title='Edit Role'
         />
       </div>
     )
