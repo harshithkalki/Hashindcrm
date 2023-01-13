@@ -1,4 +1,4 @@
-import type { ModalProps } from '@mantine/core';
+import { ModalProps, ScrollArea } from "@mantine/core";
 import {
   ActionIcon,
   Button,
@@ -9,17 +9,17 @@ import {
   MultiSelect,
   Table,
   Title,
-} from '@mantine/core';
-import React, { useState } from 'react';
-import { IconPencil } from '@tabler/icons';
-import { z } from 'zod';
-import { Form, Formik } from 'formik';
-import { toFormikValidationSchema } from 'zod-formik-adapter';
-import FormInput from '@/components/FormikCompo/FormikInput';
-import FormikSwitch from '@/components/FormikCompo/FormikSwitch';
-import type { RouterOutputs } from '@/utils/trpc';
-import { trpc } from '@/utils/trpc';
-import FormikSelect from '@/components/FormikCompo/FormikSelect';
+} from "@mantine/core";
+import React, { useState } from "react";
+import { IconPencil } from "@tabler/icons";
+import { z } from "zod";
+import { Form, Formik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import FormInput from "@/components/FormikCompo/FormikInput";
+import FormikSwitch from "@/components/FormikCompo/FormikSwitch";
+import type { RouterOutputs } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
+import FormikSelect from "@/components/FormikCompo/FormikSelect";
 
 const LinkStatus = ({
   modalProps,
@@ -34,9 +34,9 @@ const LinkStatus = ({
   console.log(createLink.data);
 
   return (
-    <Modal {...modalProps} title='Link Status'>
+    <Modal {...modalProps} title="Link Status">
       <Formik
-        initialValues={{ target: '', linkedStatus: '' }}
+        initialValues={{ target: "", linkedStatus: "" }}
         onSubmit={(values, { setSubmitting }) => {
           createLink
             .mutateAsync({
@@ -55,24 +55,24 @@ const LinkStatus = ({
         {({ isSubmitting, values }) => (
           <Form>
             <FormikSelect
-              name='target'
+              name="target"
               data={data}
               searchable
-              placeholder='Search Status'
+              placeholder="Search Status"
               clearable
             />
             <FormikSelect
-              name='linkedStatus'
+              name="linkedStatus"
               data={data.filter((val) => {
                 return val.value !== values.target;
               })}
-              placeholder='Search status to link'
+              placeholder="Search status to link"
               searchable
-              mt='md'
+              mt="md"
               disabled={!values.target}
               clearable
             />
-            <Button type='submit' size='xs' mt={'md'} loading={isSubmitting}>
+            <Button type="submit" size="xs" mt={"md"} loading={isSubmitting}>
               save
             </Button>
           </Form>
@@ -87,14 +87,14 @@ const RemoveLink = ({
   data = [],
 }: {
   modalProps: ModalProps;
-  data?: RouterOutputs['workflowRouter']['getWorkflow'];
+  data?: RouterOutputs["workflowRouter"]["getWorkflow"];
 }) => {
   const createLink = trpc.workflowRouter.removeLink.useMutation();
 
   return (
-    <Modal {...modalProps} title='Remove Link'>
+    <Modal {...modalProps} title="Remove Link">
       <Formik
-        initialValues={{ target: '', linkedStatus: '' }}
+        initialValues={{ target: "", linkedStatus: "" }}
         onSubmit={(values, { setSubmitting }) => {
           createLink
             .mutateAsync({
@@ -113,14 +113,14 @@ const RemoveLink = ({
         {({ isSubmitting, values }) => (
           <Form>
             <FormikSelect
-              name='target'
+              name="target"
               data={data.map((val) => ({ value: val.id, label: val.name }))}
               searchable
-              placeholder='Search Status'
+              placeholder="Search Status"
               clearable
             />
             <FormikSelect
-              name='linkedStatus'
+              name="linkedStatus"
               data={
                 data
                   .find((val) => val.id === values.target)
@@ -129,14 +129,14 @@ const RemoveLink = ({
                     label: val.name,
                   })) || []
               }
-              placeholder='Search status to remove'
+              placeholder="Search status to remove"
               searchable
-              mt='md'
+              mt="md"
               disabled={!values.target}
-              nothingFound='No Linked Statuses'
+              nothingFound="No Linked Statuses"
               clearable
             />
-            <Button type='submit' size='xs' mt={'md'} loading={isSubmitting}>
+            <Button type="submit" size="xs" mt={"md"} loading={isSubmitting}>
               save
             </Button>
           </Form>
@@ -155,29 +155,29 @@ const WorkFlowTable = () => {
 
   const Ddata = [
     {
-      name: 'New',
+      name: "New",
       initial: true,
-      linked: ['New', 'InProgress', 'Completed'],
+      linked: ["New", "InProgress", "Completed"],
     },
     {
-      name: 'In Progress',
+      name: "In Progress",
       initial: false,
       linked: [
-        'New',
-        'InProgress',
-        'Completed',
-        'Cancelled',
-        'On Hold',
-        'Done',
-        'Rejected',
-        'Approved',
-        'Pending',
+        "New",
+        "InProgress",
+        "Completed",
+        "Cancelled",
+        "On Hold",
+        "Done",
+        "Rejected",
+        "Approved",
+        "Pending",
       ],
     },
     {
-      name: 'Completed',
+      name: "Completed",
       initial: false,
-      linked: ['New', 'In Progress', 'Completed'],
+      linked: ["New", "In Progress", "Completed"],
     },
   ];
 
@@ -185,13 +185,13 @@ const WorkFlowTable = () => {
     <>
       <Modal
         opened={open}
-        title='New Status'
+        title="New Status"
         onClose={() => {
           setOpen(false);
         }}
       >
         <Formik
-          initialValues={{ name: '', initial: false }}
+          initialValues={{ name: "", initial: false }}
           onSubmit={(values, { setSubmitting }) => {
             createStatus
               .mutateAsync({
@@ -213,80 +213,90 @@ const WorkFlowTable = () => {
           {({ isSubmitting }) => (
             <Form>
               <FormInput
-                name='name'
-                label='Name'
-                placeholder='Enter Name'
+                name="name"
+                label="Name"
+                placeholder="Enter Name"
                 withAsterisk
               />
               <FormikSwitch
-                name='initial'
-                label='Initial State'
-                mt={'sm'}
+                name="initial"
+                label="Initial State"
+                mt={"sm"}
               ></FormikSwitch>
-              <Button type='submit' size='xs' mt={'md'} loading={isSubmitting}>
+              <Button type="submit" size="xs" mt={"md"} loading={isSubmitting}>
                 save
               </Button>
             </Form>
           )}
         </Formik>
       </Modal>
-      <Container w={'100%'} p={0}>
-        <Group h={'15vh'}>
-          <Button size='xs' onClick={() => setOpen(true)}>
-            Add status
-          </Button>
-          <Button size='xs' onClick={() => setLink(true)}>
-            Link status
-          </Button>
-          <Button size='xs' onClick={() => setRemove(true)}>
-            Remove Link
-          </Button>
-        </Group>
-        <Divider mb={'md'}></Divider>
-        <Title size={30} fw={400}>
-          WorkFlow
-        </Title>
-        <Table width={'100%'}>
-          <thead>
-            <tr style={{ textAlign: 'center' }}>
-              <th style={{ textAlign: 'center' }}>sno</th>
-              <th style={{ textAlign: 'center' }}>Name</th>
-              <th style={{ textAlign: 'center' }}>Initial State</th>
-              <th style={{ textAlign: 'center' }}>Linked</th>
-              <th></th>
-            </tr>
-            {workflow.data?.map((data, index) => (
-              <tr key={index} style={{ height: '10vh', textAlign: 'center' }}>
-                <td style={{ width: '8%' }}>{index + 1}</td>
-                <td style={{ width: '18%' }}>{data.name}</td>
-                <td style={{ width: '15%' }}>
-                  {data.initialStatus ? 'Yes' : 'No'}
-                </td>
-                <td style={{ width: '55%' }}>
-                  <form>
-                    <MultiSelect
-                      data={data.linkedStatuses.map((val) => ({
-                        value: val.value,
-                        label: val.name,
-                      }))}
-                      defaultValue={data.linkedStatuses.map((val) => val.value)}
-                      readOnly
-                    ></MultiSelect>
-                  </form>
-                </td>
-                <td style={{ width: '5%', alignContent: 'center' }}>
-                  <ActionIcon
-                    onClick={() => {
-                      console.log(`${data.name}`);
-                    }}
-                  >
-                    <IconPencil size={16} stroke={1.5} />
-                  </ActionIcon>
-                </td>
+      <Container w={"100%"} p={0}>
+        <div
+        // style={{
+        //   position: "sticky",
+        //   top: "0",
+        //   zIndex: "1",
+        //   background: "#141517",
+        // }}
+        >
+          <Title size={30} fw={400}>
+            WorkFlow
+          </Title>
+          <Group h={"10vh"}>
+            <Button size="xs" onClick={() => setOpen(true)}>
+              Add status
+            </Button>
+            <Button size="xs" onClick={() => setLink(true)}>
+              Link status
+            </Button>
+            <Button size="xs" onClick={() => setRemove(true)}>
+              Remove Link
+            </Button>
+          </Group>
+        </div>
+        {/* <Divider mb={"md"}></Divider> */}
+
+        <ScrollArea
+          style={{ height: "80vh" }}
+          offsetScrollbars={true}
+          scrollbarSize={5}
+        >
+          <Table width={"100%"}>
+            <thead>
+              <tr style={{ textAlign: "center" }}>
+                <th style={{ textAlign: "center" }}>Sno</th>
+                <th style={{ textAlign: "center" }}>Name</th>
+                <th style={{ textAlign: "center" }}>Initial State</th>
+                <th style={{ textAlign: "center" }}>Linked</th>
               </tr>
-            ))}
-          </thead>
-        </Table>
+            </thead>
+            <tbody>
+              {workflow.data?.map((data, index) => (
+                <tr key={index} style={{ height: "10vh", textAlign: "center" }}>
+                  <td style={{ width: "8%" }}>{index + 1}</td>
+                  <td style={{ width: "18%" }}>{data.name}</td>
+                  <td style={{ width: "15%" }}>
+                    {data.initialStatus ? "Yes" : "No"}
+                  </td>
+                  <td style={{ width: "55%" }}>
+                    <form>
+                      <MultiSelect
+                        data={data.linkedStatuses.map((val) => ({
+                          value: val.value,
+                          label: val.name,
+                        }))}
+                        defaultValue={data.linkedStatuses.map(
+                          (val) => val.value
+                        )}
+                        readOnly
+                      ></MultiSelect>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </ScrollArea>
         <LinkStatus
           modalProps={{ opened: link, onClose: () => setLink(false) }}
           data={workflow.data?.map((val) => ({
