@@ -192,7 +192,7 @@ export const userRouter = router({
         });
       }
       return RoleModel.findOne({
-        _id: input.id,
+        name: input.roleId,
       });
     }),
 
