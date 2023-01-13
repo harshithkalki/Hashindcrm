@@ -7,6 +7,20 @@ import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 import { Permissions } from '@/constants';
 
+interface StatusType {
+  id: string;
+  name: string;
+  linkedStatuses: StatusType[];
+}
+
+const Status: z.ZodType<StatusType> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    linkedStatuses: z.array(Status),
+  })
+);
+
 export const userRouter = router({
   login: publicProcedure
     .input(
@@ -151,7 +165,7 @@ export const userRouter = router({
   getRole: protectedProcedure
     .input(
       z.object({
-        roleName: z.string(),
+        roleId: z.string(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -179,7 +193,7 @@ export const userRouter = router({
       }
 
       return RoleModel.findOne({
-        name: input.roleName,
+        name: input.roleId,
       });
     }),
 

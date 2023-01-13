@@ -1,6 +1,6 @@
-import type { Model } from "mongoose";
-import mongoose, { Schema } from "mongoose";
-import { Permissions } from "@/constants/index";
+import type { Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { Permissions } from '@/constants/index';
 
 export interface Role {
   name: string;
@@ -23,7 +23,7 @@ type RoleModel = Model<Role, Record<string, never>>;
 
 const RoleSchema: Schema = new Schema<Role, RoleModel>(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     permissions: [
       {
@@ -42,14 +42,14 @@ const RoleSchema: Schema = new Schema<Role, RoleModel>(
     ],
     company: {
       type: Schema.Types.ObjectId,
-      ref: "Company",
+      ref: 'Company',
       required: true,
     },
     displayName: { type: String, required: true },
     users: [
       {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
   },
@@ -60,10 +60,10 @@ const RoleSchema: Schema = new Schema<Role, RoleModel>(
 
 RoleSchema.index({ name: 1, company: 1 }, { unique: true });
 RoleSchema.index(
-  { "permissions.permissionName": 1, name: 1 },
+  { 'permissions.permissionName': 1, name: 1 },
   { unique: true }
 );
 
 export default (mongoose.models.Role as ReturnType<
   typeof mongoose.model<Role, RoleModel>
->) || mongoose.model<Role, RoleModel>("Role", RoleSchema);
+>) || mongoose.model<Role, RoleModel>('Role', RoleSchema);
