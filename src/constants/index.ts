@@ -1,1 +1,7 @@
-export const Permissions = ['USER', 'ROLE', 'COMPANY'] as const;
+export const Permissions = [
+  'USER',
+  'ROLE',
+  'COMPANY',
+  'WORKFLOW',
+  'TICKET',
+] as const;

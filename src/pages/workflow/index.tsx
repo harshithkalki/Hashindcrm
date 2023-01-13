@@ -1,3 +1,7 @@
+
+import { Button, Center, Container, Modal, Title } from "@mantine/core";
+import React from "react";
+import { IconDatabase } from "@tabler/icons";
 import {
   ActionIcon,
   Button,
@@ -47,6 +51,7 @@ const NoWorkflow = () => {
         >
           {({ isSubmitting }) => (
             <Form>
+              <Title fw={200}>New WorkFlow</Title>
               {/* <Title fw={200}>New WorkFlow</Title> */}
               <FormInput
                 name="name"
@@ -82,6 +87,12 @@ const NoWorkflow = () => {
     </>
   );
 };
+
+
+const index = () => {
+  return (
+    <div>
+      <NoWorkflow />
 
 const WorkFlowTable = () => {
   const [open, setOpen] = React.useState(false);

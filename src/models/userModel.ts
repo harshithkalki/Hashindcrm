@@ -1,4 +1,4 @@
-import type { Model, Types } from 'mongoose';
+import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
