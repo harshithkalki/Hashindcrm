@@ -5,6 +5,8 @@ interface Status {
   name: string;
   createdAt: Date;
   companyId: mongoose.ObjectId;
+  initialStatus: boolean;
+  linkedStatuses: string[];
 }
 
 type StatusModel = Model<Status, Record<string, never>>;
@@ -24,6 +26,17 @@ const StatusSchema = new Schema<Status, StatusModel>(
       type: Schema.Types.ObjectId,
       required: true,
     },
+    initialStatus: {
+      type: Boolean,
+      required: true,
+    },
+    linkedStatuses: [
+      {
+        type: String,
+        required: false,
+        default: [],
+      },
+    ],
   },
   { versionKey: false }
 );

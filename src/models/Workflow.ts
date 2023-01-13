@@ -21,14 +21,6 @@ const WorkflowSchema = new Schema<Workflow, WorkflowModel>(
       required: true,
       ref: 'Company',
     },
-    links: [
-      {
-        type: Schema.Types.ObjectId,
-        required: false,
-        ref: 'Link',
-        default: [],
-      },
-    ],
     createdAt: {
       type: Date,
       default: Date.now,

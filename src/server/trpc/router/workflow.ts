@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../trpc';
 import UserModel from '@/models/userModel';
-import LinkModel from '@/models/Link';
 import StatusModel from '@/models/Status';
 import WorkflowModel from '@/models/Workflow';
 import { TRPCError } from '@trpc/server';
@@ -26,6 +25,7 @@ export const workflowRouter = router({
     .input(
       z.object({
         name: z.string(),
+        initialStatus: z.boolean(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -62,9 +62,8 @@ export const workflowRouter = router({
   createLink: protectedProcedure
     .input(
       z.object({
-        workflowId: z.string(),
         target: z.string(),
-        linkedStatus: z.array(z.string()),
+        linkedStatus: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -90,9 +89,27 @@ export const workflowRouter = router({
         });
       }
 
-      const link = await LinkModel.create(input.target);
+      const target = await StatusModel.findById(input.target);
+      const status2 = await StatusModel.findById(input.linkedStatus);
 
-      return link;
+      const targetStatuses = new Set(target?.linkedStatuses);
+
+      const linkedStatus2 = new Set(status2?.linkedStatuses);
+
+      if (status2 && target) {
+        targetStatuses.add(status2?._id.toString());
+        linkedStatus2.add(target._id.toString());
+
+        target.linkedStatuses = [...targetStatuses];
+        await target.save();
+        status2.linkedStatuses = [...linkedStatus2];
+        await status2.save();
+      }
+
+      return {
+        success: true,
+        message: 'New linked added successfully',
+      };
     }),
 
   createWorkflow: protectedProcedure
@@ -131,4 +148,51 @@ export const workflowRouter = router({
 
       return workflow;
     }),
+
+  getWorkflow: protectedProcedure.query(async ({ ctx }) => {
+    const client = await UserModel.findById(ctx.userId);
+
+    type Status = {
+      id: string;
+      name: string;
+      linkedStatus: string[];
+      initialStatus: boolean;
+    };
+
+    type Workflow = Status[];
+
+    if (!client) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create workflow',
+      });
+    }
+
+    const isPermitted = await checkPermission(
+      'WORKFLOW',
+      'create',
+      client?.toObject(),
+      true
+    );
+
+    if (!isPermitted) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create workflow',
+      });
+    }
+
+    const statuses = await StatusModel.find({ companyId: client.companyId });
+
+    const workflow: Workflow = statuses.map((val) => {
+      return {
+        id: val._id.toString(),
+        initialStatus: val.initialStatus,
+        name: val.name,
+        linkedStatus: val.linkedStatuses,
+      };
+    });
+
+    return workflow;
+  }),
 });
