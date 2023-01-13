@@ -320,7 +320,7 @@ export const userRouter = router({
       await RoleModel.find()
     ).map((val) => {
       return {
-        ...val,
+        ...val.toObject(),
         id: val._id.toHexString(),
       };
     });
