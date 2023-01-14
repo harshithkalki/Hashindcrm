@@ -4,7 +4,6 @@ import { useField } from "formik";
 
 interface Props extends SelectProps {
   name: string;
-
   label?: string;
 }
 

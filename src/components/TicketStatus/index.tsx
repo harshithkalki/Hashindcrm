@@ -1,39 +1,11 @@
 import { forwardRef } from "react";
+import type { SelectProps } from "@mantine/core";
 import { Group, Select, Badge, ActionIcon } from "@mantine/core";
 import { IconHash } from "@tabler/icons";
-
-const data = [
-  {
-    image: "https://img.icons8.com/clouds/256/000000/futurama-bender.png",
-    label: "Bender Bending Rodríguez",
-    value: "Bender Bending Rodríguez",
-    description: "Fascinated with cooking",
-  },
-
-  {
-    image: "https://img.icons8.com/clouds/256/000000/futurama-mom.png",
-    label: "Carol Miller",
-    value: "Carol Miller",
-    description: "One of the richest people on Earth",
-  },
-  {
-    image: "https://img.icons8.com/clouds/256/000000/homer-simpson.png",
-    label: "Homer Simpson",
-    value: "Homer Simpson",
-    description: "Overweight, lazy, and often ignorant",
-  },
-  {
-    image: "https://img.icons8.com/clouds/256/000000/spongebob-squarepants.png",
-    label: "Spongebob Squarepants",
-    value: "Spongebob Squarepants",
-    description: "Not just a sponge",
-  },
-];
+import { useField } from "formik";
 
 interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
-  image: string;
   label: string;
-  description: string;
 }
 const hashButton = (
   <ActionIcon size="xs" color="blue" radius="xl" variant="transparent">
@@ -57,20 +29,26 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
     );
   }
 );
-
-function TicketSelect() {
+interface Props extends SelectProps {
+  name: string;
+  label?: string;
+}
+const TicketSelect: React.FC<Props> = ({ name, ...props }) => {
+  const [field, meta, helper] = useField(name);
+  const isError = Boolean(meta.touched && meta.error);
   return (
     <Select
-      placeholder="Pick one"
       itemComponent={SelectItem}
-      data={data}
       searchable
+      {...field}
+      {...props}
       maxDropdownHeight={400}
       nothingFound="Nobody here"
       icon={<IconHash size={14} />}
+      error={isError ? meta.error : undefined}
+      onChange={(e) => helper.setValue(e, true)}
       styles={(theme) => ({
         item: {
-          // applies styles to selected item
           "&[data-selected]": {
             "&, &:hover": {
               backgroundColor:
@@ -83,12 +61,10 @@ function TicketSelect() {
                   : theme.colors.teal[9],
             },
           },
-
-          // applies styles to hovered item (with mouse or keyboard)
           "&[data-hovered]": {},
         },
       })}
     />
   );
-}
+};
 export default TicketSelect;
