@@ -10,7 +10,7 @@ const checkPermission = async (
 ) => {
   const role = await RoleModel.findById(client.role);
 
-  const permission = role?.permissions.find((p) => (p.permissionName = access));
+  const permission = role?.permissions.find((p) => p.permissionName === access);
 
   if (!permission) {
     return false;
