@@ -1,17 +1,10 @@
 import FormInput from "@/components/FormikCompo/FormikInput";
 import FormikSelect from "@/components/FormikCompo/FormikSelect";
 import TicketSelect from "@/components/TicketStatus";
-import { RouterOutputs, trpc } from "@/utils/trpc";
-import {
-  Button,
-  Container,
-  Group,
-  Modal,
-  ModalProps,
-  MultiSelect,
-  Table,
-  Title,
-} from "@mantine/core";
+import type { RouterOutputs } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
+import type { ModalProps } from "@mantine/core";
+import { Button, Container, Group, Modal, Table, Title } from "@mantine/core";
 import { Form, Formik } from "formik";
 import React from "react";
 
@@ -27,7 +20,6 @@ const AddnewTicket = ({
   modalProps: ModalProps;
   data?: RouterOutputs["workflowRouter"]["getWorkflow"];
 }) => {
-  // const createTicket = trpc.ticketRouter.createTicket.useMutation();
   return (
     <Modal title="Add Ticket" {...modalProps}>
       <Formik
@@ -162,7 +154,12 @@ const Index = () => {
                       <Form>
                         <Group w={"100%"} p={0} m={0}>
                           <TicketSelect
-                            data={MultiSelectData}
+                            data={
+                              workflow.data?.map((val) => ({
+                                value: val.id,
+                                label: val.name,
+                              })) || []
+                            }
                             name="ticketStatus"
                           />
                           <Button type="submit">ok</Button>
