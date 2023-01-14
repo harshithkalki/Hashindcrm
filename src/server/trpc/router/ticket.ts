@@ -44,6 +44,8 @@ export const ticketRouter = router({
         });
       }
 
+      console.log(client);
+
       const ticket = await TicketModel.create({
         name: input.name,
         status: input.status,
@@ -89,4 +91,33 @@ export const ticketRouter = router({
 
       return ticket;
     }),
+
+  getAllTicket: protectedProcedure.query(async ({ ctx }) => {
+    const client = await UserModel.findById(ctx.userId);
+
+    if (!client) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a status',
+      });
+    }
+
+    const isPermitted = await checkPermission(
+      'TICKET',
+      'update',
+      client?.toObject(),
+      true
+    );
+
+    if (!isPermitted) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a status',
+      });
+    }
+
+    const tickets = TicketModel.find({ companyId: client.companyId });
+
+    return tickets;
+  }),
 });

@@ -288,7 +288,7 @@ export const workflowRouter = router({
 
   getLinkedStatuses: protectedProcedure
     .input(z.string())
-    .mutation(async ({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
       const client = await UserModel.findById(ctx.userId);
 
       if (!client) {
@@ -312,8 +312,22 @@ export const workflowRouter = router({
         });
       }
 
-      const status = await StatusModel.findById(input);
+      const status = await StatusModel.findById(input).populate(
+        'linkedStatuses',
+        undefined,
+        StatusModel
+      );
 
-      return status?.linkedStatuses;
+      const linkedStatuses = status?.linkedStatuses as unknown as {
+        _id: string;
+        name: string;
+      }[];
+
+      linkedStatuses.push({
+        _id: status!._id.toString(),
+        name: status!.name,
+      });
+
+      return linkedStatuses;
     }),
 });
