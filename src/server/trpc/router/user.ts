@@ -236,7 +236,7 @@ export const userRouter = router({
       return company;
     }),
 
-  register: protectedProcedure
+  createUser: protectedProcedure
     .input(
       z.object({
         firstName: z.string(),
@@ -265,7 +265,7 @@ export const userRouter = router({
       }
 
       const isPermitted = await checkPermission(
-        'COMPANY',
+        'USER',
         'create',
         client?.toObject()
       );
@@ -290,6 +290,34 @@ export const userRouter = router({
 
       return user;
     }),
+
+  getAllUsers: protectedProcedure.query(async ({ ctx }) => {
+    const client = await UserModel.findById(ctx.userId);
+
+    if (!client) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a user',
+      });
+    }
+
+    const isPermitted = await checkPermission(
+      'USER',
+      'create',
+      client?.toObject()
+    );
+
+    if (!isPermitted) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a user',
+      });
+    }
+
+    const users = await UserModel.find({ companyId: client.companyId });
+
+    return users;
+  }),
 
   getAllRoles: protectedProcedure.query(async ({ ctx }) => {
     const client = await UserModel.findById(ctx.userId);

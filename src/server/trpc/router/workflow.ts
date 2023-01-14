@@ -253,4 +253,67 @@ export const workflowRouter = router({
         message: 'New linked added successfully',
       };
     }),
+
+  getInitialStatuses: protectedProcedure.query(async ({ ctx }) => {
+    const client = await UserModel.findById(ctx.userId);
+
+    if (!client) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a link',
+      });
+    }
+
+    const isPermitted = await checkPermission(
+      'WORKFLOW',
+      'create',
+      client?.toObject(),
+      true
+    );
+
+    if (!isPermitted) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a link',
+      });
+    }
+
+    const initialStatuses = await StatusModel.find({
+      companyId: client.companyId,
+      initialStatus: true,
+    });
+
+    return initialStatuses;
+  }),
+
+  getLinkedStatuses: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const client = await UserModel.findById(ctx.userId);
+
+      if (!client) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create a link',
+        });
+      }
+
+      const isPermitted = await checkPermission(
+        'WORKFLOW',
+        'create',
+        client?.toObject(),
+        true
+      );
+
+      if (!isPermitted) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create a link',
+        });
+      }
+
+      const status = await StatusModel.findById(input);
+
+      return status?.linkedStatuses;
+    }),
 });
