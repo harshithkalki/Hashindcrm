@@ -8,11 +8,6 @@ import { Button, Container, Group, Modal, Table, Title } from "@mantine/core";
 import { Form, Formik } from "formik";
 import React from "react";
 
-interface SelectDataType {
-  label: string;
-  name: string;
-}
-
 const AddnewTicket = ({
   modalProps,
   data = [],

@@ -1,7 +1,7 @@
 import RoleForm from "@/components/RoleFrom/RoleForm";
 import { trpc } from "@/utils/trpc";
 import React from "react";
-import type { Permissions } from "@/constants";
+import { Permissions } from "@/constants";
 
 type Permission = {
   permissionName: typeof Permissions[number];
@@ -12,26 +12,15 @@ type Permission = {
     create?: boolean;
   };
 }[];
-const permissionsDemo: Permission = [
-  {
-    permissionName: "COMPANY",
-    crud: {
-      read: false,
-      update: false,
-      delete: false,
-      create: false,
-    },
+const permissionsDemo: Permission = Permissions.map((val) => ({
+  permissionName: val,
+  crud: {
+    read: false,
+    update: false,
+    delete: false,
+    create: false,
   },
-  {
-    permissionName: "USER",
-    crud: {
-      read: false,
-      update: false,
-      delete: false,
-      create: false,
-    },
-  },
-];
+}));
 
 const app = () => {
   const AddRole = trpc.userRouter.createRole.useMutation();
