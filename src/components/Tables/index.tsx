@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Container, GroupProps } from "@mantine/core";
+import type { GroupProps } from "@mantine/core";
+import { Container } from "@mantine/core";
 import {
   createStyles,
   Table,
-  Checkbox,
   ScrollArea,
   TextInput,
   ActionIcon,
@@ -89,13 +89,6 @@ export default function TableSelection<T>({
     const selected = selection.includes(item.id);
     return (
       <tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
-        {/* <td>
-          <Checkbox
-            checked={selection.includes(item.id)}
-            onChange={() => toggleRow(item.id)}
-            transitionDuration={0}
-          />
-        </td> */}
         {keys(keysandlabels).map((key) => (
           <td
             key={`${item[key]}`}
@@ -153,16 +146,6 @@ export default function TableSelection<T>({
           <Table sx={{ minWidth: "100%" }} verticalSpacing="sm">
             <thead>
               <tr>
-                {/* <th>
-                <Checkbox
-                  onChange={toggleAll}
-                  checked={selection.length === data.length}
-                  indeterminate={
-                    selection.length > 0 && selection.length !== data.length
-                  }
-                  transitionDuration={0}
-                  />
-                </th> */}
                 {keys(keysandlabels)?.map((item) => (
                   <th
                     key={item.toString()}

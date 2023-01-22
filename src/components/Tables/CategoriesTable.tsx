@@ -54,12 +54,18 @@ interface TableSortProps {
 
 export function TableSort({ data }: TableSortProps) {
   const [search, setSearch] = useState("");
-  // const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
-  // const [reverseSortDirection, setReverseSortDirection] = useState(false);
+  const [filteredData, setFilteredData] = useState(data);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.currentTarget;
+    const value = event.currentTarget.value;
     setSearch(value);
+    setFilteredData(
+      data.filter((item) =>
+        Object.keys(item).some((key) =>
+          String(key).toLowerCase().includes(value.toLowerCase())
+        )
+      )
+    );
   };
 
   function RowMap({ data }: { data: Category }) {
@@ -108,33 +114,7 @@ export function TableSort({ data }: TableSortProps) {
     return rows;
   }
 
-  // const rows = data.map((row) => {
-  //   return (
-  //     <tr key={row.name}>
-  //       <td>
-  //         {row.children && (
-  //           <ActionIcon>
-  //             <IconPlus size={16} stroke={1.5} />
-  //           </ActionIcon>
-  //         )}
-  //       </td>
-  //       <td>{row.name}</td>
-  //       <td>{row.logo}</td>
-  //       <td>
-  //         <Group spacing={0}>
-  //           <ActionIcon>
-  //             <IconPencil size={16} stroke={1.5} />
-  //           </ActionIcon>
-
-  //           <ActionIcon color="red">
-  //             <IconTrash size={16} stroke={1.5} />
-  //           </ActionIcon>
-  //         </Group>
-  //       </td>
-  //     </tr>
-  //   );
-  // });
-  const rows = rowdatamap(data);
+  const rows = rowdatamap(filteredData);
   return (
     <ScrollArea>
       <TextInput
