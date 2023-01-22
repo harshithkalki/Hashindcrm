@@ -130,7 +130,7 @@ const Index = () => {
                 openingStockDate: "",
                 slug: "",
                 tax: "",
-                expiryDate: "",
+                expireDate: "",
               }}
             />
           </ScrollArea>
