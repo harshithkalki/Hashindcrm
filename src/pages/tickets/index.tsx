@@ -1,26 +1,26 @@
-import FormInput from '@/components/FormikCompo/FormikInput';
-import FormikSelect from '@/components/FormikCompo/FormikSelect';
-import TicketSelect from '@/components/TicketStatus';
-import type { RouterOutputs } from '@/utils/trpc';
-import { trpc } from '@/utils/trpc';
-import type { ModalProps } from '@mantine/core';
-import { Button, Container, Group, Modal, Table, Title } from '@mantine/core';
-import { Form, Formik } from 'formik';
-import React from 'react';
+import FormInput from "@/components/FormikCompo/FormikInput";
+import FormikSelect from "@/components/FormikCompo/FormikSelect";
+import TicketSelect from "@/components/TicketStatus";
+import type { RouterOutputs } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
+import type { ModalProps } from "@mantine/core";
+import { Button, Container, Group, Modal, Table, Title } from "@mantine/core";
+import { Form, Formik } from "formik";
+import React from "react";
 
 const AddnewTicket = ({
   modalProps,
   data = [],
 }: {
   modalProps: ModalProps;
-  data?: RouterOutputs['workflowRouter']['getInitialStatuses'];
+  data?: RouterOutputs["workflowRouter"]["getInitialStatuses"];
 }) => {
   const createTicket = trpc.ticketRouter.createTicket.useMutation();
 
   return (
-    <Modal title='Add Ticket' {...modalProps}>
+    <Modal title="Add Ticket" {...modalProps}>
       <Formik
-        initialValues={{ name: '', initialstatus: '' }}
+        initialValues={{ name: "", initialstatus: "" }}
         onSubmit={(values, { setSubmitting }) => {
           createTicket
             .mutateAsync({
@@ -30,25 +30,25 @@ const AddnewTicket = ({
             .then(() => setSubmitting(false));
         }}
       >
-        {({ values, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+        {({ isSubmitting }) => (
           <Form>
             <FormInput
-              name='name'
-              label='Name'
-              placeholder='Enter Name'
+              name="name"
+              label="Name"
+              placeholder="Enter Name"
               withAsterisk
             />
             <FormikSelect
-              mt={'xs'}
-              name='initialstatus'
-              label='Initial Status'
-              placeholder='Select Status'
+              mt={"xs"}
+              name="initialstatus"
+              label="Initial Status"
+              placeholder="Select Status"
               data={data.map((val) => ({
                 value: val._id.toString(),
                 label: val.name,
               }))}
             />
-            <Button type='submit' mt={'md'} loading={isSubmitting}>
+            <Button type="submit" mt={"md"} loading={isSubmitting}>
               submit
             </Button>
           </Form>
@@ -64,31 +64,31 @@ const Index = () => {
   const mokdata = [
     {
       id: 1,
-      name: 'Todo1',
+      name: "Todo1",
       done: false,
-      created: '2021-08-01',
-      status: 'open',
+      created: "2021-08-01",
+      status: "open",
     },
     {
       id: 2,
-      name: 'Todo2',
+      name: "Todo2",
       done: false,
-      created: '2021-08-01',
-      status: 'open',
+      created: "2021-08-01",
+      status: "open",
     },
     {
       id: 3,
-      name: 'Todo3',
+      name: "Todo3",
       done: false,
-      created: '2021-08-01',
-      status: 'open',
+      created: "2021-08-01",
+      status: "open",
     },
     {
       id: 4,
-      name: 'Todo4',
+      name: "Todo4",
       done: false,
-      created: '2021-08-01',
-      status: 'open',
+      created: "2021-08-01",
+      status: "open",
     },
   ];
 
@@ -102,14 +102,14 @@ const Index = () => {
         modalProps={{ opened: modal, onClose: () => setModal(false) }}
         data={initialStatuses.data}
       />
-      <Container w={'100%'} p={'md'}>
-        <Group w={'100%'} style={{ justifyContent: 'space-between' }}>
+      <Container w={"100%"} p={"md"}>
+        <Group w={"100%"} style={{ justifyContent: "space-between" }}>
           <Title size={30} fw={500}>
             Tickets
           </Title>
           <Button onClick={() => setModal(true)}>Add</Button>
         </Group>
-        <Table mt={'5vh'}>
+        <Table mt={"5vh"}>
           <thead>
             <tr>
               <th>Id</th>
@@ -147,7 +147,7 @@ const Index = () => {
 
                       return (
                         <Form>
-                          <Group w={'100%'} p={0} m={0}>
+                          <Group w={"100%"} p={0} m={0}>
                             <TicketSelect
                               data={
                                 data?.map((val) => ({
@@ -155,9 +155,9 @@ const Index = () => {
                                   label: val.name,
                                 })) || []
                               }
-                              name='ticketStatus'
+                              name="ticketStatus"
                             />
-                            <Button type='submit' loading={isSubmitting}>
+                            <Button type="submit" loading={isSubmitting}>
                               ok
                             </Button>
                           </Group>

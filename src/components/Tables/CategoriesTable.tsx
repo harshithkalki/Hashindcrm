@@ -1,0 +1,178 @@
+import { useState } from "react";
+import {
+  createStyles,
+  Table,
+  ScrollArea,
+  Text,
+  TextInput,
+  Group,
+  ActionIcon,
+} from "@mantine/core";
+
+import {
+  IconMinus,
+  IconPencil,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+} from "@tabler/icons";
+
+const useStyles = createStyles((theme) => ({
+  th: {
+    padding: "0 !important",
+  },
+
+  control: {
+    width: "100%",
+    padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
+
+    "&:hover": {
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[6]
+          : theme.colors.gray[0],
+    },
+  },
+
+  icon: {
+    width: 21,
+    height: 21,
+    borderRadius: 21,
+  },
+}));
+
+interface Category {
+  name: string;
+  slug: string;
+  logo: string;
+  children?: Category[];
+}
+
+interface TableSortProps {
+  data: Category[];
+}
+
+export function TableSort({ data }: TableSortProps) {
+  const [search, setSearch] = useState("");
+  // const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
+  // const [reverseSortDirection, setReverseSortDirection] = useState(false);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+    setSearch(value);
+  };
+
+  function RowMap({ data }: { data: Category }) {
+    const childrenRows = data.children ? rowdatamap(data.children) : null;
+    const [hide, setHide] = useState(true);
+    return (
+      <>
+        <tr>
+          <td>
+            {data.children && (
+              <ActionIcon onClick={() => setHide(!hide)}>
+                {hide ? (
+                  <IconPlus size={16} stroke={1.5} />
+                ) : (
+                  <IconMinus size={16} stroke={1.5} />
+                )}
+              </ActionIcon>
+            )}
+          </td>
+          <td>{data.name}</td>
+          <td>{data.logo}</td>
+          <td>
+            <Group spacing={0}>
+              <ActionIcon>
+                <IconPencil size={16} stroke={1.5} />
+              </ActionIcon>
+
+              <ActionIcon color="red">
+                <IconTrash size={16} stroke={1.5} />
+              </ActionIcon>
+            </Group>
+          </td>
+        </tr>
+        {data.children && !hide && childrenRows}
+      </>
+    );
+  }
+
+  function rowdatamap(data: Category[]): JSX.Element[] {
+    const rows = data.map((row, index) => {
+      // const returndata = RowMap(row);
+      // return returndata;
+      return <RowMap data={row} key={index} />;
+    });
+
+    return rows;
+  }
+
+  // const rows = data.map((row) => {
+  //   return (
+  //     <tr key={row.name}>
+  //       <td>
+  //         {row.children && (
+  //           <ActionIcon>
+  //             <IconPlus size={16} stroke={1.5} />
+  //           </ActionIcon>
+  //         )}
+  //       </td>
+  //       <td>{row.name}</td>
+  //       <td>{row.logo}</td>
+  //       <td>
+  //         <Group spacing={0}>
+  //           <ActionIcon>
+  //             <IconPencil size={16} stroke={1.5} />
+  //           </ActionIcon>
+
+  //           <ActionIcon color="red">
+  //             <IconTrash size={16} stroke={1.5} />
+  //           </ActionIcon>
+  //         </Group>
+  //       </td>
+  //     </tr>
+  //   );
+  // });
+  const rows = rowdatamap(data);
+  return (
+    <ScrollArea>
+      <TextInput
+        placeholder="Search by any field"
+        mb="md"
+        icon={<IconSearch size={14} stroke={1.5} />}
+        value={search}
+        onChange={handleSearchChange}
+      />
+      <Table
+        horizontalSpacing="md"
+        verticalSpacing="xs"
+        sx={{ tableLayout: "fixed", minWidth: 700 }}
+      >
+        <thead>
+          <tr>
+            <th style={{ width: "10%" }}></th>
+            <th>Name</th>
+            <th>Logo</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length > 0 ? (
+            rows
+          ) : (
+            <tr>
+              <td>
+                <Text weight={500} align="center">
+                  Nothing found
+                </Text>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </ScrollArea>
+  );
+}
+
+export default TableSort;

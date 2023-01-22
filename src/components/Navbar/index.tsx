@@ -27,6 +27,12 @@ const RolesData: NavData["links"] = [
   { label: "All Roles", link: "/roles" },
   { label: "Create Role", link: "/roles/new" },
 ];
+const ProductManagerData: NavData["links"] = [
+  { label: "Products", link: "/products" },
+  { label: "Brands", link: "/brands" },
+  { label: "Categories", link: "/categories" },
+  // { label: "Create Role", link: "/roles/new" },
+];
 
 const mockdata: NavData[] = [
   { links: "/dashboard", label: "DashBoard", icon: IconFileAnalytics },
@@ -34,6 +40,7 @@ const mockdata: NavData[] = [
   { links: AdminData, label: "Admins", icon: IconUser },
   { links: UserData, label: "users", icon: IconUser },
   { links: RolesData, label: "Roles", icon: IconReceipt2 },
+  { links: ProductManagerData, label: "Product Manager", icon: IconReceipt2 },
   { links: "/workflow", label: "WorkFlow", icon: IconFileAnalytics },
   { links: "/tickets", label: "Tickets", icon: IconReceipt2 },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },

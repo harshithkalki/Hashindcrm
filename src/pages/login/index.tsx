@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { Formik, Form } from "formik";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
@@ -67,6 +68,7 @@ const useStyles = createStyles((theme) => ({
 export default function AuthenticationImage() {
   const { classes } = useStyles();
   const loginUser = trpc.userRouter.login.useMutation();
+  const [loginError, setError] = useState("");
   const router = useRouter();
   return (
     <div className={classes.wrapper}>
@@ -90,10 +92,17 @@ export default function AuthenticationImage() {
             })
           )}
           onSubmit={(value) => {
-            return loginUser.mutateAsync(value).then(() => {
-              console.log("success");
-              router.push("/");
-            });
+            return loginUser
+              .mutateAsync(value)
+              .then((res) => {
+                console.log(res);
+                console.log("success");
+                router.push("/");
+              })
+              .catch((err) => {
+                console.log(err);
+                console.log("error");
+              });
           }}
         >
           {({ isSubmitting }) => (
