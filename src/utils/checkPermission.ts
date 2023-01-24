@@ -1,6 +1,6 @@
 import RoleModel from '@/models/Role';
 import type { Permissions } from '@/constants';
-import type { User } from '@/models/userModel';
+import type { User } from '@/models/User';
 
 const checkPermission = async (
   access: typeof Permissions[number],

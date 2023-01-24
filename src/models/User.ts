@@ -18,7 +18,7 @@ export interface User {
   pincode: string;
   role: mongoose.ObjectId;
   linkedTo?: mongoose.ObjectId;
-  companyId?: mongoose.ObjectId;
+  companyId: mongoose.ObjectId;
   email: string;
   password: string;
   createdAt: Date;

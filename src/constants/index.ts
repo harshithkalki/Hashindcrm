@@ -4,4 +4,5 @@ export const Permissions = [
   'COMPANY',
   'WORKFLOW',
   'TICKET',
+  'BRAND',
 ] as const;

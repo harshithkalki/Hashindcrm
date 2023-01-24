@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../trpc';
-import UserModel from '@/models/userModel';
+import UserModel from '@/models/User';
 import StatusModel from '@/models/Status';
 import WorkflowModel from '@/models/Workflow';
 import { TRPCError } from '@trpc/server';

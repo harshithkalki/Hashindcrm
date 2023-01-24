@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from '../trpc';
-import UserModel from '@/models/userModel';
+import UserModel from '@/models/User';
 import RoleModel from '@/models/Role';
 import CompanyModel from '@/models/Company';
 import { TRPCError } from '@trpc/server';
@@ -343,9 +343,7 @@ export const userRouter = router({
       });
     }
 
-    return await (
-      await RoleModel.find()
-    ).map((val) => {
+    return (await RoleModel.find()).map((val) => {
       return {
         ...val.toObject(),
         id: val._id.toHexString(),
