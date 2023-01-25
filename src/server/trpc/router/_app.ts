@@ -3,12 +3,14 @@ import { userRouter } from './user';
 import { workflowRouter } from './workflow';
 import { ticketRouter } from './ticket';
 import { brandRouter } from './brand';
+import { categoryRouter } from './category';
 
 export const appRouter = router({
   userRouter,
   workflowRouter,
   ticketRouter,
   brandRouter,
+  categoryRouter,
 });
 
 // export type definition of API

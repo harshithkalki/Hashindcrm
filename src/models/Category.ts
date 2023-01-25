@@ -5,7 +5,7 @@ export interface Category {
   name: string;
   slug: string;
   logo: string;
-  children?: string[];
+  parentCategory?: ObjectId;
   companyId: ObjectId;
 }
 
@@ -16,7 +16,11 @@ const CategorySchema: Schema = new Schema<Category, CategoryModel>(
     name: { type: String, required: true, unique: true },
     slug: { type: String, required: true },
     logo: { type: String, required: true },
-    children: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    parentCategory: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: false,
+    },
     companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
   },
   {

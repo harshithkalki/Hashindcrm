@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   createStyles,
   Table,
@@ -7,7 +7,7 @@ import {
   TextInput,
   Group,
   ActionIcon,
-} from "@mantine/core";
+} from '@mantine/core';
 
 import {
   IconMinus,
@@ -15,20 +15,20 @@ import {
   IconPlus,
   IconSearch,
   IconTrash,
-} from "@tabler/icons";
+} from '@tabler/icons';
 
 const useStyles = createStyles((theme) => ({
   th: {
-    padding: "0 !important",
+    padding: '0 !important',
   },
 
   control: {
-    width: "100%",
+    width: '100%',
     padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
 
-    "&:hover": {
+    '&:hover': {
       backgroundColor:
-        theme.colorScheme === "dark"
+        theme.colorScheme === 'dark'
           ? theme.colors.dark[6]
           : theme.colors.gray[0],
     },
@@ -53,7 +53,7 @@ interface TableSortProps {
 }
 
 export function TableSort({ data }: TableSortProps) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [filteredData, setFilteredData] = useState(data);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +75,7 @@ export function TableSort({ data }: TableSortProps) {
       <>
         <tr>
           <td>
-            {data.children && (
+            {data.children && data.children.length > 0 && (
               <ActionIcon onClick={() => setHide(!hide)}>
                 {hide ? (
                   <IconPlus size={16} stroke={1.5} />
@@ -93,13 +93,13 @@ export function TableSort({ data }: TableSortProps) {
                 <IconPencil size={16} stroke={1.5} />
               </ActionIcon>
 
-              <ActionIcon color="red">
+              <ActionIcon color='red'>
                 <IconTrash size={16} stroke={1.5} />
               </ActionIcon>
             </Group>
           </td>
         </tr>
-        {data.children && !hide && childrenRows}
+        {data.children && data.children.length > 0 && !hide && childrenRows}
       </>
     );
   }
@@ -118,20 +118,20 @@ export function TableSort({ data }: TableSortProps) {
   return (
     <ScrollArea>
       <TextInput
-        placeholder="Search by any field"
-        mb="md"
+        placeholder='Search by any field'
+        mb='md'
         icon={<IconSearch size={14} stroke={1.5} />}
         value={search}
         onChange={handleSearchChange}
       />
       <Table
-        horizontalSpacing="md"
-        verticalSpacing="xs"
-        sx={{ tableLayout: "fixed", minWidth: 700 }}
+        horizontalSpacing='md'
+        verticalSpacing='xs'
+        sx={{ tableLayout: 'fixed', minWidth: 700 }}
       >
         <thead>
           <tr>
-            <th style={{ width: "10%" }}></th>
+            <th style={{ width: '10%' }}></th>
             <th>Name</th>
             <th>Logo</th>
             <th>Actions</th>
@@ -143,7 +143,7 @@ export function TableSort({ data }: TableSortProps) {
           ) : (
             <tr>
               <td>
-                <Text weight={500} align="center">
+                <Text weight={500} align='center'>
                   Nothing found
                 </Text>
               </td>
