@@ -21,12 +21,6 @@ import { IconUpload } from "@tabler/icons";
 import { useRef } from "react";
 import Formiktextarea from "../FormikCompo/FormikTextarea";
 
-const rolesOptions = [
-  { label: "Admin", value: "admin" },
-  { label: "User", value: "user" },
-  { label: "Guest", value: "guest" },
-];
-
 const barcodeSymbologyOptions = [
   { label: "Code 39", value: "code39" },
   { label: "Code 128", value: "code128" },
