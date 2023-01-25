@@ -33,7 +33,10 @@ const ProductManagerData: NavData["links"] = [
   { label: "Categories", link: "/categories" },
   // { label: "Create Role", link: "/roles/new" },
 ];
-
+const Stockdata: NavData["links"] = [
+  { label: "Stock Adjustment", link: "/stockadjustment" },
+  { label: "Stock Transfer", link: "/stocktransfer" },
+];
 const mockdata: NavData[] = [
   { links: "/dashboard", label: "DashBoard", icon: IconFileAnalytics },
   { links: CompanyData, label: "Companies", icon: IconBuildingStore },
@@ -43,6 +46,7 @@ const mockdata: NavData[] = [
   { links: ProductManagerData, label: "Product Manager", icon: IconReceipt2 },
   { links: "/workflow", label: "WorkFlow", icon: IconFileAnalytics },
   { links: "/tickets", label: "Tickets", icon: IconReceipt2 },
+  { links: Stockdata, label: "Stock", icon: IconReceipt2 },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 
