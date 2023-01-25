@@ -73,11 +73,11 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
   }
 
   const PermissonsValues = Permissions.map((permission) => {
-    console.log(permission);
+    // console.log(permission);
     const permissionIndex = formpermissions.findIndex(
       (perm) => perm.permissionName === permission
     );
-    console.log(permissionIndex);
+    // console.log(permissionIndex);
     return {
       permissionName: permission,
       crud:
@@ -92,6 +92,14 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
     };
   }) as unknown as Permission;
 
+  const inputs = {
+    id: formInputs.id,
+    name: formInputs.name,
+    displayName: formInputs.displayName,
+    description: formInputs.description,
+    permissions: PermissonsValues,
+  };
+
   return (
     <>
       <Container w={matches ? "80" : "50%"} mt={"5vh"}>
@@ -99,7 +107,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           {title}
         </Title>
         <Formik
-          initialValues={formInputs}
+          initialValues={inputs}
           validationSchema={toFormikValidationSchema(
             z.object({
               id: z.string().optional(),
