@@ -6,4 +6,5 @@ export const Permissions = [
   "TICKET",
   "BRAND",
   "PRODUCT",
+  "CATEGORY"
 ] as const;
