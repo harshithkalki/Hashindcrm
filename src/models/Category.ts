@@ -13,7 +13,7 @@ type CategoryModel = Model<Category, Record<string, never>>;
 
 const CategorySchema: Schema = new Schema<Category, CategoryModel>(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     slug: { type: String, required: true },
     logo: { type: String, required: true },
     parentCategory: {
@@ -27,6 +27,8 @@ const CategorySchema: Schema = new Schema<Category, CategoryModel>(
     versionKey: false,
   }
 );
+
+CategorySchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Category as ReturnType<
   typeof mongoose.model<Category, CategoryModel>

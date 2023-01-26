@@ -28,7 +28,10 @@ const Index = () => {
           <Formik
             initialValues={{ name: '', slug: '', logo: '' }}
             onSubmit={async (values, actions) => {
-              await createBrand.mutateAsync(values);
+              await createBrand.mutateAsync({
+                ...values,
+                logo: 'https://cdn.mos.cms.futurecdn.net/6ZQ7Q2Z7Q4Z2Q2Z7Q4Z2Q2Z7-1200-80.jpg.webp',
+              });
               actions.resetForm();
             }}
           >
@@ -75,6 +78,9 @@ const Index = () => {
       </>
     );
   };
+
+  if (brands.isLoading) return <div>Loading...</div>;
+
   return (
     <>
       <AddBrand />

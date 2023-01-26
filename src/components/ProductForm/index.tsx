@@ -10,51 +10,52 @@ import {
   Button,
   Center,
   Container,
-} from "@mantine/core";
-import { Formik, Form } from "formik";
-import { toFormikValidationSchema } from "zod-formik-adapter";
-import FormInput from "@/components/FormikCompo/FormikInput";
-import { z } from "zod";
+} from '@mantine/core';
+import { Formik, Form } from 'formik';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import FormInput from '@/components/FormikCompo/FormikInput';
+import { z } from 'zod';
 // import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
-import FormikSelect from "@/components/FormikCompo/FormikSelect";
-import { IconUpload } from "@tabler/icons";
-import { useRef } from "react";
-import Formiktextarea from "../FormikCompo/FormikTextarea";
+import FormikSelect from '@/components/FormikCompo/FormikSelect';
+import { IconUpload } from '@tabler/icons';
+import { useRef } from 'react';
+import Formiktextarea from '../FormikCompo/FormikTextarea';
+import { trpc } from '@/utils/trpc';
 
 const rolesOptions = [
-  { label: "Admin", value: "admin" },
-  { label: "User", value: "user" },
-  { label: "Guest", value: "guest" },
+  { label: 'Admin', value: 'admin' },
+  { label: 'User', value: 'user' },
+  { label: 'Guest', value: 'guest' },
 ];
 
 const barcodeSymbologyOptions = [
-  { label: "Code 39", value: "code39" },
-  { label: "Code 128", value: "code128" },
-  { label: "EAN-13", value: "ean13" },
-  { label: "EAN-8", value: "ean8" },
-  { label: "UPC-A", value: "upca" },
-  { label: "UPC-E", value: "upce" },
+  { label: 'Code 39', value: 'code39' },
+  { label: 'Code 128', value: 'code128' },
+  { label: 'EAN-13', value: 'ean13' },
+  { label: 'EAN-8', value: 'ean8' },
+  { label: 'UPC-A', value: 'upca' },
+  { label: 'UPC-E', value: 'upce' },
 ];
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background: "dark",
-    padding: "15px 20px",
-    borderRadius: "5px",
+    background: 'dark',
+    padding: '15px 20px',
+    borderRadius: '5px',
     boxShadow: theme.shadows.xs,
   },
   profile: {
-    cursor: "pointer",
-    ":hover": {
+    cursor: 'pointer',
+    ':hover': {
       boxShadow: theme.shadows.sm,
     },
   },
   addressWrapper: {
-    padding: "8px 13px",
+    padding: '8px 13px',
   },
   containerStyles: {
-    margin: "auto",
-    width: "100%",
+    margin: 'auto',
+    width: '100%',
   },
 }));
 
@@ -78,29 +79,22 @@ export interface ProductFormType {
   expireDate?: string;
   description?: string;
 }
-
-const onSubmit = async (values: ProductFormType, actions: any) => {
-  console.log(values);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  actions.resetForm();
-};
-
 const warehouseOptions = [
-  { label: "Warehouse 1", value: "warehouse1" },
-  { label: "Warehouse 2", value: "warehouse2" },
-  { label: "Warehouse 3", value: "warehouse3" },
+  { label: 'Warehouse 1', value: 'warehouse1' },
+  { label: 'Warehouse 2', value: 'warehouse2' },
+  { label: 'Warehouse 3', value: 'warehouse3' },
 ];
 
 const categoryOptions = [
-  { label: "Category 1", value: "category1" },
-  { label: "Category 2", value: "category2" },
-  { label: "Category 3", value: "category3" },
+  { label: 'Category 1', value: 'category1' },
+  { label: 'Category 2', value: 'category2' },
+  { label: 'Category 3', value: 'category3' },
 ];
 
 const brandOptions = [
-  { label: "Brand 1", value: "brand1" },
-  { label: "Brand 2", value: "brand2" },
-  { label: "Brand 3", value: "brand3" },
+  { label: 'Brand 1', value: 'brand1' },
+  { label: 'Brand 2', value: 'brand2' },
+  { label: 'Brand 3', value: 'brand3' },
 ];
 
 interface Props {
@@ -110,6 +104,9 @@ interface Props {
 const ProductForm = ({ formInputs }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes, cx } = useStyles();
+  const createProduct = trpc.productRouter.create.useMutation();
+  const categories = trpc.categoryRouter.getAllCategorys.useQuery();
+  const brands = trpc.brandRouter.getAllBrands.useQuery();
 
   return (
     <div>
@@ -140,19 +137,23 @@ const ProductForm = ({ formInputs }: Props) => {
         // onSubmit={(values, { setSubmitting }) => {
         //   onSubmit(values).then(() => setSubmitting(false));
         // }}
-        onSubmit={onSubmit}
+        onSubmit={async (values, actions) => {
+          await createProduct.mutateAsync(values);
+          actions.resetForm();
+          actions.setSubmitting(false);
+        }}
       >
         {({ setFieldValue, values, isSubmitting }) => {
           return (
             <Form>
               <SimpleGrid
-                m={"md"}
+                m={'md'}
                 cols={3}
                 className={classes.wrapper}
                 breakpoints={[
-                  { maxWidth: "md", cols: 3, spacing: "md" },
-                  { maxWidth: "sm", cols: 2, spacing: "sm" },
-                  { maxWidth: "xs", cols: 1, spacing: "sm" },
+                  { maxWidth: 'md', cols: 3, spacing: 'md' },
+                  { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                  { maxWidth: 'xs', cols: 1, spacing: 'sm' },
                 ]}
               >
                 <Container className={classes.containerStyles}>
@@ -161,18 +162,18 @@ const ProductForm = ({ formInputs }: Props) => {
                       height={200}
                       width={200}
                       src={values.logo}
-                      alt=""
+                      alt=''
                       withPlaceholder
                     />
                     <input
                       hidden
                       ref={fileRef}
-                      type="file"
+                      type='file'
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (e.target.files) {
                           const file = e.target.files[0];
                           if (file) {
-                            setFieldValue("logo", URL.createObjectURL(file));
+                            setFieldValue('logo', URL.createObjectURL(file));
                           }
                         }
                       }}
@@ -180,7 +181,7 @@ const ProductForm = ({ formInputs }: Props) => {
                   </Center>
                   <Center>
                     <Button
-                      leftIcon={values.logo === "" && <IconUpload size={17} />}
+                      leftIcon={values.logo === '' && <IconUpload size={17} />}
                       onClick={() => {
                         fileRef.current?.click();
                       }}
@@ -190,87 +191,97 @@ const ProductForm = ({ formInputs }: Props) => {
                         },
                       }}
                     >
-                      {values.logo === "" ? `Upload` : `Change`}
+                      {values.logo === '' ? `Upload` : `Change`}
                     </Button>
                   </Center>
                 </Container>
 
                 <FormikSelect
-                  label="Warehouse"
+                  label='Warehouse'
                   data={warehouseOptions}
-                  placeholder="Pick one warehouse"
-                  name="warehouse"
+                  placeholder='Pick one warehouse'
+                  name='warehouse'
                   withAsterisk
                 />
                 <FormInput
-                  label="Name"
-                  placeholder="Name"
-                  name="name"
+                  label='Name'
+                  placeholder='Name'
+                  name='name'
                   withAsterisk
                 />
                 <FormInput
-                  label="Slug"
-                  placeholder="Slug"
-                  name="slug"
+                  label='Slug'
+                  placeholder='Slug'
+                  name='slug'
                   withAsterisk
                 />
 
                 <FormInput
-                  label="Quantity"
-                  placeholder="Quantity"
-                  type={"number"}
-                  name="quantity"
+                  label='Quantity'
+                  placeholder='Quantity'
+                  type={'number'}
+                  name='quantity'
                   withAsterisk
                 />
                 <FormInput
-                  label="Quantity Alert"
-                  type={"number"}
-                  placeholder="Quantity Alert"
-                  name="quantityAlert"
+                  label='Quantity Alert'
+                  type={'number'}
+                  placeholder='Quantity Alert'
+                  name='quantityAlert'
                 />
                 <FormikSelect
-                  label="Category"
-                  data={categoryOptions}
-                  placeholder="Pick one category"
-                  name="category"
+                  label='Category'
+                  data={
+                    categories.data?.map((category) => ({
+                      label: category.name,
+                      value: category._id.toString(),
+                    })) || []
+                  }
+                  placeholder='Pick one category'
+                  name='category'
                   withAsterisk
                 />
                 <FormikSelect
-                  label="Brand"
-                  data={brandOptions}
-                  placeholder="Pick one brand"
-                  name="brand"
+                  label='Brand'
+                  data={
+                    brands.data?.map((brand) => ({
+                      label: brand.name,
+                      value: brand._id.toString(),
+                    })) || []
+                  }
+                  placeholder='Pick one brand'
+                  name='brand'
                   withAsterisk
                 />
                 <FormikSelect
-                  label="Barcode Symbology"
+                  label='Barcode Symbology'
                   data={barcodeSymbologyOptions}
-                  placeholder="Pick one barcode symbology"
-                  name="barcodeSymbology"
+                  placeholder='Pick one barcode symbology'
+                  name='barcodeSymbology'
                   withAsterisk
                 />
                 <FormInput
-                  label="Item Code"
-                  placeholder="Item Code"
-                  name="itemCode"
+                  label='Item Code'
+                  placeholder='Item Code'
+                  name='itemCode'
                   withAsterisk
                 />
                 <FormInput
-                  label="Opening Stock"
-                  type={"number"}
-                  placeholder="Opening Stock"
-                  name="openingStock"
+                  label='Opening Stock'
+                  type={'number'}
+                  placeholder='Opening Stock'
+                  name='openingStock'
                   withAsterisk
                 />
                 <FormInput
-                  label="Opening Stock Date"
-                  placeholder="Opening Stock Date"
-                  name="openingStockDate"
+                  label='Opening Stock Date'
+                  placeholder='Opening Stock Date'
+                  name='openingStockDate'
                   withAsterisk
                 />
               </SimpleGrid>
               <Grid
-                m={"md"}
+                m={'md'}
                 className={cx(classes.wrapper, {
                   [classes.addressWrapper]: true,
                 })}
@@ -281,43 +292,43 @@ const ProductForm = ({ formInputs }: Props) => {
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormInput
-                    label="Purchase Price"
-                    type={"number"}
-                    placeholder="Purchase Price"
-                    name="purchasePrice"
+                    label='Purchase Price'
+                    type={'number'}
+                    placeholder='Purchase Price'
+                    name='purchasePrice'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormInput
-                    label="Sale Price"
-                    type={"number"}
-                    placeholder="Sale Price"
-                    name="salePrice"
+                    label='Sale Price'
+                    type={'number'}
+                    placeholder='Sale Price'
+                    name='salePrice'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormInput
-                    label="Tax"
-                    placeholder="Tax"
-                    name="tax"
+                    label='Tax'
+                    placeholder='Tax'
+                    name='tax'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormInput
-                    label="MRP"
-                    type={"number"}
-                    placeholder="MRP"
-                    name="mrp"
+                    label='MRP'
+                    type={'number'}
+                    placeholder='MRP'
+                    name='mrp'
                     withAsterisk
                   />
                 </Grid.Col>
               </Grid>
               {/* addess form */}
               <Grid
-                m={"md"}
+                m={'md'}
                 className={cx(classes.wrapper, {
                   [classes.addressWrapper]: true,
                 })}
@@ -328,28 +339,28 @@ const ProductForm = ({ formInputs }: Props) => {
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormInput
-                    label="Expire Date"
-                    placeholder="Expire Date"
-                    name="expireDate"
+                    label='Expire Date'
+                    placeholder='Expire Date'
+                    name='expireDate'
                   />
                 </Grid.Col>
                 <Grid.Col lg={3} sm={4}>
                   <Formiktextarea
-                    label="Description"
-                    placeholder="Description"
-                    name="description"
+                    label='Description'
+                    placeholder='Description'
+                    name='description'
                   />
                 </Grid.Col>
               </Grid>
               <Grid
-                m={"md"}
+                m={'md'}
                 className={cx(classes.wrapper, {
                   [classes.addressWrapper]: true,
                 })}
                 columns={2}
               >
                 <Grid.Col>
-                  <Button type="submit" loading={isSubmitting}>
+                  <Button type='submit' loading={isSubmitting}>
                     Save
                   </Button>
                 </Grid.Col>
