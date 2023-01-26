@@ -1,9 +1,21 @@
 import StockTransferTable from "@/components/Tables/StockTransferTable";
-import { Button, Container, Divider, Group, Title } from "@mantine/core";
+import { Button, Container, Divider, Group, Modal, Title } from "@mantine/core";
 import React from "react";
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const AddStockTransfer = () => {
+    return (
+      <Modal
+        opened={modal}
+        onClose={() => {
+          setModal(false);
+        }}
+        title="Add Stock Transfer"
+        size="lg"
+      ></Modal>
+    );
+  };
   return (
     <>
       <Container>
