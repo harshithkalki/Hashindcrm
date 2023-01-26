@@ -10,6 +10,9 @@ import {
   Button,
   Center,
   Container,
+  Modal,
+  Group,
+  ActionIcon,
 } from "@mantine/core";
 import { Formik, Form } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
@@ -17,11 +20,12 @@ import FormInput from "@/components/FormikCompo/FormikInput";
 import { z } from "zod";
 // import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
 import FormikSelect from "@/components/FormikCompo/FormikSelect";
-import { IconUpload } from "@tabler/icons";
-import { useRef } from "react";
+import { IconUpload, IconPlus } from "@tabler/icons";
+import { useRef, useState } from "react";
 import Formiktextarea from "../FormikCompo/FormikTextarea";
 import { trpc } from "@/utils/trpc";
 import FormDate from "../FormikCompo/FormikDate";
+import FormikInput from "@/components/FormikCompo/FormikInput";
 
 const barcodeSymbologyOptions = [
   { label: "Code 39", value: "code39" },
@@ -89,10 +93,62 @@ const ProductForm = ({ formInputs }: Props) => {
   const { classes, cx } = useStyles();
   const createProduct = trpc.productRouter.create.useMutation();
   const categories = trpc.categoryRouter.getAllCategorys.useQuery();
+  const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
   const brands = trpc.brandRouter.getAllBrands.useQuery();
+  const [modal, setModal] = useState(false);
+
+  const AddWarehouse = () => {
+    return (
+      <>
+        <Modal
+          opened={modal}
+          onClose={() => setModal(false)}
+          title="Add Warehouse"
+        >
+          <Formik
+            initialValues={{
+              name: "",
+            }}
+            validationSchema={toFormikValidationSchema(
+              z.object({
+                name: z.string().min(3).max(50),
+              })
+            )}
+            onSubmit={async (values, actions) => {
+              await createWarehouse.mutateAsync(values);
+              actions.resetForm();
+              actions.setSubmitting(false);
+              setModal(false);
+            }}
+          >
+            {({ isSubmitting }) => {
+              return (
+                <Form>
+                  <FormikInput
+                    name="name"
+                    label="Warehouse Name"
+                    placeholder="Warehouse Name"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    loading={isSubmitting}
+                    mt={"md"}
+                  >
+                    Submit
+                  </Button>
+                </Form>
+              );
+            }}
+          </Formik>
+        </Modal>
+      </>
+    );
+  };
 
   return (
     <div>
+      <AddWarehouse />
       <Formik
         initialValues={formInputs}
         validationSchema={toFormikValidationSchema(
@@ -108,17 +164,17 @@ const ProductForm = ({ formInputs }: Props) => {
             barcodeSymbology: z.string(),
             itemCode: z.string(),
             openingStock: z.number(),
-            openingStockDate: z.date(),
+            openingStockDate: z.string(),
             purchasePrice: z.number(),
             salePrice: z.number(),
             mrp: z.number(),
             tax: z.string(),
-            expireDate: z.date().optional(),
+            expireDate: z.string().optional(),
             description: z.string().optional(),
           })
         )}
         // onSubmit={(values, { setSubmitting }) => {
-        //   onSubmit(values).then(() => setSubmitting(false));
+        //   console.log(values);
         // }}
         onSubmit={async (values, actions) => {
           await createProduct.mutateAsync(values);
@@ -184,14 +240,31 @@ const ProductForm = ({ formInputs }: Props) => {
                   data={warehouseOptions}
                   placeholder="Pick one warehouse"
                   name="warehouse"
+                  searchable
+                  w={"100%"}
+                  rightSection={
+                    <IconPlus
+                      size={20}
+                      onClick={() => {
+                        setModal(true);
+                      }}
+                      cursor={"pointer"}
+                    />
+                  }
                   withAsterisk
                 />
+                {/* <ActionIcon style={{ alignContent: "end" }}>
+                    <IconPlus size={20} />
+                  </ActionIcon> */}
+
                 <FormInput
                   label="Name"
                   placeholder="Name"
                   name="name"
+                  w={"100%"}
                   withAsterisk
                 />
+
                 <FormInput
                   label="Slug"
                   placeholder="Slug"

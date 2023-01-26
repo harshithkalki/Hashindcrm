@@ -18,7 +18,11 @@ const FormDate: React.FC<Props> = ({ name, label, ...props }) => {
       error={isError ? meta.error : undefined}
       {...field}
       {...props}
-      onChange={(e) => helper.setValue(e, true)}
+      onChange={(e) => {
+        const date = e?.toISOString();
+        console.log(date);
+        helper.setValue(date, true);
+      }}
     />
   );
 };
