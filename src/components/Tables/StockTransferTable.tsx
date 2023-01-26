@@ -1,9 +1,15 @@
 import { useState } from "react";
 import type { GroupProps } from "@mantine/core";
-import { Button, Modal } from "@mantine/core";
-import { Image } from "@mantine/core";
-import { Container } from "@mantine/core";
-import { Table, ScrollArea, TextInput, ActionIcon, Group } from "@mantine/core";
+import {
+  Table,
+  ScrollArea,
+  TextInput,
+  ActionIcon,
+  Group,
+  Button,
+  Modal,
+  Container,
+} from "@mantine/core";
 import { IconPencil, IconSearch, IconTrash } from "@tabler/icons";
 import { Formik, Form } from "formik";
 import { z } from "zod";
@@ -12,14 +18,17 @@ import FormInput from "../FormikCompo/FormikInput";
 import FormikSelect from "../FormikCompo/FormikSelect";
 import Formiktextarea from "../FormikCompo/FormikTextarea";
 
-interface Stock {
-  id: string;
-  name: string;
-  logo: string;
-  quantity: string;
+interface Transfer {
+  invoicenum: string;
+  warehouse: string;
+  date: string;
+  status: string;
+  paidamount: string;
+  totalamount: string;
+  paymentstatus: string;
 }
 interface TableSelectionProps<T> {
-  data: Stock[];
+  data: Transfer[];
   onDelete?: (id: string) => void;
   onEdit?: (id: string) => void;
   editDeleteColumnProps?: {
@@ -39,10 +48,9 @@ interface AdjustForm {
   data: StockEdit;
 }
 
-export default function StockadjustmentTable<T>({
+export default function StockTransferTable<T>({
   data,
   onDelete,
-  onEdit,
   editDeleteColumnProps: { groupProps } = {},
 }: TableSelectionProps<T>) {
   const [filteredData, setFilteredData] = useState(data);
@@ -165,21 +173,25 @@ export default function StockadjustmentTable<T>({
   const rows = filteredData.map((item) => {
     return (
       <>
-        <tr key={item.id}>
-          <td style={{ whiteSpace: "nowrap" }}>{item.id}</td>
+        <tr key={item.invoicenum}>
+          <td style={{ whiteSpace: "nowrap" }}>{item.invoicenum}</td>
           <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
-            <Group spacing="xs">
-              <Image
-                src={item.logo}
-                alt={item.name}
-                radius="lg"
-                style={{ width: 32, height: 32 }}
-              />
-              {item.name}
-            </Group>
+            {item.warehouse}
           </td>
           <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
-            {item.quantity}
+            {item.date}
+          </td>
+          <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+            {item.status}
+          </td>
+          <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+            {item.paidamount}
+          </td>
+          <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+            {item.totalamount}
+          </td>
+          <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+            {item.paymentstatus}
           </td>
           <td>
             <Group
@@ -189,15 +201,8 @@ export default function StockadjustmentTable<T>({
             >
               <ActionIcon
                 onClick={() => {
-                  setSData({
-                    id: "item.id",
-                    name: item.name,
-                    currentStock: item.quantity as unknown as number,
-                    quantity: 0,
-                    adjustment: "",
-                    note: "",
-                  });
-                  setModal(true);
+                  console.log(item.invoicenum);
+                  //   setModal(true);
                 }}
               >
                 <IconPencil size={16} stroke={1.5} />
@@ -206,7 +211,7 @@ export default function StockadjustmentTable<T>({
               <ActionIcon
                 color="red"
                 onClick={() => {
-                  onDelete && onDelete(item.id);
+                  onDelete && onDelete(item.invoicenum);
                 }}
               >
                 <IconTrash size={16} stroke={1.5} />
@@ -238,10 +243,26 @@ export default function StockadjustmentTable<T>({
           <Table sx={{ minWidth: "100%" }} verticalSpacing="sm">
             <thead>
               <tr>
-                <th style={{ whiteSpace: "nowrap" }}>#</th>
-                <th style={{ whiteSpace: "nowrap" }}>Name</th>
                 <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
-                  Quantity
+                  invoicenum
+                </th>
+                <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  Warehouse
+                </th>
+                <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  Stock Transfer Date
+                </th>
+                <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  Transfer Status
+                </th>
+                <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  Amount Paid
+                </th>
+                <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  Total Amount
+                </th>
+                <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  Payment Status
                 </th>
                 <th style={{ whiteSpace: "nowrap", textAlign: "center" }}>
                   Actions
