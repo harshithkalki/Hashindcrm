@@ -102,6 +102,9 @@ const Data: Product[] = [
 const Index = () => {
   // const router = useRouter();
   const [modal, setModal] = React.useState(false);
+  const products = trpc.productRouter.getAllProducts.useQuery();
+
+  console.log(products.data);
 
   const AddProduct = () => {
     return (
@@ -140,6 +143,9 @@ const Index = () => {
       </>
     );
   };
+
+  if (products.isLoading) return <div>Loading...</div>;
+
   return (
     <>
       <AddProduct />
@@ -152,7 +158,15 @@ const Index = () => {
         </Group>
         <Divider mt={'xl'} />
         <TableSelection
-          data={Data}
+          data={
+            products.data?.map((val) => ({
+              ...val,
+              id: val._id.toString(),
+              warehouse: val.warehouse as unknown as string,
+              category: val.category as unknown as string,
+              brand: val.brand as unknown as string,
+            })) || []
+          }
           onDelete={(id) => console.log(id)}
           onEdit={(id) => console.log(id)}
         />

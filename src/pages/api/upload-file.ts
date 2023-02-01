@@ -1,6 +1,6 @@
-import AWS from "aws-sdk";
-import type { NextApiHandler } from "next";
-import { env } from "@/env/server.mjs";
+import AWS from 'aws-sdk';
+import type { NextApiHandler } from 'next';
+import { env } from '@/env/server.mjs';
 
 const s3 = new AWS.S3({
   accessKeyId: env.AWS_ACCESS_KEY_ID,
@@ -11,16 +11,18 @@ const handler: NextApiHandler = async (req, res) => {
   const { file } = req.body;
 
   const params = {
-    Bucket: "your-bucket-name",
+    Bucket: 'your-bucket-name',
     Key: file.name,
     Body: file.data,
     ContentType: file.type,
-    ACL: "public-read",
+    ACL: 'public-read',
   };
 
   try {
-    await s3.upload(params).promise();
-    res.json({ message: "File uploaded to S3" });
+    const data = await s3.upload(params).promise();
+    res
+      .status(200)
+      .json({ message: 'File uploaded successfully', url: data.Location });
   } catch (error) {
     res.status(500).json({ message: (error as AWS.AWSError).message });
   }
