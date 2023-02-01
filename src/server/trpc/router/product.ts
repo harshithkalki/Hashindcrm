@@ -241,9 +241,18 @@ export const productRouter = router({
 
     const products = await ProductModel.find({
       companyId: client.companyId,
-    });
+    })
+      .populate(['warehouse', 'category', 'brand'])
+      .lean();
 
-    return products;
+    return products.map((val) => ({
+      ...val,
+      openingStockDate: val.openingStockDate?.toISOString(),
+      expiryDate: val.expiryDate?.toISOString(),
+      brand: (val.brand as unknown as { name: string }).name as string,
+      category: (val.category as unknown as { name: string }).name as string,
+      warehouse: (val.warehouse as unknown as { name: string }).name as string,
+    }));
   }),
 
   getProduct: protectedProcedure
