@@ -21,7 +21,7 @@ import Formiktextarea from '../FormikCompo/FormikTextarea';
 import { trpc } from '@/utils/trpc';
 import FormDate from '../FormikCompo/FormikDate';
 import FormikInput from '@/components/FormikCompo/FormikInput';
-import axois from 'axios';
+import axios from 'axios';
 
 const barcodeSymbologyOptions = [
   { label: 'Code 39', value: 'code39' },
@@ -174,7 +174,7 @@ const ProductForm = ({ formInputs }: Props) => {
           if (file) {
             const form = new FormData();
             form.append('file', file);
-            const { data } = await axois.post('/api/upload-file', form);
+            const { data } = await axios.post('/api/upload-file', form);
             values.logo = data.url;
           }
           await createProduct.mutateAsync(values);

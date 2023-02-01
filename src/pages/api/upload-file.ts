@@ -1,8 +1,8 @@
 import multer from 'multer';
 import AWS from 'aws-sdk';
 import { env } from '@/env/server.mjs';
-import type { Request, Response } from 'express';
 import { createId } from '@paralleldrive/cuid2';
+import type { Request, Response } from 'express';
 
 const s3 = new AWS.S3({
   accessKeyId: env.AWS_ACCESS_KEY_ID,
@@ -24,6 +24,7 @@ export default async function handler(req: Request, res: Response) {
     }
 
     const file = req.file;
+
     if (!file) {
       return res.status(400).json({ message: 'No file provided' });
     }
