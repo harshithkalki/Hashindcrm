@@ -12,6 +12,7 @@ export const categoryRouter = router({
         name: z.string(),
         slug: z.string(),
         logo: z.string(),
+        parentCategory: z.string().nullish(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -25,7 +26,7 @@ export const categoryRouter = router({
       }
 
       const isPermitted = await checkPermission(
-        'BRAND',
+        'CATEGORY',
         'create',
         client?.toObject()
       );
@@ -36,6 +37,8 @@ export const categoryRouter = router({
           message: 'You are not permitted to create category',
         });
       }
+
+      console.log('input', input);
 
       const category = await CategoryModel.create({
         ...input,
@@ -65,7 +68,7 @@ export const categoryRouter = router({
       }
 
       const isPermitted = await checkPermission(
-        'BRAND',
+        'CATEGORY',
         'update',
         client?.toObject()
       );
@@ -108,7 +111,7 @@ export const categoryRouter = router({
       }
 
       const isPermitted = await checkPermission(
-        'BRAND',
+        'CATEGORY',
         'delete',
         client?.toObject()
       );
@@ -136,7 +139,7 @@ export const categoryRouter = router({
     }
 
     const isPermitted = await checkPermission(
-      'BRAND',
+      'CATEGORY',
       'read',
       client?.toObject()
     );
@@ -147,45 +150,7 @@ export const categoryRouter = router({
         message: 'You are not permitted to get categorys',
       });
     }
-    interface ICategoryWithChildren {
-      _id: string;
-      name: string;
-      slug: string;
-      logo: string;
-      companyId: string;
-      allChildren: ICategoryWithChildren[];
-    }
-
-    const getAllCategoriesWithNestedChildren = async (
-      companyId: string
-    ): Promise<ICategoryWithChildren[] | undefined> => {
-      try {
-        const result = await CategoryModel.aggregate([
-          {
-            $match: {
-              companyId: companyId,
-            },
-          },
-          {
-            $graphLookup: {
-              from: 'categories',
-              startWith: '$_id',
-              connectFromField: '_id',
-              connectToField: 'children',
-              as: 'allChildren',
-            },
-          },
-        ]);
-        return result;
-      } catch (err) {
-        console.log(err);
-        return undefined;
-      }
-    };
-
-    const categorys = await getAllCategoriesWithNestedChildren(
-      client.companyId.transform.toString()
-    );
+    const categorys = await CategoryModel.find({ companyId: client.companyId });
 
     return categorys;
   }),

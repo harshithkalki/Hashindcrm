@@ -64,7 +64,7 @@ export default function StockadjustmentTable<T>({
         <Modal
           onClose={() => setModal(false)}
           opened={modal && sData !== undefined}
-          title={"Add Adjustment"}
+          title={"Edit Adjustment"}
         >
           <Formik
             initialValues={
