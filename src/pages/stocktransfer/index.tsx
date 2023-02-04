@@ -417,6 +417,18 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                 </ScrollArea>
               </div>
               <Divider mt={'lg'} />
+              <Group style={{ justifyContent: 'end' }} w={'95%'}>
+                <TextInput
+                  label={'Total'}
+                  value={
+                    [...inlineProducts.values()].reduce(
+                      (acc, item) => acc + item.subtotal,
+                      0
+                    ) || 0
+                  }
+                  disabled
+                />
+              </Group>
               <SimpleGrid
                 m={'md'}
                 cols={2}
@@ -513,7 +525,7 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
               </SimpleGrid>
               <Group w={'100%'} style={{ justifyContent: 'center' }}>
                 <Button type='submit' mb={'md'}>
-                  submit
+                  Submit
                 </Button>
               </Group>
             </Form>
