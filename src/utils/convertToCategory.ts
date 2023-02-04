@@ -1,4 +1,5 @@
 interface Category {
+  _id: string;
   name: string;
   slug: string;
   logo: string;
@@ -26,6 +27,7 @@ export default function convertToCategories(
       logo: input.logo,
       children: [],
       parentId: input.parentCategory,
+      _id: input._id,
     };
     categoryMap[input._id] = category;
     if (!input.parentCategory) {

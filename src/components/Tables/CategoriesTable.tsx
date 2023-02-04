@@ -16,6 +16,7 @@ import {
   IconSearch,
   IconTrash,
 } from '@tabler/icons';
+import { trpc } from '@/utils/trpc';
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -42,6 +43,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface Category {
+  _id: string;
   name: string;
   slug: string;
   logo: string;
@@ -55,6 +57,7 @@ interface TableSortProps {
 export function TableSort({ data }: TableSortProps) {
   const [search, setSearch] = useState('');
   const [filteredData, setFilteredData] = useState(data);
+  const deleteCategory = trpc.categoryRouter.delete.useMutation();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
@@ -93,7 +96,10 @@ export function TableSort({ data }: TableSortProps) {
                 <IconPencil size={16} stroke={1.5} />
               </ActionIcon>
 
-              <ActionIcon color='red'>
+              <ActionIcon
+                color='red'
+                onClick={() => deleteCategory.mutateAsync({ id: data._id })}
+              >
                 <IconTrash size={16} stroke={1.5} />
               </ActionIcon>
             </Group>

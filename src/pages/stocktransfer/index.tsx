@@ -1,62 +1,31 @@
 import FormDate from '@/components/FormikCompo/FormikDate';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
+import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import StockTransferTable from '@/components/Tables/StockTransferTable';
 import { trpc } from '@/utils/trpc';
 import {
+  ActionIcon,
   Button,
   Container,
   createStyles,
   Divider,
   Group,
   Modal,
+  NumberInput,
+  ScrollArea,
   Select,
   SimpleGrid,
+  Table,
+  Textarea,
+  TextInput,
   Title,
 } from '@mantine/core';
-import { IconPlus } from '@tabler/icons';
+import { IconPlus, IconTrash } from '@tabler/icons';
 import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
-
-const productsData = [
-  {
-    id: 1,
-    name: 'Product 1',
-    quantity: 10,
-    price: 100,
-    total: 1000,
-  },
-  {
-    id: 2,
-    name: 'Product 2',
-    quantity: 10,
-    price: 100,
-    total: 1000,
-  },
-  {
-    id: 3,
-    name: 'Product 3',
-    quantity: 10,
-    price: 100,
-    total: 1000,
-  },
-  {
-    id: 4,
-    name: 'Product 4',
-    quantity: 10,
-    price: 100,
-    total: 1000,
-  },
-  {
-    id: 5,
-    name: 'Product 5',
-    quantity: 10,
-    price: 100,
-    total: 1000,
-  },
-];
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -85,11 +54,26 @@ interface modalProps {
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+type InlineProduct = {
+  _id: string;
+  name: string;
+  subtotal: number;
+  quantity: number;
+  price: number;
+};
+
 const AddStockTransfer = ({ modal, setModal }: modalProps) => {
   const { classes, cx } = useStyles();
   const warehouses = trpc.productRouter.getAllWarehouse.useQuery();
   const [warehouseModal, setWarehouseModal] = React.useState(false);
   const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
+  const products = trpc.productRouter.getAllProducts.useQuery();
+  const [inlineProducts, setInlineProducts] = useState<
+    Map<string, InlineProduct>
+  >(new Map());
+  const [selectProduct, setSelectProduct] = useState<InlineProduct>();
+  const terms =
+    '1.Goods once sold will not be takenback or exchanged\n2.All disputes are subject to Mumbai Jurisdiction';
 
   const AddWarehouse = () => {
     return (
@@ -158,11 +142,12 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
             warehouse: '',
             date: '',
             orderstatus: '',
-            productList: [],
+            product: [],
             tax: '',
             discount: 0,
             shipping: 0,
             total: 0,
+            notes: '',
           }}
           onSubmit={(values) => {
             console.log(values);
@@ -213,18 +198,324 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                 <FormDate
                   label='Opening Stock Date'
                   placeholder='Opening Stock Date'
-                  name='openingStockDate'
+                  name='date'
                   withAsterisk
                 />
               </SimpleGrid>
               <Select
-                style={{ width: '100%' }}
-                placeholder='Select Product'
-                data={productsData.map((product) => ({
-                  label: product.name,
-                  value: product.id,
-                }))}
+                label='Products'
+                m={'md'}
+                data={
+                  products.data?.map((item) => ({
+                    label: item.name,
+                    value: item._id.toString(),
+                  })) || []
+                }
+                placeholder='Select Products'
+                searchable
+                size='sm'
+                value={selectProduct?._id.toString() || ''}
+                rightSection={
+                  <ActionIcon
+                    onClick={() => {
+                      if (selectProduct) {
+                        const inlineProduct = inlineProducts.get(
+                          selectProduct._id.toString()
+                        );
+                        if (!inlineProduct) {
+                          inlineProducts.set(
+                            selectProduct._id.toString(),
+                            selectProduct
+                          );
+                        } else {
+                          return;
+                        }
+                        inlineProducts.set(
+                          selectProduct._id.toString(),
+                          selectProduct
+                        );
+                        setInlineProducts(new Map(inlineProducts));
+                        setSelectProduct(undefined);
+                      }
+                    }}
+                  >
+                    <IconPlus />
+                  </ActionIcon>
+                }
+                onChange={(value) => {
+                  const product = products.data?.find(
+                    (item) => item._id.toString() === value
+                  );
+
+                  if (product) {
+                    setSelectProduct({
+                      _id: product._id.toString(),
+                      name: product.name,
+                      quantity: 1,
+                      subtotal: product.mrp,
+                      price: product.mrp,
+                    });
+                  }
+                }}
               />
+              <div style={{ height: '30vh' }}>
+                <ScrollArea
+                  style={{ height: '100%', width: '100%' }}
+                  scrollbarSize={10}
+                  offsetScrollbars
+                >
+                  <Table
+                    sx={{ minWidth: '100%' }}
+                    verticalSpacing='sm'
+                    mt={'md'}
+                  >
+                    <thead>
+                      <tr>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          #
+                        </th>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Product
+                        </th>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Quantity
+                        </th>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Price
+                        </th>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Tax
+                        </th>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Subtotal
+                        </th>
+                        <th
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...inlineProducts.values()].map((item, index) => (
+                        <tr key={item._id}>
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                            }}
+                          >
+                            {index + 1}
+                          </td>
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                            }}
+                          >
+                            {item.name}
+                          </td>
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <NumberInput
+                              size='sm'
+                              value={item.quantity}
+                              onChange={(value) => {
+                                console.log(value);
+                                if (!value) return;
+                                item.quantity = value;
+                                item.subtotal = item.price * value;
+                                setInlineProducts(new Map(inlineProducts));
+                              }}
+                              min={1}
+                            />
+                          </td>
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                            }}
+                          >
+                            {item.price}
+                          </td>
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                            }}
+                          >
+                            {'XXXX'}
+                          </td>
+
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                            }}
+                          >
+                            {item.subtotal}
+                          </td>
+                          <td
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textAlign: 'center',
+                              // justifyItems: 'center',
+                            }}
+                          >
+                            <ActionIcon
+                              variant='filled'
+                              color={'blue'}
+                              onClick={() => {
+                                inlineProducts.delete(item._id);
+                                setInlineProducts(new Map(inlineProducts));
+                              }}
+                            >
+                              <IconTrash />
+                            </ActionIcon>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </ScrollArea>
+              </div>
+              <Divider mt={'lg'} />
+              <SimpleGrid
+                m={'md'}
+                cols={2}
+                className={classes.wrapper}
+                breakpoints={[
+                  { maxWidth: 'md', cols: 2, spacing: 'md' },
+                  { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                  { maxWidth: 'xs', cols: 1, spacing: 'sm' },
+                ]}
+                // style={{ alignItems: 'end' }}
+              >
+                <div>
+                  <Textarea
+                    label={'Terms & Conditions'}
+                    value={terms}
+                    disabled
+                  />
+                  <Formiktextarea
+                    mt={'md'}
+                    placeholder={'Notes'}
+                    label={'Notes'}
+                    name={'notes'}
+                    value={values.notes}
+                  />
+                </div>
+
+                <div>
+                  <Group w={'100%'}>
+                    <FormikSelect
+                      label={'Status'}
+                      placeholder={'Select Status'}
+                      name={'orderstatus'}
+                      w={'46%'}
+                      data={[
+                        { label: 'Pending', value: 'pending' },
+                        { label: 'Approved', value: 'approved' },
+                        { label: 'Rejected', value: 'rejected' },
+                      ]}
+                    />
+                    <FormikSelect
+                      w={'46%'}
+                      label={'Order Tax'}
+                      placeholder={'Select Tax'}
+                      name={'tax'}
+                      data={[
+                        { label: 'Tax 1', value: 'tax1' },
+                        { label: 'Tax 2', value: 'tax2' },
+                        { label: 'Tax 3', value: 'tax3' },
+                      ]}
+                    />
+                  </Group>
+                  <Group w={'100%'} mt={'sm'}>
+                    <FormInput
+                      w={'46%'}
+                      type={'number'}
+                      label={'Shipping'}
+                      placeholder={'Shipping'}
+                      name={'shipping'}
+                    />
+                    <FormInput
+                      w={'46%'}
+                      type={'number'}
+                      label={'Discount'}
+                      placeholder={'Discount'}
+                      name={'discount'}
+                    />
+                  </Group>
+                  <Group w={'100%'} mt={'sm'}>
+                    <TextInput
+                      w={'46%'}
+                      label={'Order Tax'}
+                      placeholder={'Order Tax'}
+                      disabled
+                      value={0}
+                      type={'number'}
+                    />
+                    <TextInput
+                      w={'46%'}
+                      label={'Total'}
+                      placeholder={'Total'}
+                      disabled
+                      value={
+                        [...inlineProducts.values()].reduce(
+                          (acc, item) => acc + item.subtotal,
+                          0
+                        ) -
+                          values.discount +
+                          values.shipping || 0
+                      }
+                      type={'number'}
+                    />
+                  </Group>
+                </div>
+              </SimpleGrid>
+              <Group w={'100%'} style={{ justifyContent: 'center' }}>
+                <Button type='submit' mb={'md'}>
+                  submit
+                </Button>
+              </Group>
             </Form>
           )}
         </Formik>
@@ -252,6 +543,7 @@ const Index = () => {
           </Button>
         </Group>
         <Divider mt={'lg'} />
+
         <StockTransferTable
           data={[
             {

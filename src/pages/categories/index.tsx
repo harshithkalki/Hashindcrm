@@ -16,6 +16,7 @@ import { IconUpload } from '@tabler/icons';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import { trpc } from '@/utils/trpc';
 import convertToCategory from '@/utils/convertToCategory';
+import axios from 'axios';
 
 type InitialValues = {
   name: string;
@@ -34,9 +35,8 @@ const Index = () => {
   const router = useRouter();
 
   const [modal, setModal] = React.useState(false);
-
   const createCategory = trpc.categoryRouter.create.useMutation();
-  const allCategories = trpc.categoryRouter.getAllCategorys.useQuery();
+  const allCategories = trpc.categoryRouter.getAllCategories.useQuery();
 
   const parsedData = useMemo(
     () =>
@@ -54,6 +54,7 @@ const Index = () => {
   );
 
   const AddBrand = () => {
+    const [logo, setLogo] = React.useState<File | null>(null);
     return (
       <>
         <Modal
@@ -64,7 +65,14 @@ const Index = () => {
           <Formik
             initialValues={initialValues}
             onSubmit={async (values, actions) => {
-              values.logo = 'https://picsum.photos/200';
+              const file = logo;
+              if (file) {
+                const form = new FormData();
+                form.append('file', file);
+                const { data } = await axios.post('/api/upload-file', form);
+                values.logo = data.url;
+              }
+
               if (!values.parentCategory) delete values.parentCategory;
               await createCategory.mutateAsync(values);
               actions.resetForm();
@@ -105,6 +113,7 @@ const Index = () => {
                   mt={'md'}
                   placeholder='Select Logo'
                   icon={<IconUpload size={14} />}
+                  onChange={setLogo}
                 />
                 <Group style={{ justifyContent: 'end' }} mt={'md'} mb={'xs'}>
                   <Button
