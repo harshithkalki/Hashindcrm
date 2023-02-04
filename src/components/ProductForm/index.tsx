@@ -83,7 +83,7 @@ const ProductForm = ({ formInputs }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes, cx } = useStyles();
   const createProduct = trpc.productRouter.create.useMutation();
-  const categories = trpc.categoryRouter.getAllCategorys.useQuery();
+  const categories = trpc.categoryRouter.getAllCategories.useQuery();
   const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
   const brands = trpc.brandRouter.getAllBrands.useQuery();
   const [modal, setModal] = useState(false);

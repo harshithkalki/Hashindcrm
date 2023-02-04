@@ -1,7 +1,8 @@
-import FormInput from "@/components/FormikCompo/FormikInput";
-import FormikSelect from "@/components/FormikCompo/FormikSelect";
-import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
-import StockadjustmentTable from "@/components/Tables/StockAdjustTable";
+import FormInput from '@/components/FormikCompo/FormikInput';
+import FormikSelect from '@/components/FormikCompo/FormikSelect';
+import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import StockadjustmentTable from '@/components/Tables/StockAdjustTable';
+import { trpc } from '@/utils/trpc';
 import {
   Button,
   Container,
@@ -9,106 +10,101 @@ import {
   Modal,
   TextInput,
   Title,
-} from "@mantine/core";
-import { Form, Formik } from "formik";
-import React from "react";
-import { z } from "zod";
-import { toFormikValidationSchema } from "zod-formik-adapter";
-
-const data = [
-  {
-    id: "1",
-    name: "Product 1",
-    logo: "https://picsum.photos/200",
-    quantity: "10",
-  },
-  {
-    id: "2",
-    name: "Product 2",
-    logo: "https://picsum.photos/200",
-    quantity: "20",
-  },
-  {
-    id: "3",
-    name: "Product 3",
-    logo: "https://picsum.photos/200",
-    quantity: "30",
-  },
-];
+} from '@mantine/core';
+import { Form, Formik } from 'formik';
+import React from 'react';
+import { z } from 'zod';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const stockadjustments = trpc.stockAdjustRouter.getAllStockAdjusts.useQuery();
+  const createAdjustment = trpc.stockAdjustRouter.create.useMutation();
+  const products = trpc.productRouter.getAllProducts.useQuery();
+
   const AdjustForm = () => {
     return (
       <>
         <Modal
           onClose={() => setModal(false)}
           opened={modal}
-          title={"Add Adjustment"}
+          title={'Add Adjustment'}
         >
           <Formik
             initialValues={{
-              name: "",
+              productId: '',
               quantity: 0,
-              adjustment: "",
-              note: "",
+              adjustment: '',
+              note: '',
             }}
             onSubmit={(values) => {
-              console.log(values);
+              createAdjustment.mutateAsync({
+                ...values,
+                operation: values.adjustment,
+              });
             }}
             validationSchema={toFormikValidationSchema(
               z.object({
-                name: z.string(),
+                productId: z.string(),
                 quantity: z.number(),
                 adjustment: z.string(),
                 note: z.string().optional(),
               })
             )}
           >
-            {({ handleSubmit }) => (
+            {({ handleSubmit, values }) => (
               <Form onSubmit={handleSubmit}>
                 <FormikSelect
-                  mt={"md"}
-                  name="name"
-                  label="Product Name"
+                  mt={'md'}
+                  name='productId'
+                  label='Product Name'
                   searchable
                   creatable
-                  data={[
-                    { label: "Product 1", value: "Product 1" },
-                    { label: "Product 2", value: "Product 2" },
-                    { label: "Product 3", value: "Product 3" },
-                  ]}
-                  placeholder="Select Product"
+                  data={
+                    products.data?.map((product) => ({
+                      label: product.name,
+                      value: product._id.toString(),
+                    })) || []
+                  }
+                  placeholder='Select Product'
                   withAsterisk
                 />
-                <Group mt={"md"}>
-                  <TextInput value={0} label="Current Stock" disabled />
+                <Group mt={'md'}>
+                  <TextInput
+                    value={
+                      products.data?.find(
+                        (product) => product._id.toString() === values.productId
+                      )?.quantity || 0
+                    }
+                    label='Current Stock'
+                    disabled
+                  />
                   <FormInput
-                    name="quantity"
-                    label="Quantity"
-                    placeholder="Quantity"
-                    type="number"
+                    name='quantity'
+                    label='Quantity'
+                    placeholder='Quantity'
+                    type='number'
                     withAsterisk
                   />
                 </Group>
                 <FormikSelect
-                  name="adjustment"
-                  label="Adjustment"
-                  mt={"md"}
+                  name='adjustment'
+                  label='Adjustment'
+                  mt={'md'}
                   data={[
-                    { label: "Add", value: "add" },
-                    { label: "Remove", value: "remove" },
+                    { label: 'Add', value: 'add' },
+                    { label: 'Remove', value: 'remove' },
                   ]}
-                  placeholder="Select Adjustment"
+                  placeholder='Select Adjustment'
                   withAsterisk
                 />
                 <Formiktextarea
-                  name="note"
-                  label="Note"
-                  placeholder="Note"
-                  mt={"md"}
+                  name='note'
+                  label='Note'
+                  placeholder='Note'
+                  mt={'md'}
                 />
-                <Button type="submit" mt={"lg"}>
+                <Button type='submit' mt={'lg'}>
                   Submit
                 </Button>
               </Form>
@@ -119,22 +115,24 @@ const Index = () => {
     );
   };
 
+  if (stockadjustments.isLoading) return <div>Loading...</div>;
+
   return (
     <>
       <AdjustForm />
       <Container>
-        <Group mb={"lg"} mt={"lg"} style={{ justifyContent: "space-between" }}>
+        <Group mb={'lg'} mt={'lg'} style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Stock Adjustment</Title>
           <Button
-            size="xs"
+            size='xs'
             onClick={() => {
               setModal(true);
             }}
           >
-            Add Categories
+            Add Adjustment
           </Button>
         </Group>
-        <StockadjustmentTable data={data} />
+        <StockadjustmentTable data={stockadjustments.data || []} />
       </Container>
     </>
   );

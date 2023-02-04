@@ -5,6 +5,45 @@ import Warehouse from '@/models/Warehouse';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 import UserModel from '@/models/User';
+import CategoryModel from '@/models/Category';
+
+const getAllChildCategories = async (
+  category: string
+): Promise<
+  {
+    _id: string;
+    name: string;
+    slug: string;
+    parentCategory: string;
+  }[]
+> => {
+  const categories = await CategoryModel.find({
+    parentCategory: category,
+  }).lean();
+
+  if (categories.length === 0) {
+    return [];
+  }
+
+  const childCategories = await Promise.all(
+    categories.map(async (category) => {
+      const child = await getAllChildCategories(category._id.toString());
+      return child;
+    })
+  );
+
+  return [
+    ...childCategories.flat(),
+    ...categories.map((category) => {
+      return {
+        _id: category._id.toString(),
+        name: category.name,
+        slug: category.slug,
+        parentCategory: category.parentCategory as unknown as string,
+      };
+    }),
+  ];
+};
 
 export const productRouter = router({
   create: protectedProcedure
@@ -128,6 +167,63 @@ export const productRouter = router({
     return warehouse;
   }),
 
+  getProductsByCategory: protectedProcedure
+    .input(
+      z.object({
+        category: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await UserModel.findById(ctx.userId);
+
+      if (!client) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to access product',
+        });
+      }
+
+      const isPermitted = await checkPermission(
+        'PRODUCT',
+        'read',
+        client?.toObject(),
+        true
+      );
+
+      if (!isPermitted) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to access product',
+        });
+      }
+
+      if (input.category === '') {
+        return [];
+      }
+
+      const products = await ProductModel.find({
+        companyId: client.companyId,
+        category: input.category,
+      }).lean();
+
+      if (products.length === 0) {
+        const childCategories = await getAllChildCategories(input.category);
+
+        console.log(childCategories, 'childCategories');
+
+        const products = await ProductModel.find({
+          companyId: client.companyId,
+          category: {
+            $in: childCategories.map((category) => category._id),
+          },
+        }).lean();
+
+        return products;
+      }
+
+      return products;
+    }),
+
   update: protectedProcedure
     .input(
       z.object({
@@ -244,6 +340,17 @@ export const productRouter = router({
     })
       .populate(['warehouse', 'category', 'brand'])
       .lean();
+
+    await Promise.all(
+      products.map(async (product) => {
+        if (
+          !product.category ||
+          !(product.category as unknown as { name: string }).name
+        ) {
+          await ProductModel.deleteOne({ _id: product._id });
+        }
+      })
+    );
 
     return products.map((val) => ({
       ...val,

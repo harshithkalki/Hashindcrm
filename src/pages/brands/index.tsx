@@ -8,12 +8,13 @@ import {
   Modal,
   Title,
 } from '@mantine/core';
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { Formik, Form } from 'formik';
 import { IconUpload } from '@tabler/icons';
 import { trpc } from '@/utils/trpc';
+import axios from 'axios';
 
 const Index = () => {
   const router = useRouter();
@@ -22,12 +23,21 @@ const Index = () => {
   const brands = trpc.brandRouter.getAllBrands.useQuery();
 
   const AddBrand = () => {
+    const [logo, setLogo] = useState<File | null>(null);
     return (
       <>
         <Modal opened={modal} onClose={() => setModal(false)} title='Add Brand'>
           <Formik
             initialValues={{ name: '', slug: '', logo: '' }}
             onSubmit={async (values, actions) => {
+              const file = logo;
+              if (file) {
+                const form = new FormData();
+                form.append('file', file);
+                const { data } = await axios.post('/api/upload-file', form);
+                values.logo = data.url;
+              }
+
               await createBrand.mutateAsync({
                 ...values,
                 logo: 'https://cdn.mos.cms.futurecdn.net/6ZQ7Q2Z7Q4Z2Q2Z7Q4Z2Q2Z7-1200-80.jpg.webp',
@@ -53,6 +63,7 @@ const Index = () => {
                 />
                 <FileInput
                   label='Logo'
+                  onChange={setLogo}
                   name='logo'
                   mt={'md'}
                   placeholder='Select Logo'

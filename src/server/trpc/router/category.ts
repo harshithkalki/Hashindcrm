@@ -128,7 +128,7 @@ export const categoryRouter = router({
       return category;
     }),
 
-  getAllCategorys: protectedProcedure.query(async ({ ctx }) => {
+  getAllCategories: protectedProcedure.query(async ({ ctx }) => {
     const client = await UserModel.findById(ctx.userId);
 
     if (!client) {
