@@ -1,16 +1,19 @@
-import type { Model, ObjectId } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
-export interface Brand {
+export interface IBrand {
   name: string;
   slug: string;
   logo: string;
-  companyId: ObjectId;
+  companyId: Types.ObjectId;
 }
 
-type BrandModel = Model<Brand, Record<string, never>>;
+export type BrandDocument = mongoose.Document & IBrand;
 
-const BrandSchema: Schema = new Schema<Brand, BrandModel>(
+type BrandModel = Model<BrandDocument, Record<string, never>>;
+
+const BrandSchema: Schema = new Schema<IBrand, BrandModel>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true },
@@ -22,8 +25,14 @@ const BrandSchema: Schema = new Schema<Brand, BrandModel>(
   }
 );
 
+BrandSchema.plugin(mongoosePaginate);
+
 BrandSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Brand as ReturnType<
-  typeof mongoose.model<Brand, BrandModel>
->) || mongoose.model<Brand, BrandModel>('Brand', BrandSchema);
+  typeof mongoose.model<BrandDocument, mongoose.PaginateModel<BrandModel>>
+>) ||
+  mongoose.model<BrandDocument, mongoose.PaginateModel<BrandModel>>(
+    'Brand',
+    BrandSchema
+  );

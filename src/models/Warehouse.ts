@@ -1,14 +1,16 @@
-import type { Model, ObjectId } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-export interface Warehouse {
+export interface IWarehouse {
   name: string;
-  companyId: ObjectId;
+  companyId: Types.ObjectId;
 }
 
-type WarehouseModel = Model<Warehouse, Record<string, never>>;
+type WarehouseModel = Model<IWarehouse, Record<string, never>>;
 
-const WarehouseSchema: Schema = new Schema<Warehouse, WarehouseModel>(
+export type WarehouseDocument = mongoose.Document & IWarehouse;
+
+const WarehouseSchema: Schema = new Schema<IWarehouse, WarehouseModel>(
   {
     name: { type: String, required: true },
     companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
@@ -21,5 +23,5 @@ const WarehouseSchema: Schema = new Schema<Warehouse, WarehouseModel>(
 WarehouseSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Warehouse as ReturnType<
-  typeof mongoose.model<Warehouse, WarehouseModel>
->) || mongoose.model<Warehouse, WarehouseModel>('Warehouse', WarehouseSchema);
+  typeof mongoose.model<IWarehouse, WarehouseModel>
+>) || mongoose.model<IWarehouse, WarehouseModel>('Warehouse', WarehouseSchema);

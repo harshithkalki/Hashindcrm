@@ -1,14 +1,19 @@
-import type { Model, ObjectId } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
+import type { BrandDocument } from './Brand';
+import type { CategoryDocument } from './Category';
+import type { CompanyDocument } from './Company';
+import type { WarehouseDocument } from './Warehouse';
 
-export interface Product {
+export interface IProduct {
   name: string;
   slug: string;
   logo?: string;
   quantity: number;
   quantityAlert: number;
-  category: ObjectId;
-  brand: ObjectId;
+  category: Types.ObjectId | CategoryDocument;
+  brand: Types.ObjectId | BrandDocument;
   barcodeSymbology: string;
   itemCode: string;
   openingStock: number;
@@ -19,13 +24,15 @@ export interface Product {
   mrp: number;
   expiryDate?: Date;
   description?: string;
-  warehouse: ObjectId;
-  companyId: ObjectId;
+  warehouse: Types.ObjectId | WarehouseDocument;
+  companyId: Types.ObjectId | CompanyDocument;
 }
 
-type ProductModel = Model<Product, Record<string, never>>;
+export type ProductDocument = mongoose.Document & IProduct;
 
-const ProductSchema: Schema = new Schema<Product, ProductModel>(
+type ProductModel = Model<ProductDocument, Record<string, never>>;
+
+const ProductSchema: Schema = new Schema<ProductDocument, ProductModel>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true },
@@ -52,8 +59,17 @@ const ProductSchema: Schema = new Schema<Product, ProductModel>(
   }
 );
 
+ProductSchema.plugin(mongoosePaginate);
+
 ProductSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Product as ReturnType<
-  typeof mongoose.model<Product, ProductModel>
->) || mongoose.model<Product, ProductModel>('Product', ProductSchema);
+  typeof mongoose.model<
+    ProductDocument,
+    mongoose.PaginateModel<ProductDocument>
+  >
+>) ||
+  mongoose.model<ProductDocument, mongoose.PaginateModel<ProductDocument>>(
+    'Product',
+    ProductSchema
+  );

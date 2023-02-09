@@ -1,10 +1,10 @@
-import type { Model, ObjectId } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 export interface StockAdjust {
-  productId: ObjectId;
+  productId: Types.ObjectId;
   quantity: number;
-  companyId: ObjectId;
+  companyId: Types.ObjectId;
   createdAt: Date;
   note?: string;
   operation: 'add' | 'remove';

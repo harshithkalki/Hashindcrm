@@ -150,6 +150,7 @@ export default function StockadjustmentTable<T>({
   };
 
   const rows = filteredData.map((item) => {
+    console.log(item);
     return (
       <>
         <tr key={item._id.toString()}>

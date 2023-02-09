@@ -22,7 +22,7 @@ import {
   Title,
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons';
-import { Form, Formik } from 'formik';
+import { FieldArray, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
@@ -55,11 +55,36 @@ interface modalProps {
 }
 
 type InlineProduct = {
-  _id: string;
-  name: string;
-  subtotal: number;
+  product: string;
   quantity: number;
+  subtotal: number;
   price: number;
+  tax: number;
+  name: string;
+};
+
+type InitialValues = {
+  products: InlineProduct[];
+  note: string;
+  total: number;
+  status: string;
+  shipping: number;
+  orderTax: number;
+  discount: number;
+  warehouse: string;
+  openingStockDate: string;
+};
+
+const initialValues: InitialValues = {
+  products: [],
+  note: '',
+  total: 0,
+  status: 'pending',
+  shipping: 0,
+  orderTax: 0,
+  discount: 0,
+  warehouse: '',
+  openingStockDate: new Date().toISOString(),
 };
 
 const AddStockTransfer = ({ modal, setModal }: modalProps) => {
@@ -68,12 +93,10 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
   const [warehouseModal, setWarehouseModal] = React.useState(false);
   const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
   const products = trpc.productRouter.getAllProducts.useQuery();
-  const [inlineProducts, setInlineProducts] = useState<
-    Map<string, InlineProduct>
-  >(new Map());
   const [selectProduct, setSelectProduct] = useState<InlineProduct>();
   const terms =
     '1.Goods once sold will not be takenback or exchanged\n2.All disputes are subject to Mumbai Jurisdiction';
+  const createStockTransfer = trpc.stockTransferRouter.create.useMutation();
 
   const AddWarehouse = () => {
     return (
@@ -87,11 +110,7 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
             initialValues={{
               name: '',
             }}
-            validationSchema={toFormikValidationSchema(
-              z.object({
-                name: z.string().min(3).max(50),
-              })
-            )}
+            validationSchema={toFormikValidationSchema(z.object({}))}
             onSubmit={async (values, actions) => {
               await createWarehouse.mutateAsync(values);
               actions.resetForm();
@@ -137,23 +156,37 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
         size='90%'
       >
         <Formik
-          initialValues={{
-            invoicenum: '',
-            warehouse: '',
-            date: '',
-            orderstatus: '',
-            product: [],
-            tax: '',
-            discount: 0,
-            shipping: 0,
-            total: 0,
-            notes: '',
+          initialValues={initialValues}
+          onSubmit={async (values, { setSubmitting }) => {
+            await createStockTransfer.mutateAsync({
+              ...values,
+              total: values.products.reduce(
+                (acc, curr) => acc + curr.subtotal,
+                0
+              ),
+            });
+            setSubmitting(false);
           }}
-          onSubmit={(values) => {
-            console.log(values);
-          }}
+          validationSchema={toFormikValidationSchema(
+            z.object({
+              products: z.array(
+                z.object({
+                  product: z.string(),
+                  quantity: z.number(),
+                })
+              ),
+              note: z.string(),
+              total: z.number(),
+              status: z.string(),
+              shipping: z.number(),
+              orderTax: z.number(),
+              discount: z.number(),
+              warehouse: z.string(),
+              openingStockDate: z.string(),
+            })
+          )}
         >
-          {({ values, handleChange, handleSubmit }) => (
+          {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
               <SimpleGrid
                 m={'md'}
@@ -174,6 +207,7 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                 />
                 <FormikSelect
                   label='Warehouse'
+                  name='warehouse'
                   data={
                     warehouses.data?.map((warehouse) => ({
                       label: warehouse.name,
@@ -181,7 +215,6 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                     })) || []
                   }
                   placeholder='Pick one warehouse'
-                  name='warehouse'
                   searchable
                   w={'100%'}
                   rightSection={
@@ -198,7 +231,7 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                 <FormDate
                   label='Opening Stock Date'
                   placeholder='Opening Stock Date'
-                  name='date'
+                  name='openingStockDate'
                   withAsterisk
                 />
               </SimpleGrid>
@@ -211,30 +244,19 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                     value: item._id.toString(),
                   })) || []
                 }
+                name='products'
                 placeholder='Select Products'
                 searchable
                 size='sm'
-                value={selectProduct?._id.toString() || ''}
+                value={selectProduct?.product.toString() || ''}
                 rightSection={
                   <ActionIcon
                     onClick={() => {
                       if (selectProduct) {
-                        const inlineProduct = inlineProducts.get(
-                          selectProduct._id.toString()
-                        );
-                        if (!inlineProduct) {
-                          inlineProducts.set(
-                            selectProduct._id.toString(),
-                            selectProduct
-                          );
-                        } else {
-                          return;
-                        }
-                        inlineProducts.set(
-                          selectProduct._id.toString(),
-                          selectProduct
-                        );
-                        setInlineProducts(new Map(inlineProducts));
+                        setFieldValue('products', [
+                          ...values.products,
+                          selectProduct,
+                        ]);
                         setSelectProduct(undefined);
                       }
                     }}
@@ -249,11 +271,12 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
 
                   if (product) {
                     setSelectProduct({
-                      _id: product._id.toString(),
                       name: product.name,
+                      product: product._id.toString(),
                       quantity: 1,
-                      subtotal: product.mrp,
-                      price: product.mrp,
+                      price: product.salePrice,
+                      tax: product.tax,
+                      subtotal: product.salePrice + product.tax,
                     });
                   }
                 }}
@@ -330,88 +353,102 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {[...inlineProducts.values()].map((item, index) => (
-                        <tr key={item._id}>
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {index + 1}
-                          </td>
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {item.name}
-                          </td>
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            <NumberInput
-                              size='sm'
-                              value={item.quantity}
-                              onChange={(value) => {
-                                console.log(value);
-                                if (!value) return;
-                                item.quantity = value;
-                                item.subtotal = item.price * value;
-                                setInlineProducts(new Map(inlineProducts));
-                              }}
-                              min={1}
-                            />
-                          </td>
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {item.price}
-                          </td>
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {'XXXX'}
-                          </td>
+                      <FieldArray
+                        name='products'
+                        render={(arrayHelpers) => (
+                          <React.Fragment>
+                            {values.products.map((item, index) => (
+                              <tr key={item.product}>
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {index + 1}
+                                </td>
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {item.name}
+                                </td>
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  <NumberInput
+                                    size='sm'
+                                    value={item.quantity}
+                                    onChange={(value) => {
+                                      if (!value) return;
+                                      item.quantity = value;
+                                      item.subtotal =
+                                        (item.price + item.tax) * value;
+                                      setFieldValue(
+                                        `products[${index}].quantity`,
+                                        value
+                                      );
+                                      setFieldValue(
+                                        `products[${index}].subtotal`,
+                                        item.subtotal
+                                      );
+                                    }}
+                                    name={`products[${index}].quantity`}
+                                    min={1}
+                                  />
+                                </td>
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {item.price}
+                                </td>
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {item.tax}
+                                </td>
 
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            {item.subtotal}
-                          </td>
-                          <td
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                              // justifyItems: 'center',
-                            }}
-                          >
-                            <ActionIcon
-                              variant='filled'
-                              color={'blue'}
-                              onClick={() => {
-                                inlineProducts.delete(item._id);
-                                setInlineProducts(new Map(inlineProducts));
-                              }}
-                            >
-                              <IconTrash />
-                            </ActionIcon>
-                          </td>
-                        </tr>
-                      ))}
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {item.subtotal}
+                                </td>
+                                <td
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                    // justifyItems: 'center',
+                                  }}
+                                >
+                                  <ActionIcon
+                                    variant='filled'
+                                    color={'blue'}
+                                    onClick={() => {
+                                      arrayHelpers.remove(index);
+                                    }}
+                                  >
+                                    <IconTrash />
+                                  </ActionIcon>
+                                </td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
+                        )}
+                      />
                     </tbody>
                   </Table>
                 </ScrollArea>
@@ -421,12 +458,12 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                 <TextInput
                   label={'Total'}
                   value={
-                    [...inlineProducts.values()].reduce(
+                    values.products.reduce(
                       (acc, item) => acc + item.subtotal,
                       0
                     ) || 0
                   }
-                  disabled
+                  readOnly
                 />
               </Group>
               <SimpleGrid
@@ -444,14 +481,13 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                   <Textarea
                     label={'Terms & Conditions'}
                     value={terms}
-                    disabled
+                    readOnly
                   />
                   <Formiktextarea
                     mt={'md'}
                     placeholder={'Notes'}
                     label={'Notes'}
-                    name={'notes'}
-                    value={values.notes}
+                    name='note'
                   />
                 </div>
 
@@ -460,7 +496,7 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                     <FormikSelect
                       label={'Status'}
                       placeholder={'Select Status'}
-                      name={'orderstatus'}
+                      name={'status'}
                       w={'46%'}
                       data={[
                         { label: 'Pending', value: 'pending' },
@@ -497,21 +533,20 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                     />
                   </Group>
                   <Group w={'100%'} mt={'sm'}>
-                    <TextInput
+                    <FormInput
                       w={'46%'}
                       label={'Order Tax'}
                       placeholder={'Order Tax'}
-                      disabled
-                      value={0}
+                      name={'orderTax'}
                       type={'number'}
                     />
                     <TextInput
                       w={'46%'}
                       label={'Total'}
                       placeholder={'Total'}
-                      disabled
+                      readOnly
                       value={
-                        [...inlineProducts.values()].reduce(
+                        values.products.reduce(
                           (acc, item) => acc + item.subtotal,
                           0
                         ) -
@@ -524,7 +559,7 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
                 </div>
               </SimpleGrid>
               <Group w={'100%'} style={{ justifyContent: 'center' }}>
-                <Button type='submit' mb={'md'}>
+                <Button type='submit' mb={'md'} loading={isSubmitting}>
                   Submit
                 </Button>
               </Group>
@@ -538,6 +573,9 @@ const AddStockTransfer = ({ modal, setModal }: modalProps) => {
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const invoices = trpc.stockTransferRouter.getAllStockTransfers.useQuery();
+
+  if (invoices.isLoading) return <div>Loading...</div>;
 
   return (
     <>
@@ -557,35 +595,17 @@ const Index = () => {
         <Divider mt={'lg'} />
 
         <StockTransferTable
-          data={[
-            {
-              invoicenum: 'INV-0001',
-              warehouse: 'Warehouse 1',
-              date: '2021-01-01',
-              status: 'Pending',
-              paidamount: '100',
-              totalamount: '100',
-              paymentstatus: 'Pending',
-            },
-            {
-              invoicenum: 'INV-0002',
-              warehouse: 'Warehouse 2',
-              date: '2021-01-01',
-              status: 'Pending',
-              paidamount: '100',
-              totalamount: '100',
-              paymentstatus: 'Pending',
-            },
-            {
-              invoicenum: 'INV-0003',
-              warehouse: 'Warehouse 3',
-              date: '2021-01-01',
-              status: 'Pending',
-              paidamount: '100',
-              totalamount: '100',
-              paymentstatus: 'Pending',
-            },
-          ]}
+          data={
+            invoices.data?.map((item) => ({
+              date: item.openingStockDate.toISOString(),
+              invoicenum: item._id.toString(),
+              paidamount: item.paidAmount.toString(),
+              totalamount: item.total.toString(),
+              paymentstatus: item.paymentStatus,
+              status: item.status,
+              warehouse: 'name' in item.warehouse ? item.warehouse.name : '',
+            })) || []
+          }
         />
       </Container>
     </>

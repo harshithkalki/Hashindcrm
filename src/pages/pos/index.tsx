@@ -1,6 +1,7 @@
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Truncate from '@/components/TextTruncate';
+import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import {
   Divider,
@@ -21,7 +22,8 @@ import {
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons';
 import { Form, Formik } from 'formik';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Waypoint } from 'react-waypoint';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -48,18 +50,41 @@ type InlineProduct = {
   subtotal: number;
   quantity: number;
   price: number;
+  tax: number;
+};
+
+type Query = {
+  page: number;
+  limit: number;
+  category?: string;
 };
 
 const Index = () => {
-  const [selectedCategory, setSelectedCategory] = useState(0);
-  const categories = trpc.categoryRouter.getAllCategories.useQuery();
-  const products = trpc.productRouter.getProductsByCategory.useQuery({
-    category: categories.data?.[selectedCategory]?._id.toString() || '',
+  const [query, setQuery] = useState<Query>({
+    page: 1,
+    limit: 20,
   });
+  const categories = trpc.categoryRouter.getAllCategories.useQuery();
+  const productsQuery = trpc.productRouter.getProducts.useQuery(query);
+
   const [inlineProducts, setInlineProducts] = useState<
     Map<string, InlineProduct>
   >(new Map());
   const [selectProduct, setSelectProduct] = useState<InlineProduct>();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const [products, setProducts] = useState<
+    RouterOutputs['productRouter']['getProducts']['docs']
+  >([]);
+
+  useEffect(() => {
+    if (productsQuery.data) {
+      setProducts((prev) => [
+        ...prev,
+        ...productsQuery.data.docs.filter((item) => !prev.includes(item)),
+      ]);
+    }
+  }, [productsQuery.data]);
 
   const { classes } = useStyles();
   return (
@@ -111,11 +136,18 @@ const Index = () => {
                         height: '100%',
                       }}
                     >
-                      {categories.data?.map((item, index) => (
+                      {categories.data?.map((item) => (
                         <ActionIcon
                           key={item._id.toString()}
                           style={{ width: '70px', height: '60px' }}
-                          onClick={() => setSelectedCategory(index)}
+                          onClick={() => {
+                            setQuery((prev) => ({
+                              ...prev,
+                              category: item._id.toString(),
+                            }));
+                            setSelectedCategory(item._id.toString());
+                            productsQuery.refetch();
+                          }}
                         >
                           <div
                             className='categorylist'
@@ -174,7 +206,12 @@ const Index = () => {
                     offsetScrollbars
                   >
                     <div className={classes.products}>
-                      {products.data?.map((item) => (
+                      {(selectedCategory
+                        ? products.sort((a, b) =>
+                            a.category._id === selectedCategory ? -1 : 1
+                          )
+                        : products
+                      ).map((item, index) => (
                         <Card
                           shadow='sm'
                           key={item._id.toString()}
@@ -195,7 +232,7 @@ const Index = () => {
                           </Card.Section>
                           <Card.Section pl={'md'}>
                             <Text fw={300} fz={'xs'}>
-                              {item.category as unknown as string}
+                              {'name' in item.category && item.category.name}
                             </Text>
                           </Card.Section>
                           <Card.Section pl={'md'} mt={'xs'}>
@@ -203,6 +240,20 @@ const Index = () => {
                               $ {item.mrp}
                             </Text>
                           </Card.Section>
+                          {index === products.length - 5 && (
+                            <Waypoint
+                              onEnter={() => {
+                                setQuery((prev) => ({
+                                  ...prev,
+                                  page: prev.page + 1,
+                                }));
+
+                                if (productsQuery.data?.hasNextPage) {
+                                  productsQuery.refetch();
+                                }
+                              }}
+                            />
+                          )}
                         </Card>
                       ))}
                     </div>
@@ -223,7 +274,7 @@ const Index = () => {
                     <Select
                       label='Products'
                       data={
-                        products.data?.map((item) => ({
+                        products.map((item) => ({
                           label: item.name,
                           value: item._id.toString(),
                         })) || []
@@ -260,7 +311,7 @@ const Index = () => {
                         </ActionIcon>
                       }
                       onChange={(value) => {
-                        const product = products.data?.find(
+                        const product = products.find(
                           (item) => item._id.toString() === value
                         );
 
@@ -269,8 +320,9 @@ const Index = () => {
                             _id: product._id.toString(),
                             name: product.name,
                             quantity: 1,
-                            subtotal: product.mrp,
-                            price: product.mrp,
+                            subtotal: product.salePrice + product.tax,
+                            price: product.salePrice,
+                            tax: product.tax,
                           });
                         }
                       }}
@@ -314,6 +366,7 @@ const Index = () => {
                           >
                             Quantity
                           </th>
+                          <th style={{ whiteSpace: 'nowrap' }}>Tax</th>
                           <th
                             style={{
                               whiteSpace: 'nowrap',
@@ -364,11 +417,20 @@ const Index = () => {
                                   console.log(value);
                                   if (!value) return;
                                   item.quantity = value;
-                                  item.subtotal = item.price * value;
+                                  item.subtotal =
+                                    (item.price + item.tax) * value;
                                   setInlineProducts(new Map(inlineProducts));
                                 }}
                                 min={1}
                               />
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              {item.tax}
                             </td>
                             <td
                               style={{
@@ -420,10 +482,13 @@ const Index = () => {
                       type='number'
                     />
                     <FormikSelect
-                      name='ordertax'
-                      label='Order Tax'
-                      data={customerOptions}
-                      placeholder='Select Order Tax'
+                      name='paymentmethod'
+                      label='Payment Method'
+                      data={[
+                        { label: 'Cash', value: 'cash' },
+                        { label: 'Card', value: 'card' },
+                      ]}
+                      placeholder='Payment Method'
                       w={'30%'}
                       searchable
                       size='sm'

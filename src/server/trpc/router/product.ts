@@ -1,11 +1,14 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import ProductModel from '@/models/Product';
-import Warehouse from '@/models/Warehouse';
+import ProductModel, { ProductDocument } from '@/models/Product';
+import type { WarehouseDocument } from '@/models/Warehouse';
+import WarehouseModel from '@/models/Warehouse';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 import UserModel from '@/models/User';
+import type { CategoryDocument } from '@/models/Category';
 import CategoryModel from '@/models/Category';
+import type { BrandDocument } from '@/models/Brand';
 
 const getAllChildCategories = async (
   category: string
@@ -129,7 +132,7 @@ export const productRouter = router({
         });
       }
 
-      const warehouse = await Warehouse.create({
+      const warehouse = await WarehouseModel.create({
         ...input,
         companyId: client.companyId,
       });
@@ -160,7 +163,7 @@ export const productRouter = router({
         message: 'You are not permitted to access warehouse',
       });
     }
-    const warehouse = await Warehouse.find({
+    const warehouse = await WarehouseModel.find({
       companyId: client.companyId,
     });
 
@@ -338,7 +341,11 @@ export const productRouter = router({
     const products = await ProductModel.find({
       companyId: client.companyId,
     })
-      .populate(['warehouse', 'category', 'brand'])
+      .populate<{
+        warehouse: WarehouseDocument;
+        category: CategoryDocument;
+        brand: BrandDocument;
+      }>(['warehouse', 'category', 'brand'])
       .lean();
 
     await Promise.all(
@@ -356,11 +363,80 @@ export const productRouter = router({
       ...val,
       openingStockDate: val.openingStockDate?.toISOString(),
       expiryDate: val.expiryDate?.toISOString(),
-      brand: (val.brand as unknown as { name: string }).name as string,
-      category: (val.category as unknown as { name: string }).name as string,
-      warehouse: (val.warehouse as unknown as { name: string }).name as string,
+      brand: val.brand.name,
+      category: val.category.name,
+      warehouse: val.warehouse.name,
     }));
   }),
+
+  getProducts: protectedProcedure
+    .input(
+      z
+        .object({
+          page: z.number(),
+          limit: z.number().optional(),
+
+          category: z.string().optional(),
+        })
+        .optional()
+    )
+
+    .query(async ({ input, ctx }) => {
+      const client = await UserModel.findById(ctx.userId);
+
+      if (!client) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to get products',
+        });
+      }
+
+      const isPermitted = await checkPermission(
+        'PRODUCT',
+        'read',
+        client?.toObject()
+      );
+
+      if (!isPermitted) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to get products',
+        });
+      }
+
+      const { page, limit } = input || {};
+
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        sort: {
+          name: 1,
+        },
+        populate: [
+          {
+            path: 'category',
+            select: 'name',
+          },
+          {
+            path: 'brand',
+            select: 'name',
+          },
+          {
+            path: 'warehouse',
+            select: 'name',
+          },
+        ],
+      };
+
+      const query = {
+        companyId: client.companyId,
+        ...(input?.category && { category: input.category }),
+      };
+
+      const products = await ProductModel.paginate(query, options);
+
+      return products;
+    }),
 
   getProduct: protectedProcedure
     .input(

@@ -1,21 +1,22 @@
-import type { Model, ObjectId } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-export interface Category {
+export interface ICategory {
   name: string;
   slug: string;
   logo: string;
-  parentCategory?: ObjectId;
-  companyId: ObjectId;
+  parentCategory?: Types.ObjectId;
+  companyId: Types.ObjectId;
 }
 
-type CategoryModel = Model<Category, Record<string, never>>;
+type CategoryModel = Model<ICategory, Record<string, never>>;
+export type CategoryDocument = mongoose.Document & ICategory;
 
-const CategorySchema: Schema = new Schema<Category, CategoryModel>(
+const CategorySchema: Schema = new Schema<ICategory, CategoryModel>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true },
-    logo: { type: String, required: true },
+    logo: { type: String, required: false },
     parentCategory: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
@@ -31,5 +32,5 @@ const CategorySchema: Schema = new Schema<Category, CategoryModel>(
 CategorySchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Category as ReturnType<
-  typeof mongoose.model<Category, CategoryModel>
->) || mongoose.model<Category, CategoryModel>('Category', CategorySchema);
+  typeof mongoose.model<ICategory, CategoryModel>
+>) || mongoose.model<ICategory, CategoryModel>('Category', CategorySchema);

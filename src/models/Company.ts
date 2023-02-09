@@ -1,7 +1,7 @@
 import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-export interface Company {
+export interface ICompany {
   companyName: string;
   addressLine1: string;
   addressLine2: string;
@@ -12,9 +12,11 @@ export interface Company {
   createdAt: Date;
 }
 
-type CompanyModel = Model<Company, Record<string, never>>;
+export type CompanyDocument = mongoose.Document & ICompany;
 
-const CompanySchema: Schema = new Schema<Company, CompanyModel>(
+type CompanyModel = Model<ICompany, Record<string, never>>;
+
+const CompanySchema: Schema = new Schema<ICompany, CompanyModel>(
   {
     companyName: { type: String, required: true, unique: true },
     addressLine1: { type: String, required: true },
@@ -31,5 +33,5 @@ const CompanySchema: Schema = new Schema<Company, CompanyModel>(
 );
 
 export default (mongoose.models.Company as ReturnType<
-  typeof mongoose.model<Company, CompanyModel>
->) || mongoose.model<Company, CompanyModel>('Company', CompanySchema);
+  typeof mongoose.model<ICompany, CompanyModel>
+>) || mongoose.model<ICompany, CompanyModel>('Company', CompanySchema);

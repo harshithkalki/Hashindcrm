@@ -1,11 +1,11 @@
-import type { Model } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 interface Ticket {
   name: string;
   createdAt: Date;
-  companyId: mongoose.ObjectId;
-  status: mongoose.ObjectId;
+  companyId: Types.ObjectId;
+  status: Types.ObjectId;
 }
 
 type TicketModel = Model<Ticket, Record<string, never>>;

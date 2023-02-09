@@ -1,10 +1,10 @@
-import type { Model } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 interface Status {
   name: string;
   createdAt: Date;
-  companyId: mongoose.ObjectId;
+  companyId: Types.ObjectId;
   initialStatus: boolean;
   linkedStatuses: string[];
 }

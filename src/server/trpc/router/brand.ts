@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import type { Brand } from '@/models/Brand';
+import type { IBrand } from '@/models/Brand';
 import BrandModel from '@/models/Brand';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';

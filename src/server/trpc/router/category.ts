@@ -11,7 +11,7 @@ export const categoryRouter = router({
       z.object({
         name: z.string(),
         slug: z.string(),
-        logo: z.string(),
+        logo: z.string().nullish(),
         parentCategory: z.string().nullish(),
       })
     )
@@ -124,6 +124,11 @@ export const categoryRouter = router({
       }
 
       const category = await CategoryModel.findByIdAndDelete(input.id);
+
+      await CategoryModel.updateMany(
+        { parentCategory: input.id },
+        { parentCategory: null }
+      );
 
       return category;
     }),

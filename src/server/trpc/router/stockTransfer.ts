@@ -1,20 +1,30 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import type { StockAdjust } from '@/models/StockAdjust';
-import StockAdjustModel from '@/models/StockAdjust';
+import type { IStockTransfer } from '@/models/StockTransfer';
+import StockTransferModel from '@/models/StockTransfer';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 import UserModel from '@/models/User';
 import ProductModel from '@/models/Product';
 
-export const stockAdjustRouter = router({
+export const stockTransferRouter = router({
   create: protectedProcedure
     .input(
       z.object({
-        productId: z.string(),
-        quantity: z.number(),
-        note: z.string().nullish(),
-        operation: z.string(),
+        products: z.array(
+          z.object({
+            product: z.string(),
+            quantity: z.number(),
+          })
+        ),
+        note: z.string(),
+        total: z.number(),
+        status: z.string(),
+        shipping: z.number(),
+        orderTax: z.number(),
+        discount: z.number(),
+        warehouse: z.string(),
+        openingStockDate: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -23,7 +33,7 @@ export const stockAdjustRouter = router({
       if (!client) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'You are not permitted to create stockAdjust',
+          message: 'You are not permitted to create stocktransfer',
         });
       }
 
@@ -36,33 +46,27 @@ export const stockAdjustRouter = router({
       if (!isPermitted) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'You are not permitted to create stockAdjust',
+          message: 'You are not permitted to create stocktransfer',
         });
       }
 
-      const stockAdjust = await StockAdjustModel.create({
+      const stocktransfer = await StockTransferModel.create({
         ...input,
         companyId: client.companyId,
       });
 
-      const product = await ProductModel.findById(input.productId);
+      await Promise.all(
+        input.products.map(async (product) => {
+          const productData = await ProductModel.findById(product.product);
+          if (productData) {
+            productData.quantity = productData.quantity - product.quantity;
+            await productData.save();
+          }
+          return product;
+        })
+      );
 
-      if (!product) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Product not found',
-        });
-      }
-
-      if (input.operation === 'add') {
-        product.quantity += input.quantity;
-      } else {
-        product.quantity -= input.quantity;
-      }
-
-      await product.save();
-
-      return stockAdjust;
+      return stocktransfer;
     }),
 
   delete: protectedProcedure
@@ -77,7 +81,7 @@ export const stockAdjustRouter = router({
       if (!client) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete stockAdjust',
+          message: 'You are not permitted to delete stocktransfer',
         });
       }
 
@@ -90,22 +94,24 @@ export const stockAdjustRouter = router({
       if (!isPermitted) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete stockAdjust',
+          message: 'You are not permitted to delete stocktransfer',
         });
       }
 
-      const stockAdjust = await StockAdjustModel.findByIdAndDelete(input.id);
+      const stocktransfer = await StockTransferModel.findByIdAndDelete(
+        input.id
+      );
 
-      return stockAdjust;
+      return stocktransfer;
     }),
 
-  getAllStockAdjusts: protectedProcedure.query(async ({ ctx }) => {
+  getAllStockTransfers: protectedProcedure.query(async ({ ctx }) => {
     const client = await UserModel.findById(ctx.userId);
 
     if (!client) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'You are not permitted to get stockAdjusts',
+        message: 'You are not permitted to get stocktransfers',
       });
     }
 
@@ -118,17 +124,16 @@ export const stockAdjustRouter = router({
     if (!isPermitted) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'You are not permitted to get stockAdjusts',
+        message: 'You are not permitted to get stocktransfers',
       });
     }
 
-    const stockAdjusts = await StockAdjustModel.find({
+    const stocktransfers = await StockTransferModel.find({
       companyId: client.companyId,
-    }).populate<{
-      _id: string;
-      productId: { name: string; logo: string; _id: string };
-    }>('productId', 'name logo');
+    })
+      .populate('warehouse', 'name')
+      .lean();
 
-    return stockAdjusts;
+    return stocktransfers;
   }),
 });

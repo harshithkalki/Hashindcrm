@@ -1,4 +1,4 @@
-import type { Model } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -16,9 +16,9 @@ export interface User {
   state: string;
   country: string;
   pincode: string;
-  role: mongoose.ObjectId;
-  linkedTo?: mongoose.ObjectId;
-  companyId: mongoose.ObjectId;
+  role: Types.ObjectId;
+  linkedTo?: Types.ObjectId;
+  companyId: Types.ObjectId;
   email: string;
   password: string;
   createdAt: Date;

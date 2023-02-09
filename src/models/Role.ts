@@ -1,4 +1,4 @@
-import type { Model } from 'mongoose';
+import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { Permissions } from '@/constants/index';
 
@@ -15,8 +15,8 @@ export interface Role {
     };
   }[];
   displayName: string;
-  company: mongoose.ObjectId;
-  users: mongoose.ObjectId[];
+  company: Types.ObjectId;
+  users: Types.ObjectId[];
 }
 
 type RoleModel = Model<Role, Record<string, never>>;
