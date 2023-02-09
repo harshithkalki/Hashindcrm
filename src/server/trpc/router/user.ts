@@ -71,7 +71,18 @@ export const userRouter = router({
   }),
 
   me: protectedProcedure.query(async ({ ctx }) => {
-    const user = await UserModel.findById(ctx.userId);
+    console.log(ctx.userId);
+    const user = await UserModel.findById(ctx.userId)
+      .populate<{
+        role: {
+          _id: string;
+          name: string;
+        };
+      }>('role', 'name')
+      .lean();
+
+    console.log(user);
+
     return user;
   }),
 
@@ -240,11 +251,11 @@ export const userRouter = router({
     .input(
       z.object({
         firstName: z.string(),
-        middleName: z.string().optional(),
+        middlename: z.string(),
         lastName: z.string(),
         phoneNumber: z.string(),
-        addressLine1: z.string(),
-        addressLine2: z.string(),
+        addressline1: z.string(),
+        addressline2: z.string(),
         city: z.string(),
         state: z.string(),
         country: z.string(),
@@ -317,6 +328,41 @@ export const userRouter = router({
     const users = await UserModel.find({ companyId: client.companyId });
 
     return users;
+  }),
+
+  getAllUsersNames: protectedProcedure.query(async ({ ctx }) => {
+    const client = await UserModel.findById(ctx.userId);
+
+    if (!client) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a user',
+      });
+    }
+
+    const isPermitted = await checkPermission(
+      'USER',
+      'create',
+      client?.toObject()
+    );
+
+    if (!isPermitted) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You are not permitted to create a user',
+      });
+    }
+
+    const users = await UserModel.find({ companyId: client.companyId })
+      .select('firstName middleName lastName')
+      .lean();
+
+    return users.map((val) => {
+      return {
+        _id: val._id.toString(),
+        name: `${val.firstName} ${val.middleName} ${val.lastName}`,
+      };
+    });
   }),
 
   getAllRoles: protectedProcedure.query(async ({ ctx }) => {

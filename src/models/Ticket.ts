@@ -1,16 +1,20 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import type { UserDocument } from '@/models/User';
 
-interface Ticket {
+export interface ITicket {
   name: string;
   createdAt: Date;
   companyId: Types.ObjectId;
+  assignedTo?: Types.ObjectId | UserDocument;
   status: Types.ObjectId;
 }
 
-type TicketModel = Model<Ticket, Record<string, never>>;
+type TicketModel = Model<ITicket, Record<string, never>>;
 
-const TicketSchema = new Schema<Ticket, TicketModel>(
+export type TicketDocument = ITicket & mongoose.Document;
+
+const TicketSchema = new Schema<ITicket, TicketModel>(
   {
     name: {
       type: String,
@@ -30,6 +34,11 @@ const TicketSchema = new Schema<Ticket, TicketModel>(
       required: true,
       ref: 'Ticket',
     },
+    assignedTo: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
+    },
   },
   { versionKey: false }
 );
@@ -37,5 +46,5 @@ const TicketSchema = new Schema<Ticket, TicketModel>(
 TicketSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Ticket as ReturnType<
-  typeof mongoose.model<Ticket, TicketModel>
->) || mongoose.model<Ticket, TicketModel>('Ticket', TicketSchema);
+  typeof mongoose.model<ITicket, TicketModel>
+>) || mongoose.model<ITicket, TicketModel>('Ticket', TicketSchema);

@@ -4,14 +4,15 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { env } from '@/env/server.mjs';
+import type { ITicket } from './Ticket';
 
-export interface User {
+export interface IUser {
   firstName: string;
   middleName: string;
   lastName: string;
   phoneNumber: string;
-  addressLine1: string;
-  addressLine2: string;
+  addressline1: string;
+  addressline2: string;
   city: string;
   state: string;
   country: string;
@@ -22,6 +23,7 @@ export interface User {
   email: string;
   password: string;
   createdAt: Date;
+  ticket?: Types.ObjectId | (ITicket & { _id: string });
 }
 
 interface UserMethods {
@@ -30,16 +32,18 @@ interface UserMethods {
   getResetPasswordToken(): string;
 }
 
-type UserModel = Model<User, Record<string, never>, UserMethods>;
+export type UserDocument = IUser & mongoose.Document;
 
-const UserSchema: Schema = new Schema<User, UserModel, UserMethods>(
+type UserModel = Model<IUser, Record<string, never>, UserMethods>;
+
+const UserSchema: Schema = new Schema<IUser, UserModel, UserMethods>(
   {
     firstName: { type: String, required: true },
     middleName: { type: String, required: false },
     lastName: { type: String, required: true },
     phoneNumber: { type: String, required: true, unique: true },
-    addressLine1: { type: String, required: true },
-    addressLine2: { type: String, required: false },
+    addressline1: { type: String, required: true },
+    addressline2: { type: String, required: false },
     city: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },
@@ -48,8 +52,9 @@ const UserSchema: Schema = new Schema<User, UserModel, UserMethods>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    linkedTo: { type: Schema.Types.ObjectId, ref: 'User' },
+    linkedTo: { type: Schema.Types.ObjectId, ref: 'IUser' },
     companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
+    ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
   },
   {
     versionKey: false,
@@ -91,5 +96,5 @@ UserSchema.method('getResetPasswordToken', function getResetPasswordToken() {
 });
 
 export default (mongoose.models.User as ReturnType<
-  typeof mongoose.model<User, UserModel>
->) || mongoose.model<User, UserModel>('User', UserSchema);
+  typeof mongoose.model<IUser, UserModel>
+>) || mongoose.model<IUser, UserModel>('User', UserSchema);

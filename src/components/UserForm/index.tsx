@@ -8,49 +8,50 @@ import {
   Grid,
   MultiSelect,
   Button,
-} from "@mantine/core";
-import { Formik, Form } from "formik";
-import { toFormikValidationSchema } from "zod-formik-adapter";
-import FormInput from "@/components/FormikCompo/FormikInput";
-import { z } from "zod";
+} from '@mantine/core';
+import { Formik, Form } from 'formik';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import FormInput from '@/components/FormikCompo/FormikInput';
+import { z } from 'zod';
 // import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
-import FormikSelect from "@/components/FormikCompo/FormikSelect";
+import FormikSelect from '@/components/FormikCompo/FormikSelect';
+import { trpc } from '@/utils/trpc';
 
 const rolesOptions = [
-  { label: "Admin", value: "admin" },
-  { label: "User", value: "user" },
-  { label: "Guest", value: "guest" },
+  { label: 'Admin', value: 'admin' },
+  { label: 'User', value: 'user' },
+  { label: 'Guest', value: 'guest' },
 ];
 
 const companyOptions = [
-  { label: "Company 1", value: "company1" },
-  { label: "Company 2", value: "company2" },
-  { label: "Company 3", value: "company3" },
+  { label: 'Company 1', value: 'company1' },
+  { label: 'Company 2', value: 'company2' },
+  { label: 'Company 3', value: 'company3' },
 ];
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    background: "dark",
-    padding: "15px 20px",
-    borderRadius: "5px",
+    background: 'dark',
+    padding: '15px 20px',
+    borderRadius: '5px',
     boxShadow: theme.shadows.xs,
   },
   profile: {
-    cursor: "pointer",
-    ":hover": {
+    cursor: 'pointer',
+    ':hover': {
       boxShadow: theme.shadows.sm,
     },
   },
   addressWrapper: {
-    padding: "8px 13px",
+    padding: '8px 13px',
   },
 }));
 
 export interface UserFormType {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   middlename: string;
-  phone: string;
+  phoneNumber: string;
   email: string;
   addressline1: string;
   addressline2: string;
@@ -75,8 +76,10 @@ interface Props {
 }
 
 const UserForm = ({ title, formInputs }: Props) => {
-  //   const createUser = trpc.user.createUser.useMutation();
+  const createUser = trpc.userRouter.createUser.useMutation();
   const { classes, cx } = useStyles();
+  const roles = trpc.userRouter.getAllRoles.useQuery();
+  const users = trpc.userRouter.getAllUsersNames.useQuery();
 
   return (
     <div>
@@ -85,13 +88,13 @@ const UserForm = ({ title, formInputs }: Props) => {
         initialValues={formInputs}
         validationSchema={toFormikValidationSchema(
           z.object({
-            firstname: z.string(),
-            middlename: z.string().optional(),
-            lastname: z.string(),
-            email: z.string().email({ message: "Please enter valid email" }),
-            phone: z
+            firstName: z.string(),
+            middleName: z.string().optional(),
+            lastName: z.string(),
+            email: z.string().email({ message: 'Please enter valid email' }),
+            phoneNumber: z
               .string()
-              .length(10, "Phone number should be only 10 digits"),
+              .length(10, 'Phone number should be only 10 digits'),
             addressline1: z.string(),
             addressline2: z.string(),
             city: z.string(),
@@ -105,53 +108,57 @@ const UserForm = ({ title, formInputs }: Props) => {
         // onSubmit={(values, { setSubmitting }) => {
         //   onSubmit(values).then(() => setSubmitting(false));
         // }}
-        onSubmit={onSubmit}
+        onSubmit={async (values, { setSubmitting }) => {
+          values.addressline1;
+          await createUser.mutateAsync(values);
+          setSubmitting(false);
+        }}
       >
         {({ setFieldValue, values, isSubmitting }) => {
           return (
             <Form>
               <SimpleGrid
-                m={"md"}
+                m={'md'}
                 cols={3}
                 className={classes.wrapper}
                 breakpoints={[
-                  { maxWidth: "md", cols: 3, spacing: "md" },
-                  { maxWidth: "sm", cols: 2, spacing: "sm" },
-                  { maxWidth: "xs", cols: 1, spacing: "sm" },
+                  { maxWidth: 'md', cols: 3, spacing: 'md' },
+                  { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                  { maxWidth: 'xs', cols: 1, spacing: 'sm' },
                 ]}
               >
                 <FormInput
-                  label="First name"
-                  placeholder="First name"
-                  name="firstname"
+                  label='First name'
+                  placeholder='First name'
+                  name='firstName'
                   withAsterisk
                 />
                 <FormInput
-                  label="middle name"
-                  placeholder="middle name"
-                  name="middlename"
+                  label='middle name'
+                  placeholder='middle name'
+                  name='middlename'
                 />
                 <FormInput
-                  label="Last name"
-                  placeholder="Last name"
-                  name="lastname"
+                  label='Last name'
+                  placeholder='Last name'
+                  name='lastName'
                   withAsterisk
                 />
                 <FormInput
-                  label="Phone number"
-                  placeholder="Ex: 1234567890"
-                  name="phone"
+                  label='Phone number'
+                  placeholder='Ex: 1234567890'
+                  name='phoneNumber'
                   withAsterisk
                 />
                 <FormInput
-                  label="Email"
-                  placeholder="Ex: name@gmail.com"
-                  name="email"
+                  label='Email'
+                  placeholder='Ex: name@gmail.com'
+                  name='email'
                   withAsterisk
                 />
               </SimpleGrid>
               <Grid
-                m={"md"}
+                m={'md'}
                 className={cx(classes.wrapper, {
                   [classes.addressWrapper]: true,
                 })}
@@ -162,25 +169,35 @@ const UserForm = ({ title, formInputs }: Props) => {
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormikSelect
-                    label="Select a Role"
-                    data={rolesOptions}
-                    placeholder="Pick one role"
-                    name="role"
+                    label='Select a Role'
+                    data={
+                      roles.data?.map((role) => ({
+                        label: role.name,
+                        value: role.id,
+                      })) || []
+                    }
+                    placeholder='Pick one role'
+                    name='role'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={4}>
                   <FormikSelect
-                    label="Linked to"
-                    data={rolesOptions}
-                    placeholder="Pick one role"
-                    name="linkedto"
+                    label='Linked to'
+                    data={
+                      users.data?.map((user) => ({
+                        label: user.name,
+                        value: user._id,
+                      })) || []
+                    }
+                    placeholder='Pick one role'
+                    name='linkedto'
                   />
                 </Grid.Col>
               </Grid>
               {/* addess form */}
               <Grid
-                m={"md"}
+                m={'md'}
                 className={cx(classes.wrapper, {
                   [classes.addressWrapper]: true,
                 })}
@@ -191,62 +208,62 @@ const UserForm = ({ title, formInputs }: Props) => {
                 </Grid.Col>
                 <Grid.Col lg={2} sm={4}>
                   <FormInput
-                    label="Address line 1"
-                    placeholder="Address line 1"
-                    name="addressline1"
+                    label='Address line 1'
+                    placeholder='Address line 1'
+                    name='addressline1'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={2} sm={4}>
                   <FormInput
-                    label="Address line 2"
-                    placeholder="Address line 2"
-                    name="addressline2"
+                    label='Address line 2'
+                    placeholder='Address line 2'
+                    name='addressline2'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={2}>
                   <FormInput
-                    label="city"
-                    placeholder="city"
-                    name="city"
+                    label='city'
+                    placeholder='city'
+                    name='city'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={2}>
                   <FormInput
-                    label="state"
-                    placeholder="state"
-                    name="state"
+                    label='state'
+                    placeholder='state'
+                    name='state'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={2}>
                   <FormInput
-                    label="country"
-                    placeholder="country"
-                    name="country"
+                    label='country'
+                    placeholder='country'
+                    name='country'
                     withAsterisk
                   />
                 </Grid.Col>
                 <Grid.Col lg={1} sm={2}>
                   <FormInput
-                    label="pincode"
-                    placeholder="pincode"
-                    name="pincode"
+                    label='pincode'
+                    placeholder='pincode'
+                    name='pincode'
                     withAsterisk
                   />
                 </Grid.Col>
               </Grid>
               <Grid
-                m={"md"}
+                m={'md'}
                 className={cx(classes.wrapper, {
                   [classes.addressWrapper]: true,
                 })}
                 columns={2}
               >
                 <Grid.Col>
-                  <Button type="submit" loading={isSubmitting}>
+                  <Button type='submit' loading={isSubmitting}>
                     Save
                   </Button>
                 </Grid.Col>

@@ -1,20 +1,14 @@
-import { Button, Container, Group, Text, Title } from "@mantine/core";
-import { Form, Formik } from "formik";
-import { toFormikValidationSchema } from "zod-formik-adapter";
-import React from "react";
-import { z } from "zod";
-import FormInput from "../../components/FormikCompo/FormikInput";
-import FormikCheck from "@/components/FormikCompo/FormikCheckBox";
-import { useMediaQuery } from "@mantine/hooks";
-import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
+import { Button, Container, Group, Text, Title } from '@mantine/core';
+import { Form, Formik } from 'formik';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import React from 'react';
+import { z } from 'zod';
+import FormInput from '../../components/FormikCompo/FormikInput';
+import FormikCheck from '@/components/FormikCompo/FormikCheckBox';
+import { useMediaQuery } from '@mantine/hooks';
+import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 // import { trpc } from "@/utils/trpc";
-import { Permissions } from "@/constants";
-
-const onSubmit = async (values: CreateRole, actions: any) => {
-  console.log(values);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  actions.resetForm();
-};
+import { Permissions } from '@/constants';
 
 // const permissionsDemo: Permission = [
 //   {
@@ -64,12 +58,12 @@ interface props {
 
 const RoleForm = ({ formInputs, onSubmit, title }: props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const matches = useMediaQuery("(max-width: 800px)");
+  const matches = useMediaQuery('(max-width: 800px)');
   const formpermissions: Permission = formInputs.permissions;
   console.log(formInputs);
 
   function setChecked(checked: boolean): void {
-    throw new Error("Function not implemented.");
+    throw new Error('Function not implemented.');
   }
 
   const PermissonsValues = Permissions.map((permission) => {
@@ -102,8 +96,8 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
 
   return (
     <>
-      <Container w={matches ? "80" : "50%"} mt={"5vh"}>
-        <Title fz={"xxl"} fw={"400"} mb={"5vh"}>
+      <Container w={matches ? '80' : '50%'} mt={'5vh'}>
+        <Title fz={'xxl'} fw={'400'} mb={'5vh'}>
           {title}
         </Title>
         <Formik
@@ -132,25 +126,25 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <FormInput
-                label="Role Name"
-                placeholder="Role name"
-                name="name"
+                label='Role Name'
+                placeholder='Role name'
+                name='name'
                 withAsterisk
-                mb={"sm"}
+                mb={'sm'}
               />
               <FormInput
-                label="Display Name"
-                placeholder="Display name"
-                name="displayName"
+                label='Display Name'
+                placeholder='Display name'
+                name='displayName'
                 withAsterisk
-                mb={"sm"}
+                mb={'sm'}
               />
               <Formiktextarea
-                label="Description"
-                placeholder="Description"
-                name="description"
+                label='Description'
+                placeholder='Description'
+                name='description'
                 withAsterisk
-                mb={"sm"}
+                mb={'sm'}
               />
               {PermissonsValues.map((permission, index) => {
                 // const permissionv: Permission = PermissonsValues[
@@ -160,40 +154,40 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                   <>
                     <div key={index}>
                       <Text
-                        mt={"xs"}
-                        mb={"sm"}
+                        mt={'xs'}
+                        mb={'sm'}
                       >{`${permission.permissionName}`}</Text>
                       <Group>
                         <FormikCheck
-                          label={"view"}
+                          label={'view'}
                           defaultChecked={
                             permission?.crud.read !== undefined
                               ? permission?.crud.read
                               : false
                           }
                           name={`permissions.${index}.crud.read`}
-                          mb={"sm"}
+                          mb={'sm'}
                         />
 
                         <FormikCheck
-                          label={"create"}
+                          label={'create'}
                           defaultChecked={permission.crud.create}
                           name={`permissions.${index}.crud.create`}
-                          mb={"sm"}
+                          mb={'sm'}
                         />
 
                         <FormikCheck
-                          label={"edit"}
+                          label={'edit'}
                           defaultChecked={permission.crud.update}
                           name={`permissions.${index}.crud.update`}
-                          mb={"sm"}
+                          mb={'sm'}
                         />
 
                         <FormikCheck
-                          label={"delete"}
+                          label={'delete'}
                           defaultChecked={permission.crud.delete}
                           name={`permissions.${index}.crud.delete`}
-                          mb={"sm"}
+                          mb={'sm'}
                         />
 
                         {/* </Checkbox.Group> */}
@@ -205,11 +199,11 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
 
               <Button
                 disabled={isSubmitting}
-                type="submit"
+                type='submit'
                 onClick={() => {
                   //   console.log(values);
                 }}
-                mt={"md"}
+                mt={'md'}
               >
                 Save
               </Button>

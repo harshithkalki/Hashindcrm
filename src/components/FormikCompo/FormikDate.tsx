@@ -1,6 +1,6 @@
-import { DatePicker } from "@mantine/dates";
-import type { DatePickerProps } from "@mantine/dates/lib/components/DatePicker";
-import { useField } from "formik";
+import { DatePicker } from '@mantine/dates';
+import type { DatePickerProps } from '@mantine/dates/lib/components/DatePicker';
+import { useField } from 'formik';
 
 interface Props extends DatePickerProps {
   name: string;
@@ -20,7 +20,6 @@ const FormDate: React.FC<Props> = ({ name, label, ...props }) => {
       {...props}
       onChange={(e) => {
         const date = e?.toISOString();
-        console.log(date);
         helper.setValue(date, true);
       }}
     />
