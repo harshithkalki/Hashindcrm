@@ -41,6 +41,14 @@ const PartiesData: NavData['links'] = [
   { label: 'Suppliers', link: '/parties/supplier' },
   { label: 'Customers', link: '/parties/customer' },
 ];
+const SalesData: NavData['links'] = [
+  { label: 'Sales', link: '/sales' },
+  { label: 'Sales Returns', link: '/sales/return' },
+];
+const PurchaseData: NavData['links'] = [
+  { label: 'Purchase', link: '/purchases' },
+  { label: 'Purchase Returns', link: '/purchases/return' },
+];
 const mockdata: NavData[] = [
   { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
   { links: CompanyData, label: 'Companies', icon: IconBuildingStore },
@@ -53,6 +61,8 @@ const mockdata: NavData[] = [
   { links: Stockdata, label: 'Stock', icon: IconReceipt2 },
   { links: '/pos', label: 'POS', icon: IconReceipt2 },
   { links: PartiesData, label: 'Parties', icon: IconReceipt2 },
+  { links: SalesData, label: 'Sales', icon: IconReceipt2 },
+  { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 

@@ -1,7 +1,7 @@
 import FormikInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
-import PartiesTable from '@/components/Tables/partiesTable';
+import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
 import {
   Button,
