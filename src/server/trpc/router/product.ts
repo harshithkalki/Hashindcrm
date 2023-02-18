@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import ProductModel, { ProductDocument } from '@/models/Product';
+import ProductModel from '@/models/Product';
 import type { WarehouseDocument } from '@/models/Warehouse';
 import WarehouseModel from '@/models/Warehouse';
 import { TRPCError } from '@trpc/server';
@@ -475,6 +475,7 @@ export const productRouter = router({
     .input(
       z.object({
         search: z.string(),
+        limit: z.number().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -500,10 +501,14 @@ export const productRouter = router({
         });
       }
 
-      const products = await ProductModel.find({
-        companyId: client.companyId,
-        name: { $regex: input.search, $options: 'i' },
-      })
+      const products = await ProductModel.find(
+        {
+          companyId: client.companyId,
+          name: { $regex: input.search, $options: 'i' },
+        },
+        null,
+        { limit: input.limit || 10 }
+      )
         .populate<{
           warehouse: WarehouseDocument;
           category: CategoryDocument;
@@ -526,9 +531,9 @@ export const productRouter = router({
         ...val,
         openingStockDate: val.openingStockDate?.toISOString(),
         expiryDate: val.expiryDate?.toISOString(),
-        brand: val.brand.name,
-        category: val.category.name,
-        warehouse: val.warehouse.name,
+        brand: { ...val.brand, _id: val.brand._id.toString() },
+        category: { ...val.category, _id: val.category._id.toString() },
+        warehouse: { ...val.warehouse, _id: val.warehouse._id.toString() },
       }));
     }),
 });
