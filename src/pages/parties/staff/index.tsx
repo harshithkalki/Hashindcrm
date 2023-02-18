@@ -1,4 +1,5 @@
 import FormikInput from '@/components/FormikCompo/FormikInput';
+import FormInput from '@/components/FormikCompo/FormikPass';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import PartiesTable from '@/components/Tables/PartiesTable';
@@ -121,16 +122,26 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
             name: '',
             email: '',
             phone: '',
-            billingAddress: '',
-            shippingAddress: '',
+            address: '',
+            role: '',
+            password: '',
             warehouse: '',
             status: '',
-            taxnumber: '',
             profile: '',
-            openingBalance: 0,
-            creditLimit: 0,
-            creditperiod: 0,
           }}
+          validationSchema={toFormikValidationSchema(
+            z.object({
+              name: z.string(),
+              email: z.string().email(),
+              phone: z.number(),
+              address: z.string(),
+              role: z.string(),
+              password: z.string(),
+              warehouse: z.string(),
+              status: z.string(),
+              profile: z.string(),
+            })
+          )}
         >
           {({ handleSubmit, handleChange, values, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
@@ -209,6 +220,18 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
                   }
                   withAsterisk
                 />
+                <FormikSelect
+                  label='Role'
+                  data={[
+                    { label: 'Admin', value: 'Admin' },
+                    { label: 'User', value: 'User' },
+                  ]}
+                  placeholder='Pick one role'
+                  name='role'
+                  searchable
+                  w={'100%'}
+                  withAsterisk
+                />
                 <FormikInput
                   label='Name'
                   placeholder='Name'
@@ -223,6 +246,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
                 />
                 <FormikInput
                   label='Phone'
+                  type={'number'}
                   placeholder='Phone'
                   name='phone'
                   withAsterisk
@@ -239,47 +263,21 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
                   w={'100%'}
                   withAsterisk
                 />
-                <FormikInput
-                  label='Tax Number'
-                  placeholder='Tax Number'
-                  name='taxnumber'
-                  withAsterisk
-                />
-                <FormikInput
-                  type={'number'}
-                  label='Opening Balance'
-                  placeholder='Opening Balance'
-                  name='openingBalance'
-                  withAsterisk
-                />
-                <FormikInput
-                  type={'number'}
-                  label='Credit Limit'
-                  placeholder='Credit Limit'
-                  name='creditLimit'
-                  withAsterisk
-                />
-                <FormikInput
-                  type={'number'}
-                  label='Credit Period'
-                  placeholder='Credit Period'
-                  name='creditperiod'
+                <FormInput
+                  label='Password'
+                  placeholder='Password'
+                  name='password'
                   withAsterisk
                 />
               </SimpleGrid>
               <Formiktextarea
-                label='Billing Address'
-                placeholder='Billing Address'
-                name='billingAddress'
+                label='Address'
+                placeholder='Address'
+                name='address'
                 withAsterisk
                 mb={'md'}
               />
-              <Formiktextarea
-                label='Shipping Address'
-                placeholder='Shipping Address'
-                name='shippingAddress'
-                withAsterisk
-              />
+
               <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
                 <Button type='submit' size='xs'>
                   Create
@@ -307,7 +305,7 @@ const Index = () => {
     <>
       <AddCustomer modal={modal} setModal={setModal} />
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
-        <Title fw={400}>Customers</Title>
+        <Title fw={400}>Staff Members</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
           Add New
         </Button>
