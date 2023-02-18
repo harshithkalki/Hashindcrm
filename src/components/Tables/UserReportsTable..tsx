@@ -1,47 +1,31 @@
 import { useState } from 'react';
-import type { GroupProps } from '@mantine/core';
-import {
-  Table,
-  ScrollArea,
-  TextInput,
-  ActionIcon,
-  Group,
-  Container,
-} from '@mantine/core';
-import { IconPencil, IconSearch, IconTrash } from '@tabler/icons';
+import { Center } from '@mantine/core';
+import { Table, TextInput } from '@mantine/core';
+import { IconSearch } from '@tabler/icons';
+
+interface SubTableProps {
+  purchase: number;
+  sales: number;
+  purchaseReturn: number;
+  salesReturn: number;
+}
 
 interface Transfer {
   name: string;
-  email: string;
-  created: string;
-  balance: string;
-  status: string;
+  subTable: SubTableProps;
+  total: number;
+  paid: number;
+  due: number;
 }
+
 interface TableSelectionProps<T> {
+  isCustomer: boolean;
   data: Transfer[];
-  onDelete?: (id: string) => void;
-  onEdit?: (id: string) => void;
-  editDeleteColumnProps?: {
-    groupProps?: GroupProps;
-  };
 }
 
-interface StockEdit {
-  id: string;
-  name: string;
-  currentStock: number;
-  quantity: number;
-  adjustment: string;
-  note: string;
-}
-interface AdjustForm {
-  data: StockEdit;
-}
-
-export default function PartiesTable<T>({
+export default function UserReportTable<T>({
   data,
-  onDelete,
-  editDeleteColumnProps: { groupProps } = {},
+  isCustomer,
 }: TableSelectionProps<T>) {
   const [filteredData, setFilteredData] = useState(data);
 
@@ -67,44 +51,28 @@ export default function PartiesTable<T>({
       <>
         <tr key={index}>
           <td style={{ whiteSpace: 'nowrap' }}>{item.name}</td>
+          {/* <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}> */}
           <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-            {item.email}
+            {item.subTable.purchase}
           </td>
           <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-            {item.created}
+            {item.subTable.purchaseReturn}
           </td>
           <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-            {item.balance}
+            {item.subTable.sales}
           </td>
           <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-            {item.status}
+            {item.subTable.salesReturn}
           </td>
-
-          <td>
-            <Group
-              spacing={0}
-              {...groupProps}
-              style={{ justifyContent: 'center' }}
-            >
-              <ActionIcon
-                onClick={() => {
-                  console.log(index);
-                  //   setModal(true);
-                }}
-              >
-                <IconPencil size={16} stroke={1.5} />
-              </ActionIcon>
-
-              <ActionIcon
-                color='red'
-                onClick={() => {
-                  console.log(index);
-                  // onDelete && onDelete(item.invoicenum);
-                }}
-              >
-                <IconTrash size={16} stroke={1.5} />
-              </ActionIcon>
-            </Group>
+          {/* </td> */}
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.total}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.paid}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.due}
           </td>
         </tr>
       </>
@@ -126,33 +94,58 @@ export default function PartiesTable<T>({
           height: '100%',
         }}
       > */}
-      <Container>
-        <Table sx={{ minWidth: '100%' }} verticalSpacing='sm'>
+      {/* <Container> */}
+      <Center>
+        <Table
+          w={'90%'}
+          //  sx={{ minWidth: '100%' }}
+          verticalSpacing='sm'
+          //  striped
+          //  withBorder
+          //  withColumnBorders
+        >
           <thead>
             <tr>
               <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
                 Name
               </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Email
+              <th
+                style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
+                colSpan={4}
+              >
+                {isCustomer ? 'Sales' : 'Purchase'}
               </th>
               <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Created At
+                Total
               </th>
               <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Balance
+                Paid
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>Due</th>
+            </tr>
+            <tr>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}></th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Purchase
               </th>
               <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Status
+                Purchase Return
               </th>
               <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Actions
+                Sales
               </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Sales Return
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}></th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}></th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}></th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>
         </Table>
-      </Container>
+      </Center>
+      {/* </Container> */}
       {/* </ScrollArea> */}
     </>
   );

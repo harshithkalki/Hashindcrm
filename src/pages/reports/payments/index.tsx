@@ -1,6 +1,5 @@
 import CashandBankTable from '@/components/Tables/CashAndBankTable';
-import { Group, Tabs, Title } from '@mantine/core';
-import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
+import { Group, Title } from '@mantine/core';
 import React from 'react';
 const cashData = [
   {
@@ -54,24 +53,9 @@ const Index = () => {
   return (
     <>
       <Group mb={'md'}>
-        <Title fw={400}>Cash and Bank</Title>
+        <Title fw={400}>Payments</Title>
       </Group>
-      <Tabs defaultValue='cash'>
-        <Tabs.List>
-          <Tabs.Tab value='cash' icon={<IconBrandCashapp size={14} />}>
-            Cash
-          </Tabs.Tab>
-          <Tabs.Tab value='bank' icon={<IconBuildingBank size={14} />}>
-            Bank
-          </Tabs.Tab>
-        </Tabs.List>
-        <Tabs.Panel value='cash' mt={'lg'}>
-          <CashandBankTable data={cashData} />
-        </Tabs.Panel>
-        <Tabs.Panel value='bank' mt={'lg'}>
-          <CashandBankTable data={cashData} />
-        </Tabs.Panel>
-      </Tabs>
+      <CashandBankTable data={cashData} />
     </>
   );
 };

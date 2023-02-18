@@ -54,6 +54,16 @@ const ExpensesData: NavData['links'] = [
   { label: 'Expenses', link: '/expenses' },
   { label: 'Expense Categories', link: '/expenses/categories' },
 ];
+const ReportDate: NavData['links'] = [
+  { label: 'Payment Report', link: '/reports/payments' },
+  { label: 'Stock Alert', link: '/reports/stockalert' },
+  { label: 'sales', link: '/reports/sales' },
+  { label: 'Stock Reports', link: '/reports/stock' },
+  { label: 'Rate List', link: '/reports/ratelist' },
+  { label: 'Product Sales', link: '/reports/productsales' },
+  { label: 'UserReports', link: '/reports/userreports' },
+  { label: 'Profit & Loss', link: '/reports/profitandloss' },
+];
 const mockdata: NavData[] = [
   { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
   { links: CompanyData, label: 'Companies', icon: IconBuildingStore },
@@ -70,6 +80,7 @@ const mockdata: NavData[] = [
   { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
   { links: '/cashandbank', label: 'Cash and Bank', icon: IconReceipt2 },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
+  { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 
