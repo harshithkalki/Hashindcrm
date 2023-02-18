@@ -1,10 +1,10 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import type { BrandDocument } from './Brand';
-import type { CategoryDocument } from './Category';
-import type { CompanyDocument } from './Company';
-import type { WarehouseDocument } from './Warehouse';
+import type { IBrand } from './Brand';
+import type { ICategory } from './Category';
+import type { ICompany } from './Company';
+import type { IWarehouse } from './Warehouse';
 
 export interface IProduct {
   name: string;
@@ -12,8 +12,8 @@ export interface IProduct {
   logo?: string;
   quantity: number;
   quantityAlert: number;
-  category: Types.ObjectId | CategoryDocument;
-  brand: Types.ObjectId | BrandDocument;
+  category: Types.ObjectId | (ICategory & { _id: string });
+  brand: Types.ObjectId | (IBrand & { _id: string });
   barcodeSymbology: string;
   itemCode: string;
   openingStock: number;
@@ -24,8 +24,8 @@ export interface IProduct {
   mrp: number;
   expiryDate?: Date;
   description?: string;
-  warehouse: Types.ObjectId | WarehouseDocument;
-  companyId: Types.ObjectId | CompanyDocument;
+  warehouse: Types.ObjectId | (IWarehouse & { _id: string });
+  companyId: Types.ObjectId | (ICompany & { _id: string });
 }
 
 export type ProductDocument = mongoose.Document & IProduct;

@@ -66,6 +66,9 @@ const Index = () => {
   });
   const categories = trpc.categoryRouter.getAllCategories.useQuery();
   const productsQuery = trpc.productRouter.getProducts.useQuery(query);
+  const searchProducts = trpc.productRouter.searchProducts.useQuery({
+    search: '',
+  });
 
   const [inlineProducts, setInlineProducts] = useState<
     Map<string, InlineProduct>

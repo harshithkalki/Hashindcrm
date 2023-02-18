@@ -1,11 +1,11 @@
 import RoleModel from '@/models/Role';
 import type { Permissions } from '@/constants';
-import type { User } from '@/models/User';
+import type { IUser } from '@/models/User';
 
 const checkPermission = async (
   access: typeof Permissions[number],
   curd: 'create' | 'read' | 'update' | 'delete',
-  client: User,
+  client: IUser,
   checkAny?: boolean
 ) => {
   const role = await RoleModel.findById(client.role);

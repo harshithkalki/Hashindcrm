@@ -1,12 +1,12 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import type { UserDocument } from '@/models/User';
+import type { IUser } from '@/models/User';
 
 export interface ITicket {
   name: string;
   createdAt: Date;
   companyId: Types.ObjectId;
-  assignedTo?: Types.ObjectId | UserDocument;
+  assignedTo?: Types.ObjectId | (IUser & { _id: string });
   status: Types.ObjectId;
 }
 

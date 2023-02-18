@@ -375,7 +375,6 @@ export const productRouter = router({
         .object({
           page: z.number(),
           limit: z.number().optional(),
-
           category: z.string().optional(),
         })
         .optional()
@@ -470,5 +469,66 @@ export const productRouter = router({
       const product = await ProductModel.findById(input.id).lean();
 
       return product;
+    }),
+
+  searchProducts: protectedProcedure
+    .input(
+      z.object({
+        search: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await UserModel.findById(ctx.userId);
+
+      if (!client) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to get products',
+        });
+      }
+
+      const isPermitted = await checkPermission(
+        'PRODUCT',
+        'read',
+        client?.toObject()
+      );
+
+      if (!isPermitted) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to get products',
+        });
+      }
+
+      const products = await ProductModel.find({
+        companyId: client.companyId,
+        name: { $regex: input.search, $options: 'i' },
+      })
+        .populate<{
+          warehouse: WarehouseDocument;
+          category: CategoryDocument;
+          brand: BrandDocument;
+        }>(['warehouse', 'category', 'brand'])
+        .lean();
+
+      await Promise.all(
+        products.map(async (product) => {
+          if (
+            !product.category ||
+            !(product.category as unknown as { name: string }).name
+          ) {
+            await ProductModel.deleteOne({ _id: product._id });
+          }
+        })
+      );
+
+      return products.map((val) => ({
+        ...val,
+        openingStockDate: val.openingStockDate?.toISOString(),
+        expiryDate: val.expiryDate?.toISOString(),
+        brand: val.brand.name,
+        category: val.category.name,
+        warehouse: val.warehouse.name,
+      }));
     }),
 });
