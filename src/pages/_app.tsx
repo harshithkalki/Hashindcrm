@@ -19,6 +19,11 @@ import { setUser } from '@/store/userSlice';
 function UserContextProvider({ children }: { children: React.ReactNode }) {
   const me = trpc.userRouter.me.useQuery(undefined, {
     retry: false,
+    onError: (err) => {
+      if (err.data?.code === 'UNAUTHORIZED') {
+        router.push('/login');
+      }
+    },
   });
   const router = useRouter();
   const dispatch = useDispatch();
