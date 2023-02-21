@@ -159,7 +159,7 @@ export default function NavbarNested({ hide }: Props) {
         <UserMenu
           logout={async () => {
             await logout.mutateAsync();
-            // window.location.reload();
+            window.location.reload();
           }}
         />
       </Navbar.Section>
