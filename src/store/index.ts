@@ -8,6 +8,6 @@ export interface RootState {
 
 export default configureStore({
   reducer: {
-    user: userReducer,
+    userState: userReducer,
   },
 });

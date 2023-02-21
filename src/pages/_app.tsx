@@ -21,11 +21,10 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
     retry: false,
   });
   const router = useRouter();
-  // useDispatcher
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (me.data && !store.getState().user.user) {
+    if (me.data && !store.getState().userState.user) {
       dispatch(
         setUser({
           ...me.data,
