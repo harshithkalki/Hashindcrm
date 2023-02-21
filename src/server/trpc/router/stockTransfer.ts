@@ -1,10 +1,7 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import type { IStockTransfer } from '@/models/StockTransfer';
 import StockTransferModel from '@/models/StockTransfer';
-import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
-import UserModel from '@/models/User';
 import ProductModel from '@/models/Product';
 
 export const stockTransferRouter = router({
@@ -28,27 +25,14 @@ export const stockTransferRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create stocktransfer',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'STOCKADJUST',
-        'create',
-        client?.toObject()
+        {
+          create: true,
+        },
+        ctx.userId,
+        'You are not permitted to create stocktransfer'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create stocktransfer',
-        });
-      }
 
       const stocktransfer = await StockTransferModel.create({
         ...input,
@@ -76,27 +60,14 @@ export const stockTransferRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete stocktransfer',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'STOCKADJUST',
-        'delete',
-        client?.toObject()
+        {
+          delete: true,
+        },
+        ctx.userId,
+        'You are not permitted to delete stocktransfer'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete stocktransfer',
-        });
-      }
 
       const stocktransfer = await StockTransferModel.findByIdAndDelete(
         input.id
@@ -106,27 +77,14 @@ export const stockTransferRouter = router({
     }),
 
   getAllStockTransfers: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get stocktransfers',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'STOCKADJUST',
-      'read',
-      client?.toObject()
+      {
+        read: true,
+      },
+      ctx.userId,
+      'You are not permitted to get stocktransfers'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get stocktransfers',
-      });
-    }
 
     const stocktransfers = await StockTransferModel.find({
       companyId: client.companyId,

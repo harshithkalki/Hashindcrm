@@ -1,31 +1,58 @@
-import RoleModel from '@/models/Role';
+import type { IRole } from '@/models/Role';
+import UserModel from '@/models/User';
 import type { Permissions } from '@/constants';
-import type { User } from '@/models/User';
+import { TRPCError } from '@trpc/server';
 
 const checkPermission = async (
-  access: typeof Permissions[number],
-  curd: 'create' | 'read' | 'update' | 'delete',
-  client: User,
-  checkAny?: boolean
+  permission: typeof Permissions[number],
+  curd: {
+    create?: boolean;
+    delete?: boolean;
+    update?: boolean;
+    read?: boolean;
+  },
+  clientId: string,
+  errorMessage: string
 ) => {
-  const role = await RoleModel.findById(client.role);
+  const client = await UserModel.findById(clientId).populate<{
+    role: IRole & { _id: string };
+  }>('role');
 
-  const permission = role?.permissions.find((p) => p.permissionName === access);
+  if (!client) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Please login to access this resource',
+    });
+  }
 
-  if (!permission) {
+  const isPermitted = Object.entries(
+    client.role.permissions.find((p) => p.permissionName === permission)
+      ?.crud || {}
+  ).some(([key, value]) => {
+    if (key === 'create') {
+      return value && curd.create;
+    }
+    if (key === 'delete') {
+      return value && curd.delete;
+    }
+    if (key === 'update') {
+      return value && curd.update;
+    }
+    if (key === 'read') {
+      return value && curd.read;
+    }
+
     return false;
+  });
+
+  if (!isPermitted) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: errorMessage,
+    });
   }
 
-  if (checkAny) {
-    return (
-      permission.crud.create ||
-      permission.crud.delete ||
-      permission.crud.update ||
-      permission.crud.read
-    );
-  }
-
-  return permission.crud[curd];
+  return client;
 };
 
 export default checkPermission;

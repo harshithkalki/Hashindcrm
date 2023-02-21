@@ -1,12 +1,12 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import type { CompanyDocument } from './Company';
-import type { ProductDocument } from './Product';
-import type { WarehouseDocument } from './Warehouse';
+import type { ICompany } from './Company';
+import type { IProduct } from './Product';
+import type { IWarehouse } from './Warehouse';
 
 export interface IStockTransfer {
   products: {
-    product: Types.ObjectId | ProductDocument;
+    product: Types.ObjectId | (IProduct & { _id: string });
     quantity: number;
   }[];
   createdAt: Date;
@@ -16,8 +16,8 @@ export interface IStockTransfer {
   shipping: number;
   orderTax: number;
   discount: number;
-  companyId: Types.ObjectId | CompanyDocument;
-  warehouse: Types.ObjectId | WarehouseDocument;
+  companyId: Types.ObjectId | (ICompany & { _id: string });
+  warehouse: Types.ObjectId | (IWarehouse & { _id: string });
   openingStockDate: Date;
   paidAmount: number;
   paymentStatus: 'pending' | 'paid';

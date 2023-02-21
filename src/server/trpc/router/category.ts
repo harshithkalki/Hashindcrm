@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
 import CategoryModel from '@/models/Category';
-import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
-import UserModel from '@/models/User';
 
 export const categoryRouter = router({
   create: protectedProcedure
@@ -16,29 +14,12 @@ export const categoryRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create category',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'CATEGORY',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create category'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create category',
-        });
-      }
-
-      console.log('input', input);
 
       const category = await CategoryModel.create({
         ...input,
@@ -58,27 +39,12 @@ export const categoryRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update category',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'CATEGORY',
-        'update',
-        client?.toObject()
+        { update: true },
+        ctx.userId,
+        'You are not permitted to update category'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update category',
-        });
-      }
 
       const category = await CategoryModel.findByIdAndUpdate(
         input.id,
@@ -101,27 +67,12 @@ export const categoryRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete category',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'CATEGORY',
-        'delete',
-        client?.toObject()
+        { delete: true },
+        ctx.userId,
+        'You are not permitted to delete category'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete category',
-        });
-      }
 
       const category = await CategoryModel.findByIdAndDelete(input.id);
 
@@ -134,27 +85,17 @@ export const categoryRouter = router({
     }),
 
   getAllCategories: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get categorys',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'CATEGORY',
-      'read',
-      client?.toObject()
+      {
+        read: true,
+        update: true,
+        delete: true,
+      },
+      ctx.userId,
+      'You are not permitted to read categorys'
     );
 
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get categorys',
-      });
-    }
     const categorys = await CategoryModel.find({ companyId: client.companyId });
 
     return categorys;

@@ -1,8 +1,8 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import { Permissions } from '@/constants/index';
+import { Permissions } from '../constants/index';
 
-export interface Role {
+export interface IRole {
   name: string;
   createdAt: Date;
   permissions: {
@@ -19,9 +19,9 @@ export interface Role {
   users: Types.ObjectId[];
 }
 
-type RoleModel = Model<Role, Record<string, never>>;
+type RoleModel = Model<IRole, Record<string, never>>;
 
-const RoleSchema: Schema = new Schema<Role, RoleModel>(
+const RoleSchema: Schema = new Schema<IRole, RoleModel>(
   {
     name: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
@@ -43,7 +43,7 @@ const RoleSchema: Schema = new Schema<Role, RoleModel>(
     company: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
-      required: true,
+      required: false,
     },
     displayName: { type: String, required: true },
     users: [
@@ -65,5 +65,5 @@ RoleSchema.index(
 );
 
 export default (mongoose.models.Role as ReturnType<
-  typeof mongoose.model<Role, RoleModel>
->) || mongoose.model<Role, RoleModel>('Role', RoleSchema);
+  typeof mongoose.model<IRole, RoleModel>
+>) || mongoose.model<IRole, RoleModel>('Role', RoleSchema);

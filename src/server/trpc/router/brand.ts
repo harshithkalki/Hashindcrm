@@ -1,10 +1,7 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import type { IBrand } from '@/models/Brand';
 import BrandModel from '@/models/Brand';
-import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
-import UserModel from '@/models/User';
 
 export const brandRouter = router({
   create: protectedProcedure
@@ -16,27 +13,12 @@ export const brandRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create brand',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'BRAND',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create brand'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create brand',
-        });
-      }
 
       const brand = await BrandModel.create({
         ...input,
@@ -56,27 +38,12 @@ export const brandRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update brand',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'BRAND',
-        'update',
-        client?.toObject()
+        { update: true },
+        ctx.userId,
+        'You are not permitted to update brand'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update brand',
-        });
-      }
 
       const brand = await BrandModel.findByIdAndUpdate(input.id, input, {
         new: true,
@@ -92,27 +59,12 @@ export const brandRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete brand',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'BRAND',
-        'delete',
-        client?.toObject()
+        { delete: true },
+        ctx.userId,
+        'You are not permitted to delete brand'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete brand',
-        });
-      }
 
       const brand = await BrandModel.findByIdAndDelete(input.id);
 
@@ -120,27 +72,12 @@ export const brandRouter = router({
     }),
 
   getAllBrands: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get brands',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'BRAND',
-      'read',
-      client?.toObject()
+      { read: true },
+      ctx.userId,
+      'You are not permitted to read brands'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get brands',
-      });
-    }
 
     const brands = await BrandModel.find({
       companyId: client.companyId,

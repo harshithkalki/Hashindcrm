@@ -64,8 +64,13 @@ const Index = () => {
     page: 1,
     limit: 20,
   });
+  const [search, setSearch] = useState<string>('');
+
   const categories = trpc.categoryRouter.getAllCategories.useQuery();
   const productsQuery = trpc.productRouter.getProducts.useQuery(query);
+  const searchProducts = trpc.productRouter.searchProducts.useQuery({
+    search: search,
+  });
 
   const [inlineProducts, setInlineProducts] = useState<
     Map<string, InlineProduct>
@@ -274,7 +279,7 @@ const Index = () => {
                     <Select
                       label='Products'
                       data={
-                        products.map((item) => ({
+                        searchProducts.data?.map((item) => ({
                           label: item.name,
                           value: item._id.toString(),
                         })) || []
@@ -311,7 +316,7 @@ const Index = () => {
                         </ActionIcon>
                       }
                       onChange={(value) => {
-                        const product = products.find(
+                        const product = searchProducts.data?.find(
                           (item) => item._id.toString() === value
                         );
 
@@ -326,6 +331,8 @@ const Index = () => {
                           });
                         }
                       }}
+                      searchValue={search}
+                      onSearchChange={setSearch}
                     />
                   </Container>
                 </div>

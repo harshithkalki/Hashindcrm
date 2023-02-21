@@ -29,6 +29,7 @@ export const createContextInner = async ({ userId }: CreateContextOptions) => {
  **/
 export const createContext = async (opts: CreateNextContextOptions) => {
   await connectDb();
+
   const id = await getServerAuthSession(opts.req);
 
   return {

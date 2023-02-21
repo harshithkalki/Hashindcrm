@@ -9,9 +9,13 @@ const getServerAuthSession = async (req: NextApiRequest) => {
     return null;
   }
 
-  const decodedData = (jwt.verify(token, env.JWT_SECRET) as { id: string }).id;
-
-  return decodedData;
+  try {
+    const decodedData = (jwt.verify(token, env.JWT_SECRET) as { id: string })
+      .id;
+    return decodedData;
+  } catch (error) {
+    return null;
+  }
 };
 
 export default getServerAuthSession;
