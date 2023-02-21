@@ -1,10 +1,8 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import type { StockAdjust } from '@/models/StockAdjust';
 import StockAdjustModel from '@/models/StockAdjust';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
-import UserModel from '@/models/User';
 import ProductModel from '@/models/Product';
 
 export const stockAdjustRouter = router({
@@ -18,27 +16,12 @@ export const stockAdjustRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create stockAdjust',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'STOCKADJUST',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create stockAdjust'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create stockAdjust',
-        });
-      }
 
       const stockAdjust = await StockAdjustModel.create({
         ...input,
@@ -72,27 +55,12 @@ export const stockAdjustRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete stockAdjust',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'STOCKADJUST',
-        'delete',
-        client?.toObject()
+        { delete: true },
+        ctx.userId,
+        'You are not permitted to delete stockAdjust'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete stockAdjust',
-        });
-      }
 
       const stockAdjust = await StockAdjustModel.findByIdAndDelete(input.id);
 
@@ -100,27 +68,12 @@ export const stockAdjustRouter = router({
     }),
 
   getAllStockAdjusts: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get stockAdjusts',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'STOCKADJUST',
-      'read',
-      client?.toObject()
+      { read: true, update: true, delete: true },
+      ctx.userId,
+      'You are not permitted to get stockAdjusts'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get stockAdjusts',
-      });
-    }
 
     const stockAdjusts = await StockAdjustModel.find({
       companyId: client.companyId,

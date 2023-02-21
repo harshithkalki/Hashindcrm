@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../trpc';
-import UserModel from '@/models/User';
 import StatusModel from '@/models/Status';
 import WorkflowModel from '@/models/Workflow';
-import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 
 interface StatusType {
@@ -29,27 +27,14 @@ export const workflowRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a status',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'WORKFLOW',
-        'create',
-        client?.toObject()
+        {
+          create: true,
+        },
+        ctx.userId,
+        'You are not permitted to create a status'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a status',
-        });
-      }
 
       const status = await StatusModel.create({
         ...input,
@@ -67,27 +52,14 @@ export const workflowRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a link',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'WORKFLOW',
-        'create',
-        client?.toObject()
+        {
+          create: true,
+        },
+        ctx.userId,
+        'You are not permitted to create a link'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a link',
-        });
-      }
 
       const target = await StatusModel.findById(input.target);
       const status2 = await StatusModel.findById(input.linkedStatus);
@@ -119,27 +91,14 @@ export const workflowRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create workflow',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'WORKFLOW',
-        'create',
-        client?.toObject()
+        {
+          create: true,
+        },
+        ctx.userId,
+        'You are not permitted to create a workflow'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create workflow',
-        });
-      }
 
       const workflow = await WorkflowModel.create({
         ...input,
@@ -150,7 +109,16 @@ export const workflowRouter = router({
     }),
 
   getWorkflow: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
+    const client = await checkPermission(
+      'WORKFLOW',
+      {
+        read: true,
+        update: true,
+        delete: true,
+      },
+      ctx.userId,
+      'You are not permitted to read a workflow'
+    );
 
     type Status = {
       id: string;
@@ -160,27 +128,6 @@ export const workflowRouter = router({
     };
 
     type Workflow = Status[];
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create workflow',
-      });
-    }
-
-    const isPermitted = await checkPermission(
-      'WORKFLOW',
-      'create',
-      client?.toObject(),
-      true
-    );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create workflow',
-      });
-    }
 
     const statuses = await StatusModel.find({ companyId: client.companyId });
 
@@ -209,27 +156,14 @@ export const workflowRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a link',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'WORKFLOW',
-        'create',
-        client?.toObject()
+        {
+          update: true,
+        },
+        ctx.userId,
+        'You are not permitted to remove a link'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a link',
-        });
-      }
 
       const target = await StatusModel.findById(input.target);
       const status2 = await StatusModel.findById(input.linkedStatus);
@@ -255,28 +189,16 @@ export const workflowRouter = router({
     }),
 
   getInitialStatuses: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a link',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'WORKFLOW',
-      'create',
-      client?.toObject(),
-      true
+      {
+        read: true,
+        update: true,
+        delete: true,
+      },
+      ctx.userId,
+      'You are not permitted to read a workflow'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a link',
-      });
-    }
 
     const initialStatuses = await StatusModel.find({
       companyId: client.companyId,
@@ -289,28 +211,16 @@ export const workflowRouter = router({
   getLinkedStatuses: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a link',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'WORKFLOW',
-        'create',
-        client?.toObject(),
-        true
+        {
+          read: true,
+          update: true,
+          delete: true,
+        },
+        ctx.userId,
+        'You are not permitted to read a workflow'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a link',
-        });
-      }
 
       const status = await StatusModel.findById(input).populate(
         'linkedStatuses',

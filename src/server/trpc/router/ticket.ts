@@ -22,29 +22,14 @@ export const ticketRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a status',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'TICKET',
-        'create',
-        client?.toObject()
+        {
+          create: true,
+        },
+        ctx.userId,
+        'You are not permitted to create a ticket'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a status',
-        });
-      }
-
-      console.log(client);
 
       const ticket = await TicketModel.create({
         name: input.name,
@@ -63,27 +48,14 @@ export const ticketRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a status',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'TICKET',
-        'update',
-        client?.toObject()
+        {
+          update: true,
+        },
+        ctx.userId,
+        'You are not permitted to update a ticket'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a status',
-        });
-      }
 
       const ticket = await TicketModel.findByIdAndUpdate(input.ticketId, {
         status: input.nextStatusId,
@@ -93,28 +65,16 @@ export const ticketRouter = router({
     }),
 
   getAllTicket: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a status',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'TICKET',
-      'update',
-      client?.toObject(),
-      true
+      {
+        delete: true,
+        read: true,
+        update: true,
+      },
+      ctx.userId,
+      'You are not permitted to read products'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a status',
-      });
-    }
 
     const tickets = TicketModel.find({ companyId: client.companyId }).populate<{
       assignedTo: {
@@ -147,27 +107,14 @@ export const ticketRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to assign a ticket',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'TICKET',
-        'update',
-        client?.toObject()
+        {
+          update: true,
+        },
+        ctx.userId,
+        'You are not permitted to update a ticket'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to assign a ticket',
-        });
-      }
 
       const ticket = await TicketModel.findByIdAndUpdate(input.ticketId, {
         assignedTo: input.userId,
@@ -183,27 +130,14 @@ export const ticketRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to assign a ticket',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'TICKET',
-        'update',
-        client?.toObject()
+        {
+          update: true,
+        },
+        ctx.userId,
+        'You are not permitted to read tickets'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to assign a ticket',
-        });
-      }
 
       const ticket = await TicketModel.findOne({
         _id: input.ticketId,

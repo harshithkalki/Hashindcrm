@@ -13,6 +13,8 @@ export const serverSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string(),
   AWS_SECRET_ACCESS_KEY: z.string(),
   AWS_BUCKET_NAME: z.string(),
+  SUPER_ADMIN_EMAIL: z.string(),
+  SUPER_ADMIN_PASSWORD: z.string(),
 });
 
 /**

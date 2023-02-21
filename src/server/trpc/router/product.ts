@@ -3,9 +3,7 @@ import { protectedProcedure, router } from '../trpc';
 import ProductModel from '@/models/Product';
 import type { WarehouseDocument } from '@/models/Warehouse';
 import WarehouseModel from '@/models/Warehouse';
-import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
-import UserModel from '@/models/User';
 import type { CategoryDocument } from '@/models/Category';
 import CategoryModel from '@/models/Category';
 import type { BrandDocument } from '@/models/Brand';
@@ -73,27 +71,12 @@ export const productRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create product',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'PRODUCT',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create product'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create product',
-        });
-      }
 
       const product = await ProductModel.create({
         ...input,
@@ -110,27 +93,12 @@ export const productRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create warehouse',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'PRODUCT',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create warehouse'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create warehouse',
-        });
-      }
 
       const warehouse = await WarehouseModel.create({
         ...input,
@@ -141,28 +109,13 @@ export const productRouter = router({
     }),
 
   getAllWarehouse: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to access warehouse',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'PRODUCT',
-      'read',
-      client?.toObject(),
-      true
+      { read: true, update: true, delete: true },
+      ctx.userId,
+      'You are not permitted to read warehouses'
     );
 
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to access warehouse',
-      });
-    }
     const warehouse = await WarehouseModel.find({
       companyId: client.companyId,
     });
@@ -177,28 +130,12 @@ export const productRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to access product',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'PRODUCT',
-        'read',
-        client?.toObject(),
-        true
+        { read: true, update: true, delete: true },
+        ctx.userId,
+        'You are not permitted to read products'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to access product',
-        });
-      }
 
       if (input.category === '') {
         return [];
@@ -252,27 +189,12 @@ export const productRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update product',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'PRODUCT',
-        'update',
-        client?.toObject()
+        { update: true },
+        ctx.userId,
+        'You are not permitted to update product'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update product',
-        });
-      }
 
       const product = await ProductModel.findByIdAndUpdate(input.id, input, {
         new: true,
@@ -288,27 +210,12 @@ export const productRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete product',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'PRODUCT',
-        'delete',
-        client?.toObject()
+        { delete: true },
+        ctx.userId,
+        'You are not permitted to delete product'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to delete product',
-        });
-      }
 
       const product = await ProductModel.findByIdAndDelete(input.id);
 
@@ -316,27 +223,12 @@ export const productRouter = router({
     }),
 
   getAllProducts: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get products',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'PRODUCT',
-      'read',
-      client?.toObject()
+      { read: true, update: true, delete: true },
+      ctx.userId,
+      'You are not permitted to read products'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to get products',
-      });
-    }
 
     const products = await ProductModel.find({
       companyId: client.companyId,
@@ -381,27 +273,12 @@ export const productRouter = router({
     )
 
     .query(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to get products',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'PRODUCT',
-        'read',
-        client?.toObject()
+        { read: true, update: true, delete: true },
+        ctx.userId,
+        'You are not permitted to read products'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to get products',
-        });
-      }
 
       const { page, limit } = input || {};
 
@@ -444,27 +321,12 @@ export const productRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to get product',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'PRODUCT',
-        'read',
-        client?.toObject()
+        { read: true, update: true, delete: true },
+        ctx.userId,
+        'You are not permitted to read products'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to get product',
-        });
-      }
 
       const product = await ProductModel.findById(input.id).lean();
 
@@ -479,27 +341,12 @@ export const productRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to get products',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'PRODUCT',
-        'read',
-        client?.toObject()
+        { read: true, update: true, delete: true },
+        ctx.userId,
+        'You are not permitted to read products'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to get products',
-        });
-      }
 
       const products = await ProductModel.find(
         {

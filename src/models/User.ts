@@ -3,7 +3,6 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { env } from '@/env/server.mjs';
 import type { ITicket } from './Ticket';
 
 export interface IUser {
@@ -70,8 +69,8 @@ UserSchema.pre('save', async function encryptPassword(next) {
 });
 
 UserSchema.method('getJWTToken', function getJWTToken() {
-  return jwt.sign({ id: this._id }, env.JWT_SECRET as string, {
-    expiresIn: env.JWT_EXPIRE,
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
+    expiresIn: process.env.JWT_EXPIRE,
   });
 });
 

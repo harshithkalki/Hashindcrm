@@ -71,7 +71,6 @@ export const userRouter = router({
   }),
 
   me: protectedProcedure.query(async ({ ctx }) => {
-    console.log(ctx.userId);
     const user = await UserModel.findById(ctx.userId)
       .populate<{
         role: {
@@ -80,8 +79,6 @@ export const userRouter = router({
         };
       }>('role', 'name')
       .lean();
-
-    console.log(user);
 
     return user;
   }),
@@ -106,23 +103,12 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
-        });
-      }
-
-      const isPermitted = await checkPermission('ROLE', 'create', client);
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a role',
-        });
-      }
+      const client = await checkPermission(
+        'ROLE',
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create a role'
+      );
 
       const role = await RoleModel.create({
         ...input,
@@ -153,22 +139,12 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update a role',
-        });
-      }
-      const isPermitted = await checkPermission('ROLE', 'update', client);
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to update a role',
-        });
-      }
+      await checkPermission(
+        'ROLE',
+        { update: true },
+        ctx.userId,
+        'You are not permitted to update a role'
+      );
 
       await RoleModel.findByIdAndUpdate(input.id, input);
     }),
@@ -180,28 +156,13 @@ export const userRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      await checkPermission(
         'ROLE',
-        'read',
-        client.toObject(),
-        true
+        { read: true, update: true, delete: true },
+        ctx.userId,
+        'You are not permitted to read a role'
       );
 
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a company',
-        });
-      }
       return RoleModel.findOne({
         _id: input.roleId,
       });
@@ -220,27 +181,12 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'COMPANY',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create a company'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a company',
-        });
-      }
 
       const company = await CompanyModel.create(input);
 
@@ -266,27 +212,12 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const client = await UserModel.findById(ctx.userId);
-
-      if (!client) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
-        });
-      }
-
-      const isPermitted = await checkPermission(
+      const client = await checkPermission(
         'USER',
-        'create',
-        client?.toObject()
+        { create: true },
+        ctx.userId,
+        'You are not permitted to create a user'
       );
-
-      if (!isPermitted) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to create a user',
-        });
-      }
 
       const user = await UserModel.create({
         ...input,
@@ -303,27 +234,12 @@ export const userRouter = router({
     }),
 
   getAllUsers: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'USER',
-      'create',
-      client?.toObject()
+      { read: true, update: true, delete: true },
+      ctx.userId,
+      'You are not permitted to read users'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
-      });
-    }
 
     const users = await UserModel.find({ companyId: client.companyId });
 
@@ -331,27 +247,12 @@ export const userRouter = router({
   }),
 
   getAllUsersNames: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    const client = await checkPermission(
       'USER',
-      'create',
-      client?.toObject()
+      { read: true, update: true, delete: true },
+      ctx.userId,
+      'You are not permitted to read users'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
-      });
-    }
 
     const users = await UserModel.find({ companyId: client.companyId })
       .select('firstName middleName lastName')
@@ -366,28 +267,12 @@ export const userRouter = router({
   }),
 
   getAllRoles: protectedProcedure.query(async ({ ctx }) => {
-    const client = await UserModel.findById(ctx.userId);
-
-    if (!client) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
-      });
-    }
-
-    const isPermitted = await checkPermission(
+    await checkPermission(
       'ROLE',
-      'read',
-      client?.toObject(),
-      true
+      { read: true, update: true, delete: true },
+      ctx.userId,
+      'You are not permitted to read roles'
     );
-
-    if (!isPermitted) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'You are not permitted to create a user',
-      });
-    }
 
     return (await RoleModel.find()).map((val) => {
       return {
