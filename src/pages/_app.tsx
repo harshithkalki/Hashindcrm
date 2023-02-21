@@ -6,6 +6,7 @@ import {
   MantineProvider,
   Burger,
   useMantineTheme,
+  Loader,
 } from '@mantine/core';
 import { Provider, useDispatch } from 'react-redux';
 import store from '../store';
@@ -18,12 +19,14 @@ import { setUser } from '@/store/userSlice';
 
 function UserContextProvider({ children }: { children: React.ReactNode }) {
   const me = trpc.userRouter.me.useQuery(undefined, {
-    retry: false,
     onError: (err) => {
       if (err.data?.code === 'UNAUTHORIZED') {
         router.push('/login');
       }
     },
+    refetchOnWindowFocus: false,
+    retry: false,
+    refetchInterval: false,
   });
   const router = useRouter();
   const dispatch = useDispatch();
@@ -50,7 +53,21 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
     }
   }, [dispatch, me.data, me.error?.data?.code, router]);
 
-  if (me.isLoading) return <div>Loading...</div>;
+  if (me.isLoading)
+    return (
+      <div style={{ height: '100vh' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <Loader size='md' />
+        </div>
+      </div>
+    );
 
   return <>{children}</>;
 }

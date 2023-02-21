@@ -9,6 +9,7 @@ import type { NavData } from '../CollapsibleLink';
 import LinksGroup from '../CollapsibleLink';
 import { useState } from 'react';
 import { UserMenu } from '../UserMenu';
+import { trpc } from '@/utils/trpc';
 // import { UserMenu } from '../UserMenu';
 
 const AdminData: NavData['links'] = [
@@ -129,6 +130,7 @@ interface Props {
 export default function NavbarNested({ hide }: Props) {
   const { classes } = useStyles();
   const [active, setActive] = useState('Billing');
+  const logout = trpc.userRouter.logout.useMutation();
 
   const links = mockdata.map((item) => (
     <LinksGroup
@@ -154,7 +156,12 @@ export default function NavbarNested({ hide }: Props) {
       </Navbar.Section>
 
       <Navbar.Section className={classes.footer}>
-        <UserMenu />
+        <UserMenu
+          logout={async () => {
+            await logout.mutateAsync();
+            // window.location.reload();
+          }}
+        />
       </Navbar.Section>
     </Navbar>
   );

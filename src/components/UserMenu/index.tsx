@@ -2,10 +2,12 @@ import { Menu, Group, useMantineTheme } from '@mantine/core';
 import { IconLogout } from '@tabler/icons';
 import UserButton from '../UserButton';
 import { useRouter } from 'next/router';
+import { trpc } from '@/utils/trpc';
 
-export function UserMenu() {
+export function UserMenu({ logout }: { logout: () => void }) {
   const theme = useMantineTheme();
   const router = useRouter();
+
   return (
     <Group position='center'>
       <Menu withArrow width={300} position='bottom' transition='pop'>
@@ -20,9 +22,7 @@ export function UserMenu() {
           <Menu.Item
             icon={<IconLogout size={14} stroke={1.5} />}
             onClick={() => {
-              document.cookie =
-                'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-              router.push('/login');
+              logout();
             }}
           >
             Logout

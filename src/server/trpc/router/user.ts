@@ -62,12 +62,10 @@ export const userRouter = router({
     }),
 
   logout: publicProcedure.mutation(async ({ ctx }) => {
-    ctx.res.setHeader(
-      'Set-Cookie',
-      `token
-      =; expires=${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)}
-      ; httpOnly; path=/`
-    );
+    ctx.res.setHeader('Set-Cookie', `token=; expires=${new Date()}; path=/`);
+    return {
+      success: true,
+    };
   }),
 
   me: protectedProcedure.query(async ({ ctx }) => {
