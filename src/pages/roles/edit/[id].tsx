@@ -3,6 +3,8 @@ import { trpc } from '@/utils/trpc';
 import React from 'react';
 import type { Permissions } from '@/constants';
 import { useRouter } from 'next/router';
+import Layout from '@/components/Layout';
+import { ScrollArea } from '@mantine/core';
 
 type Permission = {
   permissionName: typeof Permissions[number];
@@ -48,25 +50,29 @@ const App = () => {
   );
   const role = getRole.data;
   return (
-    role && (
-      <div>
-        <RoleForm
-          formInputs={{
-            id: id as string,
-            name: role.name,
-            displayName: role.displayName,
-            description: '',
-            permissions: role.permissions,
-          }}
-          onSubmit={(inputs) => {
-            return UpdateRole.mutateAsync(inputs).then((res) => {
-              console.log(res);
-            });
-          }}
-          title='Edit Role'
-        />
-      </div>
-    )
+    <Layout>
+      {role && (
+        <div style={{ height: '100%', overflow: 'hidden' }}>
+          <ScrollArea style={{ height: '100%' }}>
+            <RoleForm
+              formInputs={{
+                id: id as string,
+                name: role.name,
+                displayName: role.displayName,
+                description: '',
+                permissions: role.permissions,
+              }}
+              onSubmit={(inputs) => {
+                return UpdateRole.mutateAsync(inputs).then((res) => {
+                  console.log(res);
+                });
+              }}
+              title='Edit Role'
+            />
+          </ScrollArea>
+        </div>
+      )}
+    </Layout>
   );
 };
 

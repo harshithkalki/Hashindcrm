@@ -2,6 +2,7 @@ import FormDate from '@/components/FormikCompo/FormikDate';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import Layout from '@/components/Layout';
 import StockTransferTable from '@/components/Tables/StockTransferTable';
 import { trpc } from '@/utils/trpc';
 import {
@@ -578,9 +579,19 @@ const Index = () => {
   if (invoices.isLoading) return <div>Loading...</div>;
 
   return (
-    <>
+    <Layout>
       <AddStockTransfer modal={modal} setModal={setModal} />
-      <Container>
+      <Container
+        style={{
+          maxHeight: '100%',
+          height:
+            'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+          boxSizing: 'border-box',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Group style={{ justifyContent: 'space-between' }} mt={'md'}>
           <Title fw={400}>Stock Transfer</Title>
           <Button
@@ -595,20 +606,137 @@ const Index = () => {
         <Divider mt={'lg'} />
 
         <StockTransferTable
-          data={
-            invoices.data?.map((item) => ({
-              date: item.openingStockDate.toISOString(),
-              invoicenum: item._id.toString(),
-              paidamount: item.paidAmount.toString(),
-              totalamount: item.total.toString(),
-              paymentstatus: item.paymentStatus,
-              status: item.status,
-              warehouse: 'name' in item.warehouse ? item.warehouse.name : '',
-            })) || []
-          }
+          data={[
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+            {
+              date: '2021-08-01T00:00:00.000Z',
+              invoicenum: '1',
+              paidamount: '0',
+              totalamount: '0',
+              paymentstatus: 'pending',
+              status: 'pending',
+              warehouse: 'warehouse',
+            },
+          ]}
         />
       </Container>
-    </>
+    </Layout>
   );
 };
 

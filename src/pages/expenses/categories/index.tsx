@@ -6,6 +6,7 @@ import { Form, Formik } from 'formik';
 import FormInput from '@/components/FormikCompo/FormikInput';
 
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import Layout from '@/components/Layout';
 
 const ExpensesCategoriesData = [
   {
@@ -92,7 +93,7 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   return (
-    <div>
+    <Layout>
       <AddExpense modal={modal} setModal={setModal} />
       <Container>
         <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
@@ -119,7 +120,7 @@ const Index = () => {
           onEdit={(id) => console.log(id)}
         />
       </Container>
-    </div>
+    </Layout>
   );
 };
 

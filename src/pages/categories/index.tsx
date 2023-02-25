@@ -17,6 +17,7 @@ import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import { trpc } from '@/utils/trpc';
 import convertToCategory from '@/utils/convertToCategory';
 import axios from 'axios';
+import Layout from '@/components/Layout';
 
 type InitialValues = {
   name: string;
@@ -139,7 +140,7 @@ const Index = () => {
   if (allCategories.isLoading) return <div>Loading...</div>;
 
   return (
-    <>
+    <Layout>
       <AddBrand />
       <Container mt={'xs'}>
         <Group style={{ justifyContent: 'space-between' }}>
@@ -151,7 +152,7 @@ const Index = () => {
         <Divider mt={'xl'} />
         <CategoriesTable data={parsedData} />
       </Container>
-    </>
+    </Layout>
   );
 };
 

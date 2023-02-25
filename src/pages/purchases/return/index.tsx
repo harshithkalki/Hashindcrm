@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import SalesForm from '@/components/SandCForm';
 import SalesTable from '@/components/Tables/SalesTable';
 import { Group, Title, Button } from '@mantine/core';
@@ -6,7 +7,7 @@ import React from 'react';
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   return (
-    <>
+    <Layout>
       <SalesForm
         modal={modal}
         setModal={setModal}
@@ -53,7 +54,7 @@ const Index = () => {
           },
         ]}
       />
-    </>
+    </Layout>
   );
 };
 

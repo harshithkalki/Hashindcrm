@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import type { UserFormType } from '@/components/UserForm';
 import UserForm from '@/components/UserForm';
 import React from 'react';
@@ -10,7 +11,7 @@ const onSubmit = async (values: UserFormType, actions: any) => {
 
 const app = () => {
   return (
-    <>
+    <Layout>
       <UserForm
         title='Create User'
         // onSubmit={onSubmit}
@@ -30,7 +31,7 @@ const app = () => {
           email: '',
         }}
       />
-    </>
+    </Layout>
   );
 };
 

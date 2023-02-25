@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import CashandBankTable from '@/components/Tables/CashAndBankTable';
 import { Group, Tabs, Title } from '@mantine/core';
 import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
@@ -52,7 +53,7 @@ const cashData = [
 
 const Index = () => {
   return (
-    <>
+    <Layout>
       <Group mb={'md'}>
         <Title fw={400}>Cash and Bank</Title>
       </Group>
@@ -72,7 +73,7 @@ const Index = () => {
           <CashandBankTable data={cashData} />
         </Tabs.Panel>
       </Tabs>
-    </>
+    </Layout>
   );
 };
 

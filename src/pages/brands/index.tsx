@@ -15,6 +15,7 @@ import { Formik, Form } from 'formik';
 import { IconUpload } from '@tabler/icons';
 import { trpc } from '@/utils/trpc';
 import axios from 'axios';
+import Layout from '@/components/Layout';
 
 const Index = () => {
   const router = useRouter();
@@ -93,7 +94,7 @@ const Index = () => {
   if (brands.isLoading) return <div>Loading...</div>;
 
   return (
-    <>
+    <Layout>
       <AddBrand />
       <Container mt={'xs'}>
         <Group style={{ justifyContent: 'space-between' }}>
@@ -115,12 +116,12 @@ const Index = () => {
           keysandlabels={{
             // displayName: "Display Name",
             id: 'ID',
-            name: 'Name',
             logo: 'Logo',
+            name: 'Name',
           }}
         />
       </Container>
-    </>
+    </Layout>
   );
 };
 

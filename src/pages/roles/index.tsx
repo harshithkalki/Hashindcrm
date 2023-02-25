@@ -4,6 +4,7 @@ import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
+import Layout from '@/components/Layout';
 
 type Roles = RouterOutputs['userRouter']['getAllRoles'];
 
@@ -19,21 +20,24 @@ const Index = () => {
   const router = useRouter();
 
   return (
-    Data && (
-      <div>
-        <TableSelection
-          data={Data}
-          isDeleteColumn={true}
-          isEditColumn={true}
-          onDelete={(id) => console.log(id)}
-          onEdit={(id) => router.push('/roles/edit/' + id)}
-          keysandlabels={{
-            // displayName: "Display Name",
-            name: 'Roles',
-          }}
-        />
-      </div>
-    )
+    <Layout>
+      {Data && (
+        <div>
+          <TableSelection
+            data={Data}
+            isDeleteColumn={true}
+            isEditColumn={true}
+            onDelete={(id) => console.log(id)}
+            onEdit={(id) => router.push('/roles/edit/' + id)}
+            keysandlabels={{
+              // displayName: "Display Name",
+              id: 'ID',
+              name: 'Name',
+            }}
+          />
+        </div>
+      )}
+    </Layout>
   );
 };
 

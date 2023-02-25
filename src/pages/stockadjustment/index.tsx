@@ -1,6 +1,7 @@
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import Layout from '@/components/Layout';
 import StockadjustmentTable from '@/components/Tables/StockAdjustTable';
 import { trpc } from '@/utils/trpc';
 import {
@@ -118,9 +119,9 @@ const Index = () => {
   if (stockadjustments.isLoading) return <div>Loading...</div>;
 
   return (
-    <>
+    <Layout>
       <AdjustForm />
-      <Container>
+      <Container h='100%'>
         <Group mb={'lg'} mt={'lg'} style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Stock Adjustment</Title>
           <Button
@@ -134,7 +135,7 @@ const Index = () => {
         </Group>
         <StockadjustmentTable data={stockadjustments.data || []} />
       </Container>
-    </>
+    </Layout>
   );
 };
 

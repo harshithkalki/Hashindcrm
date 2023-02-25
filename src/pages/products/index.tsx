@@ -16,6 +16,7 @@ import { Formik, Form } from 'formik';
 import { IconUpload } from '@tabler/icons';
 import ProductForm from '@/components/ProductForm';
 import { trpc } from '@/utils/trpc';
+import Layout from '@/components/Layout';
 
 const onSubmit = async (values: any, actions: any) => {
   console.log(values);
@@ -85,7 +86,7 @@ const Index = () => {
   if (products.isLoading) return <div>Loading...</div>;
 
   return (
-    <>
+    <Layout>
       <AddProduct />
       <Container mt={'xs'}>
         <Group style={{ justifyContent: 'space-between' }}>
@@ -113,7 +114,7 @@ const Index = () => {
           onEdit={(id) => console.log(id)}
         />
       </Container>
-    </>
+    </Layout>
   );
 };
 

@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import { Group, Table, Title } from '@mantine/core';
 import React from 'react';
 
@@ -12,7 +13,7 @@ const index = () => {
   };
 
   return (
-    <>
+    <Layout>
       <Group>
         <Title fw={400}>Profit and Loss</Title>
       </Group>
@@ -62,7 +63,7 @@ const index = () => {
           </tr>
         </tbody>
       </Table>
-    </>
+    </Layout>
   );
 };
 

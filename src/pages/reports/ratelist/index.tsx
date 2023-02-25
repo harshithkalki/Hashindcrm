@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import { Group, Title, Image, TextInput, Table, Center } from '@mantine/core';
 import { IconSearch } from '@tabler/icons';
 import React, { useState } from 'react';
@@ -108,7 +109,7 @@ const Index = () => {
   });
 
   return (
-    <>
+    <Layout>
       <Group mb={'xl'}>
         <Title fw={400}>Rate List</Title>
       </Group>
@@ -143,7 +144,7 @@ const Index = () => {
           <tbody>{rows}</tbody>
         </Table>
       </Center>
-    </>
+    </Layout>
   );
 };
 

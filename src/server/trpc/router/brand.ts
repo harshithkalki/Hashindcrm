@@ -81,7 +81,7 @@ export const brandRouter = router({
 
     const brands = await BrandModel.find({
       companyId: client.companyId,
-    });
+    }).lean();
 
     return brands;
   }),
