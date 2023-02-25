@@ -90,6 +90,7 @@ const useStyles = createStyles((theme) => ({
     backgroundColor:
       theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
     paddingBottom: 0,
+    maxHeight: '100%',
   },
 
   header: {
@@ -106,11 +107,10 @@ const useStyles = createStyles((theme) => ({
   links: {
     marginLeft: -theme.spacing.md,
     marginRight: -theme.spacing.md,
-    height: 'fit-content',
+    maxHeight: '100%',
   },
 
   linksInner: {
-    paddingTop: theme.spacing.xl,
     paddingBottom: theme.spacing.xl,
   },
 
@@ -145,7 +145,6 @@ export default function NavbarNested({ hide }: Props) {
 
   return (
     <Navbar
-      width={{ sm: 200, lg: 300 }}
       p='md'
       className={classes.navbar}
       hiddenBreakpoint='sm'

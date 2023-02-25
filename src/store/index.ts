@@ -3,7 +3,7 @@ import type { UserState } from './userSlice';
 import userReducer from './userSlice';
 
 export interface RootState {
-  user: UserState;
+  userState: UserState;
 }
 
 export default configureStore({

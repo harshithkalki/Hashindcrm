@@ -1,5 +1,6 @@
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
+import Layout from '@/components/Layout';
 import Truncate from '@/components/TextTruncate';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
@@ -91,9 +92,9 @@ const Index = () => {
     }
   }, [productsQuery.data]);
 
-  const { classes } = useStyles();
+  const { classes, theme } = useStyles();
   return (
-    <>
+    <Layout>
       <Formik
         initialValues={{
           customer: '',
@@ -107,38 +108,47 @@ const Index = () => {
         }}
       >
         {({ handleSubmit, values }) => (
-          <Form onSubmit={handleSubmit}>
-            <Group>
-              <Title fw={400}>POS</Title>
-            </Group>
-            <Divider mt={'md'} />
+          <Form
+            onSubmit={handleSubmit}
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div>
+              <Group>
+                <Title fw={400}>POS</Title>
+              </Group>
+              <Divider mt={'md'} />
+            </div>
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-around',
-                height: '100%',
+                flex: 1,
                 marginTop: '10px',
+                marginBottom: '10px',
+                overflow: 'hidden',
               }}
             >
-              <div style={{ flex: 0.59 }}>
-                <div
-                  style={{
-                    height: '13%',
-                    //   border: "1px solid white",
-                  }}
-                >
-                  <ScrollArea
-                    style={{ height: '100%', width: '45vw' }}
-                    scrollbarSize={5}
-                  >
+              <div
+                style={{
+                  flex: 0.59,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                }}
+              >
+                <div>
+                  <ScrollArea scrollbarSize={5}>
                     <div
                       style={{
                         display: 'flex',
-                        marginTop: '10px',
-                        //   flexWrap: "wrap",
-                        justifyContent: 'space-around',
-                        width: `${95 * (categories.data?.length || 0)}px`,
-                        height: '100%',
+                        padding: '15px',
+                        overflow: 'hidden',
+                        gap: '10px',
                       }}
                     >
                       {categories.data?.map((item) => (
@@ -204,66 +214,64 @@ const Index = () => {
                     </div>
                   </ScrollArea>
                 </div>
-                <div style={{ height: '85%', marginTop: '15px' }}>
-                  <ScrollArea
-                    style={{ height: '75vh', width: '45vw' }}
-                    scrollbarSize={10}
-                    offsetScrollbars
-                  >
-                    <div className={classes.products}>
-                      {(selectedCategory
-                        ? products.sort((a, b) =>
-                            a.category._id === selectedCategory ? -1 : 1
-                          )
-                        : products
-                      ).map((item, index) => (
-                        <Card
-                          shadow='sm'
-                          key={item._id.toString()}
-                          p={'xl'}
-                          radius={'md'}
-                          withBorder
-                        >
-                          <Card.Section>
-                            <Image
-                              src={item.logo}
-                              alt={item.name}
-                              height={160}
-                              // width={0}
-                            />
-                          </Card.Section>
-                          <Card.Section pl={'md'} mt={'sm'}>
-                            <Text fw={500}>{item.name}</Text>
-                          </Card.Section>
-                          <Card.Section pl={'md'}>
-                            <Text fw={300} fz={'xs'}>
-                              {'name' in item.category && item.category.name}
-                            </Text>
-                          </Card.Section>
-                          <Card.Section pl={'md'} mt={'xs'}>
-                            <Text fw={500} fz={'lg'} mb={'md'}>
-                              $ {item.mrp}
-                            </Text>
-                          </Card.Section>
-                          {index === products.length - 5 && (
-                            <Waypoint
-                              onEnter={() => {
-                                setQuery((prev) => ({
-                                  ...prev,
-                                  page: prev.page + 1,
-                                }));
+                <ScrollArea
+                  style={{ flex: '1', width: '45vw', marginTop: '15px' }}
+                  scrollbarSize={10}
+                  offsetScrollbars
+                >
+                  <div className={classes.products}>
+                    {(selectedCategory
+                      ? products.sort((a, b) =>
+                          a.category._id === selectedCategory ? -1 : 1
+                        )
+                      : products
+                    ).map((item, index) => (
+                      <Card
+                        shadow='sm'
+                        key={item._id.toString()}
+                        p={'xl'}
+                        radius={'md'}
+                        withBorder
+                      >
+                        <Card.Section>
+                          <Image
+                            src={item.logo}
+                            alt={item.name}
+                            height={160}
+                            // width={0}
+                          />
+                        </Card.Section>
+                        <Card.Section pl={'md'} mt={'sm'}>
+                          <Text fw={500}>{item.name}</Text>
+                        </Card.Section>
+                        <Card.Section pl={'md'}>
+                          <Text fw={300} fz={'xs'}>
+                            {'name' in item.category && item.category.name}
+                          </Text>
+                        </Card.Section>
+                        <Card.Section pl={'md'} mt={'xs'}>
+                          <Text fw={500} fz={'lg'} mb={'md'}>
+                            $ {item.mrp}
+                          </Text>
+                        </Card.Section>
+                        {index === products.length - 5 && (
+                          <Waypoint
+                            onEnter={() => {
+                              setQuery((prev) => ({
+                                ...prev,
+                                page: prev.page + 1,
+                              }));
 
-                                if (productsQuery.data?.hasNextPage) {
-                                  productsQuery.refetch();
-                                }
-                              }}
-                            />
-                          )}
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
+                              if (productsQuery.data?.hasNextPage) {
+                                productsQuery.refetch();
+                              }
+                            }}
+                          />
+                        )}
+                      </Card>
+                    ))}
+                  </div>
+                </ScrollArea>
               </div>
               <div style={{ flex: 0.39 }}>
                 <div style={{ height: '20%' }}>
@@ -470,7 +478,7 @@ const Index = () => {
                     </Table>
                   </ScrollArea>
                 </div>
-                <div style={{ height: '20%' }}>
+                <div style={{ height: '30%' }}>
                   <Group w={'100%'}>
                     <FormInput
                       name='orderdiscount'
@@ -530,7 +538,7 @@ const Index = () => {
           </Form>
         )}
       </Formik>
-    </>
+    </Layout>
   );
 };
 
