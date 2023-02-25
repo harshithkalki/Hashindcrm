@@ -29,8 +29,7 @@ const Index = () => {
           onEdit={(id) => router.push('/roles/edit/' + id)}
           keysandlabels={{
             // displayName: "Display Name",
-            id: 'ID',
-            name: 'Name',
+            name: 'Roles',
           }}
         />
       </div>
