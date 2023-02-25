@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import CashandBankTable from '@/components/Tables/CashAndBankTable';
 import { Group, Title } from '@mantine/core';
 import React from 'react';
@@ -51,12 +52,12 @@ const cashData = [
 
 const Index = () => {
   return (
-    <>
+    <Layout>
       <Group mb={'md'}>
         <Title fw={400}>Payments</Title>
       </Group>
       <CashandBankTable data={cashData} />
-    </>
+    </Layout>
   );
 };
 

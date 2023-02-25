@@ -232,7 +232,12 @@ const WorkFlowTable = () => {
           )}
         </Formik>
       </Modal>
-      <Container w={'100%'} h='100%' p={0}>
+      <Container
+        w={'100%'}
+        h='100%'
+        p={0}
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
         <div
         // style={{
         //   position: "sticky",
@@ -258,7 +263,7 @@ const WorkFlowTable = () => {
         </div>
         {/* <Divider mb={"md"}></Divider> */}
 
-        <div style={{ height: '100%', overflow: 'auto' }}>
+        <ScrollArea style={{ flex: '1' }}>
           <Table width={'100%'} h='100%'>
             <thead>
               <tr style={{ textAlign: 'center' }}>
@@ -294,7 +299,7 @@ const WorkFlowTable = () => {
               ))}
             </tbody>
           </Table>
-        </div>
+        </ScrollArea>
         <LinkStatus
           modalProps={{ opened: link, onClose: () => setLink(false) }}
           data={workflow.data?.map((val) => ({

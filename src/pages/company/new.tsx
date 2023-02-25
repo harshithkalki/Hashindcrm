@@ -1,22 +1,23 @@
-import CompanyForm from "@/components/CompanyForm";
-import { trpc } from "@/utils/trpc";
-import React from "react";
+import CompanyForm from '@/components/CompanyForm';
+import Layout from '@/components/Layout';
+import { trpc } from '@/utils/trpc';
+import React from 'react';
 
 const index = () => {
   const createCompany = trpc.userRouter.createCompany.useMutation();
 
   return (
-    <div>
+    <Layout>
       <CompanyForm
         formInputs={{
-          companyName: "",
-          email: "",
-          addressLine1: "",
-          addressLine2: "",
-          city: "",
-          state: "",
-          pincode: "",
-          country: "",
+          companyName: '',
+          email: '',
+          addressLine1: '',
+          addressLine2: '',
+          city: '',
+          state: '',
+          pincode: '',
+          country: '',
         }}
         onSubmit={(inputs) => {
           return createCompany
@@ -28,9 +29,9 @@ const index = () => {
               console.log(err);
             });
         }}
-        title="Add Company"
+        title='Add Company'
       />
-    </div>
+    </Layout>
   );
 };
 

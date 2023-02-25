@@ -2,6 +2,7 @@ import FormikInput from '@/components/FormikCompo/FormikInput';
 import FormInput from '@/components/FormikCompo/FormikPass';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import Layout from '@/components/Layout';
 import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
 import {
@@ -302,7 +303,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   return (
-    <>
+    <Layout>
       <AddCustomer modal={modal} setModal={setModal} />
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Staff Members</Title>
@@ -342,7 +343,7 @@ const Index = () => {
           },
         ]}
       />
-    </>
+    </Layout>
   );
 };
 

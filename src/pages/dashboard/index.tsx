@@ -1,7 +1,8 @@
-import React from "react";
+import Layout from '@/components/Layout';
+import React from 'react';
 
 const index = () => {
-  return <div>DashBoard</div>;
+  return <Layout>DashBoard</Layout>;
 };
 
 export default index;

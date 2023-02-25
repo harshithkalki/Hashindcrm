@@ -6,7 +6,6 @@ import {
   createStyles,
   FileInput,
   Group,
-  Input,
   Modal,
   SimpleGrid,
   Title,
@@ -18,6 +17,7 @@ import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { IconUpload } from '@tabler/icons';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import Layout from '@/components/Layout';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -179,7 +179,7 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   return (
-    <div>
+    <Layout>
       <AddExpense modal={modal} setModal={setModal} />
       <Container>
         <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
@@ -208,7 +208,7 @@ const Index = () => {
           onEdit={(id) => console.log(id)}
         />
       </Container>
-    </div>
+    </Layout>
   );
 };
 

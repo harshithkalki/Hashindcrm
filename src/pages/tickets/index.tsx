@@ -83,20 +83,20 @@ const Index = () => {
         modalProps={{ opened: modal, onClose: () => setModal(false) }}
         data={initialStatuses.data}
       />
-      <Container w={'100%'} p={'md'} h='100%'>
+      <Container
+        w={'100%'}
+        p={'md'}
+        h='100%'
+        style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+      >
         <Group w={'100%'} style={{ justifyContent: 'space-between' }}>
           <Title size={30} fw={500}>
             Tickets
           </Title>
           <Button onClick={() => setModal(true)}>Add</Button>
         </Group>
-        <div
-          style={{
-            height: '100%',
-            marginTop: '5vh',
-          }}
-        >
-          <ScrollArea h='100%'>
+        <ScrollArea style={{ flex: '1', marginTop: '5vh' }}>
+          <div>
             <Table mb='10vh'>
               <thead>
                 <tr>
@@ -216,8 +216,8 @@ const Index = () => {
                 ))}
               </tbody>
             </Table>
-          </ScrollArea>
-        </div>
+          </div>
+        </ScrollArea>
       </Container>
     </Layout>
   );

@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import {
   ActionIcon,
   Group,
@@ -85,7 +86,7 @@ const Index = () => {
   });
 
   return (
-    <>
+    <Layout>
       <Group mb={'xl'}>
         <Title fw={400}>Product Sales Summary</Title>
       </Group>
@@ -113,7 +114,7 @@ const Index = () => {
           <tbody>{rows}</tbody>
         </Table>
       </Center>
-    </>
+    </Layout>
   );
 };
 

@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import CashandBankTable from '@/components/Tables/CashAndBankTable';
 import UserReportTable from '@/components/Tables/UserReportsTable.';
 import { Group, Tabs, Title } from '@mantine/core';
@@ -57,7 +58,7 @@ const userReportDate = [
 
 const Index = () => {
   return (
-    <>
+    <Layout>
       <Group mb={'lg'}>
         <Title fw={400}>User Report</Title>
       </Group>
@@ -77,7 +78,7 @@ const Index = () => {
           <UserReportTable data={userReportDate} isCustomer={false} />
         </Tabs.Panel>
       </Tabs>
-    </>
+    </Layout>
   );
 };
 

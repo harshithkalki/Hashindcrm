@@ -1,3 +1,4 @@
+import Layout from '@/components/Layout';
 import SalesSummaryTable from '@/components/Tables/SalesSummaryTable';
 import { Group, Title } from '@mantine/core';
 import React from 'react';
@@ -43,12 +44,12 @@ const data = [
 
 const Index = () => {
   return (
-    <>
+    <Layout>
       <Group mb={'lg'}>
         <Title fw={400}>Sales Report</Title>
       </Group>
       <SalesSummaryTable data={data} />
-    </>
+    </Layout>
   );
 };
 
