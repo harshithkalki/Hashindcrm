@@ -30,9 +30,9 @@ export interface IProduct {
 
 export type ProductDocument = mongoose.Document & IProduct;
 
-type ProductModel = Model<ProductDocument, Record<string, never>>;
+type ProductModel = Model<IProduct, Record<string, never>>;
 
-const ProductSchema: Schema = new Schema<ProductDocument, ProductModel>(
+const ProductSchema: Schema = new Schema<IProduct, ProductModel>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true },
@@ -64,12 +64,9 @@ ProductSchema.plugin(mongoosePaginate);
 ProductSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Product as ReturnType<
-  typeof mongoose.model<
-    ProductDocument,
-    mongoose.PaginateModel<ProductDocument>
-  >
+  typeof mongoose.model<IProduct, mongoose.PaginateModel<IProduct>>
 >) ||
-  mongoose.model<ProductDocument, mongoose.PaginateModel<ProductDocument>>(
+  mongoose.model<IProduct, mongoose.PaginateModel<IProduct>>(
     'Product',
     ProductSchema
   );

@@ -32,7 +32,7 @@ export const workflowRouter = router({
         {
           create: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create a status'
       );
 
@@ -57,7 +57,7 @@ export const workflowRouter = router({
         {
           create: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create a link'
       );
 
@@ -96,7 +96,7 @@ export const workflowRouter = router({
         {
           create: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create a workflow'
       );
 
@@ -116,7 +116,7 @@ export const workflowRouter = router({
         update: true,
         delete: true,
       },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read a workflow'
     );
 
@@ -161,7 +161,7 @@ export const workflowRouter = router({
         {
           update: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to remove a link'
       );
 
@@ -196,7 +196,7 @@ export const workflowRouter = router({
         update: true,
         delete: true,
       },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read a workflow'
     );
 
@@ -218,7 +218,7 @@ export const workflowRouter = router({
           update: true,
           delete: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read a workflow'
       );
 

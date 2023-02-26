@@ -7,7 +7,9 @@ import getServerAuthSession from '../common/get-server-auth-session';
  * Replace this with an object if you want to pass things to createContextInner
  */
 type CreateContextOptions = {
-  userId: string | null;
+  clientId: string | null;
+  req: CreateNextContextOptions['req'];
+  res: CreateNextContextOptions['res'];
 };
 
 /** Use this helper for:
@@ -15,11 +17,15 @@ type CreateContextOptions = {
  * - trpc's `createSSGHelpers` where we don't have req/res
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  **/
-export const createContextInner = async ({ userId }: CreateContextOptions) => {
-  const mongoose = await connectDb();
+export const createContextInner = async ({
+  clientId,
+  req,
+  res,
+}: CreateContextOptions) => {
   return {
-    userId,
-    mongoose,
+    clientId,
+    req,
+    res,
   };
 };
 
@@ -31,11 +37,14 @@ export const createContext = async (opts: CreateNextContextOptions) => {
   await connectDb();
 
   const id = await getServerAuthSession(opts.req);
+  await connectDb();
 
   return {
-    ...(await createContextInner({ userId: id })),
-    req: opts.req,
-    res: opts.res,
+    ...(await createContextInner({
+      clientId: id,
+      req: opts.req,
+      res: opts.res,
+    })),
   };
 };
 

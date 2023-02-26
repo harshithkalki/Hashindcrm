@@ -17,6 +17,7 @@ export interface IRole {
   displayName: string;
   company: Types.ObjectId;
   users: Types.ObjectId[];
+  defaultRedirect?: string;
 }
 
 type RoleModel = Model<IRole, Record<string, never>>;
@@ -52,6 +53,7 @@ const RoleSchema: Schema = new Schema<IRole, RoleModel>(
         ref: 'User',
       },
     ],
+    defaultRedirect: { type: String, required: false },
   },
   {
     versionKey: false,

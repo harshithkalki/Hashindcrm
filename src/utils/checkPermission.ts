@@ -1,5 +1,5 @@
 import type { IRole } from '@/models/Role';
-import UserModel from '@/models/User';
+import UserModel from '@/models/StaffMem';
 import type { Permissions } from '@/constants';
 import { TRPCError } from '@trpc/server';
 

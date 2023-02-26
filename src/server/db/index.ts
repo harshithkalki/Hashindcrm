@@ -19,15 +19,17 @@ if (!cached) {
 
 const { MONGODB_URI } = env;
 
-export default async function connectDB() {
+export default async function connectDB(URI?: string) {
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {}).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose
+      .connect(URI || MONGODB_URI, {})
+      .then((mongoose) => {
+        return mongoose;
+      });
   }
   cached.conn = await cached.promise;
 

@@ -30,7 +30,7 @@ export const stockTransferRouter = router({
         {
           create: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create stocktransfer'
       );
 
@@ -65,7 +65,7 @@ export const stockTransferRouter = router({
         {
           delete: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to delete stocktransfer'
       );
 
@@ -82,7 +82,7 @@ export const stockTransferRouter = router({
       {
         read: true,
       },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to get stocktransfers'
     );
 
