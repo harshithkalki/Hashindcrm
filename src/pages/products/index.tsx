@@ -68,11 +68,6 @@ const Index = () => {
               brand: val.brand as unknown as string,
             })) || []
           }
-          onDelete={(id) => {
-            deleteProduct.mutateAsync({
-              id,
-            });
-          }}
           onEdit={(id) => console.log(id)}
         />
       </div>

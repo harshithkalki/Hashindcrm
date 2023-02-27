@@ -30,12 +30,14 @@ const Index = () => {
   const router = useRouter();
   const [modal, setModal] = React.useState(false);
   const createBrand = trpc.brandRouter.create.useMutation();
-  const brands = trpc.brandRouter.getAllBrands.useQuery();
+  const brands = trpc.brandRouter.brands.useQuery();
   console.log('brands');
   console.log(brands);
 
   const AddBrand = () => {
     const [logo, setLogo] = useState<File | null>(null);
+    // const get
+
     return (
       <>
         <Modal opened={modal} onClose={() => setModal(false)} title='Add Brand'>
@@ -120,25 +122,10 @@ const Index = () => {
           </Button>
         </Group>
         <Divider mt={'xl'} />
-        {/* <TableSelection
-          data={
-            brands.data?.map((val) => ({ ...val, id: val._id.toString() })) ||
-            []
-          }
-          isDeleteColumn={true}
-          isEditColumn={true}
-          onDelete={(id) => console.log(id)}
-          onEdit={(id) => console.log(id)}
-          keysandlabels={{
-            // displayName: "Display Name",
-            // id: 'ID',
-            logo: 'Logo',
-            name: 'Name',
-          }}
-        /> */}
+
         <BrandsTableSelection
           data={
-            brands.data?.map((val) => ({
+            brands.data?.docs.map((val) => ({
               ...val,
               id: val._id.toString(),
             })) as unknown as Product[]

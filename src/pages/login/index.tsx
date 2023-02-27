@@ -1,6 +1,6 @@
-import FormInput from "@/components/FormikCompo/FormikInput";
-import FormikPass from "@/components/FormikCompo/FormikPass";
-import { trpc } from "@/utils/trpc";
+import FormInput from '@/components/FormikCompo/FormikInput';
+import FormikPass from '@/components/FormikCompo/FormikPass';
+import { trpc } from '@/utils/trpc';
 import {
   Paper,
   createStyles,
@@ -8,12 +8,12 @@ import {
   Title,
   Text,
   Anchor,
-} from "@mantine/core";
-import { Formik, Form } from "formik";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { z } from "zod";
-import { toFormikValidationSchema } from "zod-formik-adapter";
+} from '@mantine/core';
+import { Formik, Form } from 'formik';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { z } from 'zod';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 interface Login {
   email: string;
@@ -26,49 +26,49 @@ const onSubmit = async (values: Login, actions: any) => {
 };
 
 const formInputs: Login = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 };
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
     minHeight: 900,
-    backgroundSize: "cover",
+    backgroundSize: 'cover',
     backgroundImage:
-      "url(https://images.unsplash.com/photo-1484242857719-4b9144542727?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1280&q=80)",
+      'url(https://images.unsplash.com/photo-1484242857719-4b9144542727?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1280&q=80)',
   },
 
   form: {
     borderRight: `1px solid ${
-      theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[3]
+      theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[3]
     }`,
     minHeight: 900,
     maxWidth: 450,
     paddingTop: 80,
 
     [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-      maxWidth: "100%",
+      maxWidth: '100%',
     },
   },
 
   title: {
-    color: theme.colorScheme === "dark" ? theme.white : theme.black,
+    color: theme.colorScheme === 'dark' ? theme.white : theme.black,
     fontFamily: `Greycliff CF, ${theme.fontFamily}`,
   },
 
   logo: {
-    color: theme.colorScheme === "dark" ? theme.white : theme.black,
+    color: theme.colorScheme === 'dark' ? theme.white : theme.black,
     width: 120,
-    display: "block",
-    marginLeft: "auto",
-    marginRight: "auto",
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
 }));
 
 export default function AuthenticationImage() {
   const { classes } = useStyles();
   const loginUser = trpc.userRouter.login.useMutation();
-  const [loginError, setError] = useState("");
+  const [loginError, setError] = useState('');
   const router = useRouter();
   return (
     <div className={classes.wrapper}>
@@ -76,8 +76,8 @@ export default function AuthenticationImage() {
         <Title
           order={2}
           className={classes.title}
-          align="center"
-          mt="md"
+          align='center'
+          mt='md'
           mb={50}
         >
           Welcome!
@@ -87,7 +87,7 @@ export default function AuthenticationImage() {
           initialValues={formInputs}
           validationSchema={toFormikValidationSchema(
             z.object({
-              email: z.string().email({ message: "Please enter valid email" }),
+              email: z.string().email({ message: 'Please enter valid email' }),
               password: z.string(),
             })
           )}
@@ -96,38 +96,44 @@ export default function AuthenticationImage() {
               .mutateAsync(value)
               .then((res) => {
                 console.log(res);
-                console.log("success");
-                router.push("/");
+                console.log('success');
+                router.push('/');
               })
               .catch((err) => {
                 console.log(err);
-                console.log("error");
+                console.log('error');
+                setError(err.message);
+                setTimeout(() => {
+                  setError('');
+                }, 3000);
               });
           }}
         >
           {({ isSubmitting }) => (
             <Form>
               <FormInput
-                label="Email"
-                placeholder="Enter your email"
-                name="email"
+                label='Email'
+                placeholder='Enter your email'
+                name='email'
                 withAsterisk
-                mb={"sm"}
+                error={loginError}
+                mb={'sm'}
               />
               <FormikPass
-                label="Password"
-                placeholder="Password"
-                name="password"
+                label='Password'
+                placeholder='Password'
+                name='password'
+                error={loginError}
                 withAsterisk
-                mb={"sm"}
+                mb={'sm'}
               />
               <Button
                 disabled={isSubmitting}
-                type="submit"
+                type='submit'
                 // onClick={() => {
                 //   console.log(values);
                 // }}
-                mt={"md"}
+                mt={'md'}
               >
                 login
               </Button>
@@ -135,10 +141,10 @@ export default function AuthenticationImage() {
           )}
         </Formik>
 
-        <Text align="center" mt="md">
-          Don&apos;t have an account?{" "}
-          <Anchor<"a">
-            href="#"
+        <Text align='center' mt='md'>
+          Don&apos;t have an account?{' '}
+          <Anchor<'a'>
+            href='#'
             weight={700}
             onClick={(event) => event.preventDefault()}
           >

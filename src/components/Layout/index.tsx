@@ -14,6 +14,7 @@ type Props = {
   shownav?: boolean;
   showheader?: boolean;
   showfooter?: boolean;
+  navBar?: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -67,7 +68,13 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function Layout({ shownav, showheader, children, hide }: Props) {
+export default function Layout({
+  shownav,
+  showheader,
+  children,
+  hide,
+  navBar,
+}: Props) {
   const [opened, setOpened] = useState(false);
   const theme = useMantineTheme();
   const { classes } = useStyles();
@@ -95,7 +102,7 @@ export default function Layout({ shownav, showheader, children, hide }: Props) {
           </div>
         </Header>
         <div className={classes.nav}>
-          <NavbarNested hide={!opened} />
+          {navBar ?? <NavbarNested hide={!opened} />}
         </div>
         <main
           className={classes.main}

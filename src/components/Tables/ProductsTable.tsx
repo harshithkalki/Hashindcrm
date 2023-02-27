@@ -28,7 +28,7 @@ interface Product {
 
 interface TableSelectionProps<T> {
   data: Product[];
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string) => Promise<void>;
   onEdit?: (id: string) => void;
   editDeleteColumnProps?: {
     groupProps?: GroupProps;
@@ -49,6 +49,7 @@ export default function ProductTable<T>({
   // const getProduct = trpc.productRouter.getProduct.useQuery({
   //   id: productId,
   // });
+  const deleteProduct = trpc.productRouter.delete.useMutation();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
@@ -119,7 +120,10 @@ export default function ProductTable<T>({
             <ActionIcon
               color='red'
               onClick={() => {
-                onDelete && onDelete(item.id);
+                deleteProduct.mutateAsync({ id: item.id }).then(() => {
+                  router.reload();
+                });
+                // router.reload();
               }}
             >
               <IconTrash size={16} stroke={1.5} />

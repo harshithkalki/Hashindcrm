@@ -73,6 +73,7 @@ const mockdata: NavData[] = [
   { links: '/cashandbank', label: 'Cash and Bank', icon: IconReceipt2 },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
   { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
+  { links: '/settings', label: 'Settings', icon: IconReceipt2 },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 
