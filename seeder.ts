@@ -54,7 +54,7 @@ async function start() {
       await User.create({
         ...defaultSuperAdmin,
         role: superAdminRole._id,
-        companyId: superAdminRole.company,
+        company: superAdminRole.company,
       });
 
       process.exit();

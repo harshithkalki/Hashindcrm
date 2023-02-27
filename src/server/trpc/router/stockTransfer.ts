@@ -36,7 +36,7 @@ export const stockTransferRouter = router({
 
       const stocktransfer = await StockTransferModel.create({
         ...input,
-        companyId: client.companyId,
+        company: client.company,
       });
 
       await Promise.all(
@@ -87,7 +87,7 @@ export const stockTransferRouter = router({
     );
 
     const stocktransfers = await StockTransferModel.find({
-      companyId: client.companyId,
+      company: client.company,
     })
       .populate('warehouse', 'name')
       .lean();

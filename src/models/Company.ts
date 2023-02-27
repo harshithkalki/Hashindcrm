@@ -2,7 +2,7 @@ import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-export interface ICompany {
+export interface CompanyCreateInput {
   name: string;
   addressline1: string;
   addressline2: string;
@@ -10,7 +10,6 @@ export interface ICompany {
   state: string;
   pincode: string;
   country: string;
-  createdAt: Date;
   landline: string;
   mobile: string;
   gstNo: string;
@@ -19,6 +18,14 @@ export interface ICompany {
   secondaryColor: string;
   backgroundColor: string;
   logo: string;
+}
+
+export interface CompanyUpdateInput
+  extends Partial<CompanyCreateInput>,
+    DocWithId {}
+
+export interface ICompany extends CompanyCreateInput {
+  createdAt: Date;
 }
 
 export type CompanyDocument = mongoose.Document & ICompany;

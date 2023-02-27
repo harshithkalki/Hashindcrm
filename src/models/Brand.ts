@@ -2,10 +2,17 @@ import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-export interface IBrand {
+export interface BrandCreateInput {
   name: string;
   slug: string;
   logo: string;
+}
+
+export interface BrandUpdateInput
+  extends Partial<BrandCreateInput>,
+    DocWithId {}
+
+export interface IBrand extends BrandCreateInput {
   companyId: Types.ObjectId;
 }
 

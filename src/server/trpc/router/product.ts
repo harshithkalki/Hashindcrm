@@ -80,7 +80,7 @@ export const productRouter = router({
 
       const product = await ProductModel.create({
         ...input,
-        companyId: client.companyId,
+        companyId: client.company,
       });
 
       return product;
@@ -102,7 +102,7 @@ export const productRouter = router({
 
       const warehouse = await WarehouseModel.create({
         ...input,
-        companyId: client.companyId,
+        company: client.company,
       });
 
       return warehouse;
@@ -117,7 +117,7 @@ export const productRouter = router({
     );
 
     const warehouse = await WarehouseModel.find({
-      companyId: client.companyId,
+      company: client.company,
     });
 
     return warehouse;
@@ -142,7 +142,7 @@ export const productRouter = router({
       }
 
       const products = await ProductModel.find({
-        companyId: client.companyId,
+        companyId: client.company,
         category: input.category,
       }).lean();
 
@@ -152,7 +152,7 @@ export const productRouter = router({
         console.log(childCategories, 'childCategories');
 
         const products = await ProductModel.find({
-          companyId: client.companyId,
+          companyId: client.company,
           category: {
             $in: childCategories.map((category) => category._id),
           },
@@ -231,7 +231,7 @@ export const productRouter = router({
     );
 
     const products = await ProductModel.find({
-      companyId: client.companyId,
+      companyId: client.company,
     })
       .populate<{
         warehouse: WarehouseDocument;
@@ -254,7 +254,7 @@ export const productRouter = router({
     return products.map((val) => ({
       ...val,
       openingStockDate: val.openingStockDate?.toISOString(),
-      expiryDate: val.expiryDate?.toISOString(),
+      expiryDate: val.expiryDate,
       brand: val.brand.name,
       category: val.category.name,
       warehouse: val.warehouse.name,
@@ -305,7 +305,7 @@ export const productRouter = router({
       };
 
       const query = {
-        companyId: client.companyId,
+        companyId: client.company,
         ...(input?.category && { category: input.category }),
       };
 
@@ -350,7 +350,7 @@ export const productRouter = router({
 
       const products = await ProductModel.find(
         {
-          companyId: client.companyId,
+          companyId: client.company,
           name: { $regex: input.search, $options: 'i' },
         },
         null,
@@ -377,7 +377,7 @@ export const productRouter = router({
       return products.map((val) => ({
         ...val,
         openingStockDate: val.openingStockDate?.toISOString(),
-        expiryDate: val.expiryDate?.toISOString(),
+        expiryDate: val.expiryDate,
         brand: { ...val.brand, _id: val.brand._id.toString() },
         category: { ...val.category, _id: val.category._id.toString() },
         warehouse: { ...val.warehouse, _id: val.warehouse._id.toString() },

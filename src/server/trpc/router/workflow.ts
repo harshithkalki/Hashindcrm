@@ -38,7 +38,7 @@ export const workflowRouter = router({
 
       const status = await StatusModel.create({
         ...input,
-        companyId: client.companyId,
+        company: client.company,
       });
 
       return status;
@@ -102,7 +102,7 @@ export const workflowRouter = router({
 
       const workflow = await WorkflowModel.create({
         ...input,
-        companyId: client.companyId,
+        companyId: client.company,
       });
 
       return workflow;
@@ -129,7 +129,7 @@ export const workflowRouter = router({
 
     type Workflow = Status[];
 
-    const statuses = await StatusModel.find({ companyId: client.companyId });
+    const statuses = await StatusModel.find({ company: client.company });
 
     const workflow: Workflow = statuses.map((val) => {
       return {
@@ -201,7 +201,7 @@ export const workflowRouter = router({
     );
 
     const initialStatuses = await StatusModel.find({
-      companyId: client.companyId,
+      company: client.company,
       initialStatus: true,
     });
 

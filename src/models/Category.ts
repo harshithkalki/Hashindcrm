@@ -1,11 +1,24 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-export interface ICategory {
+export interface CategoryCreateInput {
   name: string;
   slug: string;
   logo: string;
-  parentCategory?: Types.ObjectId;
+  parentCategory?: string;
+}
+
+export interface CategoryUpdateInput
+  extends Partial<CategoryCreateInput>,
+    DocWithId {}
+
+export interface ICategory
+  extends ModifyDeep<
+    CategoryCreateInput,
+    {
+      parentCategory?: Types.ObjectId | (ICategory & DocWithId) | null;
+    }
+  > {
   companyId: Types.ObjectId;
 }
 
