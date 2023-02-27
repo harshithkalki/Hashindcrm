@@ -1,5 +1,5 @@
 import type { IRole } from '@/models/Role';
-import UserModel from '@/models/User';
+import StaffMemModel from '@/models/StaffMem';
 import type { Permissions } from '@/constants';
 import { TRPCError } from '@trpc/server';
 
@@ -14,7 +14,7 @@ const checkPermission = async (
   clientId: string,
   errorMessage: string
 ) => {
-  const client = await UserModel.findById(clientId).populate<{
+  const client = await StaffMemModel.findById(clientId).populate<{
     role: IRole & { _id: string };
   }>('role');
 

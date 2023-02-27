@@ -1,31 +1,43 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import BrandModel from '@/models/Brand';
+import CompanyModel from '@/models/Company';
 import checkPermission from '@/utils/checkPermission';
 
-export const brandRouter = router({
+export const companyRouter = router({
   create: protectedProcedure
     .input(
       z.object({
         name: z.string(),
-        slug: z.string(),
+        addressline1: z.string(),
+        addressline2: z.string(),
+        city: z.string(),
+        state: z.string(),
+        pincode: z.string(),
+        country: z.string(),
+        primaryColor: z.string(),
+        secondaryColor: z.string(),
+        backgroundColor: z.string(),
         logo: z.string(),
+        gstNo: z.string(),
+        cinNo: z.string(),
+        landline: z.string(),
+        mobile: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'BRAND',
+        'COMPANY',
         { create: true },
         ctx.clientId,
-        'You are not permitted to create brand'
+        'You are not permitted to create company'
       );
 
-      const brand = await BrandModel.create({
+      const company = await CompanyModel.create({
         ...input,
         companyId: client.companyId,
       });
 
-      return brand;
+      return company;
     }),
 
   update: protectedProcedure
@@ -39,17 +51,17 @@ export const brandRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'COMPANY',
         { update: true },
         ctx.clientId,
-        'You are not permitted to update brand'
+        'You are not permitted to update company'
       );
 
-      const brand = await BrandModel.findByIdAndUpdate(input.id, input, {
+      const company = await CompanyModel.findByIdAndUpdate(input.id, input, {
         new: true,
       });
 
-      return brand;
+      return company;
     }),
 
   delete: protectedProcedure
@@ -60,23 +72,23 @@ export const brandRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'COMPANY',
         { delete: true },
         ctx.clientId,
-        'You are not permitted to delete brand'
+        'You are not permitted to delete company'
       );
 
-      const brand = await BrandModel.findByIdAndDelete(input.id);
+      const company = await CompanyModel.findByIdAndDelete(input.id);
 
-      return brand;
+      return company;
     }),
 
-  // pagination with search brands by name
-  brands: protectedProcedure
+  // pagination with search companys by name
+  companys: protectedProcedure
     .input(
       z
         .object({
-          page: z.number().optional(),
+          page: z.number(),
           limit: z.number().optional(),
           search: z.string().optional(),
         })
@@ -84,10 +96,10 @@ export const brandRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'BRAND',
+        'COMPANY',
         { read: true },
         ctx.clientId,
-        'You are not permitted to read brand'
+        'You are not permitted to read company'
       );
 
       const { page = 1, limit = 10, search } = input || {};
@@ -95,6 +107,9 @@ export const brandRouter = router({
       const options = {
         page: page,
         limit: limit,
+        sort: {
+          name: 1,
+        },
       };
 
       const query = {
@@ -102,8 +117,8 @@ export const brandRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const brands = await BrandModel.paginate(query, options);
+      const companys = await CompanyModel.paginate(query, options);
 
-      return brands;
+      return companys;
     }),
 });

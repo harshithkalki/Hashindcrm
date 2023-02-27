@@ -11,7 +11,7 @@ export interface IBrand {
 
 export type BrandDocument = mongoose.Document & IBrand;
 
-type BrandModel = Model<BrandDocument, Record<string, never>>;
+type BrandModel = Model<IBrand, Record<string, never>>;
 
 const BrandSchema: Schema = new Schema<IBrand, BrandModel>(
   {
@@ -28,11 +28,9 @@ const BrandSchema: Schema = new Schema<IBrand, BrandModel>(
 BrandSchema.plugin(mongoosePaginate);
 
 BrandSchema.index({ name: 1, companyId: 1 }, { unique: true });
+BrandSchema.index({ slug: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Brand as ReturnType<
-  typeof mongoose.model<BrandDocument, mongoose.PaginateModel<BrandModel>>
+  typeof mongoose.model<IBrand, mongoose.PaginateModel<IBrand>>
 >) ||
-  mongoose.model<BrandDocument, mongoose.PaginateModel<BrandModel>>(
-    'Brand',
-    BrandSchema
-  );
+  mongoose.model<IBrand, mongoose.PaginateModel<IBrand>>('Brand', BrandSchema);

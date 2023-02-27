@@ -19,7 +19,7 @@ export const stockAdjustRouter = router({
       const client = await checkPermission(
         'STOCKADJUST',
         { create: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create stockAdjust'
       );
 
@@ -58,7 +58,7 @@ export const stockAdjustRouter = router({
       await checkPermission(
         'STOCKADJUST',
         { delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to delete stockAdjust'
       );
 
@@ -71,7 +71,7 @@ export const stockAdjustRouter = router({
     const client = await checkPermission(
       'STOCKADJUST',
       { read: true, update: true, delete: true },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to get stockAdjusts'
     );
 

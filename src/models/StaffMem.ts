@@ -4,8 +4,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import type { ITicket } from './Ticket';
+import type { IRole } from './Role';
 
-export interface IUser {
+export interface IStaffMem {
   firstName: string;
   middleName: string;
   lastName: string;
@@ -16,7 +17,7 @@ export interface IUser {
   state: string;
   country: string;
   pincode: string;
-  role: Types.ObjectId;
+  role: Types.ObjectId | IRole;
   linkedTo?: Types.ObjectId;
   companyId: Types.ObjectId;
   email: string;
@@ -25,17 +26,21 @@ export interface IUser {
   ticket?: Types.ObjectId | (ITicket & { _id: string });
 }
 
-interface UserMethods {
+interface StaffMemMethods {
   getJWTToken(): string;
   comparePassword(password: string): Promise<boolean>;
   getResetPasswordToken(): string;
 }
 
-export type UserDocument = IUser & mongoose.Document;
+export type StaffMemDocument = IStaffMem & mongoose.Document;
 
-type UserModel = Model<IUser, Record<string, never>, UserMethods>;
+type StaffMemModel = Model<IStaffMem, Record<string, never>, StaffMemMethods>;
 
-const UserSchema: Schema = new Schema<IUser, UserModel, UserMethods>(
+const StaffMemSchema: Schema = new Schema<
+  IStaffMem,
+  StaffMemModel,
+  StaffMemMethods
+>(
   {
     firstName: { type: String, required: true },
     middleName: { type: String, required: false },
@@ -51,7 +56,7 @@ const UserSchema: Schema = new Schema<IUser, UserModel, UserMethods>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    linkedTo: { type: Schema.Types.ObjectId, ref: 'IUser' },
+    linkedTo: { type: Schema.Types.ObjectId, ref: 'StaffMem' },
     companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
   },
@@ -60,7 +65,7 @@ const UserSchema: Schema = new Schema<IUser, UserModel, UserMethods>(
   }
 );
 
-UserSchema.pre('save', async function encryptPassword(next) {
+StaffMemSchema.pre('save', async function encryptPassword(next) {
   if (!this.isModified('password')) {
     next();
   }
@@ -68,32 +73,35 @@ UserSchema.pre('save', async function encryptPassword(next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-UserSchema.method('getJWTToken', function getJWTToken() {
+StaffMemSchema.method('getJWTToken', function getJWTToken() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 });
 
-UserSchema.method(
+StaffMemSchema.method(
   'comparePassword',
   async function comparePassword(password: string) {
     return bcrypt.compare(password, this.password);
   }
 );
 
-UserSchema.method('getResetPasswordToken', function getResetPasswordToken() {
-  const resetToken = crypto.randomBytes(20).toString('hex');
+StaffMemSchema.method(
+  'getResetPasswordToken',
+  function getResetPasswordToken() {
+    const resetToken = crypto.randomBytes(20).toString('hex');
 
-  this.resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+    this.resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
 
-  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
-  return resetToken;
-});
+    return resetToken;
+  }
+);
 
-export default (mongoose.models.User as ReturnType<
-  typeof mongoose.model<IUser, UserModel>
->) || mongoose.model<IUser, UserModel>('User', UserSchema);
+export default (mongoose.models.StaffMem as ReturnType<
+  typeof mongoose.model<IStaffMem, StaffMemModel>
+>) || mongoose.model<IStaffMem, StaffMemModel>('StaffMem', StaffMemSchema);

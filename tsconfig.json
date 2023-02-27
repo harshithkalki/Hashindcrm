@@ -26,7 +26,8 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "tsconfig.seeder.json"
+    "tsconfig.seeder.json",
+    "src/server/trpc/router/__test/setup/callSetup.js"
   ],
   "exclude": ["node_modules"]
 }

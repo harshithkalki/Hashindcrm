@@ -49,9 +49,10 @@ const App = () => {
     { refetchOnWindowFocus: false }
   );
   const role = getRole.data;
+
   return (
     <Layout>
-      {role && (
+      {(role && (
         <div style={{ height: '100%', overflow: 'hidden' }}>
           <ScrollArea style={{ height: '100%' }}>
             <RoleForm
@@ -71,7 +72,7 @@ const App = () => {
             />
           </ScrollArea>
         </div>
-      )}
+      )) || <div>Loading...</div>}
     </Layout>
   );
 };

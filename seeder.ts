@@ -1,4 +1,4 @@
-import User from './src/models/User';
+import User from './src/models/StaffMem';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Role from './src/models/Role';

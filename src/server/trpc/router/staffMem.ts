@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from '../trpc';
-import UserModel from '@/models/User';
+import UserModel from '@/models/StaffMem';
+import type { IRole } from '@/models/Role';
 import RoleModel from '@/models/Role';
 import CompanyModel from '@/models/Company';
 import { TRPCError } from '@trpc/server';
@@ -49,6 +50,7 @@ export const userRouter = router({
       }
 
       const token = user.getJWTToken();
+
       ctx.res.setHeader(
         'Set-Cookie',
         `token=${token}; expires=${new Date(
@@ -69,12 +71,11 @@ export const userRouter = router({
   }),
 
   me: protectedProcedure.query(async ({ ctx }) => {
-    const user = await UserModel.findById(ctx.userId)
+    const user = await UserModel.findById(ctx.clientId)
       .populate<{
         role: {
           _id: string;
-          name: string;
-        };
+        } & IRole;
       }>('role', 'name')
       .lean();
 
@@ -98,13 +99,14 @@ export const userRouter = router({
             }),
           })
         ),
+        defaultRedirect: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
         'ROLE',
         { create: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create a role'
       );
 
@@ -140,7 +142,7 @@ export const userRouter = router({
       await checkPermission(
         'ROLE',
         { update: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to update a role'
       );
 
@@ -157,38 +159,13 @@ export const userRouter = router({
       await checkPermission(
         'ROLE',
         { read: true, update: true, delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read a role'
       );
 
       return RoleModel.findOne({
         _id: input.roleId,
-      });
-    }),
-
-  createCompany: protectedProcedure
-    .input(
-      z.object({
-        companyName: z.string(),
-        addressLine1: z.string(),
-        addressLine2: z.string(),
-        city: z.string(),
-        state: z.string(),
-        pincode: z.string(),
-        country: z.string(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const client = await checkPermission(
-        'COMPANY',
-        { create: true },
-        ctx.userId,
-        'You are not permitted to create a company'
-      );
-
-      const company = await CompanyModel.create(input);
-
-      return company;
+      }).lean();
     }),
 
   createUser: protectedProcedure
@@ -213,7 +190,7 @@ export const userRouter = router({
       const client = await checkPermission(
         'USER',
         { create: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create a user'
       );
 
@@ -235,7 +212,7 @@ export const userRouter = router({
     const client = await checkPermission(
       'USER',
       { read: true, update: true, delete: true },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read users'
     );
 
@@ -248,7 +225,7 @@ export const userRouter = router({
     const client = await checkPermission(
       'USER',
       { read: true, update: true, delete: true },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read users'
     );
 
@@ -268,7 +245,7 @@ export const userRouter = router({
     await checkPermission(
       'ROLE',
       { read: true, update: true, delete: true },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read roles'
     );
 

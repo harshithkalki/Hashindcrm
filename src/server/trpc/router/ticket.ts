@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../trpc';
-import UserModel from '@/models/User';
+import UserModel from '@/models/StaffMem';
 import TicketModel from '@/models/Ticket';
 import StatusModel from '@/models/Status';
 import { TRPCError } from '@trpc/server';
@@ -27,7 +27,7 @@ export const ticketRouter = router({
         {
           create: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create a ticket'
       );
 
@@ -53,7 +53,7 @@ export const ticketRouter = router({
         {
           update: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to update a ticket'
       );
 
@@ -72,7 +72,7 @@ export const ticketRouter = router({
         read: true,
         update: true,
       },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read products'
     );
 
@@ -112,7 +112,7 @@ export const ticketRouter = router({
         {
           update: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to update a ticket'
       );
 
@@ -135,7 +135,7 @@ export const ticketRouter = router({
         {
           update: true,
         },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read tickets'
       );
 

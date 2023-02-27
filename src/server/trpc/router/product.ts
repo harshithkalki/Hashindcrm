@@ -74,7 +74,7 @@ export const productRouter = router({
       const client = await checkPermission(
         'PRODUCT',
         { create: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create product'
       );
 
@@ -96,7 +96,7 @@ export const productRouter = router({
       const client = await checkPermission(
         'PRODUCT',
         { create: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create warehouse'
       );
 
@@ -112,7 +112,7 @@ export const productRouter = router({
     const client = await checkPermission(
       'PRODUCT',
       { read: true, update: true, delete: true },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read warehouses'
     );
 
@@ -133,7 +133,7 @@ export const productRouter = router({
       const client = await checkPermission(
         'PRODUCT',
         { read: true, update: true, delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read products'
       );
 
@@ -192,7 +192,7 @@ export const productRouter = router({
       await checkPermission(
         'PRODUCT',
         { update: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to update product'
       );
 
@@ -213,7 +213,7 @@ export const productRouter = router({
       await checkPermission(
         'PRODUCT',
         { delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to delete product'
       );
 
@@ -226,7 +226,7 @@ export const productRouter = router({
     const client = await checkPermission(
       'PRODUCT',
       { read: true, update: true, delete: true },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read products'
     );
 
@@ -276,7 +276,7 @@ export const productRouter = router({
       const client = await checkPermission(
         'PRODUCT',
         { read: true, update: true, delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read products'
       );
 
@@ -324,7 +324,7 @@ export const productRouter = router({
       await checkPermission(
         'PRODUCT',
         { read: true, update: true, delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read products'
       );
 
@@ -344,7 +344,7 @@ export const productRouter = router({
       const client = await checkPermission(
         'PRODUCT',
         { read: true, update: true, delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to read products'
       );
 

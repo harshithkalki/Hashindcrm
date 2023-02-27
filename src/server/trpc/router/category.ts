@@ -17,7 +17,7 @@ export const categoryRouter = router({
       const client = await checkPermission(
         'CATEGORY',
         { create: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to create category'
       );
 
@@ -42,7 +42,7 @@ export const categoryRouter = router({
       const client = await checkPermission(
         'CATEGORY',
         { update: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to update category'
       );
 
@@ -70,7 +70,7 @@ export const categoryRouter = router({
       await checkPermission(
         'CATEGORY',
         { delete: true },
-        ctx.userId,
+        ctx.clientId,
         'You are not permitted to delete category'
       );
 
@@ -92,7 +92,7 @@ export const categoryRouter = router({
         update: true,
         delete: true,
       },
-      ctx.userId,
+      ctx.clientId,
       'You are not permitted to read categorys'
     );
 
