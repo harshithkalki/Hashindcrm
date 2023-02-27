@@ -1,22 +1,13 @@
-import TableSelection from '@/components/Tables/ProductsTable';
-import {
-  Button,
-  Container,
-  Divider,
-  FileInput,
-  Group,
-  Modal,
-  ScrollArea,
-  Title,
-} from '@mantine/core';
+// import ProductTable from '@/components/Tables/ProductsTable';
+import { Button, Divider, Group, Title } from '@mantine/core';
 import React from 'react';
 // import { useRouter } from "next/router";
-import FormInput from '@/components/FormikCompo/FormikInput';
-import { Formik, Form } from 'formik';
-import { IconUpload } from '@tabler/icons';
-import ProductForm from '@/components/ProductForm';
+
+import { useRouter } from 'next/router';
+
 import { trpc } from '@/utils/trpc';
 import Layout from '@/components/Layout';
+import ProductTable from '@/components/Tables/ProductsTable';
 
 const onSubmit = async (values: any, actions: any) => {
   console.log(values);
@@ -24,79 +15,50 @@ const onSubmit = async (values: any, actions: any) => {
   actions.resetForm();
 };
 
-interface Product {
-  id: string;
+export interface ProductFormType {
   name: string;
   logo: string;
   warehouse: string;
+  slug: string;
+  quantity: number;
+  quantityAlert: number;
   category: string;
   brand: string;
-  salePrice: string;
-  purchasePrice: string;
-  quantity: string;
-  description: string;
+  barcodeSymbology: string;
+  itemCode: string;
+  openingStock: number;
+  openingStockDate: string;
+  purchasePrice: number;
+  salePrice: number;
+  mrp: number;
+  tax: string;
+  expireDate?: string;
+  description?: string;
 }
 
 const Index = () => {
-  // const router = useRouter();
-  const [modal, setModal] = React.useState(false);
+  const router = useRouter();
+
   const products = trpc.productRouter.getAllProducts.useQuery();
   const deleteProduct = trpc.productRouter.delete.useMutation();
-
-  console.log(products.data);
-
-  const AddProduct = () => {
-    return (
-      <>
-        <Modal
-          opened={modal}
-          onClose={() => setModal(false)}
-          title='Add Product'
-          size={'80%'}
-        >
-          <ScrollArea style={{ height: '80vh' }}>
-            <ProductForm
-              formInputs={{
-                name: '',
-                logo: '',
-                warehouse: '',
-                category: '',
-                brand: '',
-                salePrice: 0,
-                purchasePrice: 0,
-                quantity: 0,
-                description: '',
-                quantityAlert: 0,
-                barcodeSymbology: '',
-                itemCode: '',
-                mrp: 0,
-                openingStock: 0,
-                openingStockDate: '',
-                slug: '',
-                tax: '',
-                expireDate: '',
-              }}
-            />
-          </ScrollArea>
-        </Modal>
-      </>
-    );
-  };
-
   if (products.isLoading) return <div>Loading...</div>;
 
   return (
     <Layout>
-      <AddProduct />
-      <Container mt={'xs'}>
+      <div style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
         <Group style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Products</Title>
-          <Button size='xs' onClick={() => setModal(true)}>
+          <Button
+            size='xs'
+            onClick={() => {
+              router.push('/products/add');
+            }}
+          >
             Add Product
           </Button>
         </Group>
         <Divider mt={'xl'} />
-        <TableSelection
+        <ProductTable
           data={
             products.data?.map((val) => ({
               ...val,
@@ -113,7 +75,8 @@ const Index = () => {
           }}
           onEdit={(id) => console.log(id)}
         />
-      </Container>
+      </div>
+      {/* </Container> */}
     </Layout>
   );
 };

@@ -7,6 +7,7 @@ import {
   TextInput,
   Group,
   ActionIcon,
+  Image,
 } from '@mantine/core';
 
 import {
@@ -89,7 +90,14 @@ export function TableSort({ data }: TableSortProps) {
             )}
           </td>
           <td>{data.name}</td>
-          <td>{data.logo}</td>
+          <td>
+            <Image
+              src={data.logo}
+              alt={'brand'}
+              radius='lg'
+              style={{ width: 32, height: 32 }}
+            />
+          </td>
           <td>
             <Group spacing={0}>
               <ActionIcon>

@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import type { GroupProps } from '@mantine/core';
+
 import { Image } from '@mantine/core';
-import { Container } from '@mantine/core';
+
 import { Table, ScrollArea, TextInput, ActionIcon, Group } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons';
+
+import type { ProductFormType } from '../ProductForm';
+import { trpc } from '@/utils/trpc';
+import { useRouter } from 'next/router';
 
 interface Product {
   id: string;
@@ -15,8 +20,12 @@ interface Product {
   salePrice: number;
   purchasePrice: number;
   quantity: number;
+  mrp: number;
+  tax: number;
+  quantityAlert: number;
   description?: string;
 }
+
 interface TableSelectionProps<T> {
   data: Product[];
   onDelete?: (id: string) => void;
@@ -26,14 +35,20 @@ interface TableSelectionProps<T> {
   };
 }
 
-export default function TableSelection<T>({
+export default function ProductTable<T>({
   data,
   onDelete,
   onEdit,
   editDeleteColumnProps: { groupProps } = {},
 }: TableSelectionProps<T>) {
   const [filteredData, setFilteredData] = useState(data);
+  const router = useRouter();
   const [search, setSearch] = useState('');
+  // const [modal, setModal] = useState(false);
+
+  // const getProduct = trpc.productRouter.getProduct.useQuery({
+  //   id: productId,
+  // });
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
@@ -53,7 +68,6 @@ export default function TableSelection<T>({
   const rows = filteredData.map((item) => {
     return (
       <tr key={item.id}>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>{item.id}</td>
         <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
           <Group spacing='xs'>
             <Image
@@ -69,25 +83,34 @@ export default function TableSelection<T>({
           {item.warehouse}
         </td>
         <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.category}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
           {item.brand}
         </td>
         <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.salePrice}
+          {item.category}
+        </td>
+        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+          {item.mrp}
         </td>
         <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
           {item.purchasePrice}
         </td>
         <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+          {item.salePrice}
+        </td>
+        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+          {item.tax}
+        </td>
+        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
           {item.quantity}
+        </td>
+        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+          {item.quantityAlert}
         </td>
         <td>
           <Group spacing={0} {...groupProps}>
             <ActionIcon
               onClick={() => {
-                onEdit && onEdit(item.id);
+                router.push(`/products/edit/${item.id}`);
               }}
             >
               <IconPencil size={16} stroke={1.5} />
@@ -116,49 +139,47 @@ export default function TableSelection<T>({
         value={search}
         onChange={handleSearchChange}
       />
-
-      <ScrollArea
-        style={{
-          height: '100%',
-        }}
-      >
-        <Container>
-          <Table sx={{ minWidth: '100%' }} verticalSpacing='sm'>
-            <thead>
-              <tr>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  ID
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Name
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Warehouse
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Category
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Brand
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Sale Price
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Purchase Price
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Quantity
-                </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </Table>
-        </Container>
+      <ScrollArea style={{ height: '100%' }}>
+        {/* <Container> */}
+        <Table sx={{ minWidth: '100%' }} verticalSpacing='sm'>
+          <thead>
+            <tr>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Name
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Warehouse
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Brand
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Category
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>MRP</th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Purchase Price
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Sale Price
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>Tax</th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Quantity
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Quantity Alert
+              </th>
+              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </Table>
+        {/* </Container> */}
       </ScrollArea>
+      {/* </div> */}
     </>
   );
 }

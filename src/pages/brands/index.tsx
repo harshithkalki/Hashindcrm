@@ -16,12 +16,23 @@ import { IconUpload } from '@tabler/icons';
 import { trpc } from '@/utils/trpc';
 import axios from 'axios';
 import Layout from '@/components/Layout';
+import BrandsTableSelection from '@/components/Tables/BrandsTable';
+
+interface Product {
+  id: string;
+  slug: string;
+  companyID: string;
+  name: string;
+  logo: string;
+}
 
 const Index = () => {
   const router = useRouter();
   const [modal, setModal] = React.useState(false);
   const createBrand = trpc.brandRouter.create.useMutation();
   const brands = trpc.brandRouter.getAllBrands.useQuery();
+  console.log('brands');
+  console.log(brands);
 
   const AddBrand = () => {
     const [logo, setLogo] = useState<File | null>(null);
@@ -41,7 +52,7 @@ const Index = () => {
 
               await createBrand.mutateAsync({
                 ...values,
-                logo: 'https://cdn.mos.cms.futurecdn.net/6ZQ7Q2Z7Q4Z2Q2Z7Q4Z2Q2Z7-1200-80.jpg.webp',
+                // logo: 'https://cdn.mos.cms.futurecdn.net/6ZQ7Q2Z7Q4Z2Q2Z7Q4Z2Q2Z7-1200-80.jpg.webp',
               });
               actions.resetForm();
             }}
@@ -92,6 +103,11 @@ const Index = () => {
   };
 
   if (brands.isLoading) return <div>Loading...</div>;
+  // const data =
+  //   brands.data?.map((val) => ({ id: val._id.toString(), name: val.name })) ||
+  //   [];
+  // console.log('brands Data');
+  // console.log(brands.data);
 
   return (
     <Layout>
@@ -104,7 +120,7 @@ const Index = () => {
           </Button>
         </Group>
         <Divider mt={'xl'} />
-        <TableSelection
+        {/* <TableSelection
           data={
             brands.data?.map((val) => ({ ...val, id: val._id.toString() })) ||
             []
@@ -115,10 +131,18 @@ const Index = () => {
           onEdit={(id) => console.log(id)}
           keysandlabels={{
             // displayName: "Display Name",
-            id: 'ID',
+            // id: 'ID',
             logo: 'Logo',
             name: 'Name',
           }}
+        /> */}
+        <BrandsTableSelection
+          data={
+            brands.data?.map((val) => ({
+              ...val,
+              id: val._id.toString(),
+            })) as unknown as Product[]
+          }
         />
       </Container>
     </Layout>

@@ -55,6 +55,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export interface ProductFormType {
+  id: string;
   name: string;
   logo: string;
   warehouse: string;
@@ -70,19 +71,20 @@ export interface ProductFormType {
   purchasePrice: number;
   salePrice: number;
   mrp: number;
-  tax: string;
+  tax: number;
   expireDate?: string;
   description?: string;
 }
 
 interface Props {
   formInputs: ProductFormType;
+  onSubmit: (values: ProductFormType) => Promise<void>;
 }
 
-const ProductForm = ({ formInputs }: Props) => {
+const ProductForm = ({ formInputs, onSubmit }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes, cx } = useStyles();
-  const createProduct = trpc.productRouter.create.useMutation();
+
   const categories = trpc.categoryRouter.getAllCategories.useQuery();
   const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
   const brands = trpc.brandRouter.getAllBrands.useQuery();
@@ -146,6 +148,7 @@ const ProductForm = ({ formInputs }: Props) => {
         initialValues={formInputs}
         validationSchema={toFormikValidationSchema(
           z.object({
+            id: z.string().optional(),
             name: z.string().min(3).max(50),
             logo: z.string().optional(),
             warehouse: z.string(),
@@ -161,7 +164,7 @@ const ProductForm = ({ formInputs }: Props) => {
             purchasePrice: z.number(),
             salePrice: z.number(),
             mrp: z.number(),
-            tax: z.string(),
+            tax: z.number(),
             expireDate: z.string().optional(),
             description: z.string().optional(),
           })
@@ -177,9 +180,10 @@ const ProductForm = ({ formInputs }: Props) => {
             const { data } = await axios.post('/api/upload-file', form);
             values.logo = data.url;
           }
-          await createProduct.mutateAsync(values);
-          actions.resetForm();
-          actions.setSubmitting(false);
+          onSubmit(values).then(() => {
+            actions.resetForm();
+            actions.setSubmitting(false);
+          });
         }}
       >
         {({ setFieldValue, values, isSubmitting }) => {

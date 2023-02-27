@@ -12,14 +12,6 @@ import { UserMenu } from '../UserMenu';
 import { trpc } from '@/utils/trpc';
 // import { UserMenu } from '../UserMenu';
 
-const AdminData: NavData['links'] = [
-  { label: 'Manage admins', link: '/admins' },
-  { label: 'Create admins', link: '/admins/new' },
-];
-const UserData: NavData['links'] = [
-  { label: 'Manage users', link: '/users' },
-  { label: 'Create user', link: '/users/new' },
-];
 const CompanyData: NavData['links'] = [
   { label: 'Manage companies', link: '/company' },
   { label: 'Create company', link: '/company/new' },
@@ -68,8 +60,7 @@ const ReportDate: NavData['links'] = [
 const mockdata: NavData[] = [
   { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
   { links: CompanyData, label: 'Companies', icon: IconBuildingStore },
-  { links: AdminData, label: 'Admins', icon: IconUser },
-  { links: UserData, label: 'users', icon: IconUser },
+
   { links: RolesData, label: 'Roles', icon: IconReceipt2 },
   { links: ProductManagerData, label: 'Product Manager', icon: IconReceipt2 },
   { links: '/workflow', label: 'WorkFlow', icon: IconFileAnalytics },
