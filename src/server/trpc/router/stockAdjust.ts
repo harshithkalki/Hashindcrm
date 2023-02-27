@@ -25,7 +25,7 @@ export const stockAdjustRouter = router({
 
       const stockAdjust = await StockAdjustModel.create({
         ...input,
-        companyId: client.companyId,
+        company: client.company,
       });
 
       const product = await ProductModel.findById(input.productId);
@@ -76,7 +76,7 @@ export const stockAdjustRouter = router({
     );
 
     const stockAdjusts = await StockAdjustModel.find({
-      companyId: client.companyId,
+      company: client.company,
     }).populate<{
       _id: string;
       productId: { name: string; logo: string; _id: string };

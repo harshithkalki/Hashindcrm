@@ -23,7 +23,7 @@ export const categoryRouter = router({
 
       const category = await CategoryModel.create({
         ...input,
-        companyId: client.companyId,
+        companyId: client.company,
       });
 
       return category;
@@ -50,7 +50,7 @@ export const categoryRouter = router({
         input.id,
         {
           ...input,
-          companyId: client.companyId,
+          companyId: client.company,
         },
         {
           new: true,
@@ -96,7 +96,7 @@ export const categoryRouter = router({
       'You are not permitted to read categorys'
     );
 
-    const categorys = await CategoryModel.find({ companyId: client.companyId });
+    const categorys = await CategoryModel.find({ companyId: client.company });
 
     return categorys;
   }),

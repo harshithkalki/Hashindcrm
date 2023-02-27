@@ -196,13 +196,13 @@ export const userRouter = router({
 
       const user = await UserModel.create({
         ...input,
-        companyId: client.companyId,
+        company: client.company,
         password: '123456',
       });
 
       await RoleModel.updateOne(
         { _id: input.role },
-        { $push: { users: user._id } }
+        { $push: { staffMem: user._id } }
       );
 
       return user;
@@ -216,7 +216,7 @@ export const userRouter = router({
       'You are not permitted to read users'
     );
 
-    const users = await UserModel.find({ companyId: client.companyId });
+    const users = await UserModel.find({ company: client.company });
 
     return users;
   }),
@@ -229,7 +229,7 @@ export const userRouter = router({
       'You are not permitted to read users'
     );
 
-    const users = await UserModel.find({ companyId: client.companyId })
+    const users = await UserModel.find({ company: client.company })
       .select('firstName middleName lastName')
       .lean();
 

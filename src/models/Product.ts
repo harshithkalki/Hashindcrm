@@ -6,26 +6,43 @@ import type { ICategory } from './Category';
 import type { ICompany } from './Company';
 import type { IWarehouse } from './Warehouse';
 
-export interface IProduct {
+export interface ProductCreateInput {
   name: string;
   slug: string;
   logo?: string;
   quantity: number;
   quantityAlert: number;
-  category: Types.ObjectId | (ICategory & { _id: string });
-  brand: Types.ObjectId | (IBrand & { _id: string });
+  category: string;
+  brand: string;
   barcodeSymbology: string;
   itemCode: string;
   openingStock: number;
-  openingStockDate: Date;
+  openingStockDate: string;
   purchasePrice: number;
   salePrice: number;
   tax: number;
   mrp: number;
-  expiryDate?: Date;
+  expiryDate?: string;
   description?: string;
-  warehouse: Types.ObjectId | (IWarehouse & { _id: string });
-  companyId: Types.ObjectId | (ICompany & { _id: string });
+  warehouse: string;
+}
+
+export interface ProductUpdateInput
+  extends Partial<ProductCreateInput>,
+    DocWithId {}
+
+export interface IProduct
+  extends ModifyDeep<
+    ProductCreateInput,
+    {
+      category: Types.ObjectId | (ICategory & DocWithId) | null;
+      brand: Types.ObjectId | (IBrand & DocWithId) | null;
+      warehouse: Types.ObjectId | (IWarehouse & DocWithId) | null;
+      company: Types.ObjectId | (ICompany & DocWithId) | null;
+      openingStockDate: Date;
+    }
+  > {
+  createdAt: Date;
 }
 
 export type ProductDocument = mongoose.Document & IProduct;
@@ -52,7 +69,8 @@ const ProductSchema: Schema = new Schema<IProduct, ProductModel>(
     expiryDate: { type: Date },
     description: { type: String },
     warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse' },
-    companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
+    company: { type: Schema.Types.ObjectId, ref: 'Company' },
+    createdAt: { type: Date, default: Date.now },
   },
   {
     versionKey: false,

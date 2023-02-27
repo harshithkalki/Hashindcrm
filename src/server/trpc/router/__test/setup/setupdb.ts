@@ -63,7 +63,7 @@ export const seedTestDB = async () => {
     role: testAdminRole._id,
   });
 
-  testAdminRole.users.push(staff._id);
+  testAdminRole.staffMem.push(staff._id);
 
   try {
     await testCompany.save();

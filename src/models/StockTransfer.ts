@@ -4,7 +4,7 @@ import type { ICompany } from './Company';
 import type { IProduct } from './Product';
 import type { IWarehouse } from './Warehouse';
 
-export interface IStockTransfer {
+export interface StockTransferCreateInput {
   products: {
     product: Types.ObjectId | (IProduct & { _id: string });
     quantity: number;
@@ -16,11 +16,25 @@ export interface IStockTransfer {
   shipping: number;
   orderTax: number;
   discount: number;
-  companyId: Types.ObjectId | (ICompany & { _id: string });
-  warehouse: Types.ObjectId | (IWarehouse & { _id: string });
+  warehouse: string;
   openingStockDate: Date;
   paidAmount: number;
   paymentStatus: 'pending' | 'paid';
+}
+
+export interface StockTransferUpdateInput
+  extends Partial<StockTransferCreateInput>,
+    DocWithId {}
+
+export interface IStockTransfer
+  extends ModifyDeep<
+    StockTransferCreateInput,
+    {
+      warehouse: Types.ObjectId | (IWarehouse & DocWithId);
+    }
+  > {
+  createdAt: Date;
+  company: Types.ObjectId | (ICompany & { _id: string });
 }
 
 type StockAdjustModel = Model<IStockTransfer, Record<string, never>>;
@@ -67,7 +81,7 @@ const StockAdjustSchema: Schema = new Schema<IStockTransfer, StockAdjustModel>(
       type: Number,
       required: true,
     },
-    companyId: {
+    company: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
     },

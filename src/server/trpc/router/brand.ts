@@ -22,7 +22,7 @@ export const brandRouter = router({
 
       const brand = await BrandModel.create({
         ...input,
-        companyId: client.companyId,
+        companyId: client.company,
       });
 
       return brand;
@@ -98,7 +98,7 @@ export const brandRouter = router({
       };
 
       const query = {
-        companyId: client.companyId,
+        companyId: client.company,
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 

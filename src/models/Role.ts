@@ -1,10 +1,11 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { Permissions } from '../constants/index';
+import type { ICompany } from './Company';
+import type { IStaffMem } from './StaffMem';
 
-export interface IRole {
+export interface RoleCreateInput {
   name: string;
-  createdAt: Date;
   permissions: {
     permissionName: typeof Permissions[number];
     crud: {
@@ -15,9 +16,15 @@ export interface IRole {
     };
   }[];
   displayName: string;
-  company: Types.ObjectId;
-  users: Types.ObjectId[];
   defaultRedirect?: string;
+}
+
+export interface RoleUpdateInput extends Partial<RoleCreateInput>, DocWithId {}
+
+export interface IRole extends RoleCreateInput {
+  createdAt: Date;
+  company?: Types.ObjectId | (ICompany & DocWithId) | null;
+  staffMem?: Types.ObjectId[] | (IStaffMem & DocWithId)[];
 }
 
 type RoleModel = Model<IRole, Record<string, never>>;
@@ -47,10 +54,10 @@ const RoleSchema: Schema = new Schema<IRole, RoleModel>(
       required: false,
     },
     displayName: { type: String, required: true },
-    users: [
+    staffMem: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'StaffMem',
       },
     ],
     defaultRedirect: { type: String, required: false },

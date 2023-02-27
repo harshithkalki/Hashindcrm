@@ -34,7 +34,7 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
             _id: me.data.linkedTo.toString(),
           },
           companyId: {
-            _id: me.data.companyId.toString(),
+            _id: me.data.company.toString(),
           },
           ticket: me.data.ticket && {
             _id: me.data.ticket?._id.toString(),

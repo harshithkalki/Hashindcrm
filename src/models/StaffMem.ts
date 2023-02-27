@@ -6,6 +6,27 @@ import crypto from 'crypto';
 import type { ITicket } from './Ticket';
 import type { IRole } from './Role';
 
+export interface StaffMemCreateInput {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  phoneNumber: string;
+  addressline1: string;
+  addressline2: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+  role: string;
+  linkedTo?: string;
+  email: string;
+  password: string;
+}
+
+export interface StaffMemUpdateInput
+  extends Partial<StaffMemCreateInput>,
+    DocWithId {}
+
 export interface IStaffMem {
   firstName: string;
   middleName: string;
@@ -19,7 +40,7 @@ export interface IStaffMem {
   pincode: string;
   role: Types.ObjectId | IRole;
   linkedTo?: Types.ObjectId;
-  companyId: Types.ObjectId;
+  company: Types.ObjectId;
   email: string;
   password: string;
   createdAt: Date;
@@ -57,7 +78,7 @@ const StaffMemSchema: Schema = new Schema<
     password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     linkedTo: { type: Schema.Types.ObjectId, ref: 'StaffMem' },
-    companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
+    company: { type: Schema.Types.ObjectId, ref: 'Company' },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
   },
   {

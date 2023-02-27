@@ -1,17 +1,24 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-interface Status {
+export interface StatusCreateInput {
   name: string;
-  createdAt: Date;
-  companyId: Types.ObjectId;
   initialStatus: boolean;
   linkedStatuses: string[];
 }
 
-type StatusModel = Model<Status, Record<string, never>>;
+export interface StatusUpdateInput
+  extends Partial<StatusCreateInput>,
+    DocWithId {}
 
-const StatusSchema = new Schema<Status, StatusModel>(
+interface IStatus extends StatusCreateInput {
+  createdAt: Date;
+  company: Types.ObjectId;
+}
+
+type StatusModel = Model<IStatus, Record<string, never>>;
+
+const StatusSchema = new Schema<IStatus, StatusModel>(
   {
     name: {
       type: String,
@@ -22,7 +29,7 @@ const StatusSchema = new Schema<Status, StatusModel>(
       required: false,
       default: Date.now,
     },
-    companyId: {
+    company: {
       type: Schema.Types.ObjectId,
       required: true,
     },
@@ -44,5 +51,5 @@ const StatusSchema = new Schema<Status, StatusModel>(
 StatusSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Status as ReturnType<
-  typeof mongoose.model<Status, StatusModel>
->) || mongoose.model<Status, StatusModel>('Status', StatusSchema);
+  typeof mongoose.model<IStatus, StatusModel>
+>) || mongoose.model<IStatus, StatusModel>('Status', StatusSchema);

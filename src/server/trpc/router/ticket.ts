@@ -34,7 +34,7 @@ export const ticketRouter = router({
       const ticket = await TicketModel.create({
         name: input.name,
         status: input.status,
-        companyId: client.companyId,
+        companyId: client.company,
       });
 
       return ticket;
@@ -76,7 +76,7 @@ export const ticketRouter = router({
       'You are not permitted to read products'
     );
 
-    const tickets = TicketModel.find({ companyId: client.companyId }).populate<{
+    const tickets = TicketModel.find({ companyId: client.company }).populate<{
       assignedTo: {
         firstName: string;
         lastName: string;
@@ -141,7 +141,7 @@ export const ticketRouter = router({
 
       const ticket = await TicketModel.findOne({
         _id: input.ticketId,
-        companyId: client.companyId,
+        companyId: client.company,
         assignedTo: client._id,
       });
 
@@ -154,7 +154,7 @@ export const ticketRouter = router({
 
       const childUsers = await UserModel.find({
         linkedTo: client._id,
-        companyId: client.companyId,
+        company: client.company,
       })
         .select('firstName lastName middleName')
         .populate<{ role: { name: string } }>('role', 'name')
@@ -167,7 +167,7 @@ export const ticketRouter = router({
 
       const allparentUsers = await UserModel.find({
         role: parentUser?.role,
-        companyId: client.companyId,
+        company: client.company,
       })
         .select('firstName lastName middleName')
         .populate<{ role: { name: string } }>('role', 'name')
