@@ -76,7 +76,7 @@ export const brandRouter = router({
     .input(
       z
         .object({
-          page: z.number(),
+          page: z.number().optional(),
           limit: z.number().optional(),
           search: z.string().optional(),
         })
@@ -95,9 +95,6 @@ export const brandRouter = router({
       const options = {
         page: page,
         limit: limit,
-        sort: {
-          name: 1,
-        },
       };
 
       const query = {

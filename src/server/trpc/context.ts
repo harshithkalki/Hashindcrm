@@ -22,6 +22,7 @@ export const createContextInner = async ({
   req,
   res,
 }: CreateContextOptions) => {
+  await connectDb();
   return {
     clientId,
     req,
@@ -34,10 +35,7 @@ export const createContextInner = async ({
  * @link https://trpc.io/docs/context
  **/
 export const createContext = async (opts: CreateNextContextOptions) => {
-  await connectDb();
-
   const id = await getServerAuthSession(opts.req);
-  await connectDb();
 
   return {
     ...(await createContextInner({

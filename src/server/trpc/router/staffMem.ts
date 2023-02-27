@@ -50,6 +50,7 @@ export const userRouter = router({
       }
 
       const token = user.getJWTToken();
+
       ctx.res.setHeader(
         'Set-Cookie',
         `token=${token}; expires=${new Date(

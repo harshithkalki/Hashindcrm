@@ -1,21 +1,31 @@
-import User from '@/models/StaffMem';
+import StaffMem from '@/models/StaffMem';
 import Company from '@/models/Company';
 import Role from '@/models/Role';
 import { Permissions } from '@/constants';
 
-export const seedTestDB = async (db: typeof import('mongoose')) => {
-  await db.connection.dropDatabase();
+export const seedTestDB = async () => {
+  await Company.deleteMany({});
+  await Role.deleteMany({});
+  await StaffMem.deleteMany({});
 
   const testCompany = new Company({
     name: 'Test Company',
-    addressLine1: 'Test Address',
-    addressLine2: 'Test Address',
+    addressline1: 'Test Address',
+    addressline2: 'Test Address',
     city: 'Test City',
     state: 'Test State',
     companyName: 'Test Company',
     country: 'Test Country',
     createdAt: new Date(),
     pincode: 'Test Pincode',
+    backgroundColor: 'Test Color',
+    logo: 'Test Logo',
+    cinNo: 'Test CIN',
+    gstNo: 'Test GST',
+    secondaryColor: 'Test Color',
+    primaryColor: 'Test Color',
+    landline: 'Test Landline',
+    mobile: 'Test Mobile',
   });
 
   const testAdminRole = new Role({
@@ -35,7 +45,7 @@ export const seedTestDB = async (db: typeof import('mongoose')) => {
     users: [],
   });
 
-  const user = new User({
+  const staff = new StaffMem({
     firstName: 'Test',
     middleName: 'Test',
     lastName: 'Test',
@@ -53,9 +63,17 @@ export const seedTestDB = async (db: typeof import('mongoose')) => {
     role: testAdminRole._id,
   });
 
-  testAdminRole.users.push(user._id);
+  testAdminRole.users.push(staff._id);
 
-  await testCompany.save();
-  await testAdminRole.save();
-  await user.save();
+  try {
+    await testCompany.save();
+    await testAdminRole.save();
+    await staff.save();
+
+    process.env.TEST_COMPANY_ID = testCompany._id.toString();
+    process.env.TEST_ADMIN_ROLE_ID = testAdminRole._id.toString();
+    process.env.TEST_STAFF_ID = staff._id.toString();
+  } catch (error) {
+    console.log(error);
+  }
 };

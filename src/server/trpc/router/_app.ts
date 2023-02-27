@@ -7,6 +7,7 @@ import { categoryRouter } from './category';
 import { productRouter } from './product';
 import { stockAdjustRouter } from './stockAdjust';
 import { stockTransferRouter } from './stockTransfer';
+import { auth } from './auth';
 
 export const appRouter = router({
   userRouter,
@@ -17,6 +18,7 @@ export const appRouter = router({
   productRouter,
   stockAdjustRouter,
   stockTransferRouter,
+  auth,
 });
 
 // export type definition of API

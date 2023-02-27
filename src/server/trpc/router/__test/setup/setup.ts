@@ -1,10 +1,10 @@
 import { seedTestDB } from './setupdb';
-import connectDb from '../../../../db';
+import connectDb from '@/server/db';
 
 const setup = async () => {
   const mongo = await connectDb();
   try {
-    await seedTestDB(mongo);
+    await seedTestDB();
     await mongo.disconnect();
   } catch (err) {
     console.error(err);
