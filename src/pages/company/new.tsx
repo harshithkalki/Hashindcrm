@@ -18,6 +18,14 @@ const index = () => {
           state: '',
           pincode: '',
           country: '',
+          landline: '',
+          mobile: '',
+          cin: '',
+          gst: '',
+          primaryColor: '',
+          secondaryColor: '',
+          backGroundColor: '',
+          logo: '',
         }}
         onSubmit={(inputs) => {
           return createCompany
