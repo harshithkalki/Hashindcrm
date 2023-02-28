@@ -16,6 +16,7 @@ export const ZCompanyCreateInput = z.object({
   secondaryColor: z.string(),
   backgroundColor: z.string(),
   logo: z.string(),
+  natureOfBusiness: z.string(),
 });
 
 export const ZCompanyUpdateInput = ZCompanyCreateInput.partial().extend({
