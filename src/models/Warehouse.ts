@@ -1,17 +1,14 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import type { z } from 'zod';
+import type { ZWarehouse } from '@/zobjs/warehouse';
 
-export interface WarehouseCreateInput {
-  name: string;
-}
-
-export interface WarehouseUpdateInput
-  extends Partial<WarehouseCreateInput>,
-    DocWithId {}
-
-export interface IWarehouse extends WarehouseCreateInput {
-  company: Types.ObjectId;
-}
+export type IWarehouse = ModifyDeep<
+  z.infer<typeof ZWarehouse>,
+  {
+    company: Types.ObjectId;
+  }
+>;
 
 type WarehouseModel = Model<IWarehouse, Record<string, never>>;
 

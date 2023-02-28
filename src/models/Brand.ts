@@ -1,21 +1,15 @@
-import type { Model, Types } from 'mongoose';
+import type { ZBrand } from '@/zobjs/brand';
+import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import type { z } from 'zod';
 
-export interface BrandCreateInput {
-  name: string;
-  slug: string;
-  logo: string;
-}
-
-export interface BrandUpdateInput
-  extends Partial<BrandCreateInput>,
-    DocWithId {}
-
-export interface IBrand extends BrandCreateInput {
-  companyId: Types.ObjectId;
-}
-
+export type IBrand = ModifyDeep<
+  z.infer<typeof ZBrand>,
+  {
+    company: mongoose.Types.ObjectId;
+  }
+>;
 export type BrandDocument = mongoose.Document & IBrand;
 
 type BrandModel = Model<IBrand, Record<string, never>>;
@@ -25,7 +19,7 @@ const BrandSchema: Schema = new Schema<IBrand, BrandModel>(
     name: { type: String, required: true },
     slug: { type: String, required: true },
     logo: { type: String, required: true },
-    companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
+    company: { type: Schema.Types.ObjectId, ref: 'Company' },
   },
   {
     versionKey: false,

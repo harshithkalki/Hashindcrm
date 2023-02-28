@@ -1,41 +1,20 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import type { ICompany } from './Company';
-import type { IProduct } from './Product';
-import type { IWarehouse } from './Warehouse';
+import type { z } from 'zod';
+import type { ZStockTransfer } from '@/zobjs/stockTransfer';
 
-export interface StockTransferCreateInput {
-  products: {
-    product: Types.ObjectId | (IProduct & { _id: string });
-    quantity: number;
-  }[];
-  createdAt: Date;
-  note: string;
-  total: number;
-  status: 'pending' | 'approved' | 'rejected';
-  shipping: number;
-  orderTax: number;
-  discount: number;
-  warehouse: string;
-  openingStockDate: Date;
-  paidAmount: number;
-  paymentStatus: 'pending' | 'paid';
-}
-
-export interface StockTransferUpdateInput
-  extends Partial<StockTransferCreateInput>,
-    DocWithId {}
-
-export interface IStockTransfer
-  extends ModifyDeep<
-    StockTransferCreateInput,
-    {
-      warehouse: Types.ObjectId | (IWarehouse & DocWithId);
-    }
-  > {
-  createdAt: Date;
-  company: Types.ObjectId | (ICompany & { _id: string });
-}
+export type IStockTransfer = ModifyDeep<
+  z.infer<typeof ZStockTransfer>,
+  {
+    company: Types.ObjectId;
+    products: {
+      product: Types.ObjectId;
+      quantity: number;
+    }[];
+    warehouse: Types.ObjectId;
+    openingStockDate: Date;
+  }
+>;
 
 type StockAdjustModel = Model<IStockTransfer, Record<string, never>>;
 

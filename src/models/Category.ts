@@ -1,26 +1,15 @@
+import type { ZCategory } from '@/zobjs/category';
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import type { z } from 'zod';
 
-export interface CategoryCreateInput {
-  name: string;
-  slug: string;
-  logo: string;
-  parentCategory?: string;
-}
-
-export interface CategoryUpdateInput
-  extends Partial<CategoryCreateInput>,
-    DocWithId {}
-
-export interface ICategory
-  extends ModifyDeep<
-    CategoryCreateInput,
-    {
-      parentCategory?: Types.ObjectId | (ICategory & DocWithId) | null;
-    }
-  > {
-  companyId: Types.ObjectId;
-}
+export type ICategory = ModifyDeep<
+  z.infer<typeof ZCategory>,
+  {
+    companyId: Types.ObjectId;
+    parentCategory: Types.ObjectId;
+  }
+>;
 
 type CategoryModel = Model<ICategory, Record<string, never>>;
 export type CategoryDocument = mongoose.Document & ICategory;

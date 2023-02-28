@@ -1,32 +1,10 @@
+import type { ZCompany } from '@/zobjs/company';
 import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import type { z } from 'zod';
 
-export interface CompanyCreateInput {
-  name: string;
-  addressline1: string;
-  addressline2: string;
-  city: string;
-  state: string;
-  pincode: string;
-  country: string;
-  landline: string;
-  mobile: string;
-  gstNo: string;
-  cinNo: string;
-  primaryColor: string;
-  secondaryColor: string;
-  backgroundColor: string;
-  logo: string;
-}
-
-export interface CompanyUpdateInput
-  extends Partial<CompanyCreateInput>,
-    DocWithId {}
-
-export interface ICompany extends CompanyCreateInput {
-  createdAt: Date;
-}
+export type ICompany = z.infer<typeof ZCompany>;
 
 export type CompanyDocument = mongoose.Document & ICompany;
 
