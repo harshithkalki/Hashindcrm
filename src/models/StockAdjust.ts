@@ -1,28 +1,15 @@
-import type { Model, Types } from 'mongoose';
+import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import type { IProduct } from './Product';
+import type { z } from 'zod';
+import type { ZStockAdjust } from '@/zobjs/stockAdjust';
 
-export interface StockAdjustCreateInput {
-  product: string;
-  quantity: number;
-  note?: string;
-  operation: 'add' | 'remove';
-}
-
-export interface StockAdjustUpdateInput
-  extends Partial<StockAdjustCreateInput>,
-    DocWithId {}
-
-export interface IStockAdjust
-  extends ModifyDeep<
-    StockAdjustCreateInput,
-    {
-      product: Types.ObjectId | (IProduct & DocWithId);
-    }
-  > {
-  company: Types.ObjectId;
-  createdAt: Date;
-}
+export type IStockAdjust = ModifyDeep<
+  z.infer<typeof ZStockAdjust>,
+  {
+    company: mongoose.Types.ObjectId;
+    product: mongoose.Types.ObjectId;
+  }
+>;
 
 type StockAdjustModel = Model<IStockAdjust, Record<string, never>>;
 

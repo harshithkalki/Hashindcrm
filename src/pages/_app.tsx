@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { setUser } from '@/store/userSlice';
 
 function UserContextProvider({ children }: { children: React.ReactNode }) {
-  const me = trpc.userRouter.me.useQuery(undefined, {
+  const me = trpc.staffRouter.me.useQuery(undefined, {
     onError: (err) => {
       if (err.data?.code === 'UNAUTHORIZED') {
         router.push('/login');

@@ -2,17 +2,11 @@ import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
 import CategoryModel from '@/models/Category';
 import checkPermission from '@/utils/checkPermission';
+import { ZCategoryCreateInput, ZCategoryUpdateInput } from '@/zobjs/category';
 
 export const categoryRouter = router({
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        slug: z.string(),
-        logo: z.string().nullish(),
-        parentCategory: z.string().nullish(),
-      })
-    )
+    .input(ZCategoryCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
         'CATEGORY',
@@ -23,21 +17,14 @@ export const categoryRouter = router({
 
       const category = await CategoryModel.create({
         ...input,
-        companyId: client.company,
+        company: client.company,
       });
 
       return category;
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        slug: z.string(),
-        logo: z.string(),
-      })
-    )
+    .input(ZCategoryUpdateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
         'CATEGORY',
@@ -47,10 +34,12 @@ export const categoryRouter = router({
       );
 
       const category = await CategoryModel.findByIdAndUpdate(
-        input.id,
+        input._id,
         {
-          ...input,
-          companyId: client.company,
+          $set: {
+            ...input,
+            company: client.company,
+          },
         },
         {
           new: true,
@@ -96,7 +85,7 @@ export const categoryRouter = router({
       'You are not permitted to read categorys'
     );
 
-    const categorys = await CategoryModel.find({ companyId: client.company });
+    const categorys = await CategoryModel.find({ company: client.company });
 
     return categorys;
   }),

@@ -1,31 +1,16 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import { Permissions } from '../constants/index';
-import type { ICompany } from './Company';
-import type { IStaffMem } from './StaffMem';
+import type { z } from 'zod';
+import type { ZRole } from '@/zobjs/role';
 
-export interface RoleCreateInput {
-  name: string;
-  permissions: {
-    permissionName: typeof Permissions[number];
-    crud: {
-      create?: boolean;
-      read?: boolean;
-      update?: boolean;
-      delete?: boolean;
-    };
-  }[];
-  displayName: string;
-  defaultRedirect?: string;
-}
-
-export interface RoleUpdateInput extends Partial<RoleCreateInput>, DocWithId {}
-
-export interface IRole extends RoleCreateInput {
-  createdAt: Date;
-  company?: Types.ObjectId | (ICompany & DocWithId) | null;
-  staffMem?: Types.ObjectId[] | (IStaffMem & DocWithId)[];
-}
+export type IRole = ModifyDeep<
+  z.infer<typeof ZRole>,
+  {
+    company: Types.ObjectId;
+    staffMem: Types.ObjectId[];
+  }
+>;
 
 type RoleModel = Model<IRole, Record<string, never>>;
 
@@ -51,7 +36,7 @@ const RoleSchema: Schema = new Schema<IRole, RoleModel>(
     company: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
-      required: false,
+      required: true,
     },
     displayName: { type: String, required: true },
     staffMem: [
@@ -74,5 +59,5 @@ RoleSchema.index(
 );
 
 export default (mongoose.models.Role as ReturnType<
-  typeof mongoose.model<IRole, RoleModel>
->) || mongoose.model<IRole, RoleModel>('Role', RoleSchema);
+  typeof mongoose.model<IRole, mongoose.PaginateModel<IRole>>
+>) || mongoose.model<IRole, mongoose.PaginateModel<IRole>>('Role', RoleSchema);

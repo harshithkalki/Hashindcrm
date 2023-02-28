@@ -1,49 +1,19 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import type { IBrand } from './Brand';
-import type { ICategory } from './Category';
-import type { ICompany } from './Company';
-import type { IWarehouse } from './Warehouse';
+import type { z } from 'zod';
+import type { ZProduct } from '@/zobjs/product';
 
-export interface ProductCreateInput {
-  name: string;
-  slug: string;
-  logo?: string;
-  quantity: number;
-  quantityAlert: number;
-  category: string;
-  brand: string;
-  barcodeSymbology: string;
-  itemCode: string;
-  openingStock: number;
-  openingStockDate: string;
-  purchasePrice: number;
-  salePrice: number;
-  tax: number;
-  mrp: number;
-  expiryDate?: string;
-  description?: string;
-  warehouse: string;
-}
-
-export interface ProductUpdateInput
-  extends Partial<ProductCreateInput>,
-    DocWithId {}
-
-export interface IProduct
-  extends ModifyDeep<
-    ProductCreateInput,
-    {
-      category: Types.ObjectId | (ICategory & DocWithId) | null;
-      brand: Types.ObjectId | (IBrand & DocWithId) | null;
-      warehouse: Types.ObjectId | (IWarehouse & DocWithId) | null;
-      company: Types.ObjectId | (ICompany & DocWithId) | null;
-      openingStockDate: Date;
-    }
-  > {
-  createdAt: Date;
-}
+export type IProduct = ModifyDeep<
+  z.infer<typeof ZProduct>,
+  {
+    company: Types.ObjectId;
+    category: Types.ObjectId;
+    brand: Types.ObjectId;
+    warehouse: Types.ObjectId;
+    openingStockDate: Date;
+  }
+>;
 
 export type ProductDocument = mongoose.Document & IProduct;
 

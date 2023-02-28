@@ -2,16 +2,11 @@ import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
 import BrandModel from '@/models/Brand';
 import checkPermission from '@/utils/checkPermission';
+import { ZBrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
 
 export const brandRouter = router({
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        slug: z.string(),
-        logo: z.string(),
-      })
-    )
+    .input(ZBrandCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
         'BRAND',
@@ -22,21 +17,14 @@ export const brandRouter = router({
 
       const brand = await BrandModel.create({
         ...input,
-        companyId: client.company,
+        company: client.company,
       });
 
       return brand;
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        slug: z.string(),
-        logo: z.string(),
-      })
-    )
+    .input(ZBrandUpdateInput)
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
         'BRAND',
@@ -45,7 +33,7 @@ export const brandRouter = router({
         'You are not permitted to update brand'
       );
 
-      const brand = await BrandModel.findByIdAndUpdate(input.id, input, {
+      const brand = await BrandModel.findByIdAndUpdate(input._id, input, {
         new: true,
       });
 
@@ -55,7 +43,7 @@ export const brandRouter = router({
   delete: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        _id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -66,7 +54,7 @@ export const brandRouter = router({
         'You are not permitted to delete brand'
       );
 
-      const brand = await BrandModel.findByIdAndDelete(input.id);
+      const brand = await BrandModel.findByIdAndDelete(input._id);
 
       return brand;
     }),
@@ -98,7 +86,7 @@ export const brandRouter = router({
       };
 
       const query = {
-        companyId: client.company,
+        company: client.company,
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 

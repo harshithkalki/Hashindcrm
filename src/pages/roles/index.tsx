@@ -7,14 +7,14 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { ScrollArea } from '@mantine/core';
 
-type Roles = RouterOutputs['userRouter']['getAllRoles'];
+type Roles = RouterOutputs['staffRouter']['getAllRoles'];
 
 interface props {
   data: Roles;
 }
 
 const Index = () => {
-  const getAllRoles = trpc.userRouter.getAllRoles.useQuery();
+  const getAllRoles = trpc.staffRouter.getAllRoles.useQuery();
 
   const tabData = getAllRoles.data;
   const Data = tabData;

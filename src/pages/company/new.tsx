@@ -4,7 +4,7 @@ import { trpc } from '@/utils/trpc';
 import React from 'react';
 
 const index = () => {
-  const createCompany = trpc.userRouter.createCompany.useMutation();
+  const createCompany = trpc.staffRouter.createCompany.useMutation();
 
   return (
     <Layout>

@@ -1,17 +1,14 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import type { z } from 'zod';
+import type { ZWarehouse } from '@/zobjs/warehouse';
 
-export interface WarehouseCreateInput {
-  name: string;
-}
-
-export interface WarehouseUpdateInput
-  extends Partial<WarehouseCreateInput>,
-    DocWithId {}
-
-export interface IWarehouse extends WarehouseCreateInput {
-  company: Types.ObjectId;
-}
+export type IWarehouse = ModifyDeep<
+  z.infer<typeof ZWarehouse>,
+  {
+    company: Types.ObjectId;
+  }
+>;
 
 type WarehouseModel = Model<IWarehouse, Record<string, never>>;
 
@@ -30,5 +27,9 @@ const WarehouseSchema: Schema = new Schema<IWarehouse, WarehouseModel>(
 WarehouseSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Warehouse as ReturnType<
-  typeof mongoose.model<IWarehouse, WarehouseModel>
->) || mongoose.model<IWarehouse, WarehouseModel>('Warehouse', WarehouseSchema);
+  typeof mongoose.model<IWarehouse, mongoose.PaginateModel<IWarehouse>>
+>) ||
+  mongoose.model<IWarehouse, mongoose.PaginateModel<IWarehouse>>(
+    'Warehouse',
+    WarehouseSchema
+  );

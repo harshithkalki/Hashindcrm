@@ -1,51 +1,20 @@
-import type { Model, Types } from 'mongoose';
+import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import type { ITicket } from './Ticket';
-import type { IRole } from './Role';
+import type { z } from 'zod';
+import type { ZStaffMem } from '@/zobjs/staffMem';
 
-export interface StaffMemCreateInput {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  phoneNumber: string;
-  addressline1: string;
-  addressline2: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
-  role: string;
-  linkedTo?: string;
-  email: string;
-  password: string;
-}
-
-export interface StaffMemUpdateInput
-  extends Partial<StaffMemCreateInput>,
-    DocWithId {}
-
-export interface IStaffMem {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  phoneNumber: string;
-  addressline1: string;
-  addressline2: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
-  role: Types.ObjectId | IRole;
-  linkedTo?: Types.ObjectId;
-  company: Types.ObjectId;
-  email: string;
-  password: string;
-  createdAt: Date;
-  ticket?: Types.ObjectId | (ITicket & { _id: string });
-}
+export type IStaffMem = ModifyDeep<
+  z.infer<typeof ZStaffMem>,
+  {
+    role: mongoose.Types.ObjectId;
+    company: mongoose.Types.ObjectId;
+    ticket: mongoose.Types.ObjectId;
+    linkedTo: mongoose.Types.ObjectId;
+  }
+>;
 
 interface StaffMemMethods {
   getJWTToken(): string;
@@ -124,5 +93,12 @@ StaffMemSchema.method(
 );
 
 export default (mongoose.models.StaffMem as ReturnType<
-  typeof mongoose.model<IStaffMem, StaffMemModel>
->) || mongoose.model<IStaffMem, StaffMemModel>('StaffMem', StaffMemSchema);
+  typeof mongoose.model<
+    IStaffMem,
+    mongoose.PaginateModel<IStaffMem, Record<string, never>, StaffMemMethods>
+  >
+>) ||
+  mongoose.model<
+    IStaffMem,
+    mongoose.PaginateModel<IStaffMem, Record<string, never>, StaffMemMethods>
+  >('StaffMem', StaffMemSchema);

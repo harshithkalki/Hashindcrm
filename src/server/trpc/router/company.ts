@@ -2,30 +2,13 @@ import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
 import CompanyModel from '@/models/Company';
 import checkPermission from '@/utils/checkPermission';
+import { ZCompanyCreateInput, ZCompanyUpdateInput } from '@/zobjs/company';
 
 export const companyRouter = router({
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        addressline1: z.string(),
-        addressline2: z.string(),
-        city: z.string(),
-        state: z.string(),
-        pincode: z.string(),
-        country: z.string(),
-        primaryColor: z.string(),
-        secondaryColor: z.string(),
-        backgroundColor: z.string(),
-        logo: z.string(),
-        gstNo: z.string(),
-        cinNo: z.string(),
-        landline: z.string(),
-        mobile: z.string(),
-      })
-    )
+    .input(ZCompanyCreateInput)
     .mutation(async ({ input, ctx }) => {
-      const client = await checkPermission(
+      await checkPermission(
         'COMPANY',
         { create: true },
         ctx.clientId,
@@ -34,21 +17,13 @@ export const companyRouter = router({
 
       const company = await CompanyModel.create({
         ...input,
-        companyId: client.company,
       });
 
       return company;
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        slug: z.string(),
-        logo: z.string(),
-      })
-    )
+    .input(ZCompanyUpdateInput)
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
         'COMPANY',
@@ -57,7 +32,7 @@ export const companyRouter = router({
         'You are not permitted to update company'
       );
 
-      const company = await CompanyModel.findByIdAndUpdate(input.id, input, {
+      const company = await CompanyModel.findByIdAndUpdate(input._id, input, {
         new: true,
       });
 
@@ -83,7 +58,6 @@ export const companyRouter = router({
       return company;
     }),
 
-  // pagination with search companys by name
   companys: protectedProcedure
     .input(
       z
@@ -95,7 +69,7 @@ export const companyRouter = router({
         .optional()
     )
     .query(async ({ input, ctx }) => {
-      const client = await checkPermission(
+      await checkPermission(
         'COMPANY',
         { read: true },
         ctx.clientId,
@@ -113,7 +87,6 @@ export const companyRouter = router({
       };
 
       const query = {
-        companyId: client.company,
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 

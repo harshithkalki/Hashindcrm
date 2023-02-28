@@ -1,20 +1,14 @@
+import type { ZStatus } from '@/zobjs/status';
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import type { z } from 'zod';
 
-export interface StatusCreateInput {
-  name: string;
-  initialStatus: boolean;
-  linkedStatuses: string[];
-}
-
-export interface StatusUpdateInput
-  extends Partial<StatusCreateInput>,
-    DocWithId {}
-
-interface IStatus extends StatusCreateInput {
-  createdAt: Date;
-  company: Types.ObjectId;
-}
+export type IStatus = ModifyDeep<
+  z.infer<typeof ZStatus>,
+  {
+    company: Types.ObjectId;
+  }
+>;
 
 type StatusModel = Model<IStatus, Record<string, never>>;
 

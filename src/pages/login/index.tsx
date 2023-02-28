@@ -67,7 +67,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function AuthenticationImage() {
   const { classes } = useStyles();
-  const loginUser = trpc.userRouter.login.useMutation();
+  const loginUser = trpc.staffRouter.login.useMutation();
   const [loginError, setError] = useState('');
   const router = useRouter();
   return (
