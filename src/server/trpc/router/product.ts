@@ -2,11 +2,11 @@ import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
 import ProductModel from '@/models/Product';
 import type { WarehouseDocument } from '@/models/Warehouse';
-import WarehouseModel from '@/models/Warehouse';
 import checkPermission from '@/utils/checkPermission';
 import type { CategoryDocument } from '@/models/Category';
 import CategoryModel from '@/models/Category';
 import type { BrandDocument } from '@/models/Brand';
+import { ZProductCreateInput, ZProductUpdateInput } from '@/zobjs/product';
 
 const getAllChildCategories = async (
   category: string
@@ -48,28 +48,7 @@ const getAllChildCategories = async (
 
 export const productRouter = router({
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(3).max(50),
-        logo: z.string().optional(),
-        warehouse: z.string(),
-        slug: z.string(),
-        quantity: z.number(),
-        quantityAlert: z.number(),
-        category: z.string(),
-        brand: z.string(),
-        barcodeSymbology: z.string(),
-        itemCode: z.string(),
-        openingStock: z.number(),
-        openingStockDate: z.string(),
-        purchasePrice: z.number(),
-        salePrice: z.number(),
-        mrp: z.number(),
-        tax: z.number(),
-        expireDate: z.string().optional(),
-        description: z.string().optional(),
-      })
-    )
+    .input(ZProductCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
         'PRODUCT',
@@ -80,48 +59,11 @@ export const productRouter = router({
 
       const product = await ProductModel.create({
         ...input,
-        companyId: client.company,
+        company: client.company,
       });
 
       return product;
     }),
-
-  createWarehouse: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const client = await checkPermission(
-        'PRODUCT',
-        { create: true },
-        ctx.clientId,
-        'You are not permitted to create warehouse'
-      );
-
-      const warehouse = await WarehouseModel.create({
-        ...input,
-        company: client.company,
-      });
-
-      return warehouse;
-    }),
-
-  getAllWarehouse: protectedProcedure.query(async ({ ctx }) => {
-    const client = await checkPermission(
-      'PRODUCT',
-      { read: true, update: true, delete: true },
-      ctx.clientId,
-      'You are not permitted to read warehouses'
-    );
-
-    const warehouse = await WarehouseModel.find({
-      company: client.company,
-    });
-
-    return warehouse;
-  }),
 
   getProductsByCategory: protectedProcedure
     .input(
@@ -142,7 +84,7 @@ export const productRouter = router({
       }
 
       const products = await ProductModel.find({
-        companyId: client.company,
+        company: client.company,
         category: input.category,
       }).lean();
 
@@ -152,7 +94,7 @@ export const productRouter = router({
         console.log(childCategories, 'childCategories');
 
         const products = await ProductModel.find({
-          companyId: client.company,
+          company: client.company,
           category: {
             $in: childCategories.map((category) => category._id),
           },
@@ -165,29 +107,7 @@ export const productRouter = router({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        slug: z.string(),
-        logo: z.string(),
-        quantity: z.number(),
-        quantityAlert: z.number(),
-        category: z.string(),
-        // product: z.string(),
-        // barcode: z.string(),
-        itemCode: z.string(),
-        openingStock: z.number(),
-        openingStockDate: z.string(),
-        purchasePrice: z.number(),
-        salePrice: z.number(),
-        tax: z.number(),
-        mrp: z.number(),
-        expiryDate: z.string().optional(),
-        description: z.string().optional(),
-        warehouse: z.string(),
-      })
-    )
+    .input(ZProductUpdateInput)
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
         'PRODUCT',
@@ -196,7 +116,7 @@ export const productRouter = router({
         'You are not permitted to update product'
       );
 
-      const product = await ProductModel.findByIdAndUpdate(input.id, input, {
+      const product = await ProductModel.findByIdAndUpdate(input._id, input, {
         new: true,
       });
 
@@ -231,7 +151,7 @@ export const productRouter = router({
     );
 
     const products = await ProductModel.find({
-      companyId: client.company,
+      company: client.company,
     })
       .populate<{
         warehouse: WarehouseDocument;
@@ -305,7 +225,7 @@ export const productRouter = router({
       };
 
       const query = {
-        companyId: client.company,
+        company: client.company,
         ...(input?.category && { category: input.category }),
       };
 
@@ -350,7 +270,7 @@ export const productRouter = router({
 
       const products = await ProductModel.find(
         {
-          companyId: client.company,
+          company: client.company,
           name: { $regex: input.search, $options: 'i' },
         },
         null,

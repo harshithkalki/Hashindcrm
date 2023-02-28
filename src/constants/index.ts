@@ -1,5 +1,5 @@
 export const Permissions = [
-  'USER',
+  'STAFFMEM',
   'ROLE',
   'COMPANY',
   'WORKFLOW',
@@ -8,4 +8,5 @@ export const Permissions = [
   'CATEGORY',
   'PRODUCT',
   'STOCKADJUST',
+  'WAREHOUSE',
 ] as const;

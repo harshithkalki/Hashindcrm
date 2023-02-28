@@ -4,17 +4,14 @@ import StockAdjustModel from '@/models/StockAdjust';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 import ProductModel from '@/models/Product';
+import {
+  ZStockAdjustCreateInput,
+  ZStockAdjustUpdateInput,
+} from '@/zobjs/stockAdjust';
 
 export const stockAdjustRouter = router({
   create: protectedProcedure
-    .input(
-      z.object({
-        productId: z.string(),
-        quantity: z.number(),
-        note: z.string().nullish(),
-        operation: z.string(),
-      })
-    )
+    .input(ZStockAdjustCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
         'STOCKADJUST',
@@ -28,7 +25,7 @@ export const stockAdjustRouter = router({
         company: client.company,
       });
 
-      const product = await ProductModel.findById(input.productId);
+      const product = await ProductModel.findById(input.product);
 
       if (!product) {
         throw new TRPCError({
@@ -51,7 +48,7 @@ export const stockAdjustRouter = router({
   delete: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        _id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -62,7 +59,7 @@ export const stockAdjustRouter = router({
         'You are not permitted to delete stockAdjust'
       );
 
-      const stockAdjust = await StockAdjustModel.findByIdAndDelete(input.id);
+      const stockAdjust = await StockAdjustModel.findByIdAndDelete(input._id);
 
       return stockAdjust;
     }),
@@ -79,9 +76,31 @@ export const stockAdjustRouter = router({
       company: client.company,
     }).populate<{
       _id: string;
-      productId: { name: string; logo: string; _id: string };
-    }>('productId', 'name logo');
+      product: { name: string; logo: string; _id: string };
+    }>('product', 'name logo');
 
     return stockAdjusts;
   }),
+
+  getStockAdjust: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      await checkPermission(
+        'STOCKADJUST',
+        { read: true, update: true, delete: true },
+        ctx.clientId,
+        'You are not permitted to get stockAdjusts'
+      );
+
+      const stockAdjust = await StockAdjustModel.findById(input._id).populate<{
+        _id: string;
+        product: { name: string; logo: string; _id: string };
+      }>('product', 'name logo');
+
+      return stockAdjust;
+    }),
 });

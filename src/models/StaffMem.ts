@@ -93,5 +93,12 @@ StaffMemSchema.method(
 );
 
 export default (mongoose.models.StaffMem as ReturnType<
-  typeof mongoose.model<IStaffMem, StaffMemModel>
->) || mongoose.model<IStaffMem, StaffMemModel>('StaffMem', StaffMemSchema);
+  typeof mongoose.model<
+    IStaffMem,
+    mongoose.PaginateModel<IStaffMem, Record<string, never>, StaffMemMethods>
+  >
+>) ||
+  mongoose.model<
+    IStaffMem,
+    mongoose.PaginateModel<IStaffMem, Record<string, never>, StaffMemMethods>
+  >('StaffMem', StaffMemSchema);

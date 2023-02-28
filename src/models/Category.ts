@@ -6,7 +6,7 @@ import type { z } from 'zod';
 export type ICategory = ModifyDeep<
   z.infer<typeof ZCategory>,
   {
-    companyId: Types.ObjectId;
+    company: Types.ObjectId;
     parentCategory: Types.ObjectId;
   }
 >;
@@ -24,7 +24,7 @@ const CategorySchema: Schema = new Schema<ICategory, CategoryModel>(
       ref: 'Category',
       required: false,
     },
-    companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
+    company: { type: Schema.Types.ObjectId, ref: 'Company' },
   },
   {
     versionKey: false,

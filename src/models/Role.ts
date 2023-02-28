@@ -59,5 +59,5 @@ RoleSchema.index(
 );
 
 export default (mongoose.models.Role as ReturnType<
-  typeof mongoose.model<IRole, RoleModel>
->) || mongoose.model<IRole, RoleModel>('Role', RoleSchema);
+  typeof mongoose.model<IRole, mongoose.PaginateModel<IRole>>
+>) || mongoose.model<IRole, mongoose.PaginateModel<IRole>>('Role', RoleSchema);

@@ -41,10 +41,10 @@ type Permission = {
 // https://decision-tree-lxlo.vercel.app/workspace
 
 const App = () => {
-  const UpdateRole = trpc.userRouter.updateRole.useMutation();
+  const UpdateRole = trpc.staffRouter.updateRole.useMutation();
   const router = useRouter();
   const { id } = router.query;
-  const getRole = trpc.userRouter.getRole.useQuery(
+  const getRole = trpc.staffRouter.getRole.useQuery(
     { roleId: id as string },
     { refetchOnWindowFocus: false }
   );

@@ -1,5 +1,5 @@
 import { router } from '../trpc';
-import { userRouter } from './staffMem';
+import { staffRouter } from './staffMem';
 import { workflowRouter } from './workflow';
 import { ticketRouter } from './ticket';
 import { brandRouter } from './brand';
@@ -10,7 +10,7 @@ import { stockTransferRouter } from './stockTransfer';
 import { auth } from './auth';
 
 export const appRouter = router({
-  userRouter,
+  staffRouter,
   workflowRouter,
   ticketRouter,
   brandRouter,
@@ -20,6 +20,4 @@ export const appRouter = router({
   stockTransferRouter,
   auth,
 });
-
-// export type definition of API
 export type AppRouter = typeof appRouter;

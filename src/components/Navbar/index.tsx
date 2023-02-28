@@ -122,7 +122,7 @@ interface Props {
 export default function NavbarNested({ hide }: Props) {
   const { classes } = useStyles();
   const [active, setActive] = useState('Billing');
-  const logout = trpc.userRouter.logout.useMutation();
+  const logout = trpc.staffRouter.logout.useMutation();
 
   const links = mockdata.map((item) => (
     <LinksGroup

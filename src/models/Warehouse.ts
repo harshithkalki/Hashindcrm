@@ -27,5 +27,9 @@ const WarehouseSchema: Schema = new Schema<IWarehouse, WarehouseModel>(
 WarehouseSchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Warehouse as ReturnType<
-  typeof mongoose.model<IWarehouse, WarehouseModel>
->) || mongoose.model<IWarehouse, WarehouseModel>('Warehouse', WarehouseSchema);
+  typeof mongoose.model<IWarehouse, mongoose.PaginateModel<IWarehouse>>
+>) ||
+  mongoose.model<IWarehouse, mongoose.PaginateModel<IWarehouse>>(
+    'Warehouse',
+    WarehouseSchema
+  );

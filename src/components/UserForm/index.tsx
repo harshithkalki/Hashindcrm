@@ -76,10 +76,10 @@ interface Props {
 }
 
 const UserForm = ({ title, formInputs }: Props) => {
-  const createUser = trpc.userRouter.createUser.useMutation();
+  const createUser = trpc.staffRouter.createUser.useMutation();
   const { classes, cx } = useStyles();
-  const roles = trpc.userRouter.getAllRoles.useQuery();
-  const users = trpc.userRouter.getAllUsersNames.useQuery();
+  const roles = trpc.staffRouter.getAllRoles.useQuery();
+  const users = trpc.staffRouter.getAllUsersNames.useQuery();
 
   return (
     <div>

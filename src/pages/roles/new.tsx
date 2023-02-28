@@ -25,7 +25,7 @@ const permissionsDemo: Permission = Permissions.map((val) => ({
 }));
 
 const app = () => {
-  const AddRole = trpc.userRouter.createRole.useMutation();
+  const AddRole = trpc.staffRouter.createRole.useMutation();
   return (
     <Layout>
       <ScrollArea style={{ height: '100%' }}>
