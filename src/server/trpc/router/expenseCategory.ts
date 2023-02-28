@@ -1,43 +1,50 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import BrandModel from '@/models/Brand';
+import ExpenseCategoryModel from '@/models/ExpenseCategory';
 import checkPermission from '@/utils/checkPermission';
-import { ZBrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
+import {
+  ZExpenseCategoryCreateInput,
+  ZExpenseCategoryUpdateInput,
+} from '@/zobjs/expenseCategory';
 
-export const brandRouter = router({
+export const expenseCategoryRouter = router({
   create: protectedProcedure
-    .input(ZBrandCreateInput)
+    .input(ZExpenseCategoryCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'BRAND',
+        'EXPENSECATEGORY',
         { create: true },
         ctx.clientId,
-        'You are not permitted to create brand'
+        'You are not permitted to create expenseCategory'
       );
 
-      const brand = await BrandModel.create({
+      const expenseCategory = await ExpenseCategoryModel.create({
         ...input,
         company: client.company,
       });
 
-      return brand;
+      return expenseCategory;
     }),
 
   update: protectedProcedure
-    .input(ZBrandUpdateInput)
+    .input(ZExpenseCategoryUpdateInput)
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'EXPENSECATEGORY',
         { update: true },
         ctx.clientId,
-        'You are not permitted to update brand'
+        'You are not permitted to update expenseCategory'
       );
 
-      const brand = await BrandModel.findByIdAndUpdate(input._id, input, {
-        new: true,
-      });
+      const expenseCategory = await ExpenseCategoryModel.findByIdAndUpdate(
+        input._id,
+        input,
+        {
+          new: true,
+        }
+      );
 
-      return brand;
+      return expenseCategory;
     }),
 
   delete: protectedProcedure
@@ -48,19 +55,21 @@ export const brandRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'EXPENSECATEGORY',
         { delete: true },
         ctx.clientId,
-        'You are not permitted to delete brand'
+        'You are not permitted to delete expenseCategory'
       );
 
-      const brand = await BrandModel.findByIdAndDelete(input._id);
+      const expenseCategory = await ExpenseCategoryModel.findByIdAndDelete(
+        input._id
+      );
 
-      return brand;
+      return expenseCategory;
     }),
 
-  // pagination with search brands by name
-  brands: protectedProcedure
+  // pagination with search expenseCategorys by name
+  expenseCategorys: protectedProcedure
     .input(
       z
         .object({
@@ -72,10 +81,10 @@ export const brandRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'BRAND',
+        'EXPENSECATEGORY',
         { read: true },
         ctx.clientId,
-        'You are not permitted to read brand'
+        'You are not permitted to read expenseCategory'
       );
 
       const { page = 1, limit = 10, search } = input || {};
@@ -90,9 +99,12 @@ export const brandRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const brands = await BrandModel.paginate(query, options);
+      const expenseCategorys = await ExpenseCategoryModel.paginate(
+        query,
+        options
+      );
 
-      return brands;
+      return expenseCategorys;
     }),
 
   get: protectedProcedure
@@ -103,14 +115,14 @@ export const brandRouter = router({
     )
     .query(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'EXPENSECATEGORY',
         { read: true },
         ctx.clientId,
-        'You are not permitted to read brand'
+        'You are not permitted to read expenseCategory'
       );
 
-      const brand = await BrandModel.findById(input._id);
+      const expenseCategory = await ExpenseCategoryModel.findById(input._id);
 
-      return brand;
+      return expenseCategory;
     }),
 });
