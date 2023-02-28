@@ -9,6 +9,8 @@ import { stockAdjustRouter } from './stockAdjust';
 import { stockTransferRouter } from './stockTransfer';
 import { auth } from './auth';
 import { roleRouter } from './role';
+import { customerRouter } from './customer';
+import { supplierRouter } from './supplier';
 
 export const appRouter = router({
   staffRouter,
@@ -21,5 +23,7 @@ export const appRouter = router({
   stockTransferRouter,
   auth,
   roleRouter,
+  customerRouter,
+  supplierRouter,
 });
 export type AppRouter = typeof appRouter;
