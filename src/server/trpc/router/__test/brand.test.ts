@@ -51,7 +51,7 @@ describe('get brands', async () => {
       name: `Test Brand ${i}`,
       logo: `Test Logo ${i}`,
       slug: `test-brand-${i}`,
-      companyId: new mongoose.Types.ObjectId(
+      company: new mongoose.Types.ObjectId(
         process.env.TEST_COMPANY_ID as string
       ),
     }));

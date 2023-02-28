@@ -56,7 +56,7 @@ export const seedTestDB = async () => {
     city: 'test',
     state: 'test',
     phoneNumber: 'test',
-    companyId: testCompany._id,
+    company: testCompany._id,
     createdAt: new Date(),
     country: 'test',
     pincode: 'test',

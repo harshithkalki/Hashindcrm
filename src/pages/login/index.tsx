@@ -67,7 +67,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function AuthenticationImage() {
   const { classes } = useStyles();
-  const loginUser = trpc.staffRouter.login.useMutation();
+  const loginUser = trpc.auth.login.useMutation();
   const [loginError, setError] = useState('');
   const router = useRouter();
   return (
@@ -95,8 +95,6 @@ export default function AuthenticationImage() {
             return loginUser
               .mutateAsync(value)
               .then((res) => {
-                console.log(res);
-                console.log('success');
                 router.push('/');
               })
               .catch((err) => {

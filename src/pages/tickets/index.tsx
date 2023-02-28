@@ -68,7 +68,7 @@ const Index = () => {
   const initialStatuses = trpc.workflowRouter.getInitialStatuses.useQuery();
   const tickets = trpc.ticketRouter.getAllTicket.useQuery();
   const updateTicket = trpc.ticketRouter.updateTicket.useMutation();
-  const user = useSelector((state: RootState) => state.userState.user);
+  const user = useSelector((state: RootState) => state.userState.client);
   const [activeTicket, setActiveTicket] = React.useState<string | null>(null);
   const assignableUsers = trpc.ticketRouter.getAssignableUsers.useQuery({
     ticketId: activeTicket || '',

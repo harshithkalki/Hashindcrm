@@ -10,6 +10,7 @@ export type IBrand = ModifyDeep<
     company: mongoose.Types.ObjectId;
   }
 >;
+
 export type BrandDocument = mongoose.Document & IBrand;
 
 type BrandModel = Model<IBrand, Record<string, never>>;
