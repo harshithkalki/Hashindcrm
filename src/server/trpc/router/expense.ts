@@ -1,43 +1,43 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
-import BrandModel from '@/models/Brand';
+import ExpenseModel from '@/models/Expense';
 import checkPermission from '@/utils/checkPermission';
-import { ZBrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
+import { ZExpenseCreateInput, ZExpenseUpdateInput } from '@/zobjs/expense';
 
-export const brandRouter = router({
+export const expenseRouter = router({
   create: protectedProcedure
-    .input(ZBrandCreateInput)
+    .input(ZExpenseCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'BRAND',
+        'EXPENSE',
         { create: true },
         ctx.clientId,
-        'You are not permitted to create brand'
+        'You are not permitted to create expense'
       );
 
-      const brand = await BrandModel.create({
+      const expense = await ExpenseModel.create({
         ...input,
         company: client.company,
       });
 
-      return brand;
+      return expense;
     }),
 
   update: protectedProcedure
-    .input(ZBrandUpdateInput)
+    .input(ZExpenseUpdateInput)
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'EXPENSE',
         { update: true },
         ctx.clientId,
-        'You are not permitted to update brand'
+        'You are not permitted to update expense'
       );
 
-      const brand = await BrandModel.findByIdAndUpdate(input._id, input, {
+      const expense = await ExpenseModel.findByIdAndUpdate(input._id, input, {
         new: true,
       });
 
-      return brand;
+      return expense;
     }),
 
   delete: protectedProcedure
@@ -48,19 +48,19 @@ export const brandRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'EXPENSE',
         { delete: true },
         ctx.clientId,
-        'You are not permitted to delete brand'
+        'You are not permitted to delete expense'
       );
 
-      const brand = await BrandModel.findByIdAndDelete(input._id);
+      const expense = await ExpenseModel.findByIdAndDelete(input._id);
 
-      return brand;
+      return expense;
     }),
 
-  // pagination with search brands by name
-  brands: protectedProcedure
+  // pagination with search expenses by name
+  expenses: protectedProcedure
     .input(
       z
         .object({
@@ -72,10 +72,10 @@ export const brandRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'BRAND',
+        'EXPENSE',
         { read: true },
         ctx.clientId,
-        'You are not permitted to read brand'
+        'You are not permitted to read expense'
       );
 
       const { page = 1, limit = 10, search } = input || {};
@@ -90,9 +90,9 @@ export const brandRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const brands = await BrandModel.paginate(query, options);
+      const expenses = await ExpenseModel.paginate(query, options);
 
-      return brands;
+      return expenses;
     }),
 
   get: protectedProcedure
@@ -103,14 +103,14 @@ export const brandRouter = router({
     )
     .query(async ({ input, ctx }) => {
       await checkPermission(
-        'BRAND',
+        'EXPENSE',
         { read: true },
         ctx.clientId,
-        'You are not permitted to read brand'
+        'You are not permitted to read expense'
       );
 
-      const brand = await BrandModel.findById(input._id);
+      const expense = await ExpenseModel.findById(input._id);
 
-      return brand;
+      return expense;
     }),
 });

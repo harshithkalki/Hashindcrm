@@ -7,10 +7,10 @@ import { trpc } from '../utils/trpc';
 import { useMediaQuery } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { setUser } from '@/store/userSlice';
+import { setClient } from '@/store/clientSlice';
 
 function UserContextProvider({ children }: { children: React.ReactNode }) {
-  const me = trpc.staffRouter.me.useQuery(undefined, {
+  const me = trpc.auth.me.useQuery(undefined, {
     onError: (err) => {
       if (err.data?.code === 'UNAUTHORIZED') {
         router.push('/login');
@@ -20,28 +20,13 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
     retry: false,
     refetchInterval: false,
   });
+
   const router = useRouter();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (me.data && !store.getState().userState.user) {
-      dispatch(
-        setUser({
-          ...me.data,
-          _id: me.data._id.toString(),
-          role: { _id: me.data.role._id, name: me.data.role.name },
-          linkedTo: me.data.linkedTo && {
-            _id: me.data.linkedTo.toString(),
-          },
-          companyId: {
-            _id: me.data.company.toString(),
-          },
-          ticket: me.data.ticket && {
-            _id: me.data.ticket?._id.toString(),
-          },
-          createdAt: me.data.createdAt.toString(),
-        })
-      );
+    if (me.data && !store.getState().clientState.client) {
+      dispatch(setClient(me.data.data));
     }
   }, [dispatch, me.data, me.error?.data?.code, router]);
 

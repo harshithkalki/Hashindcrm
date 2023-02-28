@@ -28,6 +28,7 @@ const CompanySchema: Schema = new Schema<ICompany, CompanyModel>(
     secondaryColor: { type: String, required: true },
     backgroundColor: { type: String, required: true },
     logo: { type: String, required: true },
+    natureOfBusiness: { type: String, required: true },
   },
   {
     versionKey: false,

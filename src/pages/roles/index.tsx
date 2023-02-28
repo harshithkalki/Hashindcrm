@@ -7,14 +7,14 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { ScrollArea } from '@mantine/core';
 
-type Roles = RouterOutputs['staffRouter']['getAllRoles'];
+type Roles = RouterOutputs['roleRouter']['roles']['docs'];
 
 interface props {
   data: Roles;
 }
 
 const Index = () => {
-  const getAllRoles = trpc.staffRouter.getAllRoles.useQuery();
+  const getAllRoles = trpc.roleRouter.roles.useQuery();
 
   const tabData = getAllRoles.data;
   const Data = tabData;
@@ -26,7 +26,7 @@ const Index = () => {
         <ScrollArea style={{ height: '100%' }}>
           <div>
             <TableSelection
-              data={Data}
+              data={Data.docs}
               isDeleteColumn={true}
               isEditColumn={true}
               onDelete={(id) => console.log(id)}

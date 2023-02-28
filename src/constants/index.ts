@@ -9,4 +9,8 @@ export const Permissions = [
   'PRODUCT',
   'STOCKADJUST',
   'WAREHOUSE',
+  'SUPPLIER',
+  'CUSTOMER',
+  'EXPENSECATEGORY',
+  'EXPENSE',
 ] as const;

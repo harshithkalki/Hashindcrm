@@ -11,12 +11,12 @@ export type IStaffMem = ModifyDeep<
   {
     role: mongoose.Types.ObjectId;
     company: mongoose.Types.ObjectId;
-    ticket: mongoose.Types.ObjectId;
-    linkedTo: mongoose.Types.ObjectId;
+    ticket?: mongoose.Types.ObjectId;
+    linkedTo?: mongoose.Types.ObjectId;
   }
 >;
 
-interface StaffMemMethods {
+export interface StaffMemMethods {
   getJWTToken(): string;
   comparePassword(password: string): Promise<boolean>;
   getResetPasswordToken(): string;

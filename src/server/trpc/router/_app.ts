@@ -8,6 +8,11 @@ import { productRouter } from './product';
 import { stockAdjustRouter } from './stockAdjust';
 import { stockTransferRouter } from './stockTransfer';
 import { auth } from './auth';
+import { roleRouter } from './role';
+import { customerRouter } from './customer';
+import { supplierRouter } from './supplier';
+import { expenseCategoryRouter } from './expenseCategory';
+import { expenseRouter } from './expense';
 
 export const appRouter = router({
   staffRouter,
@@ -19,5 +24,10 @@ export const appRouter = router({
   stockAdjustRouter,
   stockTransferRouter,
   auth,
+  roleRouter,
+  customerRouter,
+  supplierRouter,
+  expenseRouter,
+  expenseCategoryRouter,
 });
 export type AppRouter = typeof appRouter;
