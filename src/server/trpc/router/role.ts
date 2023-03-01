@@ -3,6 +3,8 @@ import RoleModel from '@/models/Role';
 import { ZRoleCreateInput, ZRoleUpdateInput } from '@/zobjs/role';
 import checkPermission from '@/utils/checkPermission';
 import { z } from 'zod';
+import { Roles } from '@/constants';
+import { TRPCError } from '@trpc/server';
 
 export const roleRouter = router({
   create: protectedProcedure
@@ -14,6 +16,13 @@ export const roleRouter = router({
         ctx.clientId,
         'You are not permitted to create a role'
       );
+
+      if (input.name === Roles[0]) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Role name is not allowed',
+        });
+      }
 
       const role = await RoleModel.create({
         ...input,
@@ -32,6 +41,13 @@ export const roleRouter = router({
         ctx.clientId,
         'You are not permitted to update a role'
       );
+
+      if (input.name === Roles[0]) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Role name is not allowed',
+        });
+      }
 
       const role = await RoleModel.findOneAndUpdate(
         { _id: input._id },

@@ -14,3 +14,5 @@ export const Permissions = [
   'EXPENSECATEGORY',
   'EXPENSE',
 ] as const;
+
+export const Roles = ['ADMIN'] as const;

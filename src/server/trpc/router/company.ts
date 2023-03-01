@@ -1,19 +1,20 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';
 import CompanyModel from '@/models/Company';
-import checkPermission from '@/utils/checkPermission';
 import { ZCompanyCreateInput, ZCompanyUpdateInput } from '@/zobjs/company';
+import { env } from '@/env/server.mjs';
+import { TRPCError } from '@trpc/server';
 
 export const companyRouter = router({
   create: protectedProcedure
     .input(ZCompanyCreateInput)
     .mutation(async ({ input, ctx }) => {
-      await checkPermission(
-        'COMPANY',
-        { create: true },
-        ctx.clientId,
-        'You are not permitted to create company'
-      );
+      if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create company',
+        });
+      }
 
       const company = await CompanyModel.create({
         ...input,
@@ -25,12 +26,12 @@ export const companyRouter = router({
   update: protectedProcedure
     .input(ZCompanyUpdateInput)
     .mutation(async ({ input, ctx }) => {
-      await checkPermission(
-        'COMPANY',
-        { update: true },
-        ctx.clientId,
-        'You are not permitted to update company'
-      );
+      if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create company',
+        });
+      }
 
       const company = await CompanyModel.findByIdAndUpdate(input._id, input, {
         new: true,
@@ -46,12 +47,12 @@ export const companyRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await checkPermission(
-        'COMPANY',
-        { delete: true },
-        ctx.clientId,
-        'You are not permitted to delete company'
-      );
+      if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create company',
+        });
+      }
 
       const company = await CompanyModel.findByIdAndDelete(input.id);
 
@@ -69,12 +70,12 @@ export const companyRouter = router({
         .optional()
     )
     .query(async ({ input, ctx }) => {
-      await checkPermission(
-        'COMPANY',
-        { read: true },
-        ctx.clientId,
-        'You are not permitted to read company'
-      );
+      if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create company',
+        });
+      }
 
       const { page = 1, limit = 10, search } = input || {};
 

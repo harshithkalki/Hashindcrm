@@ -17,8 +17,18 @@ export const ZStaffMemCreateInput = z.object({
   password: z.string(),
 });
 
+export const ZAdminCreateInput = ZStaffMemCreateInput.omit({
+  role: true,
+}).extend({
+  company: z.string(),
+});
+
 export const ZStaffMemUpdateInput = ZStaffMemCreateInput.partial().extend({
   _id: z.string(),
+});
+
+export const ZAdminUpdateInput = ZStaffMemUpdateInput.omit({
+  role: true,
 });
 
 export const ZDocWithId = z.object({

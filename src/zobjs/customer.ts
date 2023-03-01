@@ -13,6 +13,7 @@ export const ZCustomerCreateInput = z.object({
   openingBalance: z.number(),
   creditLimit: z.number(),
   creditPeriod: z.number(),
+  natureOfBusiness: z.string(),
 });
 
 export type CustomerCreateInput = z.infer<typeof ZCustomerCreateInput>;
