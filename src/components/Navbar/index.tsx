@@ -7,12 +7,14 @@ import {
 } from '@tabler/icons';
 import type { NavData } from '../CollapsibleLink';
 import LinksGroup from '../CollapsibleLink';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { UserMenu } from '../UserMenu';
 import { trpc } from '@/utils/trpc';
 import type { RootState } from '@/store';
 import store from '@/store';
 import { useSelector } from 'react-redux';
+import { z } from 'zod';
+import { ZRole } from '@/zobjs/role';
 
 // import { UserMenu } from '../UserMenu';
 
@@ -217,71 +219,83 @@ export default function NavbarNested({ hide }: Props) {
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
   );
-  if (!client?.isSuperAdmin) {
-    client?.role.permissions.map;
-  }
 
-  const links = mockdata
-    // .filter((value) => {
-    //   if (client?.isSuperAdmin) {
-    //     if (typeof value.links === 'string') {
-    //       if (value.links === allLinks[28]) {
-    //         return true;
-    //       }
-    //       return false;
-    //     } else {
-    //       value.links = value.links.filter((item) => {
-    //         if (item.link === allLinks[10]) {
-    //           return true;
-    //         }
-    //         return false;
-    //       });
+  const links = useMemo(() => {
+    if (client && !client.isSuperAdmin) {
+      return filterNavLinks(mockdata, client.role.permissions);
+    }
 
-    //       if (value.links.length > 0) {
-    //         return true;
-    //       }
-    //       return false;
-    //     }
-    //   } else {
-    //     if (typeof value.links === 'string') {
-    //       if (value.permissionName) {
-    //         client?.role.permissions.find((item) => {
-    //           if (item.permissionName === value.permissionName) {
-    //             return true;
-    //           }
-    //         });
-    //         return false;
-    //       }
-    //       return true;
-    //     } else {
-    //       value.links = value.links.filter((item) => {
-    //         if (item.permissionName) {
-    //           client?.role.permissions.find((item) => {
-    //             if (item.permissionName === value.permissionName) {
-    //               return true;
-    //             }
-    //           });
-    //           return false;
-    //         }
-    //         return true;
-    //       });
-    //       if (value.links.length > 0) {
-    //         return true;
-    //       }
-    //       return false;
-    //     }
-    //   }
-    // })
-    .map((item) => (
-      <LinksGroup
-        {...item}
-        key={item.label}
-        onClick={() => {
-          setActive(item.label);
-        }}
-        active={item.label === active}
-      />
-    ));
+    return [];
+  }, [client]);
+
+  // const links = mockdata
+  //   // .filter((value) => {
+  //   //   if (client?.isSuperAdmin) {
+  //   //     if (typeof value.links === 'string') {
+  //   //       if (value.links === allLinks[28]) {
+  //   //         return true;
+  //   //       }
+  //   //       return false;
+  //   //     } else {
+  //   //       value.links = value.links.filter((item) => {
+  //   //         if (item.link === allLinks[10]) {
+  //   //           return true;
+  //   //         }
+  //   //         return false;
+  //   //       });
+
+  //   //       if (value.links.length > 0) {
+  //   //         return true;
+  //   //       }
+  //   //       return false;
+  //   //     }
+  //   //   } else {
+  //   //     if (client) {
+  //   //       console.log(filterNavLinks(mockdata, client.role.permissions));
+  //   //     }
+
+  //   //     if (typeof value.links === 'string') {
+  //   //       if (value.permissionName) {
+  //   //         return client?.role.permissions.find((item) => {
+  //   //           if (item.permissionName === value.permissionName) {
+  //   //             return true;
+  //   //           }
+  //   //         });
+  //   //         // return false;
+  //   //       }
+  //   //       return true;
+  //   //     } else {
+  //   //       value.links = value.links.filter((item) => {
+  //   //         if (item.permissionName) {
+  //   //           return client?.role.permissions.find((item) => {
+  //   //             if (item.permissionName === value.permissionName) {
+  //   //               return true;
+  //   //             }
+  //   //           });
+
+  //   //           // return false;
+  //   //         }
+  //   //         return true;
+  //   //       });
+
+  //   //       console.log(value.links);
+  //   //       if (value.links.length > 0) {
+  //   //         return true;
+  //   //       }
+  //   //       return false;
+  //   //     }
+  //   //   }
+  //   // })
+  //   .map((item) => (
+  //     <LinksGroup
+  //       {...item}
+  //       key={item.label}
+  //       onClick={() => {
+  //         setActive(item.label);
+  //       }}
+  //       active={item.label === active}
+  //     />
+  //   ));
 
   return (
     <Navbar
@@ -291,7 +305,18 @@ export default function NavbarNested({ hide }: Props) {
       hidden={hide}
     >
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
-        <div className={classes.linksInner}>{links}</div>
+        <div className={classes.linksInner}>
+          {links.map((item) => (
+            <LinksGroup
+              {...item}
+              key={item.label}
+              onClick={() => {
+                setActive(item.label);
+              }}
+              active={item.label === active}
+            />
+          ))}
+        </div>
       </Navbar.Section>
 
       <Navbar.Section className={classes.footer}>
@@ -304,4 +329,48 @@ export default function NavbarNested({ hide }: Props) {
       </Navbar.Section>
     </Navbar>
   );
+}
+
+function filterNavLinks(
+  navLinks: NavData[],
+  permissions: z.infer<typeof ZRole>['permissions']
+) {
+  const filter1 = navLinks.filter((navLink) => {
+    // filter out any navLinks that don't have a permissionName
+    if (typeof navLink.links === 'string' && !navLink.permissionName) {
+      return false;
+    }
+
+    // console.log(navLink);
+    // check if any of the CRUD operations are enabled for the navLink's permissionName
+    const permission = permissions.find(
+      (p) => p.permissionName === navLink.permissionName
+    );
+
+    if (permission) {
+      const crud = permission.crud;
+      return crud.create || crud.read || crud.update || crud.delete;
+    }
+
+    return true;
+  });
+
+  return filter1.filter((navLink) => {
+    if (Array.isArray(navLink.links)) {
+      navLink.links = navLink.links.filter((link) => {
+        const permission = permissions.find(
+          (p) => p.permissionName === link.permissionName
+        );
+
+        if (permission) {
+          const crud = permission.crud;
+          return crud.create || crud.read || crud.update || crud.delete;
+        }
+
+        return false;
+      });
+    }
+
+    return navLink.links.length > 0;
+  });
 }

@@ -21,11 +21,26 @@ import { Form, Formik } from 'formik';
 import React, { useRef, useState } from 'react';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { ZAdminCreateInput } from '@/zobjs/staffMem';
 
 interface modalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+const initialValues: z.infer<typeof ZAdminCreateInput> = {
+  firstName: 'kalki',
+  lastName: 'harshith',
+  phoneNumber: '123456',
+  addressline1: 'hahah',
+  city: 'hyd',
+  state: 'tel',
+  country: 'ind',
+  pincode: '212345',
+  email: 'harshith@gmail.com',
+  password: '123456',
+  company: '63ff1a39b29440e57af4c524',
+};
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -51,6 +66,7 @@ const useStyles = createStyles((theme) => ({
 
 const AddCustomer = ({ modal, setModal }: modalProps) => {
   const { classes, cx } = useStyles();
+  const createAdmin = trpc.staffRouter.createAdmin.useMutation();
   const fileRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -63,30 +79,12 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
       >
         <Formik
           onSubmit={(values) => {
-            console.log(values);
+            createAdmin.mutateAsync(values).then((res) => {
+              console.log(res);
+            });
           }}
-          initialValues={{
-            name: '',
-            email: '',
-            phone: '',
-            address: '',
-            password: '',
-            status: '',
-            profile: '',
-          }}
-          validationSchema={toFormikValidationSchema(
-            z.object({
-              name: z.string(),
-              email: z.string().email(),
-              phone: z.number(),
-              address: z.string(),
-
-              password: z.string(),
-
-              status: z.string(),
-              profile: z.string(),
-            })
-          )}
+          initialValues={initialValues}
+          validationSchema={toFormikValidationSchema(ZAdminCreateInput)}
         >
           {({ handleSubmit, handleChange, values, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
