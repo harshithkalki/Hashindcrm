@@ -21,3 +21,5 @@ export const Permissions = [
   'STOCKTRANSFER',
   'PURCHASE',
 ] as const;
+
+export const Roles = ['ADMIN'] as const;

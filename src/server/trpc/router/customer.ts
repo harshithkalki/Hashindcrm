@@ -2,7 +2,7 @@ import { router } from '@/server/trpc/trpc';
 import checkPermission from '@/utils/checkPermission';
 import { ZCustomerCreateInput, ZCustomerUpdateInput } from '@/zobjs/customer';
 import { protectedProcedure } from '../trpc';
-import Cu from '@/models/Customer';
+import Customer from '@/models/Customer';
 import { z } from 'zod';
 
 export const customerRouter = router({
@@ -18,7 +18,7 @@ export const customerRouter = router({
         "You don't have permission to create a customer"
       );
 
-      const customer = new Cu({
+      const customer = new Customer({
         ...input,
         company: client.company,
       });
@@ -40,7 +40,7 @@ export const customerRouter = router({
         "You don't have permission to update a customer"
       );
 
-      const customer = await Cu.updateOne({ _id: input._id }, input);
+      const customer = await Customer.updateOne({ _id: input._id }, input);
 
       return customer;
     }),
@@ -57,7 +57,7 @@ export const customerRouter = router({
         "You don't have permission to delete a customer"
       );
 
-      const customer = await Cu.deleteOne({ _id: input._id });
+      const customer = await Customer.deleteOne({ _id: input._id });
 
       return customer;
     }),
@@ -74,7 +74,7 @@ export const customerRouter = router({
         "You don't have permission to read a customer"
       );
 
-      const customer = await Cu.findOne({ _id: input._id });
+      const customer = await Customer.findOne({ _id: input._id });
 
       return customer;
     }),
@@ -101,13 +101,13 @@ export const customerRouter = router({
 
       const { page = 1, limit = 10, search = '' } = input ?? {};
 
-      const customers = await Cu.find({
+      const customers = await Customer.find({
         name: { $regex: search, $options: 'i' },
       })
         .skip((page - 1) * limit)
         .limit(limit);
 
-      const total = await Cu.countDocuments({
+      const total = await Customer.countDocuments({
         name: { $regex: search, $options: 'i' },
       });
 
