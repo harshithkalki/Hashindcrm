@@ -4,6 +4,7 @@ export const ZCompanyCreateInput = z.object({
   name: z.string(),
   addressline1: z.string(),
   addressline2: z.string(),
+  email: z.string(),
   city: z.string(),
   state: z.string(),
   pincode: z.string(),

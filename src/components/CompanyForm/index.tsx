@@ -14,8 +14,11 @@ import { Formik, Form } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { z } from 'zod';
+import { ZCompanyCreateInput } from '@/zobjs/company';
 import { IconUpload } from '@tabler/icons';
 import { useRef } from 'react';
+import FormikSelect from '../FormikCompo/FormikSelect';
+import FormikColor from '../FormikCompo/FormikColor';
 // import { trpc } from "@/utils/trpc";
 // import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
 // import FormikSelect from "@/components/FormikCompo/FormikSelect";
@@ -42,22 +45,23 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export interface Company {
-  companyName: string;
+  name: string;
   email: string;
-  addressLine1: string;
-  addressLine2: string;
+  addressline1: string;
+  addressline2: string;
   city: string;
   state: string;
   pincode: string;
   country: string;
   landline: string;
   mobile: string;
-  cin: string;
-  gst: string;
+  cinNo: string;
+  gstNo: string;
   primaryColor: string;
   secondaryColor: string;
-  backGroundColor: string;
+  backgroundColor: string;
   logo: string;
+  natureOfBusiness: string;
 }
 
 // const onSubmit = async (values: Company, actions: any) => {
@@ -82,20 +86,11 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
         <Title order={2}>{title}</Title>
         <Formik
           initialValues={formInputs}
-          validationSchema={toFormikValidationSchema(
-            z.object({
-              companyName: z.string(),
-              email: z.string().email({ message: 'Please enter valid email' }),
-              addressLine1: z.string(),
-              addressLine2: z.string(),
-              city: z.string(),
-              state: z.string(),
-              country: z.string(),
-              pincode: z.string(),
-            })
-          )}
-          // onSubmit={(values, { setSubmitting }) => {
-          //   onSubmit(values).then(() => setSubmitting(false));
+          validationSchema={toFormikValidationSchema(ZCompanyCreateInput)}
+          // onSubmit={async (values, actions) => {
+          //   console.log(values);
+          //   await new Promise((resolve) => setTimeout(resolve, 1000));
+          //   actions.resetForm();
           // }}
           onSubmit={onSubmit}
         >
@@ -115,7 +110,7 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                   <FormInput
                     label='Company Name'
                     placeholder='Company Name'
-                    name='companyName'
+                    name='name'
                     withAsterisk
                   />
                   <FormInput
@@ -196,7 +191,7 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                     <FormInput
                       label='cin'
                       placeholder='cin'
-                      name='cin'
+                      name='cinNo'
                       withAsterisk
                     />
                   </Grid.Col>
@@ -204,26 +199,41 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                     <FormInput
                       label='gst'
                       placeholder='gst'
-                      name='gst'
+                      name='gstNo'
                       withAsterisk
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <ColorInput
+                    <FormikColor
                       label='PrimaryColor'
+                      name='primaryColor'
                       placeholder='Primary Color'
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <ColorInput
+                    <FormikColor
                       label='SecondaryColor'
+                      name='secondaryColor'
                       placeholder='Secondary Color'
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <ColorInput
-                      label='BackGroundColor'
-                      placeholder='BackGround Color'
+                    <FormikColor
+                      label='BackgroundColor'
+                      name='backgroundColor'
+                      placeholder='Background Color'
+                    />
+                  </Grid.Col>
+                  <Grid.Col lg={1} sm={3}>
+                    <FormikSelect
+                      label='Nature of Business'
+                      name='natureOfBusiness'
+                      placeholder='Nature of Business'
+                      data={[
+                        { label: 'Manufacturing', value: 'Manufacturing' },
+                        { label: 'Trading', value: 'Trading' },
+                        { label: 'Service', value: 'Service' },
+                      ]}
                     />
                   </Grid.Col>
                 </Grid>
@@ -243,7 +253,7 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                     <FormInput
                       label='Address line 1'
                       placeholder='Address line 1'
-                      name='addressLine1'
+                      name='addressline1'
                       withAsterisk
                     />
                   </Grid.Col>
@@ -251,7 +261,7 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                     <FormInput
                       label='Address line 2'
                       placeholder='Address line 2'
-                      name='addressLine2'
+                      name='addressline2'
                       withAsterisk
                     />
                   </Grid.Col>

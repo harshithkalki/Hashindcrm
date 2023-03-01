@@ -4,28 +4,29 @@ import { trpc } from '@/utils/trpc';
 import React from 'react';
 
 const index = () => {
-  const createCompany = trpc.staffRouter.createCompany.useMutation();
+  const createCompany = trpc.companyRouter.create.useMutation();
 
   return (
     <Layout>
       <CompanyForm
         formInputs={{
-          companyName: '',
+          name: '',
           email: '',
-          addressLine1: '',
-          addressLine2: '',
+          addressline1: '',
+          addressline2: '',
           city: '',
           state: '',
           pincode: '',
           country: '',
           landline: '',
           mobile: '',
-          cin: '',
-          gst: '',
+          cinNo: '',
+          gstNo: '',
           primaryColor: '',
           secondaryColor: '',
-          backGroundColor: '',
+          backgroundColor: '',
           logo: '',
+          natureOfBusiness: '',
         }}
         onSubmit={(inputs) => {
           return createCompany

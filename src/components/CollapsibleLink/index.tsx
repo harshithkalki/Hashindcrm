@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Group,
   Box,
@@ -7,72 +7,73 @@ import {
   UnstyledButton,
   createStyles,
   ThemeIcon,
-} from "@mantine/core";
-import type { TablerIcon } from "@tabler/icons";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons";
-import { useRouter } from "next/router";
+} from '@mantine/core';
+import type { TablerIcon } from '@tabler/icons';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons';
+import { useRouter } from 'next/router';
+import { Permissions } from '@/constants';
 
 const useStyles = createStyles((theme, _params, getRef) => {
-  const icon = getRef("icon");
+  const icon = getRef('icon');
   return {
     control: {
       fontWeight: 500,
-      display: "block",
-      width: "100%",
+      display: 'block',
+      width: '100%',
       padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
-      color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
+      color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
       fontSize: theme.fontSizes.sm,
 
-      "&:hover": {
+      '&:hover': {
         backgroundColor:
-          theme.colorScheme === "dark"
+          theme.colorScheme === 'dark'
             ? theme.colors.dark[7]
             : theme.colors.gray[0],
-        color: theme.colorScheme === "dark" ? theme.white : theme.black,
+        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
       },
     },
 
     link: {
       fontWeight: 500,
-      display: "block",
-      textDecoration: "none",
+      display: 'block',
+      textDecoration: 'none',
       padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
       paddingLeft: 31,
       marginLeft: 30,
       fontSize: theme.fontSizes.sm,
       color:
-        theme.colorScheme === "dark"
+        theme.colorScheme === 'dark'
           ? theme.colors.dark[0]
           : theme.colors.gray[7],
       borderLeft: `1px solid ${
-        theme.colorScheme === "dark"
+        theme.colorScheme === 'dark'
           ? theme.colors.dark[4]
           : theme.colors.gray[3]
       }`,
 
-      "&:hover": {
+      '&:hover': {
         backgroundColor:
-          theme.colorScheme === "dark"
+          theme.colorScheme === 'dark'
             ? theme.colors.dark[7]
             : theme.colors.gray[0],
-        color: theme.colorScheme === "dark" ? theme.white : theme.black,
+        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
       },
     },
 
     chevron: {
-      transition: "transform 200ms ease",
+      transition: 'transform 200ms ease',
     },
     linkActive: {
-      "&, &:hover": {
+      '&, &:hover': {
         backgroundColor: theme.fn.variant({
-          variant: "light",
+          variant: 'light',
           color: theme.primaryColor,
         }).background,
-        color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
+        color: theme.fn.variant({ variant: 'light', color: theme.primaryColor })
           .color,
         [`& .${icon}`]: {
           color: theme.fn.variant({
-            variant: "light",
+            variant: 'light',
             color: theme.primaryColor,
           }).color,
         },
@@ -89,8 +90,15 @@ const useStyles = createStyles((theme, _params, getRef) => {
 });
 
 export interface NavData {
-  links: string | { label: string; link: string }[];
+  links:
+    | string
+    | {
+        label: string;
+        link: string;
+        permissionName?: typeof Permissions[number];
+      }[];
   label: string;
+  permissionName?: typeof Permissions[number];
   icon: TablerIcon;
 }
 
@@ -113,10 +121,10 @@ export default function LinksGroup({
   const { push } = useRouter();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
-  const ChevronIcon = theme.dir === "ltr" ? IconChevronRight : IconChevronLeft;
+  const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
   const items = (hasLinks ? links : []).map((link, index) => (
-    <Text<"a">
-      component="a"
+    <Text<'a'>
+      component='a'
       className={cx(classes.link, {
         [classes.linkActive]: isActive === index && active,
       })}
@@ -152,12 +160,12 @@ export default function LinksGroup({
         })}
         // style={{ cursor: "pointer" }}
       >
-        <Group position="apart" spacing={0}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Group position='apart' spacing={0}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <ThemeIcon size={30}>
               <Icon size={18} />
             </ThemeIcon>
-            <Box ml="md">{label}</Box>
+            <Box ml='md'>{label}</Box>
           </Box>
           {hasLinks && (
             <ChevronIcon
@@ -166,8 +174,8 @@ export default function LinksGroup({
               stroke={1.5}
               style={{
                 transform: opened
-                  ? `rotate(${theme.dir === "rtl" ? -90 : 90}deg)`
-                  : "none",
+                  ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)`
+                  : 'none',
               }}
             />
           )}

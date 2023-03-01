@@ -49,40 +49,56 @@ const allLinks = [
 ] as const;
 
 const CompanyData: NavData['links'] = [
-  { label: 'Manage companies', link: '/company' },
-  { label: 'Create company', link: '/company/new' },
+  { label: 'Manage companies', link: '/company', permissionName: 'COMPANY' },
+  { label: 'Create company', link: '/company/new', permissionName: 'COMPANY' },
 ];
 
 const RolesData: NavData['links'] = [
-  { label: 'All Roles', link: '/roles' },
-  { label: 'Create Role', link: '/roles/new' },
+  { label: 'All Roles', link: '/roles', permissionName: 'ROLE' },
+  { label: 'Create Role', link: '/roles/new', permissionName: 'ROLE' },
 ];
 const ProductManagerData: NavData['links'] = [
-  { label: 'Products', link: '/products' },
-  { label: 'Brands', link: '/brands' },
-  { label: 'Categories', link: '/categories' },
+  { label: 'Products', link: '/products', permissionName: 'PRODUCT' },
+  { label: 'Brands', link: '/brands', permissionName: 'BRAND' },
+  { label: 'Categories', link: '/categories', permissionName: 'CATEGORY' },
   // { label: "Create Role", link: "/roles/new" },
 ];
 const Stockdata: NavData['links'] = [
-  { label: 'Stock Adjustment', link: '/stockadjustment' },
-  { label: 'Stock Transfer', link: '/stocktransfer' },
+  {
+    label: 'Stock Adjustment',
+    link: '/stockadjustment',
+    permissionName: 'STOCKADJUST',
+  },
+  {
+    label: 'Stock Transfer',
+    link: '/stocktransfer',
+    permissionName: 'STOCKTRANSFER',
+  },
 ];
 const PartiesData: NavData['links'] = [
-  { label: 'Suppliers', link: '/parties/supplier' },
-  { label: 'Staff Members', link: '/parties/staff' },
-  { label: 'Customers', link: '/parties/customer' },
+  { label: 'Suppliers', link: '/parties/supplier', permissionName: 'SUPPLIER' },
+  {
+    label: 'Staff Members',
+    link: '/parties/staff',
+    permissionName: 'STAFFMEM',
+  },
+  { label: 'Customers', link: '/parties/customer', permissionName: 'CUSTOMER' },
 ];
 const SalesData: NavData['links'] = [
-  { label: 'Sales', link: '/sales' },
-  { label: 'Sales Returns', link: '/sales/return' },
+  { label: 'Sales', link: '/sales', permissionName: 'SALES' },
+  { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
 ];
 const PurchaseData: NavData['links'] = [
   { label: 'Purchase', link: '/purchases' },
   { label: 'Purchase Returns', link: '/purchases/return' },
 ];
 const ExpensesData: NavData['links'] = [
-  { label: 'Expenses', link: '/expenses' },
-  { label: 'Expense Categories', link: '/expenses/categories' },
+  { label: 'Expenses', link: '/expenses', permissionName: 'EXPENSE' },
+  {
+    label: 'Expense Categories',
+    link: '/expenses/categories',
+    permissionName: 'EXPENSE',
+  },
 ];
 const ReportDate: NavData['links'] = [
   { label: 'Payment Report', link: '/reports/payments' },
@@ -96,21 +112,59 @@ const ReportDate: NavData['links'] = [
 ];
 
 const mockdata: NavData[] = [
-  { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
-  { links: CompanyData, label: 'Companies', icon: IconBuildingStore },
-  { links: RolesData, label: 'Roles', icon: IconReceipt2 },
-  { links: ProductManagerData, label: 'Product Manager', icon: IconReceipt2 },
-  { links: '/workflow', label: 'WorkFlow', icon: IconFileAnalytics },
-  { links: '/tickets', label: 'Tickets', icon: IconReceipt2 },
+  {
+    links: '/dashboard',
+    label: 'DashBoard',
+    icon: IconFileAnalytics,
+    permissionName: 'DASHBOARD',
+  },
+  {
+    links: CompanyData,
+    label: 'Companies',
+    icon: IconBuildingStore,
+  },
+  {
+    links: RolesData,
+    label: 'Roles',
+    icon: IconReceipt2,
+    permissionName: 'ROLE',
+  },
+  {
+    links: ProductManagerData,
+    label: 'Product Manager',
+    icon: IconReceipt2,
+  },
+  {
+    links: '/workflow',
+    label: 'WorkFlow',
+    icon: IconFileAnalytics,
+    permissionName: 'WORKFLOW',
+  },
+  {
+    links: '/tickets',
+    label: 'Tickets',
+    icon: IconReceipt2,
+    permissionName: 'TICKET',
+  },
   { links: Stockdata, label: 'Stock', icon: IconReceipt2 },
-  { links: '/pos', label: 'POS', icon: IconReceipt2 },
+  { links: '/pos', label: 'POS', icon: IconReceipt2, permissionName: 'POS' },
   { links: PartiesData, label: 'Parties', icon: IconReceipt2 },
   { links: SalesData, label: 'Sales', icon: IconReceipt2 },
   { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
-  { links: '/cashandbank', label: 'Cash and Bank', icon: IconReceipt2 },
+  {
+    links: '/cashandbank',
+    label: 'Cash and Bank',
+    icon: IconReceipt2,
+    permissionName: 'CASHANDBANK',
+  },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
   { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
-  { links: '/settings', label: 'Settings', icon: IconReceipt2 },
+  {
+    links: '/settings',
+    label: 'Settings',
+    icon: IconReceipt2,
+    permissionName: 'SETTINGS',
+  },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 
@@ -163,30 +217,61 @@ export default function NavbarNested({ hide }: Props) {
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
   );
+  if (!client?.isSuperAdmin) {
+    client?.role.permissions.map;
+  }
 
   const links = mockdata
-    .filter((value) => {
-      if (client?.isSuperAdmin) {
-        if (typeof value.links === 'string') {
-          if (value.links === allLinks[28]) {
-            return true;
-          }
-          return false;
-        } else {
-          value.links = value.links.filter((item) => {
-            if (item.link === allLinks[10]) {
-              return true;
-            }
-            return false;
-          });
+    // .filter((value) => {
+    //   if (client?.isSuperAdmin) {
+    //     if (typeof value.links === 'string') {
+    //       if (value.links === allLinks[28]) {
+    //         return true;
+    //       }
+    //       return false;
+    //     } else {
+    //       value.links = value.links.filter((item) => {
+    //         if (item.link === allLinks[10]) {
+    //           return true;
+    //         }
+    //         return false;
+    //       });
 
-          if (value.links.length > 0) {
-            return true;
-          }
-          return false;
-        }
-      }
-    })
+    //       if (value.links.length > 0) {
+    //         return true;
+    //       }
+    //       return false;
+    //     }
+    //   } else {
+    //     if (typeof value.links === 'string') {
+    //       if (value.permissionName) {
+    //         client?.role.permissions.find((item) => {
+    //           if (item.permissionName === value.permissionName) {
+    //             return true;
+    //           }
+    //         });
+    //         return false;
+    //       }
+    //       return true;
+    //     } else {
+    //       value.links = value.links.filter((item) => {
+    //         if (item.permissionName) {
+    //           client?.role.permissions.find((item) => {
+    //             if (item.permissionName === value.permissionName) {
+    //               return true;
+    //             }
+    //           });
+    //           return false;
+    //         }
+    //         return true;
+    //       });
+    //       if (value.links.length > 0) {
+    //         return true;
+    //       }
+    //       return false;
+    //     }
+    //   }
+    // })
     .map((item) => (
       <LinksGroup
         {...item}
