@@ -18,6 +18,6 @@ const clientSlice = createSlice({
   },
 });
 
-export const { setClient: setClient } = clientSlice.actions;
+export const { setClient } = clientSlice.actions;
 
 export default clientSlice.reducer;

@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { ClientState } from './clientSlice';
-import userReducer from './clientSlice';
+import clientReducer from './clientSlice';
 
 export interface RootState {
-  userState: ClientState;
+  clientState: ClientState;
 }
 
 export default configureStore({
   reducer: {
-    clientState: userReducer,
+    clientState: clientReducer,
   },
 });
