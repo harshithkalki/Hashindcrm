@@ -10,12 +10,49 @@ import LinksGroup from '../CollapsibleLink';
 import { useState } from 'react';
 import { UserMenu } from '../UserMenu';
 import { trpc } from '@/utils/trpc';
+import type { RootState } from '@/store';
+import store from '@/store';
+import { useSelector } from 'react-redux';
+
 // import { UserMenu } from '../UserMenu';
+
+const allLinks = [
+  '/company',
+  '/company/new',
+  '/roles',
+  '/roles/new',
+  '/products',
+  '/brands',
+  '/categories',
+  '/stockadjustment',
+  '/stocktransfer',
+  '/parties/supplier',
+  '/parties/staff',
+  '/parties/customer',
+  '/sales',
+  '/sales/return',
+  '/purchases',
+  '/purchases/return',
+  '/expenses',
+  '/expenses/categories',
+  '/reports/payments',
+  '/reports/stockalert',
+  '/reports/sales',
+  '/reports/stock',
+  '/reports/ratelist',
+  '/reports/productsales',
+  '/reports/userreports',
+  '/reports/profitandloss',
+  '/settings',
+  '/logs',
+  '/dashboard',
+] as const;
 
 const CompanyData: NavData['links'] = [
   { label: 'Manage companies', link: '/company' },
   { label: 'Create company', link: '/company/new' },
 ];
+
 const RolesData: NavData['links'] = [
   { label: 'All Roles', link: '/roles' },
   { label: 'Create Role', link: '/roles/new' },
@@ -57,10 +94,10 @@ const ReportDate: NavData['links'] = [
   { label: 'UserReports', link: '/reports/userreports' },
   { label: 'Profit & Loss', link: '/reports/profitandloss' },
 ];
+
 const mockdata: NavData[] = [
   { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
   { links: CompanyData, label: 'Companies', icon: IconBuildingStore },
-
   { links: RolesData, label: 'Roles', icon: IconReceipt2 },
   { links: ProductManagerData, label: 'Product Manager', icon: IconReceipt2 },
   { links: '/workflow', label: 'WorkFlow', icon: IconFileAnalytics },
@@ -122,18 +159,44 @@ interface Props {
 export default function NavbarNested({ hide }: Props) {
   const { classes } = useStyles();
   const [active, setActive] = useState('Billing');
-  const logout = trpc.staffRouter.logout.useMutation();
+  const logout = trpc.auth.logout.useMutation();
+  const client = useSelector<RootState, RootState['clientState']['client']>(
+    (state) => state.clientState.client
+  );
 
-  const links = mockdata.map((item) => (
-    <LinksGroup
-      {...item}
-      key={item.label}
-      onClick={() => {
-        setActive(item.label);
-      }}
-      active={item.label === active}
-    />
-  ));
+  const links = mockdata
+    .filter((value) => {
+      if (client?.isSuperAdmin) {
+        if (typeof value.links === 'string') {
+          if (value.links === allLinks[28]) {
+            return true;
+          }
+          return false;
+        } else {
+          value.links = value.links.filter((item) => {
+            if (item.link === allLinks[10]) {
+              return true;
+            }
+            return false;
+          });
+
+          if (value.links.length > 0) {
+            return true;
+          }
+          return false;
+        }
+      }
+    })
+    .map((item) => (
+      <LinksGroup
+        {...item}
+        key={item.label}
+        onClick={() => {
+          setActive(item.label);
+        }}
+        active={item.label === active}
+      />
+    ));
 
   return (
     <Navbar

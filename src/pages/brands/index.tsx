@@ -17,6 +17,9 @@ import { trpc } from '@/utils/trpc';
 import axios from 'axios';
 import Layout from '@/components/Layout';
 import BrandsTableSelection from '@/components/Tables/BrandsTable';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import type { BrandCreateInput } from '@/zobjs/brand';
+import { ZBrandCreateInput } from '@/zobjs/brand';
 
 interface Product {
   id: string;
@@ -26,13 +29,17 @@ interface Product {
   logo: string;
 }
 
+const initialValues: BrandCreateInput = {
+  name: '',
+  slug: '',
+  logo: '',
+};
+
 const Index = () => {
   const router = useRouter();
   const [modal, setModal] = React.useState(false);
   const createBrand = trpc.brandRouter.create.useMutation();
   const brands = trpc.brandRouter.brands.useQuery();
-  console.log('brands');
-  console.log(brands);
 
   const AddBrand = () => {
     const [logo, setLogo] = useState<File | null>(null);
@@ -42,7 +49,8 @@ const Index = () => {
       <>
         <Modal opened={modal} onClose={() => setModal(false)} title='Add Brand'>
           <Formik
-            initialValues={{ name: '', slug: '', logo: '' }}
+            initialValues={initialValues}
+            validationSchema={toFormikValidationSchema(ZBrandCreateInput)}
             onSubmit={async (values, actions) => {
               const file = logo;
               if (file) {
@@ -62,7 +70,7 @@ const Index = () => {
             {({ isSubmitting }) => (
               <Form>
                 <FormInput
-                  name='name'
+                  name={'name'}
                   label='Name'
                   placeholder='Enter Name'
                   withAsterisk

@@ -6,6 +6,8 @@ export const ZBrandCreateInput = z.object({
   logo: z.string(),
 });
 
+export type BrandCreateInput = z.infer<typeof ZBrandCreateInput>;
+
 export const ZBrandUpdateInput = ZBrandCreateInput.partial().extend({
   _id: z.string(),
 });
