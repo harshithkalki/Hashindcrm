@@ -34,7 +34,7 @@ import { Permissions } from '@/constants';
 //remove the type error from the array
 
 interface CreateRole {
-  id: string;
+  _id: string;
   name: string;
   displayName: string;
   description: string;
@@ -87,7 +87,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
   }) as unknown as Permission;
 
   const inputs = {
-    id: formInputs.id,
+    _id: formInputs._id,
     name: formInputs.name,
     displayName: formInputs.displayName,
     description: formInputs.description,

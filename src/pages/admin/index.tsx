@@ -29,17 +29,18 @@ interface modalProps {
 }
 
 const initialValues: z.infer<typeof ZAdminCreateInput> = {
-  firstName: 'kalki',
-  lastName: 'harshith',
-  phoneNumber: '123456',
-  addressline1: 'hahah',
+  firstName: '',
+  lastName: 'lastname',
+  phoneNumber: '',
+  addressline1: '',
   city: 'hyd',
   state: 'tel',
   country: 'ind',
   pincode: '212345',
-  email: 'harshith@gmail.com',
+  email: '',
   password: '123456',
   company: '63ff1a39b29440e57af4c524',
+  profile: 'profile',
 };
 
 const useStyles = createStyles((theme) => ({
@@ -86,7 +87,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(ZAdminCreateInput)}
         >
-          {({ handleSubmit, handleChange, values, setFieldValue }) => (
+          {({ handleSubmit, values, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
               <SimpleGrid
                 m={'md'}
@@ -144,7 +145,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
                 <FormikInput
                   label='Name'
                   placeholder='Name'
-                  name='name'
+                  name='firstName'
                   withAsterisk
                 />
                 <FormikInput
@@ -155,9 +156,8 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
                 />
                 <FormikInput
                   label='Phone'
-                  type={'number'}
                   placeholder='Phone'
-                  name='phone'
+                  name='phoneNumber'
                   withAsterisk
                 />
                 <FormikSelect
@@ -182,7 +182,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
               <Formiktextarea
                 label='Address'
                 placeholder='Address'
-                name='address'
+                name='addressline1'
                 withAsterisk
                 mb={'md'}
               />
@@ -210,6 +210,8 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const admin = trpc.staffRouter.getAdmins.useQuery();
+
   return (
     <Layout>
       <AddCustomer modal={modal} setModal={setModal} />

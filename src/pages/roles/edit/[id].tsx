@@ -41,11 +41,11 @@ type Permission = {
 // https://decision-tree-lxlo.vercel.app/workspace
 
 const App = () => {
-  const UpdateRole = trpc.staffRouter.updateRole.useMutation();
+  const UpdateRole = trpc.roleRouter.update.useMutation();
   const router = useRouter();
   const { id } = router.query;
-  const getRole = trpc.staffRouter.getRole.useQuery(
-    { roleId: id as string },
+  const getRole = trpc.roleRouter.get.useQuery(
+    { _id: id as string },
     { refetchOnWindowFocus: false }
   );
   const role = getRole.data;
@@ -57,7 +57,7 @@ const App = () => {
           <ScrollArea style={{ height: '100%' }}>
             <RoleForm
               formInputs={{
-                id: id as string,
+                _id: id as string,
                 name: role.name,
                 displayName: role.displayName,
                 description: '',

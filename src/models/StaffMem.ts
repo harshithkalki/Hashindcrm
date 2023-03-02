@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import type { z } from 'zod';
 import type { ZStaffMem } from '@/zobjs/staffMem';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type IStaffMem = ModifyDeep<
   z.infer<typeof ZStaffMem>,
@@ -49,6 +50,7 @@ const StaffMemSchema: Schema = new Schema<
     linkedTo: { type: Schema.Types.ObjectId, ref: 'StaffMem' },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
+    profile: { type: String, required: true },
   },
   {
     versionKey: false,
@@ -91,6 +93,8 @@ StaffMemSchema.method(
     return resetToken;
   }
 );
+
+StaffMemSchema.plugin(mongoosePaginate);
 
 export default (mongoose.models.StaffMem as ReturnType<
   typeof mongoose.model<

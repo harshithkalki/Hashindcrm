@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { GroupProps } from '@mantine/core';
 import { Container } from '@mantine/core';
 import { Table, ScrollArea, TextInput, ActionIcon, Group } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons';
 import { useRouter } from 'next/router';
 import type { ZRole } from '@/zobjs/role';
-import { z } from 'zod';
+import type { z } from 'zod';
 
-type role = z.infer<typeof ZRole> & { _id: string };
 interface TableSelectionProps<T> {
-  data: role[];
+  data: T[];
   onDelete?: (id: string) => void;
   onEdit?: (id: string) => void;
   editDeleteColumnProps?: {
@@ -41,6 +40,10 @@ export default function RolesTable<T>({
       )
     );
   };
+
+  useMemo(() => {
+    setFilteredData(data);
+  }, [data]);
 
   const rows = filteredData.map((item, index) => {
     return (

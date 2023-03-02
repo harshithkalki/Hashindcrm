@@ -1,6 +1,6 @@
-import type { TextInputProps } from "@mantine/core";
-import { TextInput } from "@mantine/core";
-import { useField } from "formik";
+import type { TextInputProps } from '@mantine/core';
+import { TextInput } from '@mantine/core';
+import { useField } from 'formik';
 
 interface Props extends TextInputProps {
   name: string;
