@@ -5,7 +5,9 @@ import { trpc } from '@/utils/trpc';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
-import { ScrollArea } from '@mantine/core';
+import { Pagination, ScrollArea } from '@mantine/core';
+import RolesTable from '@/components/Tables/RolesTable';
+import { usePagination } from '@mantine/hooks';
 
 type Roles = RouterOutputs['roleRouter']['roles']['docs'];
 
@@ -14,10 +16,29 @@ interface props {
 }
 
 const Index = () => {
-  const getAllRoles = trpc.roleRouter.roles.useQuery();
+  const [page, setPage] = React.useState(1);
+  const getAllRoles = trpc.roleRouter.roles.useQuery({ page: page, limit: 1 });
+  // const pagination = usePagination({
+  //   total: getAllRoles.data?.totalPages as number,
+  //   page,
+  //   // onChange: (page) => setPage(page),
+  // });
+  console.log(page);
+
+  const data = [
+    {
+      id: '1',
+      name: 'Admin',
+    },
+    {
+      id: '2',
+      name: 'User',
+    },
+  ];
 
   const tabData = getAllRoles.data;
   const Data = tabData;
+  // console.log(Data.docs);
   const router = useRouter();
 
   return (
@@ -25,18 +46,20 @@ const Index = () => {
       {Data && (
         <ScrollArea style={{ height: '100%' }}>
           <div>
-            <TableSelection
-              data={Data.docs}
-              isDeleteColumn={true}
-              isEditColumn={true}
-              onDelete={(id) => console.log(id)}
-              onEdit={(id) => router.push('/roles/edit/' + id)}
-              keysandlabels={{
-                // displayName: "Display Name",
-                // id: 'ID',
-                name: 'Name',
-              }}
-            />
+            {getAllRoles.isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              <>
+                <RolesTable data={Data.docs} />
+                <Pagination
+                  total={getAllRoles.data?.totalPages}
+                  initialPage={1}
+                  // {...pagination}
+                  page={page}
+                  onChange={setPage}
+                />
+              </>
+            )}
           </div>
         </ScrollArea>
       )}
