@@ -1,25 +1,7 @@
 import type { IRole } from '@/models/Role';
-import type { IStaffMem, StaffMemMethods } from '@/models/StaffMem';
 import StaffMemModel from '@/models/StaffMem';
 import type { Permissions } from '@/constants';
 import { TRPCError } from '@trpc/server';
-import { env } from '@/env/server.mjs';
-import type { Types } from 'mongoose';
-import type { Document } from 'mongoose';
-
-type Client = Omit<
-  Document<unknown, any, IStaffMem> &
-    IStaffMem & {
-      _id: Types.ObjectId;
-    } & StaffMemMethods,
-  'role'
-> & {
-  role: IRole & {
-    _id: string;
-  };
-};
-
-type SuperAdmin = 'super-admin';
 
 const checkPermission = async <T extends typeof Permissions[number]>(
   permission: T,
@@ -31,18 +13,7 @@ const checkPermission = async <T extends typeof Permissions[number]>(
   },
   clientId: string,
   errorMessage: string
-): Promise<T extends 'COMPANY' ? SuperAdmin : Client> => {
-  if (clientId === env.SUPER_ADMIN_EMAIL) {
-    if (permission === 'COMPANY') {
-      return 'super-admin' as T extends 'COMPANY' ? 'super-admin' : Client;
-    } else {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'Super admin can only access company resources',
-      });
-    }
-  }
-
+) => {
   const client = await StaffMemModel.findById(clientId).populate<{
     role: IRole & { _id: string };
   }>('role');
@@ -81,7 +52,7 @@ const checkPermission = async <T extends typeof Permissions[number]>(
     });
   }
 
-  return client as T extends 'COMPANY' ? 'super-admin' : Client;
+  return client;
 };
 
 export default checkPermission;

@@ -1,7 +1,6 @@
 export const Permissions = [
   'STAFFMEM',
   'ROLE',
-  'COMPANY',
   'WORKFLOW',
   'TICKET',
   'BRAND',

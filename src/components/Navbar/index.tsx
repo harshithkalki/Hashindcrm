@@ -51,8 +51,8 @@ const allLinks = [
 ] as const;
 
 const CompanyData: NavData['links'] = [
-  { label: 'Manage companies', link: '/company', permissionName: 'COMPANY' },
-  { label: 'Create company', link: '/company/new', permissionName: 'COMPANY' },
+  { label: 'Manage companies', link: '/company' },
+  { label: 'Create company', link: '/company/new' },
 ];
 
 const RolesData: NavData['links'] = [

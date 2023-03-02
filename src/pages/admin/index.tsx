@@ -19,7 +19,7 @@ import {
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import React, { useRef, useState } from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { ZAdminCreateInput } from '@/zobjs/staffMem';
 

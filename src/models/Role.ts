@@ -3,6 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 import { Permissions } from '../constants/index';
 import type { z } from 'zod';
 import type { ZRole } from '@/zobjs/role';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type IRole = ModifyDeep<
   z.infer<typeof ZRole>,
@@ -57,6 +58,8 @@ RoleSchema.index(
   { 'permissions.permissionName': 1, name: 1 },
   { unique: true }
 );
+
+RoleSchema.plugin(mongoosePaginate);
 
 export default (mongoose.models.Role as ReturnType<
   typeof mongoose.model<IRole, mongoose.PaginateModel<IRole>>

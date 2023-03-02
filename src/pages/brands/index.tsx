@@ -40,10 +40,10 @@ const Index = () => {
   const [modal, setModal] = React.useState(false);
   const createBrand = trpc.brandRouter.create.useMutation();
   const brands = trpc.brandRouter.brands.useQuery();
-
+  // const [id,setId]=useState<string>('');
   const AddBrand = () => {
     const [logo, setLogo] = useState<File | null>(null);
-    // const get
+    // const getBrand=trpc.brandRouter.get.useQuery({_id:});
 
     return (
       <>
