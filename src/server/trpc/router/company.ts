@@ -43,7 +43,7 @@ export const companyRouter = router({
   delete: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        _id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -54,20 +54,18 @@ export const companyRouter = router({
         });
       }
 
-      const company = await CompanyModel.findByIdAndDelete(input.id);
+      const company = await CompanyModel.findByIdAndDelete(input._id);
 
       return company;
     }),
 
-  companys: protectedProcedure
+  companies: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        limit: z.number().optional(),
+        search: z.string().optional(),
+        cursor: z.number().nullish(),
+      })
     )
     .query(async ({ input, ctx }) => {
       if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
@@ -77,14 +75,11 @@ export const companyRouter = router({
         });
       }
 
-      const { page = 1, limit = 10, search } = input || {};
+      const { cursor: page, limit = 10, search } = input || {};
 
       const options = {
-        page: page,
+        page: page ?? 1,
         limit: limit,
-        sort: {
-          name: 1,
-        },
       };
 
       const query = {
@@ -93,6 +88,12 @@ export const companyRouter = router({
 
       const companys = await CompanyModel.paginate(query, options);
 
-      return companys;
+      return {
+        ...companys,
+        docs: companys.docs.map((company) => ({
+          ...company.toObject(),
+          _id: company._id.toString(),
+        })),
+      };
     }),
 });

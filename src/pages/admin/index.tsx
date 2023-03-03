@@ -3,7 +3,6 @@ import FormInput from '@/components/FormikCompo/FormikPass';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
-import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
 import {
   Button,
@@ -16,16 +15,18 @@ import {
   SimpleGrid,
   Title,
 } from '@mantine/core';
-import { IconPlus, IconUpload } from '@tabler/icons';
+import { IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { ZAdminCreateInput } from '@/zobjs/staffMem';
+import Tables from '@/components/Tables';
 
 interface modalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onCreated?: () => void;
 }
 
 const initialValues: z.infer<typeof ZAdminCreateInput> = {
@@ -65,7 +66,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const AddCustomer = ({ modal, setModal }: modalProps) => {
+const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
   const { classes, cx } = useStyles();
   const createAdmin = trpc.staffRouter.createAdmin.useMutation();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -79,9 +80,11 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
         size={'60%'}
       >
         <Formik
-          onSubmit={(values) => {
-            createAdmin.mutateAsync(values).then((res) => {
-              console.log(res);
+          onSubmit={(values, { setSubmitting }) => {
+            createAdmin.mutateAsync(values).then(() => {
+              setModal(false);
+              onCreated && onCreated();
+              setSubmitting(false);
             });
           }}
           initialValues={initialValues}
@@ -188,7 +191,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
               />
 
               <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
-                <Button type='submit' size='xs'>
+                <Button type='submit' size='xs' loading={createAdmin.isLoading}>
                   Create
                 </Button>
                 <Button
@@ -210,48 +213,29 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
-  const admin = trpc.staffRouter.getAdmins.useQuery();
+  const admin = trpc.staffRouter.getAdmins.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <Layout>
-      <AddCustomer modal={modal} setModal={setModal} />
+      <AddCustomer
+        modal={modal}
+        setModal={setModal}
+        onCreated={() => admin.refetch()}
+      />
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Admins</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
           Add New
         </Button>
       </Group>
-      <PartiesTable
-        data={[
-          {
-            name: 'John Doe',
-            email: 'harshith@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-        ]}
+      <Tables
+        data={admin.data?.docs || []}
+        keysandlabels={{
+          firstName: 'Name',
+          email: 'Email',
+        }}
       />
     </Layout>
   );

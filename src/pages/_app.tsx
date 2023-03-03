@@ -1,11 +1,10 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { MantineProvider, useMantineTheme, Loader } from '@mantine/core';
+import { MantineProvider, Loader } from '@mantine/core';
 import { Provider, useDispatch } from 'react-redux';
 import store from '../store';
 import { trpc } from '../utils/trpc';
-import { useMediaQuery } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { setClient } from '@/store/clientSlice';
 
@@ -32,29 +31,59 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
 
   if (me.isLoading)
     return (
-      <div style={{ height: '100vh' }}>
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <Loader size='md' />
+      <MantineProvider
+        withGlobalStyles
+        withNormalizeCSS
+        theme={{
+          colorScheme: 'dark',
+        }}
+      >
+        <div style={{ height: '100vh' }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Loader size='md' />
+          </div>
         </div>
-      </div>
+      </MantineProvider>
     );
 
-  return <>{children}</>;
+  return (
+    <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
+      theme={{
+        colorScheme: 'dark',
+
+        colors: {
+          company: [
+            '',
+            me.data?.data.company?.primaryColor ?? '#faa819',
+            me.data?.data.company?.primaryColor ?? '#faa819',
+            me.data?.data.company?.primaryColor ?? '#faa819',
+            me.data?.data.company?.primaryColor ?? '#faa819',
+            me.data?.data.company?.secondaryColor ?? '#faa819',
+            '',
+            '',
+            me.data?.data.company?.primaryColor ?? '#faa819',
+            '',
+          ],
+        },
+        primaryColor: 'company',
+      }}
+    >
+      {children}
+    </MantineProvider>
+  );
 }
 
 function App(props: AppProps) {
   const { Component, pageProps } = props;
-  const [opened, setOpened] = useState(false);
-  const theme = useMantineTheme();
-  const matches = useMediaQuery('(max-width: 800px)');
-  const router = useRouter();
 
   return (
     <>
@@ -66,19 +95,12 @@ function App(props: AppProps) {
         />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          colorScheme: 'dark',
-        }}
-      >
-        <Provider store={store}>
-          <UserContextProvider>
-            <Component {...pageProps} />
-          </UserContextProvider>
-        </Provider>
-      </MantineProvider>
+
+      <Provider store={store}>
+        <UserContextProvider>
+          <Component {...pageProps} />
+        </UserContextProvider>
+      </Provider>
     </>
   );
 }

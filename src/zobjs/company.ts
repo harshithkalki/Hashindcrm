@@ -9,15 +9,14 @@ export const ZCompanyCreateInput = z.object({
   state: z.string(),
   pincode: z.string(),
   country: z.string(),
-  landline: z.string(),
-  mobile: z.string(),
-  gstNo: z.string(),
-  cinNo: z.string(),
+  gstNo: z.string().optional(),
+  cinNo: z.string().optional(),
   primaryColor: z.string(),
   secondaryColor: z.string(),
   backgroundColor: z.string(),
   logo: z.string(),
   natureOfBusiness: z.string(),
+  numbers: z.array(z.string()),
 });
 
 export const ZCompanyUpdateInput = ZCompanyCreateInput.partial().extend({
