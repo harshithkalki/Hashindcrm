@@ -19,7 +19,12 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>(
     name: { type: String, required: true },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
     email: { type: String, required: true },
-    phone: { type: String, required: true },
+    numbers: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     billingAddress: { type: String, required: true },
     shippingAddress: { type: String, required: true },
     warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse' },

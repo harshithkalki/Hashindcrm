@@ -18,23 +18,6 @@ interface props {
 const Index = () => {
   const [page, setPage] = React.useState(1);
   const getAllRoles = trpc.roleRouter.roles.useQuery({ page: page, limit: 1 });
-  // const pagination = usePagination({
-  //   total: getAllRoles.data?.totalPages as number,
-  //   page,
-  //   // onChange: (page) => setPage(page),
-  // });
-  console.log(page);
-
-  const data = [
-    {
-      id: '1',
-      name: 'Admin',
-    },
-    {
-      id: '2',
-      name: 'User',
-    },
-  ];
 
   const tabData = getAllRoles.data;
   const Data = tabData;

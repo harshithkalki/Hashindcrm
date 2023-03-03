@@ -16,6 +16,7 @@ export const ZRoleCreateInput = z.object({
   ),
   displayName: z.string(),
   defaultRedirect: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export const ZRoleUpdateInput = ZRoleCreateInput.partial().extend({

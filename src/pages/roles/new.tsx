@@ -31,13 +31,12 @@ const app = () => {
       <ScrollArea style={{ height: '100%' }}>
         <RoleForm
           formInputs={{
-            id: '',
             name: '',
             displayName: '',
-            description: '',
             permissions: permissionsDemo,
+            defaultRedirect: '',
           }}
-          onSubmit={(inputs) => {
+          onSubmit={async (inputs) => {
             return AddRole.mutateAsync(inputs).then((res) => {
               console.log(res);
             });

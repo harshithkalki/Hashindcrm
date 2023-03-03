@@ -47,6 +47,7 @@ const RoleSchema: Schema = new Schema<IRole, RoleModel>(
       },
     ],
     defaultRedirect: { type: String, required: false },
+    description: { type: String, required: false },
   },
   {
     versionKey: false,

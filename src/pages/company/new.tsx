@@ -15,8 +15,6 @@ const initialFormInputs: z.infer<typeof ZCompanyCreateInput> = {
   state: '',
   pincode: '',
   country: '',
-  landline: '',
-  mobile: '',
   gstNo: '',
   cinNo: '',
   primaryColor: '',

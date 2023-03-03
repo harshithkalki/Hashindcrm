@@ -7,7 +7,7 @@ import {
   Pagination,
   Title,
 } from '@mantine/core';
-import React, { useMemo } from 'react';
+import React, { useEffect } from 'react';
 import Tables from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 
@@ -24,20 +24,18 @@ const Index = () => {
   const companies = trpc.companyRouter.companies.useInfiniteQuery(
     { limit: 1 },
     {
-      getNextPageParam: (lastPage) => lastPage.nextPage,
+      getNextPageParam: () => page,
       refetchOnWindowFocus: false,
     }
   );
 
   const deleteCompany = trpc.companyRouter.delete.useMutation();
 
-  const onChangePage = (val: number) => {
-    setPage(val);
-
-    if (companies.data?.pages.length && val > companies.data.pages.length) {
+  useEffect(() => {
+    if (!companies.data?.pages.find((pageData) => pageData.page === page)) {
       companies.fetchNextPage();
     }
-  };
+  }, [companies, page]);
 
   if (companies.isLoading)
     return (
@@ -54,7 +52,10 @@ const Index = () => {
       {companies.data && (
         <>
           <Tables
-            data={companies.data.pages[page - 1]?.docs || []}
+            data={
+              companies.data.pages.find((pageData) => pageData.page === page)
+                ?.docs || []
+            }
             keysandlabels={{
               name: 'Company Name',
               email: 'Email',
@@ -70,11 +71,14 @@ const Index = () => {
             }}
           />
           <Pagination
-            total={companies.data.pages[page - 1]?.totalPages || 0}
+            total={
+              companies.data.pages.find((pageData) => pageData.page === page)
+                ?.totalPages || 0
+            }
             initialPage={1}
             // {...pagination}
             page={page}
-            onChange={onChangePage}
+            onChange={setPage}
           />
         </>
       )}
