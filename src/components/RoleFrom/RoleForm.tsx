@@ -9,6 +9,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 // import { trpc } from "@/utils/trpc";
 import { Permissions } from '@/constants';
+import { ZRoleUpdateInput } from '@/zobjs/role';
 
 // const permissionsDemo: Permission = [
 //   {
@@ -102,25 +103,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
         </Title>
         <Formik
           initialValues={inputs}
-          validationSchema={toFormikValidationSchema(
-            z.object({
-              id: z.string().optional(),
-              name: z.string(),
-              displayName: z.string(),
-              description: z.string().optional(),
-              permissions: z.array(
-                z.object({
-                  permissionName: z.enum(Permissions),
-                  crud: z.object({
-                    read: z.boolean(),
-                    update: z.boolean(),
-                    delete: z.boolean(),
-                    create: z.boolean(),
-                  }),
-                })
-              ),
-            })
-          )}
+          validationSchema={toFormikValidationSchema(ZRoleUpdateInput)}
           onSubmit={onSubmit}
         >
           {({ values, setFieldValue, isSubmitting }) => (

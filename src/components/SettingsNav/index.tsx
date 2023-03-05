@@ -20,7 +20,21 @@ import { trpc } from '@/utils/trpc';
 // import { UserMenu } from '../UserMenu';
 
 const mockdata: NavData[] = [
-  { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
+  // { links: '/dashboard', label: 'DashBoard', icon: IconFileAnalytics },
+  {
+    links: '/settings/paymentmodes',
+    label: 'Payment Modes',
+    icon: IconReceipt2,
+  },
+  { links: '/settings/taxes', label: 'Taxes', icon: IconReceipt2 },
+  { links: '/settings/units', label: 'Units', icon: IconReceipt2 },
+  {
+    links: '/settings/warehouses',
+    label: 'Warehouses',
+    icon: IconBuildingStore,
+  },
+  { links: '/settings/currencies', label: 'Currencies', icon: IconReceipt2 },
+  { links: '/settings/profile', label: 'Profile', icon: IconUser },
 
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
@@ -70,7 +84,7 @@ interface Props {
 export default function SettingsNav({ hide }: Props) {
   const { classes } = useStyles();
   const [active, setActive] = useState('Billing');
-  const logout = trpc.staffRouter.logout.useMutation();
+  // const logout = trpc.staffRouter.logout.useMutation();
 
   const links = mockdata.map((item) => (
     <LinksGroup
@@ -91,22 +105,23 @@ export default function SettingsNav({ hide }: Props) {
       hidden={hide}
     >
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
-        <Group className={classes.header} style={{ justifyContent: 'center' }}>
-          <Title fw={400} fz={'xl'}>
+        {/* <Group className={classes.header} style={{ justifyContent: 'center' }}>
+          <Title fw={400} fz={'lg'}>
             Settings
           </Title>
-        </Group>
+        </Group> */}
         <div className={classes.linksInner}>{links}</div>
       </Navbar.Section>
 
-      <Navbar.Section className={classes.footer}>
+      {/* <Navbar.Section className={classes.footer}>
         <UserMenu
           logout={async () => {
             await logout.mutateAsync();
             window.location.reload();
           }}
         />
-      </Navbar.Section>
+      </Navbar.Section> */}
+      {/* <Navbar sectioned className={classes.footer}></Navbar> */}
     </Navbar>
   );
 }
