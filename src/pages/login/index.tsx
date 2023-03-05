@@ -95,7 +95,9 @@ export default function AuthenticationImage() {
             return loginUser
               .mutateAsync(value)
               .then((res) => {
-                router.push('/');
+                if (res.success) {
+                  window.location.replace('/');
+                }
               })
               .catch((err) => {
                 console.log(err);

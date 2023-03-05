@@ -272,6 +272,12 @@ export const staffRouter = router({
 
       const admins = await StaffModel.paginate(query, options);
 
-      return admins;
+      return {
+        ...admins,
+        docs: admins.docs.map((admin) => ({
+          ...admin.toObject(),
+          _id: admin._id.toString(),
+        })),
+      };
     }),
 });

@@ -15,6 +15,7 @@ export const ZStaffMemCreateInput = z.object({
   linkedTo: z.string().optional(),
   email: z.string(),
   password: z.string(),
+  profile: z.string(),
 });
 
 export const ZAdminCreateInput = ZStaffMemCreateInput.omit({

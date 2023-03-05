@@ -8,18 +8,11 @@ interface Props extends TextInputProps {
   label?: string;
 }
 
-const FormInput: React.FC<Props> = ({ name, label, ...props }) => {
+const ArrayInput: React.FC<Props> = ({ name, label, ...props }) => {
   const [field, meta] = useField(name);
   const isError = Boolean(meta.touched && meta.error);
 
-  return (
-    <TextInput
-      label={label}
-      error={isError ? meta.error : undefined}
-      {...field}
-      {...props}
-    />
-  );
+  return <TextInput error={isError} label={label} {...field} {...props} />;
 };
 
-export default FormInput;
+export default ArrayInput;

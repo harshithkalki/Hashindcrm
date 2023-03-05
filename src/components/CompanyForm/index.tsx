@@ -4,24 +4,26 @@ import {
   createStyles,
   Grid,
   Button,
-  ColorInput,
   Image,
   Center,
   Container,
   ScrollArea,
+  Group,
+  ActionIcon,
+  Stack,
+  Text,
 } from '@mantine/core';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FieldArray } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import FormInput from '@/components/FormikCompo/FormikInput';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { ZCompanyCreateInput } from '@/zobjs/company';
-import { IconUpload } from '@tabler/icons';
+import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
 import { useRef } from 'react';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import FormikColor from '../FormikCompo/FormikColor';
-// import { trpc } from "@/utils/trpc";
-// import Formiktextarea from "@/components/FormikCompo/FormikTextarea";
-// import FormikSelect from "@/components/FormikCompo/FormikSelect";
+import ArrayInput from '../FormikCompo/ArrayInput';
+
 const useStyles = createStyles((theme) => ({
   wrapper: {
     background: 'dark',
@@ -44,36 +46,12 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export interface Company {
-  name: string;
-  email: string;
-  addressline1: string;
-  addressline2: string;
-  city: string;
-  state: string;
-  pincode: string;
-  country: string;
-  landline: string;
-  mobile: string;
-  cinNo: string;
-  gstNo: string;
-  primaryColor: string;
-  secondaryColor: string;
-  backgroundColor: string;
-  logo: string;
-  natureOfBusiness: string;
-}
-
-// const onSubmit = async (values: Company, actions: any) => {
-//   console.log(values);
-//   await new Promise((resolve) => setTimeout(resolve, 1000));
-//   actions.resetForm();
-// };
+export type CreateCompanyInput = z.infer<typeof ZCompanyCreateInput>;
 
 interface Props {
   title: string;
-  onSubmit: (inputs: Company) => Promise<void>;
-  formInputs: Company;
+  onSubmit: (inputs: CreateCompanyInput) => Promise<void>;
+  formInputs: CreateCompanyInput;
 }
 
 const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
@@ -94,7 +72,10 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
           // }}
           onSubmit={onSubmit}
         >
-          {({ values, isSubmitting, setFieldValue }) => {
+          {({ values, isSubmitting, setFieldValue, errors, touched }) => {
+            console.log(errors);
+            console.log(touched, 'touched');
+
             return (
               <Form>
                 <SimpleGrid
@@ -119,16 +100,65 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                     name='email'
                     withAsterisk
                   />
-                  <FormInput
-                    label='landline'
-                    placeholder='landline'
-                    name='landline'
-                  />
-                  <FormInput
-                    label='mobile'
-                    placeholder='mobile'
-                    name='mobile'
-                    withAsterisk
+
+                  <FieldArray
+                    name='numbers'
+                    render={(arrayHelpers) => (
+                      <div>
+                        <label
+                          style={{
+                            fontSize: '14px',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Mobile
+                        </label>
+                        <Stack spacing='xs'>
+                          {values.numbers.map((num, index) => (
+                            <div key={index}>
+                              <Group spacing={0}>
+                                <ArrayInput
+                                  name={`numbers.${index}`}
+                                  placeholder='mobile'
+                                  style={{
+                                    flex: 1,
+                                  }}
+                                />
+                                <Group spacing={1} ml={2}>
+                                  <ActionIcon
+                                    onClick={() => arrayHelpers.remove(index)}
+                                    color='red'
+                                    variant='light'
+                                    size={'lg'}
+                                    disabled={values.numbers.length === 1}
+                                  >
+                                    <IconMinus />
+                                  </ActionIcon>
+                                  <ActionIcon
+                                    onClick={() => arrayHelpers.push('')}
+                                    color='blue'
+                                    variant='light'
+                                    size={'lg'}
+                                  >
+                                    <IconPlus />
+                                  </ActionIcon>
+                                </Group>
+                              </Group>
+                              {
+                                <Text size='xs' color='red'>
+                                  {Array.isArray(touched.numbers) &&
+                                    (touched.numbers as unknown as boolean[])[
+                                      index
+                                    ] &&
+                                    errors.numbers &&
+                                    errors.numbers[index]}
+                                </Text>
+                              }
+                            </div>
+                          ))}
+                        </Stack>
+                      </div>
+                    )}
                   />
                 </SimpleGrid>
 

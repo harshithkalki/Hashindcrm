@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const ZCustomerCreateInput = z.object({
   name: z.string(),
   email: z.string().email(),
-  phone: z.string(),
+  numbers: z.array(z.string()),
   billingAddress: z.string(),
   shippingAddress: z.string(),
   warehouse: z.string(),

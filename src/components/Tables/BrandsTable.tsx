@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Button, FileInput, GroupProps, Modal } from '@mantine/core';
+import type { GroupProps } from '@mantine/core';
+import { Button, FileInput, Modal } from '@mantine/core';
 import { Image } from '@mantine/core';
 import { Container } from '@mantine/core';
 import { Table, ScrollArea, TextInput, ActionIcon, Group } from '@mantine/core';

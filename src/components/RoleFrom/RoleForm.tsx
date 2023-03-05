@@ -2,14 +2,14 @@ import { Button, Container, Group, Text, Title } from '@mantine/core';
 import { Form, Formik } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import React from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import FormInput from '../../components/FormikCompo/FormikInput';
 import FormikCheck from '@/components/FormikCompo/FormikCheckBox';
 import { useMediaQuery } from '@mantine/hooks';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 // import { trpc } from "@/utils/trpc";
 import { Permissions } from '@/constants';
-import { ZRoleUpdateInput } from '@/zobjs/role';
+import { ZRoleCreateInput } from '@/zobjs/role';
 
 // const permissionsDemo: Permission = [
 //   {
@@ -34,13 +34,8 @@ import { ZRoleUpdateInput } from '@/zobjs/role';
 
 //remove the type error from the array
 
-interface CreateRole {
-  id: string;
-  name: string;
-  displayName: string;
-  description: string;
-  permissions: Permission;
-}
+type CreateRole = z.infer<typeof ZRoleCreateInput>;
+
 type Permission = {
   permissionName: typeof Permissions[number];
   crud: {
@@ -58,21 +53,14 @@ interface props {
 }
 
 const RoleForm = ({ formInputs, onSubmit, title }: props) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const matches = useMediaQuery('(max-width: 800px)');
   const formpermissions: Permission = formInputs.permissions;
-  console.log(formInputs);
-
-  function setChecked(checked: boolean): void {
-    throw new Error('Function not implemented.');
-  }
 
   const PermissonsValues = Permissions.map((permission) => {
-    // console.log(permission);
     const permissionIndex = formpermissions.findIndex(
       (perm) => perm.permissionName === permission
     );
-    // console.log(permissionIndex);
+
     return {
       permissionName: permission,
       crud:
@@ -85,15 +73,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
               create: false,
             },
     };
-  }) as unknown as Permission;
-
-  const inputs = {
-    id: formInputs.id,
-    name: formInputs.name,
-    displayName: formInputs.displayName,
-    description: formInputs.description,
-    permissions: PermissonsValues,
-  };
+  });
 
   return (
     <>
@@ -102,8 +82,8 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           {title}
         </Title>
         <Formik
-          initialValues={inputs}
-          validationSchema={toFormikValidationSchema(ZRoleUpdateInput)}
+          initialValues={formInputs}
+          validationSchema={toFormikValidationSchema(ZRoleCreateInput)}
           onSubmit={onSubmit}
         >
           {({ values, setFieldValue, isSubmitting }) => (
@@ -129,65 +109,54 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                 withAsterisk
                 mb={'sm'}
               />
-              {PermissonsValues.map((permission, index) => {
+              {formInputs.permissions.map((permission, index) => {
                 // const permissionv: Permission = PermissonsValues[
                 //   index
                 // ] as unknown as Permission;
                 return (
-                  <>
-                    <div key={index}>
-                      <Text
-                        mt={'xs'}
+                  <div key={permission.permissionName}>
+                    <Text
+                      mt={'xs'}
+                      mb={'sm'}
+                    >{`${permission.permissionName}`}</Text>
+                    <Group>
+                      <FormikCheck
+                        label={'view'}
+                        defaultChecked={
+                          permission?.crud?.read !== undefined
+                            ? permission?.crud.read
+                            : false
+                        }
+                        name={`permissions.${index}.crud.read`}
                         mb={'sm'}
-                      >{`${permission.permissionName}`}</Text>
-                      <Group>
-                        <FormikCheck
-                          label={'view'}
-                          defaultChecked={
-                            permission?.crud.read !== undefined
-                              ? permission?.crud.read
-                              : false
-                          }
-                          name={`permissions.${index}.crud.read`}
-                          mb={'sm'}
-                        />
+                      />
 
-                        <FormikCheck
-                          label={'create'}
-                          defaultChecked={permission.crud.create}
-                          name={`permissions.${index}.crud.create`}
-                          mb={'sm'}
-                        />
+                      <FormikCheck
+                        label={'create'}
+                        defaultChecked={permission.crud?.create}
+                        name={`permissions.${index}.crud.create`}
+                        mb={'sm'}
+                      />
 
-                        <FormikCheck
-                          label={'edit'}
-                          defaultChecked={permission.crud.update}
-                          name={`permissions.${index}.crud.update`}
-                          mb={'sm'}
-                        />
+                      <FormikCheck
+                        label={'edit'}
+                        defaultChecked={permission.crud?.update}
+                        name={`permissions.${index}.crud.update`}
+                        mb={'sm'}
+                      />
 
-                        <FormikCheck
-                          label={'delete'}
-                          defaultChecked={permission.crud.delete}
-                          name={`permissions.${index}.crud.delete`}
-                          mb={'sm'}
-                        />
-
-                        {/* </Checkbox.Group> */}
-                      </Group>
-                    </div>
-                  </>
+                      <FormikCheck
+                        label={'delete'}
+                        defaultChecked={permission.crud?.delete}
+                        name={`permissions.${index}.crud.delete`}
+                        mb={'sm'}
+                      />
+                    </Group>
+                  </div>
                 );
               })}
 
-              <Button
-                disabled={isSubmitting}
-                type='submit'
-                onClick={() => {
-                  //   console.log(values);
-                }}
-                mt={'md'}
-              >
+              <Button disabled={isSubmitting} type='submit' mt={'md'}>
                 Save
               </Button>
             </Form>

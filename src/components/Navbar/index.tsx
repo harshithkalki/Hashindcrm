@@ -13,8 +13,8 @@ import { trpc } from '@/utils/trpc';
 import type { RootState } from '@/store';
 import store from '@/store';
 import { useSelector } from 'react-redux';
-import { z } from 'zod';
-import { ZRole } from '@/zobjs/role';
+import type { z } from 'zod';
+import type { ZRole } from '@/zobjs/role';
 
 // import { UserMenu } from '../UserMenu';
 
@@ -48,6 +48,7 @@ const allLinks = [
   '/settings',
   '/logs',
   '/dashboard',
+  '/admin',
 ] as const;
 
 const CompanyData: NavData['links'] = [
@@ -167,6 +168,7 @@ const mockdata: NavData[] = [
     icon: IconReceipt2,
     permissionName: 'SETTINGS',
   },
+  { label: 'Admin', icon: IconReceipt2, links: '/admin' },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 
@@ -225,77 +227,31 @@ export default function NavbarNested({ hide }: Props) {
       return filterNavLinks(mockdata, client.role.permissions);
     }
 
+    if (client && client.isSuperAdmin) {
+      return mockdata.filter((value) => {
+        if (typeof value.links === 'string') {
+          if (value.links === allLinks[28] || value.links === allLinks[29]) {
+            return true;
+          }
+          return false;
+        } else {
+          value.links = value.links.filter((item) => {
+            if (item.link === allLinks[0] || item.link === allLinks[1]) {
+              return true;
+            }
+            return false;
+          });
+
+          if (value.links.length > 0) {
+            return true;
+          }
+          return false;
+        }
+      });
+    }
+
     return [];
   }, [client]);
-
-  // const links = mockdata
-  //   // .filter((value) => {
-  //   //   if (client?.isSuperAdmin) {
-  //   //     if (typeof value.links === 'string') {
-  //   //       if (value.links === allLinks[28]) {
-  //   //         return true;
-  //   //       }
-  //   //       return false;
-  //   //     } else {
-  //   //       value.links = value.links.filter((item) => {
-  //   //         if (item.link === allLinks[10]) {
-  //   //           return true;
-  //   //         }
-  //   //         return false;
-  //   //       });
-
-  //   //       if (value.links.length > 0) {
-  //   //         return true;
-  //   //       }
-  //   //       return false;
-  //   //     }
-  //   //   } else {
-  //   //     if (client) {
-  //   //       console.log(filterNavLinks(mockdata, client.role.permissions));
-  //   //     }
-
-  //   //     if (typeof value.links === 'string') {
-  //   //       if (value.permissionName) {
-  //   //         return client?.role.permissions.find((item) => {
-  //   //           if (item.permissionName === value.permissionName) {
-  //   //             return true;
-  //   //           }
-  //   //         });
-  //   //         // return false;
-  //   //       }
-  //   //       return true;
-  //   //     } else {
-  //   //       value.links = value.links.filter((item) => {
-  //   //         if (item.permissionName) {
-  //   //           return client?.role.permissions.find((item) => {
-  //   //             if (item.permissionName === value.permissionName) {
-  //   //               return true;
-  //   //             }
-  //   //           });
-
-  //   //           // return false;
-  //   //         }
-  //   //         return true;
-  //   //       });
-
-  //   //       console.log(value.links);
-  //   //       if (value.links.length > 0) {
-  //   //         return true;
-  //   //       }
-  //   //       return false;
-  //   //     }
-  //   //   }
-  //   // })
-  //   .map((item) => (
-  //     <LinksGroup
-  //       {...item}
-  //       key={item.label}
-  //       onClick={() => {
-  //         setActive(item.label);
-  //       }}
-  //       active={item.label === active}
-  //     />
-  //   ));
 
   return (
     <Navbar

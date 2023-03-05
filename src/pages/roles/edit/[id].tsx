@@ -6,16 +6,6 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { ScrollArea } from '@mantine/core';
 
-type Permission = {
-  permissionName: typeof Permissions[number];
-  crud: {
-    read?: boolean;
-    update?: boolean;
-    delete?: boolean;
-    create?: boolean;
-  };
-}[];
-
 // const permissionsDemo: Permission = [
 //   {
 //     permissionName: "COMPANY",
@@ -57,16 +47,15 @@ const App = () => {
           <ScrollArea style={{ height: '100%' }}>
             <RoleForm
               formInputs={{
-                id: id as string,
                 name: role.name,
                 displayName: role.displayName,
-                description: '',
+                description: role.description,
                 permissions: role.permissions,
               }}
               onSubmit={(inputs) => {
                 return UpdateRole.mutateAsync({
-                  ...inputs,
                   _id: id as string,
+                  ...inputs,
                 }).then((res) => {
                   console.log(res);
                 });

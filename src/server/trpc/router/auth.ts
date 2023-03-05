@@ -2,11 +2,49 @@ import { env } from '@/env/server.mjs';
 import type { IRole } from '@/models/Role';
 import StaffMem from '@/models/StaffMem';
 import { getJWTToken } from '@/utils/jwt';
+import { ZCompany } from '@/zobjs/company';
 import { ZRole } from '@/zobjs/role';
 import { ZStaffMem } from '@/zobjs/staffMem';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { protectedProcedure, publicProcedure, router } from '../trpc';
+
+export const outSchemaForMe = z.object({
+  success: z.boolean(),
+  data: z.discriminatedUnion('isSuperAdmin', [
+    ZStaffMem.extend({
+      company: ZCompany.pick({
+        logo: true,
+        name: true,
+        backgroundColor: true,
+        secondaryColor: true,
+        primaryColor: true,
+      }).extend({
+        _id: z.string(),
+      }),
+    })
+      .partial()
+      .extend({
+        role: z.literal('super-admin'),
+        email: z.string(),
+        isSuperAdmin: z.literal(true),
+      })
+      .omit({ password: true }),
+    ZStaffMem.extend({
+      role: ZRole.omit({ staffMem: true }),
+      isSuperAdmin: z.literal(false),
+      company: ZCompany.pick({
+        logo: true,
+        name: true,
+        backgroundColor: true,
+        secondaryColor: true,
+        primaryColor: true,
+      }).extend({
+        _id: z.string(),
+      }),
+    }).omit({ password: true }),
+  ]),
+});
 
 export const auth = router({
   login: publicProcedure
@@ -78,64 +116,57 @@ export const auth = router({
     };
   }),
 
-  me: protectedProcedure
-    .output(
-      z.object({
-        success: z.boolean(),
-        data: z.discriminatedUnion('isSuperAdmin', [
-          ZStaffMem.partial()
-            .extend({
-              role: z.literal('super-admin'),
-              email: z.string(),
-              isSuperAdmin: z.literal(true),
-            })
-            .omit({ password: true }),
-          ZStaffMem.extend({
-            role: ZRole.omit({ staffMem: true }),
-            isSuperAdmin: z.literal(false),
-          }).omit({ password: true }),
-        ]),
-      })
-    )
-    .query(async ({ ctx }) => {
-      if (ctx.clientId === env.SUPER_ADMIN_EMAIL) {
-        return {
-          success: true,
-          data: {
-            isSuperAdmin: true,
-            email: env.SUPER_ADMIN_EMAIL,
-            role: 'super-admin',
-          },
-        };
-      }
-
-      const res = await StaffMem.findById(ctx.clientId)
-        .select('-password')
-        .populate<{ role: IRole & { _id: string } }>('role', '-staffMem')
-        .lean();
-
-      if (!res) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid credentials',
-        });
-      }
-
-      const { password: _, ...staff } = res;
-
+  me: protectedProcedure.output(outSchemaForMe).query(async ({ ctx }) => {
+    if (ctx.clientId === env.SUPER_ADMIN_EMAIL) {
       return {
         success: true,
         data: {
-          isSuperAdmin: false,
-          ...staff,
-          linkedTo: staff.linkedTo?.toString(),
-          ticket: staff.ticket?.toString(),
-          company: staff.company.toString(),
-          role: {
-            ...staff.role,
-            company: staff.role.company.toString(),
-          },
+          isSuperAdmin: true,
+          email: env.SUPER_ADMIN_EMAIL,
+          role: 'super-admin',
         },
       };
-    }),
+    }
+
+    const res = await StaffMem.findById(ctx.clientId)
+      .lean()
+      .select('-password')
+      .populate<{
+        role: IRole & { _id: string };
+        company: Pick<
+          z.infer<typeof ZCompany>,
+          | 'logo'
+          | 'name'
+          | 'backgroundColor'
+          | 'secondaryColor'
+          | 'primaryColor'
+        > & { _id: string };
+      }>('role company', '-staffMem')
+      .lean();
+
+    if (!res) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Invalid credentials',
+      });
+    }
+
+    const { password: _, ...staff } = res;
+
+    staff.company._id = staff.company._id.toString();
+
+    return {
+      success: true,
+      data: {
+        isSuperAdmin: false,
+        ...staff,
+        linkedTo: staff.linkedTo?.toString(),
+        ticket: staff.ticket?.toString(),
+        role: {
+          ...staff.role,
+          company: staff.role.company.toString(),
+        },
+      },
+    };
+  }),
 });
