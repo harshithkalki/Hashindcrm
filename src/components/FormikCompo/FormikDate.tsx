@@ -22,8 +22,8 @@ const FormDate: React.FC<Props> = ({ name, label, ...props }) => {
         const date = e?.toISOString();
         helper.setValue(date, true);
       }}
+      value={field.value ? new Date(field.value) : undefined}
     />
   );
 };
-
 export default FormDate;

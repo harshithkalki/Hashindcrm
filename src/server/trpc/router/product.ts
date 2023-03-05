@@ -7,6 +7,7 @@ import type { CategoryDocument } from '@/models/Category';
 import CategoryModel from '@/models/Category';
 import type { BrandDocument } from '@/models/Brand';
 import { ZProductCreateInput, ZProductUpdateInput } from '@/zobjs/product';
+import { objectkeys } from '@/utils/helpers';
 
 const getAllChildCategories = async (
   category: string
@@ -249,6 +250,16 @@ export const productRouter = router({
       );
 
       const product = await ProductModel.findById(input.id).lean();
+
+      if (!product) {
+        throw new Error('Product not found');
+      }
+
+      objectkeys(product).forEach((key: keyof typeof product) => {
+        if (product[key] === null) {
+          delete product[key];
+        }
+      });
 
       return product;
     }),

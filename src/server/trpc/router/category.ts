@@ -73,6 +73,32 @@ export const categoryRouter = router({
       return category;
     }),
 
+  get: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'CATEGORY',
+        {
+          read: true,
+          update: true,
+          delete: true,
+        },
+        ctx.clientId,
+        'You are not permitted to read category'
+      );
+
+      const category = await CategoryModel.findOne({
+        _id: input._id,
+        company: client.company,
+      }).lean();
+
+      return category;
+    }),
+
   getAllCategories: protectedProcedure.query(async ({ ctx }) => {
     const client = await checkPermission(
       'CATEGORY',

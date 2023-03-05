@@ -62,13 +62,11 @@ export const brandRouter = router({
   // pagination with search brands by name
   brands: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
@@ -78,10 +76,10 @@ export const brandRouter = router({
         'You are not permitted to read brand'
       );
 
-      const { page = 1, limit = 10, search } = input || {};
+      const { cursor: page, limit = 10, search } = input || {};
 
       const options = {
-        page: page,
+        page: page ?? 1,
         limit: limit,
       };
 

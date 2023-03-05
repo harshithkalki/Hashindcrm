@@ -7,7 +7,7 @@ export type ICategory = ModifyDeep<
   z.infer<typeof ZCategory>,
   {
     company: Types.ObjectId;
-    parentCategory: Types.ObjectId;
+    parentCategory?: Types.ObjectId;
   }
 >;
 

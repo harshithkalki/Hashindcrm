@@ -49,7 +49,7 @@ const ProductSchema: Schema = new Schema<IProduct, ProductModel>(
 
 ProductSchema.plugin(mongoosePaginate);
 
-ProductSchema.index({ name: 1, companyId: 1 }, { unique: true });
+ProductSchema.index({ name: 1, warehouse: 1 }, { unique: true });
 
 export default (mongoose.models.Product as ReturnType<
   typeof mongoose.model<IProduct, mongoose.PaginateModel<IProduct>>

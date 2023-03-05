@@ -1,16 +1,17 @@
 import React from 'react';
 import Layout from '@/components/Layout';
 import ProductForm from '@/components/ProductForm';
-import { ScrollArea } from '@mantine/core';
+import { ScrollArea, Title } from '@mantine/core';
 import { trpc } from '@/utils/trpc';
 import { useRouter } from 'next/router';
+import type { z } from 'zod';
+import type { ZProductCreateInput } from '@/zobjs/product';
 
 const Index = () => {
   const createProduct = trpc.productRouter.create.useMutation();
   const router = useRouter();
 
-  const initialValues = {
-    id: '',
+  const initialValues: z.infer<typeof ZProductCreateInput> = {
     name: '',
     logo: '',
     warehouse: '',
@@ -28,15 +29,18 @@ const Index = () => {
     openingStockDate: '',
     slug: '',
     tax: 0,
-    expireDate: '',
+    expiryDate: '',
   };
   return (
     <Layout>
       <div style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
-        <ScrollArea style={{ height: '100%' }}>
+        <ScrollArea style={{ flex: 1 }}>
+          <Title fw={400} mx='md'>
+            Add Product
+          </Title>
           <ProductForm
             formInputs={initialValues}
-            onSubmit={(values) => {
+            onSubmit={async (values) => {
               return createProduct.mutateAsync(values).then(() => {
                 router.push('/products');
               });

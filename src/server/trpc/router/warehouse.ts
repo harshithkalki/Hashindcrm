@@ -95,13 +95,11 @@ export const warehouseRouter = router({
 
   warehouses: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
@@ -111,10 +109,10 @@ export const warehouseRouter = router({
         'You are not permitted to read warehouse'
       );
 
-      const { page = 1, limit = 10, search } = input || {};
+      const { cursor: page = 1, limit = 10, search } = input || {};
 
       const options = {
-        page: page,
+        page: page ?? 1,
         limit: limit,
       };
 

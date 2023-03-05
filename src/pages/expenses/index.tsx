@@ -202,8 +202,8 @@ const Index = () => {
             date: 'Date',
             user: 'User',
           }}
-          isDeleteColumn={true}
-          isEditColumn={true}
+          deletable={true}
+          editable={true}
           onDelete={(id) => console.log(id)}
           onEdit={(id) => console.log(id)}
         />

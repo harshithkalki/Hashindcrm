@@ -30,8 +30,8 @@ type Data<T> = T & {
 
 interface TableSelectionProps<T> {
   data: Data<T>[];
-  isDeleteColumn?: boolean;
-  isEditColumn?: boolean;
+  deletable?: boolean;
+  editable?: boolean;
   onDelete?: (id: string) => void;
   onEdit?: (id: string) => void;
   editDeleteColumnProps?: {
@@ -72,8 +72,8 @@ function ConfirmDelete({
 
 export default function TableSelection<T>({
   data,
-  isDeleteColumn,
-  isEditColumn,
+  deletable: isDeleteColumn,
+  editable: isEditColumn,
   onDelete,
   onEdit,
   editDeleteColumnProps: { groupProps } = {},

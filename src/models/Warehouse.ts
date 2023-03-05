@@ -2,6 +2,7 @@ import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import type { z } from 'zod';
 import type { ZWarehouse } from '@/zobjs/warehouse';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type IWarehouse = ModifyDeep<
   z.infer<typeof ZWarehouse>,
@@ -25,6 +26,8 @@ const WarehouseSchema: Schema = new Schema<IWarehouse, WarehouseModel>(
 );
 
 WarehouseSchema.index({ name: 1, companyId: 1 }, { unique: true });
+
+WarehouseSchema.plugin(mongoosePaginate);
 
 export default (mongoose.models.Warehouse as ReturnType<
   typeof mongoose.model<IWarehouse, mongoose.PaginateModel<IWarehouse>>

@@ -47,15 +47,16 @@ interface Category {
   _id: string;
   name: string;
   slug: string;
-  logo: string;
+  logo?: string;
   children?: Category[];
 }
 
 interface TableSortProps {
   data: Category[];
+  onEdit: (id: string) => void;
 }
 
-export function TableSort({ data }: TableSortProps) {
+export function TableSort({ data, onEdit }: TableSortProps) {
   const [search, setSearch] = useState('');
   const [filteredData, setFilteredData] = useState(data);
   const deleteCategory = trpc.categoryRouter.delete.useMutation();
@@ -96,11 +97,12 @@ export function TableSort({ data }: TableSortProps) {
               alt={'brand'}
               radius='lg'
               style={{ width: 32, height: 32 }}
+              withPlaceholder
             />
           </td>
           <td>
             <Group spacing={0}>
-              <ActionIcon>
+              <ActionIcon onClick={() => onEdit(data._id)}>
                 <IconPencil size={16} stroke={1.5} />
               </ActionIcon>
 

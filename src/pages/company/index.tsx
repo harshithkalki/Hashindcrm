@@ -60,8 +60,8 @@ const Index = () => {
               name: 'Company Name',
               email: 'Email',
             }}
-            isEditColumn={true}
-            isDeleteColumn={true}
+            editable={true}
+            deletable={true}
             onDelete={async (_id) => {
               await deleteCompany.mutateAsync({
                 _id,

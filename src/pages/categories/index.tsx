@@ -5,11 +5,11 @@ import {
   Divider,
   FileInput,
   Group,
+  Loader,
   Modal,
   Title,
 } from '@mantine/core';
 import React, { useMemo } from 'react';
-import { useRouter } from 'next/router';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { Formik, Form } from 'formik';
 import { IconUpload } from '@tabler/icons';
@@ -18,130 +18,222 @@ import { trpc } from '@/utils/trpc';
 import convertToCategory from '@/utils/convertToCategory';
 import axios from 'axios';
 import Layout from '@/components/Layout';
+import type { CategoryCreateInput } from '@/zobjs/category';
 
-type InitialValues = {
-  name: string;
-  slug: string;
-  logo: string;
-  parentCategory?: string;
-};
-
-const initialValues: InitialValues = {
+const initialValues: CategoryCreateInput = {
+  logo: '',
   name: '',
   slug: '',
-  logo: '',
+  parentCategory: '',
+};
+
+const CategoryForm = ({
+  onSubmit,
+  values = initialValues,
+}: {
+  onSubmit: (values: CategoryCreateInput) => Promise<void>;
+  values?: (CategoryCreateInput & { _id?: string }) | null;
+}) => {
+  const allCategories = trpc.categoryRouter.getAllCategories.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const [logo, setLogo] = React.useState<File | null>(null);
+
+  return (
+    <Formik
+      initialValues={values ?? initialValues}
+      onSubmit={async (values, actions) => {
+        const file = logo;
+        if (file) {
+          const form = new FormData();
+          form.append('file', file);
+          const { data } = await axios.post('/api/upload-file', form);
+          values.logo = data.url;
+        }
+
+        if (values.parentCategory === '') {
+          delete values.parentCategory;
+        }
+
+        if (values.logo === '') {
+          delete values.logo;
+        }
+
+        await onSubmit(values);
+        actions.resetForm();
+        actions.setSubmitting(false);
+      }}
+    >
+      {({ isSubmitting }) => (
+        <Form>
+          <FormInput
+            name='name'
+            label='Name'
+            placeholder='Enter Name'
+            withAsterisk
+            mt={'md'}
+          />
+          <FormikSelect
+            name='parentCategory'
+            label='Parent Category'
+            data={
+              allCategories.data
+                ?.filter((val) => val._id.toString() !== values?._id)
+                .map((val) => {
+                  return { label: val.name, value: val._id.toString() };
+                }) || []
+            }
+            placeholder='Enter Parent Category'
+            mt={'md'}
+          />
+
+          <FormInput
+            name='slug'
+            label='Slug'
+            placeholder='Enter Slug'
+            withAsterisk
+            mt={'xs'}
+          />
+          <FileInput
+            label='Logo'
+            name='logo'
+            mt={'md'}
+            placeholder='Select Logo'
+            icon={<IconUpload size={14} />}
+            onChange={setLogo}
+          />
+          <Group mt={'md'} mb={'xs'}>
+            <Button type='submit' mt={'md'} loading={isSubmitting} size={'sm'}>
+              Submit
+            </Button>
+          </Group>
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
+const AddCategory = ({
+  onClose,
+  opened,
+}: {
+  onClose: () => void;
+  opened: boolean;
+}) => {
+  const createCategory = trpc.categoryRouter.create.useMutation();
+
+  return (
+    <>
+      <Modal opened={opened} onClose={onClose} title='Add Categories'>
+        <CategoryForm
+          onSubmit={async (values) => {
+            await createCategory.mutateAsync({
+              ...values,
+            });
+
+            onClose();
+          }}
+        />
+      </Modal>
+    </>
+  );
+};
+
+const EditCategory = ({
+  onClose,
+  _id,
+}: {
+  onClose: () => void;
+  _id: string;
+}) => {
+  const category = trpc.categoryRouter.get.useQuery(
+    {
+      _id,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const updateCategory = trpc.categoryRouter.update.useMutation();
+
+  return (
+    <Modal opened={Boolean(_id)} onClose={onClose} title='Edit Categories'>
+      {category.isLoading ? (
+        <Loader />
+      ) : (
+        <CategoryForm
+          onSubmit={async (values) => {
+            await updateCategory.mutateAsync({
+              _id,
+              ...values,
+            });
+            onClose();
+          }}
+          values={
+            category.data
+              ? {
+                  ...category.data,
+                  parentCategory: category.data.parentCategory?.toString(),
+                  _id: category.data._id.toString(),
+                }
+              : null
+          }
+        />
+      )}
+    </Modal>
+  );
 };
 
 const Index = () => {
-  const router = useRouter();
-
   const [modal, setModal] = React.useState(false);
-  const createCategory = trpc.categoryRouter.create.useMutation();
-  const allCategories = trpc.categoryRouter.getAllCategories.useQuery();
+  const allCategories = trpc.categoryRouter.getAllCategories.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const [editId, setEditId] = React.useState<string | null>(null);
 
   const parsedData = useMemo(
     () =>
       convertToCategory(
         allCategories.data?.map((val) => ({
           _id: val._id.toString(),
-          parentCategory: val.parentCategory as unknown as string,
           name: val.name,
           slug: val.slug,
           logo: val.logo,
-          companyId: val.companyId as unknown as string,
+          parentCategory: val.parentCategory?.toString(),
+          company: val.company.toString(),
         })) || []
       ),
     [allCategories.data]
   );
 
-  const AddBrand = () => {
-    const [logo, setLogo] = React.useState<File | null>(null);
-    return (
-      <>
-        <Modal
-          opened={modal}
-          onClose={() => setModal(false)}
-          title='Add Categories'
-        >
-          <Formik
-            initialValues={initialValues}
-            onSubmit={async (values, actions) => {
-              const file = logo;
-              if (file) {
-                const form = new FormData();
-                form.append('file', file);
-                const { data } = await axios.post('/api/upload-file', form);
-                values.logo = data.url;
-              }
-
-              if (!values.parentCategory) delete values.parentCategory;
-              await createCategory.mutateAsync(values);
-              actions.resetForm();
-              actions.setSubmitting(false);
-            }}
-          >
-            {({ isSubmitting }) => (
-              <Form>
-                <FormInput
-                  name='name'
-                  label='Name'
-                  placeholder='Enter Name'
-                  withAsterisk
-                  mt={'md'}
-                />
-                <FormikSelect
-                  name='parentCategory'
-                  label='Parent Category'
-                  data={
-                    allCategories.data?.map((val) => {
-                      return { label: val.name, value: val._id.toString() };
-                    }) || []
-                  }
-                  placeholder='Enter Parent Category'
-                  mt={'md'}
-                />
-
-                <FormInput
-                  name='slug'
-                  label='Slug'
-                  placeholder='Enter Slug'
-                  withAsterisk
-                  mt={'xs'}
-                />
-                <FileInput
-                  label='Logo'
-                  name='logo'
-                  mt={'md'}
-                  placeholder='Select Logo'
-                  icon={<IconUpload size={14} />}
-                  onChange={setLogo}
-                />
-                <Group style={{ justifyContent: 'end' }} mt={'md'} mb={'xs'}>
-                  <Button
-                    type='submit'
-                    mt={'md'}
-                    loading={isSubmitting}
-                    size={'sm'}
-                  >
-                    Submit
-                  </Button>
-                  <Button mt={'md'} onClick={() => setModal(false)} size={'sm'}>
-                    Cancel
-                  </Button>
-                </Group>
-              </Form>
-            )}
-          </Formik>
-        </Modal>
-      </>
-    );
-  };
-
   if (allCategories.isLoading) return <div>Loading...</div>;
 
   return (
     <Layout>
-      <AddBrand />
+      <AddCategory
+        onClose={() => {
+          setModal(false);
+          allCategories.refetch();
+        }}
+        opened={modal}
+      />
+
+      {editId && (
+        <EditCategory
+          onClose={() => {
+            setEditId(null);
+            allCategories.refetch();
+          }}
+          _id={editId}
+        />
+      )}
       <Container mt={'xs'}>
         <Group style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Categories</Title>
@@ -150,7 +242,7 @@ const Index = () => {
           </Button>
         </Group>
         <Divider mt={'xl'} />
-        <CategoriesTable data={parsedData} />
+        <CategoriesTable data={parsedData} onEdit={setEditId} />
       </Container>
     </Layout>
   );

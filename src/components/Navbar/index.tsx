@@ -49,6 +49,7 @@ const allLinks = [
   '/logs',
   '/dashboard',
   '/admin',
+  '/warehouse',
 ] as const;
 
 const CompanyData: NavData['links'] = [
@@ -169,6 +170,12 @@ const mockdata: NavData[] = [
     permissionName: 'SETTINGS',
   },
   { label: 'Admin', icon: IconReceipt2, links: '/admin' },
+  {
+    label: 'Warehouse',
+    icon: IconReceipt2,
+    links: '/warehouse',
+    permissionName: 'WAREHOUSE',
+  },
   //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
 ];
 

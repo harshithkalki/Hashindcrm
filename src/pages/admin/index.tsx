@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { ZAdminCreateInput } from '@/zobjs/staffMem';
@@ -40,7 +40,7 @@ const initialValues: z.infer<typeof ZAdminCreateInput> = {
   pincode: '212345',
   email: '',
   password: '123456',
-  company: '63ff1a39b29440e57af4c524',
+  company: '',
   profile: 'profile',
 };
 
@@ -66,9 +66,35 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+function Company() {
+  const [searchValue, onSearchChange] = useState('');
+  const companies = trpc.companyRouter.companies.useQuery({
+    search: searchValue,
+  });
+
+  return (
+    <FormikSelect
+      label='Company'
+      placeholder='Company'
+      name='company'
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      data={
+        companies.data?.docs.map((company) => ({
+          label: company.name,
+          value: company._id,
+        })) || []
+      }
+      withAsterisk
+      searchable
+    />
+  );
+}
+
 const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
   const { classes, cx } = useStyles();
   const createAdmin = trpc.staffRouter.createAdmin.useMutation();
+
   const fileRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -163,6 +189,9 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
                   name='phoneNumber'
                   withAsterisk
                 />
+
+                <Company />
+
                 <FormikSelect
                   label='Status'
                   data={[

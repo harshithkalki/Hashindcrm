@@ -1,21 +1,19 @@
+import type { ZCategory } from '@/zobjs/category';
+import type { z } from 'zod';
+
 interface Category {
   _id: string;
   name: string;
   slug: string;
-  logo: string;
+  logo?: string;
   children?: Category[];
   parentId?: string;
 }
 
 export default function convertToCategories(
-  inputs: {
+  inputs: (z.infer<typeof ZCategory> & {
     _id: string;
-    name: string;
-    slug: string;
-    logo: string;
-    parentCategory?: string;
-    companyId: string;
-  }[]
+  })[]
 ): Category[] {
   const categories: Category[] = [];
   const categoryMap: { [key: string]: Category } = {};

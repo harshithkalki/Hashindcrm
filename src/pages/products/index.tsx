@@ -39,7 +39,10 @@ export interface ProductFormType {
 const Index = () => {
   const router = useRouter();
 
-  const products = trpc.productRouter.getAllProducts.useQuery();
+  const products = trpc.productRouter.getAllProducts.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    cacheTime: 0,
+  });
   const deleteProduct = trpc.productRouter.delete.useMutation();
   if (products.isLoading) return <div>Loading...</div>;
 

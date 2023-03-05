@@ -17,6 +17,7 @@ export const ZCompanyCreateInput = z.object({
   logo: z.string(),
   natureOfBusiness: z.string(),
   numbers: z.array(z.string()),
+  company: z.string(),
 });
 
 export const ZCompanyUpdateInput = ZCompanyCreateInput.partial().extend({

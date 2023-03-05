@@ -114,8 +114,8 @@ const Index = () => {
             expensecategoryname: 'Expense Category Name',
             description: 'Description',
           }}
-          isDeleteColumn={true}
-          isEditColumn={true}
+          deletable={true}
+          editable={true}
           onDelete={(id) => console.log(id)}
           onEdit={(id) => console.log(id)}
         />
