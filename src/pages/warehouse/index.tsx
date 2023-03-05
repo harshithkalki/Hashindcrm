@@ -16,6 +16,7 @@ import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { useEffect, useState } from 'react';
 import TableSelection from '@/components/Tables';
+import Layout from '@/components/Layout';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
 
@@ -142,43 +143,47 @@ export default function Warehouse() {
 
   return (
     <>
-      <AddWarehouse open={open} onClose={() => setOpen(false)} />
-      {editId && <EditWarehouse _id={editId} onClose={() => setEditId(null)} />}
-      <Container mt={'xs'}>
-        <Group style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Warehouse</Title>
-          <Button size='xs' onClick={() => setOpen(true)}>
-            Add Warehouse
-          </Button>
-        </Group>
-        <Divider mt={'xl'} />
+      <Layout>
+        <AddWarehouse open={open} onClose={() => setOpen(false)} />
+        {editId && (
+          <EditWarehouse _id={editId} onClose={() => setEditId(null)} />
+        )}
+        <Container mt={'xs'}>
+          <Group style={{ justifyContent: 'space-between' }}>
+            <Title fw={400}>Warehouse</Title>
+            <Button size='xs' onClick={() => setOpen(true)}>
+              Add Warehouse
+            </Button>
+          </Group>
+          <Divider mt={'xl'} />
 
-        <TableSelection
-          data={
-            warehouses.data?.pages
-              .find((pageData) => pageData.page === page)
-              ?.docs.map((doc) => ({
-                ...doc,
-                _id: doc._id.toString(),
-              })) || []
-          }
-          keysandlabels={{
-            name: 'Name',
-          }}
-          onEdit={(id) => setEditId(id)}
-          editable
-          deletable
-        />
-        <Pagination
-          total={
-            warehouses.data?.pages.find((pageData) => pageData.page === page)
-              ?.totalPages || 0
-          }
-          initialPage={1}
-          page={page}
-          onChange={setPage}
-        />
-      </Container>
+          <TableSelection
+            data={
+              warehouses.data?.pages
+                .find((pageData) => pageData.page === page)
+                ?.docs.map((doc) => ({
+                  ...doc,
+                  _id: doc._id.toString(),
+                })) || []
+            }
+            keysandlabels={{
+              name: 'Name',
+            }}
+            onEdit={(id) => setEditId(id)}
+            editable
+            deletable
+          />
+          <Pagination
+            total={
+              warehouses.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages || 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        </Container>
+      </Layout>
     </>
   );
 }

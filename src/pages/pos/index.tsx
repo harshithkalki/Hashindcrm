@@ -48,6 +48,8 @@ const customerOptions = [
 type InlineProduct = {
   _id: string;
   name: string;
+  discountedPrice?: number;
+  taxPrice?: number;
   subtotal: number;
   quantity: number;
   price: number;
@@ -99,7 +101,7 @@ const Index = () => {
         initialValues={{
           customer: '',
           product: [],
-          ordertax: '',
+          ordertax: 0,
           orderdiscount: 0,
           shipping: 0,
         }}
@@ -335,7 +337,11 @@ const Index = () => {
                             _id: product._id.toString(),
                             name: product.name,
                             quantity: 1,
-                            subtotal: product.salePrice + product.tax,
+                            subtotal: product.salePrice,
+                            // discountedPrice:
+                            //   product.salePrice -
+                            //   (totalPrice * (values.orderdiscount / 100)) /
+                            //     (inlineProducts.size + 1),
                             price: product.salePrice,
                             tax: product.tax,
                           });
@@ -403,79 +409,95 @@ const Index = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {[...inlineProducts.values()].map((item, index) => (
-                          <tr key={item._id}>
-                            <td
-                              style={{
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                              }}
-                            >
-                              {index + 1}
-                            </td>
-                            <td
-                              style={{
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                              }}
-                            >
-                              {item.name}
-                            </td>
-                            <td
-                              style={{
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                              }}
-                            >
-                              <NumberInput
-                                size='sm'
-                                value={item.quantity}
-                                onChange={(value) => {
-                                  console.log(value);
-                                  if (!value) return;
-                                  item.quantity = value;
-                                  item.subtotal =
-                                    (item.price + item.tax) * value;
-                                  setInlineProducts(new Map(inlineProducts));
-                                }}
-                                min={1}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                              }}
-                            >
-                              {item.tax}
-                            </td>
-                            <td
-                              style={{
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                              }}
-                            >
-                              {item.subtotal}
-                            </td>
-                            <td
-                              style={{
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                              }}
-                            >
-                              <ActionIcon
-                                variant='filled'
-                                color={'blue'}
-                                onClick={() => {
-                                  inlineProducts.delete(item._id);
-                                  setInlineProducts(new Map(inlineProducts));
+                        {[...inlineProducts.values()].map((item, index) => {
+                          const totalPrice = [
+                            ...inlineProducts.values(),
+                          ].reduce((acc, item) => acc + item.price, 0);
+                          const discountedPrice =
+                            item.subtotal -
+                            (totalPrice * (values.orderdiscount / 100)) /
+                              inlineProducts.size;
+                          item.discountedPrice = discountedPrice;
+                          // console.log(item);
+                          const taxedPrice =
+                            item.discountedPrice * (item.tax / 100);
+                          item.taxPrice = taxedPrice;
+                          // item.subtotal = item.discountedPrice + taxedPrice;
+                          return (
+                            <tr key={item._id}>
+                              <td
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
                                 }}
                               >
-                                <IconTrash />
-                              </ActionIcon>
-                            </td>
-                          </tr>
-                        ))}
+                                {index + 1}
+                              </td>
+                              <td
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {item.name}
+                              </td>
+                              <td
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                <NumberInput
+                                  size='sm'
+                                  value={item.quantity}
+                                  onChange={(value) => {
+                                    // console.log(item);
+                                    if (!value) return;
+                                    item.quantity = value;
+
+                                    // item.discountedPrice =
+                                    //   item.discountedPrice * value;
+                                    setInlineProducts(new Map(inlineProducts));
+                                  }}
+                                  min={1}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {item.tax}
+                              </td>
+                              <td
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {(discountedPrice + taxedPrice) * item.quantity}
+                              </td>
+                              <td
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                <ActionIcon
+                                  variant='filled'
+                                  color={'blue'}
+                                  onClick={() => {
+                                    inlineProducts.delete(item._id);
+                                    setInlineProducts(new Map(inlineProducts));
+                                  }}
+                                >
+                                  <IconTrash />
+                                </ActionIcon>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </Table>
                   </ScrollArea>
@@ -519,7 +541,10 @@ const Index = () => {
                       size='sm'
                       value={
                         [...inlineProducts.values()].reduce(
-                          (acc, item) => acc + item.subtotal,
+                          (acc, item) =>
+                            acc +
+                            (item.discountedPrice + item.taxPrice) *
+                              item.quantity,
                           0
                         ) -
                           values.orderdiscount +
