@@ -35,11 +35,11 @@ const useStyles = createStyles((theme) => ({
   },
 
   inner: {
-    height: rem(56),
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
+    height: '100%',
   },
 
   links: {
@@ -57,7 +57,6 @@ const useStyles = createStyles((theme) => ({
   link: {
     display: 'block',
     lineHeight: 1,
-    padding: `${rem(8)} ${rem(12)}`,
     borderRadius: theme.radius.sm,
     textDecoration: 'none',
     color:
@@ -120,8 +119,6 @@ export default function HeaderSearch({ links, logout }: HeaderSearchProps) {
     <Header height={50} className={classes.header} mb={120}>
       <div className={classes.inner}>
         <Group>
-          {/* <Burger opened={opened} onClick={toggle} size='sm' /> */}
-          {/* <MantineLogo size={28} /> */}
           <Image src='/headerlogo2.svg' alt='hashind' width={140} height={28} />
         </Group>
 
@@ -129,7 +126,7 @@ export default function HeaderSearch({ links, logout }: HeaderSearchProps) {
           <Menu
             width={260}
             position='bottom-end'
-            transitionProps={{ transition: 'pop-top-right' }}
+            transition='pop-top-right'
             onClose={() => setUserMenuOpened(false)}
             onOpen={() => setUserMenuOpened(true)}
             withinPortal
@@ -152,7 +149,7 @@ export default function HeaderSearch({ links, logout }: HeaderSearchProps) {
                   <Text weight={500} size='sm' sx={{ lineHeight: 1 }} mr={3}>
                     {'name'}
                   </Text>
-                  <IconChevronDown size={rem(12)} stroke={1.5} />
+                  <IconChevronDown size={'0.9rem'} stroke={1.5} />
                 </Group>
               </UnstyledButton>
             </Menu.Target>

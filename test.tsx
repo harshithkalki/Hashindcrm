@@ -1,187 +1,126 @@
-import { useState } from 'react';
 import {
-  Group,
-  Box,
-  Collapse,
-  Text,
-  UnstyledButton,
+  Header,
+  Burger,
+  useMantineTheme,
+  MediaQuery,
   createStyles,
-  ThemeIcon,
 } from '@mantine/core';
-import type { TablerIcon } from '@tabler/icons';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons';
-import { useRouter } from 'next/router';
-import { Permissions } from '@/constants';
+import { useState } from 'react';
+import { Footer } from '../Footer';
+import NavbarNested from '../Navbar';
 
-const useStyles = createStyles((theme, _params, getRef) => {
-  const icon = getRef('icon');
-  return {
-    control: {
-      fontWeight: 500,
-      display: 'block',
-      width: '100%',
-      padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
-      color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-      fontSize: theme.fontSizes.sm,
+type Props = {
+  hide?: boolean;
+  shownav?: boolean;
+  showheader?: boolean;
+  showfooter?: boolean;
+  navBar?: React.ReactNode;
+  children: React.ReactNode;
+};
 
-      '&:hover': {
-        backgroundColor:
-          theme.colorScheme === 'dark'
-            ? theme.colors.dark[7]
-            : theme.colors.gray[0],
-        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-      },
+const useStyles = createStyles((theme) => ({
+  container: {
+    height: '100vh',
+    display: 'grid',
+    gridTemplateColumns: '0.8fr 1fr 1fr 1fr',
+
+    gridTemplateAreas: `
+      "header header header header"
+      "nav main main main"
+    `,
+    gridTemplateRows: '50px 1fr',
+
+    [theme.fn.smallerThan('sm')]: {
+      gridTemplateColumns: '1fr',
+      gridTemplateAreas: `
+        "header"
+        "nav"
+        "main"
+      `,
     },
+  },
 
-    link: {
-      fontWeight: 500,
-      display: 'block',
-      textDecoration: 'none',
-      padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
-      paddingLeft: 31,
-      marginLeft: 30,
-      fontSize: theme.fontSizes.sm,
-      color:
-        theme.colorScheme === 'dark'
-          ? theme.colors.dark[0]
-          : theme.colors.gray[7],
-      borderLeft: `1px solid ${
-        theme.colorScheme === 'dark'
-          ? theme.colors.dark[4]
-          : theme.colors.gray[3]
-      }`,
+  nav: {
+    gridArea: 'nav',
+    backgroundColor:
+      theme.colorScheme === 'dark'
+        ? theme.colors.dark[8]
+        : theme.colors.gray[0],
+    maxHeight: '100%',
+  },
 
-      '&:hover': {
-        backgroundColor:
-          theme.colorScheme === 'dark'
-            ? theme.colors.dark[7]
-            : theme.colors.gray[0],
-        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-      },
-    },
+  main: {
+    gridArea: 'main',
+    backgroundColor:
+      theme.colorScheme === 'dark'
+        ? theme.colors.dark[8]
+        : theme.colors.gray[0],
+    gridRowStart: 2,
+    gridRowEnd: 3,
+  },
 
-    chevron: {
-      transition: 'transform 200ms ease',
-    },
-    linkActive: {
-      '&, &:hover': {
-        backgroundColor: theme.fn.variant({
-          variant: 'light',
-          color: theme.primaryColor,
-        }).background,
-        color: theme.fn.variant({ variant: 'light', color: theme.primaryColor })
-          .color,
-        [`& .${icon}`]: {
-          color: theme.fn.variant({
-            variant: 'light',
-            color: theme.primaryColor,
-          }).color,
-        },
-      },
-    },
+  header: {
+    gridArea: 'header',
+    backgroundColor:
+      theme.colorScheme === 'dark'
+        ? theme.colors.dark[8]
+        : theme.colors.gray[0],
+    paddingLeft: theme.spacing.md,
+    paddingRight: theme.spacing.md,
+  },
+}));
 
-    linkIcon: {
-      ref: icon,
-      color: theme.white,
-      opacity: 0.75,
-      marginRight: theme.spacing.sm,
-    },
-  };
-});
-
-export interface NavData {
-  links:
-    | string
-    | {
-        label: string;
-        link: string;
-        permissionName?: typeof Permissions[number];
-      }[];
-  label: string;
-  permissionName?: typeof Permissions[number];
-  icon: TablerIcon;
-}
-
-export interface LinksGroupProps extends NavData {
-  initiallyOpened?: boolean;
-  active?: boolean;
-  onClick?: () => void;
-}
-
-export default function LinksGroup({
-  icon: Icon,
-  label,
-  initiallyOpened,
-  links,
-  active,
-  onClick,
-}: LinksGroupProps) {
-  const { classes, theme, cx } = useStyles();
-  const [isActive, setActive] = useState<number>();
-  const { push } = useRouter();
-  const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
-  const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
-  const items = (hasLinks ? links : []).map((link, index) => (
-    <Text<'a'>
-      component='a'
-      className={cx(classes.link, {
-        [classes.linkActive]: isActive === index && active,
-      })}
-      key={link.label}
-      onClick={(event) => {
-        event.preventDefault();
-        if (onClick) {
-          onClick();
-        }
-        setActive(index);
-        push(link.link);
-      }}
-    >
-      {link.label}
-    </Text>
-  ));
+export default function Layout({
+  shownav,
+  showheader,
+  children,
+  hide,
+  navBar,
+}: Props) {
+  const [opened, setOpened] = useState(false);
+  const theme = useMantineTheme();
+  const { classes } = useStyles();
 
   return (
-    <>
-      <UnstyledButton
-        onClick={() => {
-          setOpened((o) => !o);
-
-          if (!hasLinks) {
-            push(links);
-            if (onClick) {
-              onClick();
-            }
-          }
-        }}
-        className={cx(classes.control, {
-          [classes.linkActive]: active && !hasLinks,
-        })}
-        // style={{ cursor: "pointer" }}
-      >
-        <Group position='apart' spacing={0}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <ThemeIcon size={30}>
-              <Icon size={18} />
-            </ThemeIcon>
-            <Box ml='md'>{label}</Box>
-          </Box>
-          {hasLinks && (
-            <ChevronIcon
-              className={classes.chevron}
-              size={14}
-              stroke={1.5}
-              style={{
-                transform: opened
-                  ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)`
-                  : 'none',
-              }}
-            />
-          )}
-        </Group>
-      </UnstyledButton>
-      {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
-    </>
+    <div>
+      <div className={classes.container}>
+        <Header p='md' height={50} className={classes.header}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              height: '100%',
+            }}
+          >
+            <MediaQuery largerThan='sm' styles={{ display: 'none' }}>
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((o) => !o)}
+                size='sm'
+                color={theme.colors.gray[6]}
+                mr='xl'
+              />
+            </MediaQuery>
+          </div>
+        </Header>
+        <div className={classes.nav}>
+          {navBar ?? <NavbarNested hide={!opened} />}
+        </div>
+        <main
+          className={classes.main}
+          style={{
+            display: opened ? 'none' : 'block',
+            padding: theme.spacing.xs,
+            overflow: 'hidden',
+            maxHeight: '100%',
+            height: '100%',
+          }}
+        >
+          {/* <ScrollArea style={{ height: '100%' }}>{children}</ScrollArea> */}
+          {children}
+        </main>
+      </div>
+      <Footer />
+    </div>
   );
 }
