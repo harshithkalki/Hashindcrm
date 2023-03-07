@@ -1,3 +1,4 @@
+import { trpc } from '@/utils/trpc';
 import {
   Header,
   Burger,
@@ -7,6 +8,9 @@ import {
 } from '@mantine/core';
 import { useState } from 'react';
 import { Footer } from '../Footer';
+import HeaderSearch from '../Header';
+// import HeaderTabs from '../Header';
+
 import NavbarNested from '../Navbar';
 
 type Props = {
@@ -78,11 +82,12 @@ export default function Layout({
   const [opened, setOpened] = useState(false);
   const theme = useMantineTheme();
   const { classes } = useStyles();
+  const logout = trpc.auth.logout.useMutation();
 
   return (
     <div>
       <div className={classes.container}>
-        <Header p='md' height={50} className={classes.header}>
+        {/* <Header p='md' height={0} className={classes.header}>
           <div
             style={{
               display: 'flex',
@@ -90,6 +95,7 @@ export default function Layout({
               height: '100%',
             }}
           >
+            <HeaderSearch links={[]} />
             <MediaQuery largerThan='sm' styles={{ display: 'none' }}>
               <Burger
                 opened={opened}
@@ -100,7 +106,17 @@ export default function Layout({
               />
             </MediaQuery>
           </div>
-        </Header>
+        </Header> */}
+        <div className={classes.header}>
+          <HeaderSearch
+            links={[]}
+            logout={async () => {
+              await logout.mutateAsync();
+              window.location.reload();
+            }}
+          />
+        </div>
+
         <div className={classes.nav}>
           {navBar ?? <NavbarNested hide={!opened} />}
         </div>

@@ -281,7 +281,7 @@ export default function NavbarNested({ hide }: Props) {
           ))}
         </div>
       </Navbar.Section>
-
+      {/* 
       <Navbar.Section className={classes.footer}>
         <UserMenu
           logout={async () => {
@@ -289,7 +289,7 @@ export default function NavbarNested({ hide }: Props) {
             window.location.reload();
           }}
         />
-      </Navbar.Section>
+      </Navbar.Section> */}
     </Navbar>
   );
 }
