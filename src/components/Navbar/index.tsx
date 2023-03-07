@@ -164,7 +164,7 @@ const mockdata: NavData[] = [
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
   { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
   {
-    links: '/settings',
+    links: '/settings/paymentmodes',
     label: 'Settings',
     icon: IconReceipt2,
     permissionName: 'SETTINGS',

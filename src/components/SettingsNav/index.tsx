@@ -1,22 +1,15 @@
+import { Navbar, ScrollArea, createStyles, Button, Group } from '@mantine/core';
 import {
-  Navbar,
-  ScrollArea,
-  createStyles,
-  Group,
-  Code,
-  Title,
-} from '@mantine/core';
-import {
-  IconFileAnalytics,
-  IconBuildingStore,
+  IconArrowNarrowLeft,
+  IconDatabase,
   IconReceipt2,
   IconUser,
 } from '@tabler/icons';
 import type { NavData } from '../CollapsibleLink';
 import LinksGroup from '../CollapsibleLink';
 import { useState } from 'react';
-import { UserMenu } from '../UserMenu';
-import { trpc } from '@/utils/trpc';
+import { useRouter } from 'next/router';
+
 // import { UserMenu } from '../UserMenu';
 
 const mockdata: NavData[] = [
@@ -28,11 +21,7 @@ const mockdata: NavData[] = [
   },
   { links: '/settings/taxes', label: 'Taxes', icon: IconReceipt2 },
   { links: '/settings/units', label: 'Units', icon: IconReceipt2 },
-  {
-    links: '/settings/warehouses',
-    label: 'Warehouses',
-    icon: IconBuildingStore,
-  },
+
   { links: '/settings/currencies', label: 'Currencies', icon: IconReceipt2 },
   { links: '/settings/profile', label: 'Profile', icon: IconUser },
 
@@ -71,9 +60,6 @@ const useStyles = createStyles((theme) => ({
   footer: {
     marginLeft: -theme.spacing.md,
     marginRight: -theme.spacing.md,
-    borderTop: `1px solid ${
-      theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
-    }`,
   },
 }));
 
@@ -84,6 +70,7 @@ interface Props {
 export default function SettingsNav({ hide }: Props) {
   const { classes } = useStyles();
   const [active, setActive] = useState('Billing');
+  const router = useRouter();
   // const logout = trpc.staffRouter.logout.useMutation();
 
   const links = mockdata.map((item) => (
@@ -113,15 +100,22 @@ export default function SettingsNav({ hide }: Props) {
         <div className={classes.linksInner}>{links}</div>
       </Navbar.Section>
 
-      {/* <Navbar.Section className={classes.footer}>
-        <UserMenu
-          logout={async () => {
-            await logout.mutateAsync();
-            window.location.reload();
-          }}
-        />
-      </Navbar.Section> */}
-      {/* <Navbar sectioned className={classes.footer}></Navbar> */}
+      <Navbar.Section className={classes.footer}>
+        <Group style={{ justifyContent: 'center' }}>
+          <Button
+            leftIcon={<IconArrowNarrowLeft />}
+            variant='outline'
+            onClick={() => {
+              router.push('/dashboard');
+            }}
+          >
+            Go back to Home
+          </Button>
+        </Group>
+      </Navbar.Section>
+      {/* <Navbar sectio className={classes.footer}>
+       
+      </Navbar> */}
     </Navbar>
   );
 }
