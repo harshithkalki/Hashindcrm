@@ -25,6 +25,9 @@ import {
 import InfiniteSelect from '../Custom/InfiniteSelect';
 import { trpc } from '@/utils/trpc';
 import { setWarehouse } from '@/store/clientSlice';
+import type { RootState } from '@/store';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -110,6 +113,11 @@ function WarehouseSelect() {
     {},
     { refetchOnWindowFocus: false }
   );
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+  const dispatch = useDispatch();
 
   return (
     <InfiniteSelect
@@ -121,8 +129,9 @@ function WarehouseSelect() {
         })) ?? []
       }
       onChange={(value) => {
-        if (value) setWarehouse(value);
+        if (value) dispatch(setWarehouse(value));
       }}
+      value={warehouse}
     />
   );
 }

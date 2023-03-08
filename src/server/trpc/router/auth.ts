@@ -31,7 +31,7 @@ export const outSchemaForMe = z.object({
       })
       .omit({ password: true }),
     ZStaffMem.extend({
-      role: ZRole.omit({ staffMem: true }),
+      role: ZRole.omit({ staffMem: true, createdAt: true }),
       isSuperAdmin: z.literal(false),
       company: ZCompany.pick({
         logo: true,
@@ -141,7 +141,7 @@ export const auth = router({
           | 'secondaryColor'
           | 'primaryColor'
         > & { _id: string };
-      }>('role company', '-staffMem')
+      }>('role company', '-staffMem -createdAt')
       .lean();
 
     if (!res) {
@@ -166,6 +166,7 @@ export const auth = router({
           ...staff.role,
           company: staff.role.company.toString(),
         },
+        createdAt: staff.createdAt.toISOString(),
       },
     };
   }),

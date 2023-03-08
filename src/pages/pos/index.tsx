@@ -2,6 +2,7 @@ import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Layout from '@/components/Layout';
 import Truncate from '@/components/TextTruncate';
+import type { RootState } from '@/store';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import {
@@ -24,6 +25,7 @@ import {
 import { IconPlus, IconTrash } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Waypoint } from 'react-waypoint';
 
 const useStyles = createStyles((theme) => ({
@@ -68,9 +70,25 @@ const Index = () => {
     limit: 20,
   });
   const [search, setSearch] = useState<string>('');
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+
+  console.log(warehouse);
 
   const categories = trpc.categoryRouter.getAllCategories.useQuery();
-  const productsQuery = trpc.productRouter.getProducts.useQuery(query);
+
+  const productsQuery = trpc.productRouter.getProducts.useQuery(
+    {
+      ...query,
+      warehouse,
+    },
+    {
+      enabled: !!warehouse,
+    }
+  );
+
   const searchProducts = trpc.productRouter.searchProducts.useQuery({
     search: search,
   });
@@ -89,12 +107,14 @@ const Index = () => {
 
   useEffect(() => {
     if (productsQuery.data) {
-      setProducts((prev) => [
-        ...prev,
-        ...productsQuery.data.docs.filter((item) => !prev.includes(item)),
-      ]);
+      setProducts((prev) => {
+        return [
+          ...(prev[0]?.warehouse.toString() === warehouse ? prev : []),
+          ...productsQuery.data.docs.filter((item) => !prev.includes(item)),
+        ];
+      });
     }
-  }, [productsQuery.data]);
+  }, [productsQuery.data, warehouse]);
 
   const { classes, theme } = useStyles();
   return (
@@ -331,6 +351,8 @@ const Index = () => {
                         {index === products.length - 5 && (
                           <Waypoint
                             onEnter={() => {
+                              if (!productsQuery.data?.hasNextPage) return;
+
                               setQuery((prev) => ({
                                 ...prev,
                                 page: prev.page + 1,

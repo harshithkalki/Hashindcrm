@@ -14,6 +14,7 @@ export type IStaffMem = ModifyDeep<
     company: mongoose.Types.ObjectId;
     ticket?: mongoose.Types.ObjectId;
     linkedTo?: mongoose.Types.ObjectId;
+    createdAt: Date;
   }
 >;
 
