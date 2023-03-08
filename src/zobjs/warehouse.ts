@@ -2,6 +2,11 @@ import { z } from 'zod';
 
 export const ZWarehouseCreateInput = z.object({
   name: z.string(),
+  numbers: z.array(z.string()),
+  address: z.string(),
+  landline: z.array(z.string()),
+  cinNo: z.string(),
+  gstNo: z.string(),
 });
 
 export const ZWarehouseUpdateInput = ZWarehouseCreateInput.partial().extend({

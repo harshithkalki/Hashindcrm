@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Button,
   Container,
   Divider,
@@ -6,22 +7,33 @@ import {
   Loader,
   Modal,
   Pagination,
+  Stack,
   Title,
+  Text,
 } from '@mantine/core';
 import type { ZWarehouseCreateInput } from '@/zobjs/warehouse';
 import { trpc } from '@/utils/trpc';
 import FormikInput from '@/components/FormikCompo/FormikInput';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FieldArray } from 'formik';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { useEffect, useState } from 'react';
 import TableSelection from '@/components/Tables';
 import Layout from '@/components/Layout';
+import ArrayInput from '@/components/FormikCompo/ArrayInput';
+import { IconMinus, IconPlus } from '@tabler/icons';
+import { errors } from 'formidable';
+import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
 
 const initialValues: WarehouseInput = {
   name: '',
+  numbers: [''],
+  landline: [''],
+  address: '',
+  cinNo: '',
+  gstNo: '',
 };
 
 const WarehouseForm = ({
@@ -44,13 +56,139 @@ const WarehouseForm = ({
         actions.resetForm();
       }}
     >
-      {({ isSubmitting }) => {
+      {({ isSubmitting, values, setFieldValue, errors, touched }) => {
         return (
           <Form>
             <FormikInput
               name='name'
               label='Warehouse Name'
               placeholder='Warehouse Name'
+            />
+            <FormikInput name='cinNo' label='CIN No' placeholder='CIN No' />
+            <FormikInput name='gstNo' label='GST No' placeholder='GST No' />
+
+            <FieldArray
+              name='numbers'
+              render={(arrayHelpers) => (
+                <div>
+                  <label
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Mobile
+                  </label>
+                  <Stack spacing='xs'>
+                    {values.numbers.map((num, index) => (
+                      <div key={index}>
+                        <Group spacing={0}>
+                          <ArrayInput
+                            name={`numbers.${index}`}
+                            placeholder='mobile'
+                            style={{
+                              flex: 1,
+                            }}
+                          />
+                          <Group spacing={1} ml={2}>
+                            <ActionIcon
+                              onClick={() => arrayHelpers.remove(index)}
+                              color='red'
+                              variant='light'
+                              size={'lg'}
+                              disabled={values.numbers.length === 1}
+                            >
+                              <IconMinus />
+                            </ActionIcon>
+                            <ActionIcon
+                              onClick={() => arrayHelpers.push('')}
+                              color='blue'
+                              variant='light'
+                              size={'lg'}
+                            >
+                              <IconPlus />
+                            </ActionIcon>
+                          </Group>
+                        </Group>
+                        {
+                          <Text size='xs' color='red'>
+                            {Array.isArray(touched.numbers) &&
+                              (touched.numbers as unknown as boolean[])[
+                                index
+                              ] &&
+                              errors.numbers &&
+                              errors.numbers[index]}
+                          </Text>
+                        }
+                      </div>
+                    ))}
+                  </Stack>
+                </div>
+              )}
+            />
+            <FieldArray
+              name='landline'
+              render={(arrayHelpers) => (
+                <div>
+                  <label
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Mobile
+                  </label>
+                  <Stack spacing='xs'>
+                    {values.landline.map((num, index) => (
+                      <div key={index}>
+                        <Group spacing={0}>
+                          <ArrayInput
+                            name={`landline.${index}`}
+                            placeholder='mobile'
+                            style={{
+                              flex: 1,
+                            }}
+                          />
+                          <Group spacing={1} ml={2}>
+                            <ActionIcon
+                              onClick={() => arrayHelpers.remove(index)}
+                              color='red'
+                              variant='light'
+                              size={'lg'}
+                              disabled={values.landline.length === 1}
+                            >
+                              <IconMinus />
+                            </ActionIcon>
+                            <ActionIcon
+                              onClick={() => arrayHelpers.push('')}
+                              color='blue'
+                              variant='light'
+                              size={'lg'}
+                            >
+                              <IconPlus />
+                            </ActionIcon>
+                          </Group>
+                        </Group>
+                        {
+                          <Text size='xs' color='red'>
+                            {Array.isArray(touched.landline) &&
+                              (touched.landline as unknown as boolean[])[
+                                index
+                              ] &&
+                              errors.landline &&
+                              errors.landline[index]}
+                          </Text>
+                        }
+                      </div>
+                    ))}
+                  </Stack>
+                </div>
+              )}
+            />
+            <Formiktextarea
+              name='address'
+              label='Address'
+              placeholder='Address'
             />
             <Button
               type='submit'
