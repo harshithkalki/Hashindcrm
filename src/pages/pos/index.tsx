@@ -247,7 +247,6 @@ const Index = () => {
                     flex: '1',
                     width: '45vw',
                     marginTop: '15px',
-                    height: '100%',
                   }}
                   scrollbarSize={10}
                   offsetScrollbars

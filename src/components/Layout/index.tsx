@@ -1,12 +1,7 @@
-import {
-  Header,
-  Burger,
-  useMantineTheme,
-  MediaQuery,
-  createStyles,
-} from '@mantine/core';
+import { useMantineTheme, createStyles } from '@mantine/core';
 import { useState } from 'react';
 import { Footer } from '../Footer';
+import { CustomHeader } from '../Header';
 import NavbarNested from '../Navbar';
 
 type Props = {
@@ -25,15 +20,13 @@ const useStyles = createStyles((theme) => ({
     gridTemplateColumns: '0.8fr 1fr 1fr 1fr',
 
     gridTemplateAreas: `
-      "header header header header"
       "nav main main main"
     `,
-    gridTemplateRows: '50px 1fr',
+    gridTemplateRows: '1fr',
 
     [theme.fn.smallerThan('sm')]: {
       gridTemplateColumns: '1fr',
       gridTemplateAreas: `
-        "header"
         "nav"
         "main"
       `,
@@ -55,8 +48,8 @@ const useStyles = createStyles((theme) => ({
       theme.colorScheme === 'dark'
         ? theme.colors.dark[8]
         : theme.colors.gray[0],
-    gridRowStart: 2,
-    gridRowEnd: 3,
+    gridRowStart: 1,
+    gridRowEnd: 2,
   },
 
   header: {
@@ -81,26 +74,8 @@ export default function Layout({
 
   return (
     <div>
+      <CustomHeader user={{ name: 'abhriam', image: '' }} />
       <div className={classes.container}>
-        <Header p='md' height={50} className={classes.header}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: '100%',
-            }}
-          >
-            <MediaQuery largerThan='sm' styles={{ display: 'none' }}>
-              <Burger
-                opened={opened}
-                onClick={() => setOpened((o) => !o)}
-                size='sm'
-                color={theme.colors.gray[6]}
-                mr='xl'
-              />
-            </MediaQuery>
-          </div>
-        </Header>
         <div className={classes.nav}>
           {navBar ?? <NavbarNested hide={!opened} />}
         </div>
