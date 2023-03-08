@@ -149,4 +149,37 @@ export const saleRouter = router({
 
       return sale;
     }),
+
+  sales: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'SALES',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const { cursor: page, limit = 10 } = input || {};
+
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+      };
+
+      const query = {
+        company: client.company,
+      };
+
+      const brands = await Sale.paginate(query, options);
+
+      return brands;
+    }),
 });

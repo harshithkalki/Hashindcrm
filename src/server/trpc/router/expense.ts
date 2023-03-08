@@ -3,6 +3,7 @@ import { protectedProcedure, router } from '../trpc';
 import ExpenseModel from '@/models/Expense';
 import checkPermission from '@/utils/checkPermission';
 import { ZExpenseCreateInput, ZExpenseUpdateInput } from '@/zobjs/expense';
+import type { ExpenseCategory } from '@/zobjs/expenseCategory';
 
 export const expenseRouter = router({
   create: protectedProcedure
@@ -90,9 +91,14 @@ export const expenseRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const expenses = await ExpenseModel.paginate(query, options);
+      const expenses = await ExpenseModel.paginate(query, {
+        ...options,
+        populate: 'category',
+      });
 
-      return expenses;
+      return expenses as unknown as z.infer<typeof ZExpenseCreateInput> & {
+        category: ExpenseCategory & DocWithId;
+      } & DocWithId[];
     }),
 
   get: protectedProcedure

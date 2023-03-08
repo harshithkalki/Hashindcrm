@@ -1,11 +1,14 @@
 import Layout from '@/components/Layout';
 import SalesForm from '@/components/SandCForm';
-import SalesTable from '@/components/Tables/SalesTable';
+import TableSelection from '@/components/Tables';
+import { trpc } from '@/utils/trpc';
 import { Group, Title, Button } from '@mantine/core';
 import React from 'react';
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const sales = trpc.saleRouter.sales.useQuery({});
+
   return (
     <Layout>
       <SalesForm
@@ -20,37 +23,20 @@ const Index = () => {
           Add New
         </Button>
       </Group>
-      <SalesTable
-        isCustomer={true}
-        data={[
-          {
-            invoicenum: 'INV-0001',
-            date: '2021-01-01',
-            name: 'John Doe',
-            status: 'Paid',
-            paidamount: '1000',
-            totalamount: '1000',
-            paymentstatus: 'Paid',
-          },
-          {
-            invoicenum: 'INV-0002',
-            date: '2021-01-01',
-            name: 'John Doe',
-            status: 'Paid',
-            paidamount: '1000',
-            totalamount: '1000',
-            paymentstatus: 'Paid',
-          },
-          {
-            invoicenum: 'INV-0003',
-            date: '2021-01-01',
-            name: 'John Doe',
-            status: 'Paid',
-            paidamount: '1000',
-            totalamount: '1000',
-            paymentstatus: 'Paid',
-          },
-        ]}
+      <TableSelection
+        data={
+          sales.data?.docs.map((val) => ({
+            ...val,
+            _id: val._id.toString(),
+          })) || []
+        }
+        keysandlabels={{
+          invoiceId: 'Invoice',
+          date: 'Date',
+          customer: 'Customer',
+          status: 'Payment Status',
+          total: 'Total Amount',
+        }}
       />
     </Layout>
   );
