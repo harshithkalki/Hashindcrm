@@ -5,7 +5,7 @@ export const ZSaleCreateInput = z.object({
   date: z.string(),
   products: z.array(
     z.object({
-      product: z.string(),
+      _id: z.string(),
       quantity: z.number(),
       price: z.number(),
     })

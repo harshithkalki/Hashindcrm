@@ -15,6 +15,7 @@ import { expenseCategoryRouter } from './expenseCategory';
 import { expenseRouter } from './expense';
 import { companyRouter } from './company';
 import { warehouseRouter } from './warehouse';
+import { saleRouter } from './sale';
 
 export const appRouter = router({
   staffRouter,
@@ -26,6 +27,7 @@ export const appRouter = router({
   stockAdjustRouter,
   stockTransferRouter,
   auth,
+  saleRouter,
   roleRouter,
   customerRouter,
   supplierRouter,

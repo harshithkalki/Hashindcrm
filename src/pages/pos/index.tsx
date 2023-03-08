@@ -85,6 +85,8 @@ const Index = () => {
     RouterOutputs['productRouter']['getProducts']['docs']
   >([]);
 
+  const salesSubmit = trpc.saleRouter.create.useMutation();
+
   useEffect(() => {
     if (productsQuery.data) {
       setProducts((prev) => [
@@ -97,474 +99,528 @@ const Index = () => {
   const { classes, theme } = useStyles();
   return (
     <Layout>
-      <Formik
-        initialValues={{
-          customer: '',
-          product: [],
-          ordertax: 0,
-          orderdiscount: 0,
-          shipping: 0,
-        }}
-        onSubmit={(values) => {
-          console.log(values);
-        }}
-      >
-        {({ handleSubmit, values }) => (
-          <Form
-            onSubmit={handleSubmit}
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <ScrollArea scrollbarSize={2}>
+          <Formik
+            initialValues={{
+              customer: '',
+              date: new Date().toISOString(),
+              products: [],
+              orderTax: 0,
+              status: 'approved' as 'approved' | 'pending' | 'rejected',
+              discount: 0,
+              shipping: 0,
+              notes: '',
+              total: 0,
+            }}
+            onSubmit={(values) => {
+              values.products = Array.from(inlineProducts.values());
+              values.orderTax =
+                [...inlineProducts.values()].reduce(
+                  (acc, item) => acc + item.taxPrice * item.quantity,
+                  0
+                ) -
+                  values.discount +
+                  values.shipping || 0;
+              values.total =
+                [...inlineProducts.values()].reduce(
+                  (acc, item) =>
+                    acc +
+                    (item.discountedPrice + item.taxPrice) * item.quantity,
+                  0
+                ) + values.shipping || 0;
+
+              salesSubmit.mutateAsync(values).then((res) => {
+                console.log(res);
+              });
+
+              console.log(values);
             }}
           >
-            <div>
-              <Group>
-                <Title fw={400}>POS</Title>
-              </Group>
-              <Divider mt={'md'} />
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                flex: 1,
-                marginTop: '10px',
-                marginBottom: '10px',
-                overflow: 'hidden',
-              }}
-            >
-              <div
+            {({ handleSubmit, values }) => (
+              <Form
+                onSubmit={handleSubmit}
                 style={{
-                  flex: 0.59,
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
-                  overflow: 'hidden',
                 }}
               >
                 <div>
-                  <ScrollArea scrollbarSize={5}>
+                  <Group>
+                    <Title fw={400}>POS</Title>
+                  </Group>
+                  <Divider mt={'md'} />
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-around',
+                    flex: 1,
+                    marginTop: '10px',
+                    marginBottom: '10px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: 0.59,
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div>
+                      <ScrollArea scrollbarSize={5}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            padding: '15px',
+                            overflow: 'hidden',
+                            gap: '10px',
+                          }}
+                        >
+                          {categories.data?.map((item) => (
+                            <ActionIcon
+                              key={item._id.toString()}
+                              style={{ width: '70px', height: '60px' }}
+                              onClick={() => {
+                                setQuery((prev) => ({
+                                  ...prev,
+                                  category: item._id.toString(),
+                                }));
+                                setSelectedCategory(item._id.toString());
+                                productsQuery.refetch();
+                              }}
+                            >
+                              <div
+                                className='categorylist'
+                                style={{
+                                  boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
+                                  marginTop: '3px',
+                                  width: '70px',
+                                  height: '70px',
+                                  //   border: "1px solid white",
+                                  borderRadius: '10px',
+                                  backgroundColor: '#25262B',
+                                  display: 'inline-block',
+                                }}
+                              >
+                                <Container
+                                  p={2}
+                                  ta={'center'}
+                                  mt={'5px'}
+                                  style={{
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                  }}
+                                  styles={{
+                                    '&:hover': {
+                                      backgroundColor: 'white',
+                                      color: 'black',
+                                      cursor: 'pointer',
+                                    },
+                                  }}
+                                >
+                                  <Image
+                                    ml={'14px'}
+                                    src={item.logo}
+                                    alt={item.name}
+                                    height={35}
+                                    width={35}
+                                    radius='xl'
+                                  />
+                                  <Truncate
+                                    text={item.name}
+                                    maxLength={8}
+                                    textProps={{ size: 'xs' }}
+                                  />
+                                  {/* <Text fz={"xs"}>{item.name}</Text> */}
+                                </Container>
+                              </div>
+                            </ActionIcon>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
                     <div
                       style={{
                         display: 'flex',
-                        padding: '15px',
-                        overflow: 'hidden',
-                        gap: '10px',
+                        flexDirection: 'column',
                       }}
                     >
-                      {categories.data?.map((item) => (
-                        <ActionIcon
-                          key={item._id.toString()}
-                          style={{ width: '70px', height: '60px' }}
-                          onClick={() => {
-                            setQuery((prev) => ({
-                              ...prev,
-                              category: item._id.toString(),
-                            }));
-                            setSelectedCategory(item._id.toString());
-                            productsQuery.refetch();
-                          }}
-                        >
-                          <div
-                            className='categorylist'
-                            style={{
-                              boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
-                              marginTop: '3px',
-                              width: '70px',
-                              height: '70px',
-                              //   border: "1px solid white",
-                              borderRadius: '10px',
-                              backgroundColor: '#25262B',
-                              display: 'inline-block',
-                            }}
-                          >
-                            <Container
-                              p={2}
-                              ta={'center'}
-                              mt={'5px'}
-                              style={{
-                                textOverflow: 'ellipsis',
-                                overflow: 'hidden',
-                              }}
-                              styles={{
-                                '&:hover': {
-                                  backgroundColor: 'white',
-                                  color: 'black',
-                                  cursor: 'pointer',
-                                },
+                      <ScrollArea
+                        style={{
+                          flex: '1',
+                          width: '45vw',
+                          marginTop: '15px',
+                          height: '100%',
+                        }}
+                        scrollbarSize={10}
+                        offsetScrollbars
+                      >
+                        <div className={classes.products}>
+                          {(selectedCategory
+                            ? products.sort((a, b) =>
+                                a.category._id === selectedCategory ? -1 : 1
+                              )
+                            : products
+                          ).map((item, index) => (
+                            <Card
+                              shadow='sm'
+                              key={item._id.toString()}
+                              p={'xl'}
+                              radius={'md'}
+                              withBorder
+                            >
+                              <Card.Section>
+                                <Image
+                                  src={item.logo}
+                                  alt={item.name}
+                                  height={160}
+                                  // width={0}
+                                />
+                              </Card.Section>
+                              <Card.Section pl={'md'} mt={'sm'}>
+                                <Text fw={500}>{item.name}</Text>
+                              </Card.Section>
+                              <Card.Section pl={'md'}>
+                                <Text fw={300} fz={'xs'}>
+                                  {'name' in item.category &&
+                                    item.category.name}
+                                </Text>
+                              </Card.Section>
+                              <Card.Section pl={'md'} mt={'xs'}>
+                                <Text fw={500} fz={'lg'} mb={'md'}>
+                                  $ {item.mrp}
+                                </Text>
+                              </Card.Section>
+                              {index === products.length - 5 && (
+                                <Waypoint
+                                  onEnter={() => {
+                                    setQuery((prev) => ({
+                                      ...prev,
+                                      page: prev.page + 1,
+                                    }));
+
+                                    if (productsQuery.data?.hasNextPage) {
+                                      productsQuery.refetch();
+                                    }
+                                  }}
+                                />
+                              )}
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      flex: 0.39,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <div style={{ flex: 0.2 }}>
+                      <Container w={'100%'}>
+                        <FormikSelect
+                          name='customer'
+                          label='Customer'
+                          data={customerOptions}
+                          placeholder='Select Customer'
+                          searchable
+                          size='sm'
+                        />
+                        <Select
+                          label='Products'
+                          data={
+                            searchProducts.data?.map((item) => ({
+                              label: item.name,
+                              value: item._id.toString(),
+                            })) || []
+                          }
+                          placeholder='Select Products'
+                          searchable
+                          size='sm'
+                          value={selectProduct?._id.toString() || ''}
+                          rightSection={
+                            <ActionIcon
+                              onClick={() => {
+                                if (selectProduct) {
+                                  const inlineProduct = inlineProducts.get(
+                                    selectProduct._id.toString()
+                                  );
+                                  if (!inlineProduct) {
+                                    inlineProducts.set(
+                                      selectProduct._id.toString(),
+                                      selectProduct
+                                    );
+                                  } else {
+                                    return;
+                                  }
+                                  inlineProducts.set(
+                                    selectProduct._id.toString(),
+                                    selectProduct
+                                  );
+                                  setInlineProducts(new Map(inlineProducts));
+                                  setSelectProduct(undefined);
+                                }
                               }}
                             >
-                              <Image
-                                ml={'14px'}
-                                src={item.logo}
-                                alt={item.name}
-                                height={35}
-                                width={35}
-                                radius='xl'
-                              />
-                              <Truncate
-                                text={item.name}
-                                maxLength={8}
-                                textProps={{ size: 'xs' }}
-                              />
-                              {/* <Text fz={"xs"}>{item.name}</Text> */}
-                            </Container>
-                          </div>
-                        </ActionIcon>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-                <ScrollArea
-                  style={{ flex: '1', width: '45vw', marginTop: '15px' }}
-                  scrollbarSize={10}
-                  offsetScrollbars
-                >
-                  <div className={classes.products}>
-                    {(selectedCategory
-                      ? products.sort((a, b) =>
-                          a.category._id === selectedCategory ? -1 : 1
-                        )
-                      : products
-                    ).map((item, index) => (
-                      <Card
-                        shadow='sm'
-                        key={item._id.toString()}
-                        p={'xl'}
-                        radius={'md'}
-                        withBorder
-                      >
-                        <Card.Section>
-                          <Image
-                            src={item.logo}
-                            alt={item.name}
-                            height={160}
-                            // width={0}
-                          />
-                        </Card.Section>
-                        <Card.Section pl={'md'} mt={'sm'}>
-                          <Text fw={500}>{item.name}</Text>
-                        </Card.Section>
-                        <Card.Section pl={'md'}>
-                          <Text fw={300} fz={'xs'}>
-                            {'name' in item.category && item.category.name}
-                          </Text>
-                        </Card.Section>
-                        <Card.Section pl={'md'} mt={'xs'}>
-                          <Text fw={500} fz={'lg'} mb={'md'}>
-                            $ {item.mrp}
-                          </Text>
-                        </Card.Section>
-                        {index === products.length - 5 && (
-                          <Waypoint
-                            onEnter={() => {
-                              setQuery((prev) => ({
-                                ...prev,
-                                page: prev.page + 1,
-                              }));
+                              <IconPlus />
+                            </ActionIcon>
+                          }
+                          onChange={(value) => {
+                            const product = searchProducts.data?.find(
+                              (item) => item._id.toString() === value
+                            );
 
-                              if (productsQuery.data?.hasNextPage) {
-                                productsQuery.refetch();
-                              }
-                            }}
-                          />
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-              <div
-                style={{ flex: 0.39, display: 'flex', flexDirection: 'column' }}
-              >
-                <div style={{ flex: 0.2 }}>
-                  <Container w={'100%'}>
-                    <FormikSelect
-                      name='customer'
-                      label='Customer'
-                      data={customerOptions}
-                      placeholder='Select Customer'
-                      searchable
-                      size='sm'
-                    />
-                    <Select
-                      label='Products'
-                      data={
-                        searchProducts.data?.map((item) => ({
-                          label: item.name,
-                          value: item._id.toString(),
-                        })) || []
-                      }
-                      placeholder='Select Products'
-                      searchable
-                      size='sm'
-                      value={selectProduct?._id.toString() || ''}
-                      rightSection={
-                        <ActionIcon
-                          onClick={() => {
-                            if (selectProduct) {
-                              const inlineProduct = inlineProducts.get(
-                                selectProduct._id.toString()
-                              );
-                              if (!inlineProduct) {
-                                inlineProducts.set(
-                                  selectProduct._id.toString(),
-                                  selectProduct
-                                );
-                              } else {
-                                return;
-                              }
-                              inlineProducts.set(
-                                selectProduct._id.toString(),
-                                selectProduct
-                              );
-                              setInlineProducts(new Map(inlineProducts));
-                              setSelectProduct(undefined);
+                            if (product) {
+                              setSelectProduct({
+                                _id: product._id.toString(),
+                                name: product.name,
+                                quantity: 1,
+                                subtotal: product.salePrice,
+                                // discountedPrice:
+                                //   product.salePrice -
+                                //   (totalPrice * (values.orderdiscount / 100)) /
+                                //     (inlineProducts.size + 1),
+                                price: product.salePrice,
+                                tax: product.tax,
+                              });
                             }
                           }}
+                          searchValue={search}
+                          onSearchChange={setSearch}
+                        />
+                      </Container>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <ScrollArea
+                        style={{ height: '100%', width: '100%' }}
+                        scrollbarSize={10}
+                        offsetScrollbars
+                      >
+                        <Table
+                          sx={{ minWidth: '100%' }}
+                          verticalSpacing='sm'
+                          mt={'md'}
                         >
-                          <IconPlus />
-                        </ActionIcon>
-                      }
-                      onChange={(value) => {
-                        const product = searchProducts.data?.find(
-                          (item) => item._id.toString() === value
-                        );
-
-                        if (product) {
-                          setSelectProduct({
-                            _id: product._id.toString(),
-                            name: product.name,
-                            quantity: 1,
-                            subtotal: product.salePrice,
-                            // discountedPrice:
-                            //   product.salePrice -
-                            //   (totalPrice * (values.orderdiscount / 100)) /
-                            //     (inlineProducts.size + 1),
-                            price: product.salePrice,
-                            tax: product.tax,
-                          });
-                        }
-                      }}
-                      searchValue={search}
-                      onSearchChange={setSearch}
-                    />
-                  </Container>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <ScrollArea
-                    style={{ height: '100%', width: '100%' }}
-                    scrollbarSize={10}
-                    offsetScrollbars
-                  >
-                    <Table
-                      sx={{ minWidth: '100%' }}
-                      verticalSpacing='sm'
-                      mt={'md'}
-                    >
-                      <thead>
-                        <tr>
-                          <th
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            #
-                          </th>
-                          <th
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            Product
-                          </th>
-                          <th
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            Quantity
-                          </th>
-                          <th style={{ whiteSpace: 'nowrap' }}>Tax</th>
-                          <th
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            Subtotal
-                          </th>
-                          <th
-                            style={{
-                              whiteSpace: 'nowrap',
-                              textAlign: 'center',
-                            }}
-                          >
-                            Action
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[...inlineProducts.values()].map((item, index) => {
-                          const totalPrice = [
-                            ...inlineProducts.values(),
-                          ].reduce((acc, item) => acc + item.price, 0);
-                          const discountedPrice =
-                            item.subtotal -
-                            (totalPrice * (values.orderdiscount / 100)) /
-                              inlineProducts.size;
-                          item.discountedPrice = discountedPrice;
-                          // console.log(item);
-                          const taxedPrice =
-                            item.discountedPrice * (item.tax / 100);
-                          item.taxPrice = taxedPrice;
-                          // item.subtotal = item.discountedPrice + taxedPrice;
-                          return (
-                            <tr key={item._id}>
-                              <td
+                          <thead>
+                            <tr>
+                              <th
                                 style={{
                                   whiteSpace: 'nowrap',
                                   textAlign: 'center',
                                 }}
                               >
-                                {index + 1}
-                              </td>
-                              <td
+                                #
+                              </th>
+                              <th
                                 style={{
                                   whiteSpace: 'nowrap',
                                   textAlign: 'center',
                                 }}
                               >
-                                {item.name}
-                              </td>
-                              <td
+                                Product
+                              </th>
+                              <th
                                 style={{
                                   whiteSpace: 'nowrap',
                                   textAlign: 'center',
                                 }}
                               >
-                                <NumberInput
-                                  size='sm'
-                                  value={item.quantity}
-                                  onChange={(value) => {
-                                    // console.log(item);
-                                    if (!value) return;
-                                    item.quantity = value;
-
-                                    // item.discountedPrice =
-                                    //   item.discountedPrice * value;
-                                    setInlineProducts(new Map(inlineProducts));
-                                  }}
-                                  min={1}
-                                />
-                              </td>
-                              <td
+                                Quantity
+                              </th>
+                              <th style={{ whiteSpace: 'nowrap' }}>Tax</th>
+                              <th
                                 style={{
                                   whiteSpace: 'nowrap',
                                   textAlign: 'center',
                                 }}
                               >
-                                {item.tax}
-                              </td>
-                              <td
+                                Subtotal
+                              </th>
+                              <th
                                 style={{
                                   whiteSpace: 'nowrap',
                                   textAlign: 'center',
                                 }}
                               >
-                                {(discountedPrice + taxedPrice) * item.quantity}
-                              </td>
-                              <td
-                                style={{
-                                  whiteSpace: 'nowrap',
-                                  textAlign: 'center',
-                                }}
-                              >
-                                <ActionIcon
-                                  variant='filled'
-                                  color={'blue'}
-                                  onClick={() => {
-                                    inlineProducts.delete(item._id);
-                                    setInlineProducts(new Map(inlineProducts));
-                                  }}
-                                >
-                                  <IconTrash />
-                                </ActionIcon>
-                              </td>
+                                Action
+                              </th>
                             </tr>
-                          );
-                        })}
-                      </tbody>
-                    </Table>
-                  </ScrollArea>
+                          </thead>
+                          <tbody>
+                            {[...inlineProducts.values()].map((item, index) => {
+                              const totalPrice = [
+                                ...inlineProducts.values(),
+                              ].reduce((acc, item) => acc + item.price, 0);
+                              const discountedPrice =
+                                item.subtotal -
+                                (totalPrice * (values.discount / 100)) /
+                                  inlineProducts.size;
+                              item.discountedPrice = discountedPrice;
+                              // console.log(item);
+                              const taxedPrice =
+                                item.discountedPrice * (item.tax / 100);
+                              item.taxPrice = taxedPrice;
+                              // item.subtotal = item.discountedPrice + taxedPrice;
+                              return (
+                                <tr key={item._id}>
+                                  <td
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {index + 1}
+                                  </td>
+                                  <td
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {item.name}
+                                  </td>
+                                  <td
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    <NumberInput
+                                      size='sm'
+                                      value={item.quantity}
+                                      onChange={(value) => {
+                                        // console.log(item);
+                                        if (!value) return;
+                                        item.quantity = value;
+
+                                        // item.discountedPrice =
+                                        //   item.discountedPrice * value;
+                                        setInlineProducts(
+                                          new Map(inlineProducts)
+                                        );
+                                      }}
+                                      min={1}
+                                    />
+                                  </td>
+                                  <td
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {item.tax}
+                                  </td>
+                                  <td
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {(discountedPrice + taxedPrice) *
+                                      item.quantity}
+                                  </td>
+                                  <td
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    <ActionIcon
+                                      variant='filled'
+                                      color={'blue'}
+                                      onClick={() => {
+                                        inlineProducts.delete(item._id);
+                                        setInlineProducts(
+                                          new Map(inlineProducts)
+                                        );
+                                      }}
+                                    >
+                                      <IconTrash />
+                                    </ActionIcon>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      </ScrollArea>
+                    </div>
+                    <div style={{ flex: 0.3 }}>
+                      <Group w={'100%'}>
+                        <FormInput
+                          name='discount'
+                          label='Order Discount'
+                          placeholder='Order Discount'
+                          w={'30%'}
+                          size='sm'
+                          type='number'
+                        />
+                        <FormInput
+                          name='shipping'
+                          label='Shipping'
+                          placeholder='Shipping'
+                          w={'30%'}
+                          size='sm'
+                          type='number'
+                        />
+                        <FormikSelect
+                          name='paymentmethod'
+                          label='Payment Method'
+                          data={[
+                            { label: 'Cash', value: 'cash' },
+                            { label: 'Card', value: 'card' },
+                          ]}
+                          placeholder='Payment Method'
+                          w={'30%'}
+                          searchable
+                          size='sm'
+                        />
+                      </Group>
+                      <Group w={'100%'} align={'end'}>
+                        <TextInput
+                          label='Total'
+                          w={'30%'}
+                          placeholder='Total'
+                          size='sm'
+                          value={
+                            [...inlineProducts.values()].reduce(
+                              (acc, item) =>
+                                acc +
+                                (item.discountedPrice + item.taxPrice) *
+                                  item.quantity,
+                              0
+                            ) + values.shipping || 0
+                          }
+                          disabled
+                        />
+                        <Button w={'30%'} size='sm' type='submit'>
+                          Save & Print
+                        </Button>
+                        <Button
+                          w={'30%'}
+                          size='sm'
+                          onClick={() => {
+                            console.log(values);
+                          }}
+                        >
+                          Reset
+                        </Button>
+                      </Group>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ flex: 0.3 }}>
-                  <Group w={'100%'}>
-                    <FormInput
-                      name='orderdiscount'
-                      label='Order Discount'
-                      placeholder='Order Discount'
-                      w={'30%'}
-                      size='sm'
-                      type='number'
-                    />
-                    <FormInput
-                      name='shipping'
-                      label='Shipping'
-                      placeholder='Shipping'
-                      w={'30%'}
-                      size='sm'
-                      type='number'
-                    />
-                    <FormikSelect
-                      name='paymentmethod'
-                      label='Payment Method'
-                      data={[
-                        { label: 'Cash', value: 'cash' },
-                        { label: 'Card', value: 'card' },
-                      ]}
-                      placeholder='Payment Method'
-                      w={'30%'}
-                      searchable
-                      size='sm'
-                    />
-                  </Group>
-                  <Group w={'100%'} align={'end'}>
-                    <TextInput
-                      label='Total'
-                      w={'30%'}
-                      placeholder='Total'
-                      size='sm'
-                      value={
-                        [...inlineProducts.values()].reduce(
-                          (acc, item) =>
-                            acc +
-                            (item.discountedPrice + item.taxPrice) *
-                              item.quantity,
-                          0
-                        ) -
-                          values.orderdiscount +
-                          values.shipping || 0
-                      }
-                      disabled
-                    />
-                    <Button w={'30%'} size='sm' type='submit'>
-                      Pay Now
-                    </Button>
-                    <Button w={'30%'} size='sm'>
-                      Reset
-                    </Button>
-                  </Group>
-                </div>
-              </div>
-            </div>
-          </Form>
-        )}
-      </Formik>
+              </Form>
+            )}
+          </Formik>
+        </ScrollArea>
+      </div>
     </Layout>
   );
 };
