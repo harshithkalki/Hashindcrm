@@ -73,11 +73,11 @@ const Stockdata: NavData['links'] = [
     link: '/stockadjustment',
     permissionName: 'STOCKADJUST',
   },
-  {
-    label: 'Stock Transfer',
-    link: '/stocktransfer',
-    permissionName: 'STOCKTRANSFER',
-  },
+  // {
+  //   label: 'Stock Transfer',
+  //   link: '/stocktransfer',
+  //   permissionName: 'STOCKTRANSFER',
+  // },
 ];
 const PartiesData: NavData['links'] = [
   // { label: 'Suppliers', link: '/parties/supplier', permissionName: 'SUPPLIER' },

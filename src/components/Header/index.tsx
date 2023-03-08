@@ -145,7 +145,13 @@ export function CustomHeader({ user }: HeaderTabsProps) {
     <div className={classes.header}>
       <Container className={classes.mainSection}>
         <Group position='apart'>
-          <Image src='/logo.svg' height={30} width={30} alt='Mantine logo' />
+          <Image
+            src='/logo.svg'
+            height={30}
+            width={30}
+            alt='Mantine logo'
+            withPlaceholder
+          />
 
           <Burger
             opened={opened}

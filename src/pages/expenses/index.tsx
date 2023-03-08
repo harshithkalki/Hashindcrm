@@ -189,7 +189,11 @@ const EditExpense = ({
           }}
           validationSchema={toFormikValidationSchema(ZExpenseCreateInput)}
           onSubmit={async (values) => {
-            await updateExpense.mutateAsync({ _id, ...values });
+            await updateExpense.mutateAsync({
+              _id,
+              ...values,
+              category: values.category?.toString(),
+            });
             onClose();
           }}
         >
@@ -254,10 +258,8 @@ const Index = () => {
   const CreateExpense = trpc.expenseRouter.create.useMutation();
   const Expenses = trpc.expenseRouter.expenses.useQuery({ page: page });
   const deleteExpense = trpc.expenseRouter.delete.useMutation();
-  const tabData = Expenses.data;
   const [editId, setEditId] = useState<string>('');
   const router = useRouter();
-  const Data = tabData;
 
   // console.log(Data);
 
@@ -312,7 +314,13 @@ const Index = () => {
         ) : (
           <>
             <TableSelection
-              data={Data?.docs || []}
+              data={
+                Expenses.data?.docs.map((val) => ({
+                  ...val,
+                  _id: val._id.toString(),
+                  category: (val.category as unknown as { name: string }).name,
+                })) || []
+              }
               keysandlabels={{
                 category: 'Expense Category',
                 amount: 'Amount',

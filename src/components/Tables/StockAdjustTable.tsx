@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { GroupProps } from '@mantine/core';
 import { Button, Modal } from '@mantine/core';
 import { Image } from '@mantine/core';
@@ -42,6 +42,10 @@ export default function StockadjustmentTable<T>({
     adjustment: '',
     note: '',
   });
+
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
 
   const [search, setSearch] = useState('');
 
@@ -158,18 +162,18 @@ export default function StockadjustmentTable<T>({
           <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
             <Group spacing='xs'>
               <Image
-                src={item.productId.logo}
-                alt={item.productId.name}
+                src={item.product.logo}
+                alt={item.product.name}
                 radius='lg'
                 style={{ width: 32, height: 32 }}
               />
-              {item.productId.name}
+              {item.product.name}
             </Group>
           </td>
           <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
             {item.quantity}
           </td>
-          <td>
+          {/* <td>
             <Group
               spacing={0}
               {...groupProps}
@@ -178,13 +182,13 @@ export default function StockadjustmentTable<T>({
               <ActionIcon
                 color='red'
                 onClick={() => {
-                  onDelete && onDelete(item.productId._id);
+                  onDelete && onDelete(item.product._id);
                 }}
               >
                 <IconTrash size={16} stroke={1.5} />
               </ActionIcon>
             </Group>
-          </td>
+          </td> */}
         </tr>
       </>
     );
@@ -215,9 +219,9 @@ export default function StockadjustmentTable<T>({
                 <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
                   Quantity
                 </th>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                {/* <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
                   Actions
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>{rows}</tbody>

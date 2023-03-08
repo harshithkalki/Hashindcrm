@@ -4,6 +4,7 @@ import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
 import StockadjustmentTable from '@/components/Tables/StockAdjustTable';
 import { trpc } from '@/utils/trpc';
+import { ZStockAdjustCreateInput } from '@/zobjs/stockAdjust';
 import {
   Button,
   Container,
@@ -14,12 +15,24 @@ import {
 } from '@mantine/core';
 import { Form, Formik } from 'formik';
 import React from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+
+const initialValues: z.infer<typeof ZStockAdjustCreateInput> = {
+  product: '',
+  quantity: 0,
+  operation: 'add',
+  note: '',
+};
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
-  const stockadjustments = trpc.stockAdjustRouter.getAllStockAdjusts.useQuery();
+  const stockadjustments = trpc.stockAdjustRouter.getAllStockAdjusts.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
   const createAdjustment = trpc.stockAdjustRouter.create.useMutation();
   const products = trpc.productRouter.getAllProducts.useQuery();
 
@@ -32,32 +45,22 @@ const Index = () => {
           title={'Add Adjustment'}
         >
           <Formik
-            initialValues={{
-              productId: '',
-              quantity: 0,
-              adjustment: '',
-              note: '',
-            }}
-            onSubmit={(values) => {
+            initialValues={initialValues}
+            onSubmit={(values, { resetForm }) => {
               createAdjustment.mutateAsync({
                 ...values,
-                operation: values.adjustment,
               });
+              stockadjustments.refetch();
+              setModal(false);
+              resetForm();
             }}
-            validationSchema={toFormikValidationSchema(
-              z.object({
-                productId: z.string(),
-                quantity: z.number(),
-                adjustment: z.string(),
-                note: z.string().optional(),
-              })
-            )}
+            validationSchema={toFormikValidationSchema(ZStockAdjustCreateInput)}
           >
             {({ handleSubmit, values }) => (
               <Form onSubmit={handleSubmit}>
                 <FormikSelect
                   mt={'md'}
-                  name='productId'
+                  name='product'
                   label='Product Name'
                   searchable
                   creatable
@@ -74,7 +77,7 @@ const Index = () => {
                   <TextInput
                     value={
                       products.data?.find(
-                        (product) => product._id.toString() === values.productId
+                        (product) => product._id.toString() === values.product
                       )?.quantity || 0
                     }
                     label='Current Stock'
@@ -89,7 +92,7 @@ const Index = () => {
                   />
                 </Group>
                 <FormikSelect
-                  name='adjustment'
+                  name='operation'
                   label='Adjustment'
                   mt={'md'}
                   data={[

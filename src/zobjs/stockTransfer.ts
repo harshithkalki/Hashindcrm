@@ -19,8 +19,6 @@ export const ZStockTransferCreateInput = z.object({
   discount: z.number(),
   warehouse: z.string(),
   openingStockDate: z.string(),
-  paidAmount: z.number(),
-  paymentStatus: z.union([z.literal('pending'), z.literal('paid')]),
 });
 
 export const ZStockTransferUpdateInput =
