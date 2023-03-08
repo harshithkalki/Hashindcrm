@@ -18,6 +18,10 @@ import FormDate from '@/components/FormikCompo/FormikDate';
 import { IconUpload } from '@tabler/icons';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
+import { ZExpenseCreateInput } from '@/zobjs/expense';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { trpc } from '@/utils/trpc';
+import { z } from 'zod';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -65,13 +69,17 @@ const ExpensesData = [
   },
 ];
 
+type CreateExpenseCategory = z.infer<typeof ZExpenseCreateInput>;
+
 interface modalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onSubmit: (inputs: CreateExpenseCategory) => Promise<void>;
 }
 
 const AddExpense = ({ modal, setModal }: modalProps) => {
   const { classes, cx } = useStyles();
+  const AddExpenseCategory = trpc.expenseRouter.create.useMutation();
   return (
     <>
       <Modal
@@ -89,8 +97,10 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
             expensebill: '',
             notes: '',
           }}
+          validationSchema={toFormikValidationSchema(ZExpenseCreateInput)}
           onSubmit={(values) => {
-            console.log(values);
+            AddExpenseCategory.mutateAsync(values);
+            setModal(false);
           }}
         >
           {({ handleSubmit }) => (

@@ -129,7 +129,7 @@ export default function Warehouse() {
   const [page, setPage] = useState(1);
 
   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
-    { limit: 1 },
+    { limit: 10 },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
 

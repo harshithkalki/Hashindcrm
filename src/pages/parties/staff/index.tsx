@@ -6,6 +6,7 @@ import Layout from '@/components/Layout';
 import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
 import {
+  ActionIcon,
   Button,
   Center,
   Container,
@@ -18,6 +19,7 @@ import {
 } from '@mantine/core';
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
+import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
@@ -49,70 +51,90 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+const WarehousesSelect = () => {
+  const [search, setSearch] = useState('');
+  const warehouses = trpc.warehouseRouter.warehouses.useQuery(
+    {
+      search: search,
+    },
+    { refetchOnWindowFocus: false }
+  );
+  const { push } = useRouter();
+
+  return (
+    <div>
+      <label
+        style={{
+          fontSize: '14px',
+          fontWeight: 500,
+        }}
+      >
+        Warehouse <span style={{ color: 'red' }}>*</span>
+      </label>
+      <Group spacing={2}>
+        <FormikSelect
+          data={
+            warehouses.data?.docs?.map((warehouse) => ({
+              label: warehouse.name,
+              value: warehouse._id.toString(),
+            })) || []
+          }
+          searchable
+          searchValue={search}
+          onSearchChange={setSearch}
+          placeholder='Pick one warehouse'
+          name='warehouse'
+          style={{ flex: 1 }}
+        />
+        <ActionIcon
+          onClick={() => push('/warehouse')}
+          color='blue'
+          variant='light'
+          size={'lg'}
+        >
+          <IconPlus />
+        </ActionIcon>
+      </Group>
+    </div>
+  );
+};
+
+const RolesSelect = () => {
+  const [search, setSearch] = useState('');
+  const roles = trpc.roleRouter.roles.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  return (
+    <FormikSelect
+      label='Role'
+      data={
+        roles.data?.docs?.map((brand) => ({
+          label: brand.name,
+          value: brand._id.toString(),
+        })) || []
+      }
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='role'
+      withAsterisk
+    />
+  );
+};
+
 const AddCustomer = ({ modal, setModal }: modalProps) => {
   const { classes, cx } = useStyles();
-  const [Wmodal, WsetModal] = useState(false);
-  const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
-  const warehouses = trpc.productRouter.getAllWarehouse.useQuery();
+  // const [Wmodal, WsetModal] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const AddWarehouse = () => {
-    return (
-      <>
-        <Modal
-          opened={Wmodal}
-          onClose={() => WsetModal(false)}
-          title='Add Warehouse'
-        >
-          <Formik
-            initialValues={{
-              name: '',
-            }}
-            validationSchema={toFormikValidationSchema(
-              z.object({
-                name: z.string().min(3).max(50),
-              })
-            )}
-            onSubmit={async (values, actions) => {
-              await createWarehouse.mutateAsync(values);
-              actions.resetForm();
-              actions.setSubmitting(false);
-              setModal(false);
-              warehouses.refetch();
-            }}
-          >
-            {({ isSubmitting }) => {
-              return (
-                <Form>
-                  <FormikInput
-                    name='name'
-                    label='Warehouse Name'
-                    placeholder='Warehouse Name'
-                  />
-                  <Button
-                    type='submit'
-                    disabled={isSubmitting}
-                    loading={isSubmitting}
-                    mt={'md'}
-                  >
-                    Submit
-                  </Button>
-                </Form>
-              );
-            }}
-          </Formik>
-        </Modal>
-      </>
-    );
-  };
 
   return (
     <>
-      <AddWarehouse />
       <Modal
         opened={modal}
         onClose={() => setModal(false)}
-        title='Add New Customer'
+        title='Add New Staffmember'
         size={'60%'}
       >
         <Formik
@@ -198,41 +220,8 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
                     </Button>
                   </Center>
                 </Container>
-                <FormikSelect
-                  label='Warehouse'
-                  data={
-                    warehouses.data?.map((warehouse) => ({
-                      label: warehouse.name,
-                      value: warehouse._id.toString(),
-                    })) || []
-                  }
-                  placeholder='Pick one warehouse'
-                  name='warehouse'
-                  searchable
-                  w={'100%'}
-                  rightSection={
-                    <IconPlus
-                      size={20}
-                      onClick={() => {
-                        WsetModal(true);
-                      }}
-                      cursor={'pointer'}
-                    />
-                  }
-                  withAsterisk
-                />
-                <FormikSelect
-                  label='Role'
-                  data={[
-                    { label: 'Admin', value: 'Admin' },
-                    { label: 'User', value: 'User' },
-                  ]}
-                  placeholder='Pick one role'
-                  name='role'
-                  searchable
-                  w={'100%'}
-                  withAsterisk
-                />
+                <WarehousesSelect />
+                <RolesSelect />
                 <FormikInput
                   label='Name'
                   placeholder='Name'
