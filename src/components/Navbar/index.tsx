@@ -80,7 +80,7 @@ const Stockdata: NavData['links'] = [
   },
 ];
 const PartiesData: NavData['links'] = [
-  { label: 'Suppliers', link: '/parties/supplier', permissionName: 'SUPPLIER' },
+  // { label: 'Suppliers', link: '/parties/supplier', permissionName: 'SUPPLIER' },
   {
     label: 'Staff Members',
     link: '/parties/staff',
@@ -90,7 +90,7 @@ const PartiesData: NavData['links'] = [
 ];
 const SalesData: NavData['links'] = [
   { label: 'Sales', link: '/sales', permissionName: 'SALES' },
-  { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
+  // { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
 ];
 const PurchaseData: NavData['links'] = [
   { label: 'Purchase', link: '/purchases' },
@@ -116,12 +116,12 @@ const ReportDate: NavData['links'] = [
 ];
 
 const mockdata: NavData[] = [
-  {
-    links: '/dashboard',
-    label: 'DashBoard',
-    icon: IconFileAnalytics,
-    permissionName: 'DASHBOARD',
-  },
+  // {
+  //   links: '/dashboard',
+  //   label: 'DashBoard',
+  //   icon: IconFileAnalytics,
+  //   permissionName: 'DASHBOARD',
+  // },
   {
     links: CompanyData,
     label: 'Companies',
@@ -138,37 +138,37 @@ const mockdata: NavData[] = [
     label: 'Product Manager',
     icon: IconReceipt2,
   },
-  {
-    links: '/workflow',
-    label: 'WorkFlow',
-    icon: IconFileAnalytics,
-    permissionName: 'WORKFLOW',
-  },
-  {
-    links: '/tickets',
-    label: 'Tickets',
-    icon: IconReceipt2,
-    permissionName: 'TICKET',
-  },
+  // {
+  //   links: '/workflow',
+  //   label: 'WorkFlow',
+  //   icon: IconFileAnalytics,
+  //   permissionName: 'WORKFLOW',
+  // },
+  // {
+  //   links: '/tickets',
+  //   label: 'Tickets',
+  //   icon: IconReceipt2,
+  //   permissionName: 'TICKET',
+  // },
   { links: Stockdata, label: 'Stock', icon: IconReceipt2 },
   { links: '/pos', label: 'POS', icon: IconReceipt2, permissionName: 'POS' },
   { links: PartiesData, label: 'Parties', icon: IconReceipt2 },
   { links: SalesData, label: 'Sales', icon: IconReceipt2 },
   { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
-  {
-    links: '/cashandbank',
-    label: 'Cash and Bank',
-    icon: IconReceipt2,
-    permissionName: 'CASHANDBANK',
-  },
+  // {
+  //   links: '/cashandbank',
+  //   label: 'Cash and Bank',
+  //   icon: IconReceipt2,
+  //   permissionName: 'CASHANDBANK',
+  // },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
   { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
-  {
-    links: '/settings/paymentmodes',
-    label: 'Settings',
-    icon: IconReceipt2,
-    permissionName: 'SETTINGS',
-  },
+  // {
+  //   links: '/settings/paymentmodes',
+  //   label: 'Settings',
+  //   icon: IconReceipt2,
+  //   permissionName: 'SETTINGS',
+  // },
   { label: 'Admin', icon: IconReceipt2, links: '/admin' },
   {
     label: 'Warehouse',
