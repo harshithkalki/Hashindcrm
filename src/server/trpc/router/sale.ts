@@ -1,4 +1,5 @@
 import Sale from '@/models/Sale';
+import Count from '@/models/Count';
 import { protectedProcedure, router } from '@/server/trpc/trpc';
 import checkPermission from '@/utils/checkPermission';
 import { ZSaleCreateInput, ZSaleUpdateInput } from '@/zobjs/sale';
@@ -17,9 +18,38 @@ export const saleRouter = router({
         "You don't have permission to create sales"
       );
 
+      let invoiceId = '';
+
+      const count = await Count.findOneAndUpdate(
+        {
+          company: client.company,
+        },
+        {
+          $inc: {
+            count: 1,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (count) {
+        invoiceId = `${count.count}`;
+      } else {
+        const newCount = await Count.create({
+          count: 1,
+          company: client.company,
+        });
+
+        invoiceId = `${newCount.count}`;
+      }
+
       const sale = await Sale.create({
         ...input,
         company: client.company,
+        invoiceId,
+        customer: !input.customer ? 'Walk in Customer' : input.customer,
       });
 
       return sale;
