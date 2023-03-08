@@ -265,6 +265,48 @@ const Index = () => {
                         p={'xl'}
                         radius={'md'}
                         withBorder
+                        style={{ cursor: 'pointer' }}
+                        onClick={(e) => {
+                          console.log(item);
+                          const _id = item._id.toString();
+                          const product = searchProducts.data?.find(
+                            (item) => item._id.toString() === _id
+                          );
+                          let pushItem: InlineProduct;
+                          if (product) {
+                            pushItem = {
+                              _id: product._id.toString(),
+                              name: product.name,
+                              quantity: 1,
+                              subtotal: product.salePrice,
+                              // discountedPrice:
+                              //   product.salePrice -
+                              //   (totalPrice * (values.orderdiscount / 100)) /
+                              //     (inlineProducts.size + 1),
+                              price: product.salePrice,
+                              tax: product.tax,
+                            };
+                          }
+                          if (pushItem) {
+                            const inlineProduct = inlineProducts.get(
+                              pushItem._id.toString()
+                            );
+                            if (!inlineProduct) {
+                              inlineProducts.set(
+                                pushItem._id.toString(),
+                                pushItem
+                              );
+                            } else {
+                              return;
+                            }
+                            inlineProducts.set(
+                              pushItem._id.toString(),
+                              pushItem
+                            );
+                            setInlineProducts(new Map(inlineProducts));
+                            setSelectProduct(undefined);
+                          }
+                        }}
                       >
                         <Card.Section>
                           <Image
