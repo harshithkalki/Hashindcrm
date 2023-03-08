@@ -17,9 +17,9 @@ import FormInput from '@/components/FormikCompo/FormikInput';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
 // import { ZExpenseCreateInput } from '@/zobjs/expense';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { trpc } from '@/utils/trpc';
-import { ZExpenseCategoryCreateInput } from '@/zobjs/expenseCategory';
+import type { ZExpenseCategoryCreateInput } from '@/zobjs/expenseCategory';
 import { useRouter } from 'next/router';
 
 type CreateExpenseCategory = z.infer<typeof ZExpenseCategoryCreateInput>;
