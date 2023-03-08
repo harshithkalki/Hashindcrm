@@ -9,6 +9,7 @@ import {
   Group,
   Loader,
   Modal,
+  Pagination,
   SimpleGrid,
   Title,
 } from '@mantine/core';
@@ -161,6 +162,92 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
   );
 };
 
+const EditExpense = ({
+  _id,
+  onClose,
+}: {
+  _id: string;
+  onClose: () => void;
+}) => {
+  const { classes, cx } = useStyles();
+  const updateExpense = trpc.expenseRouter.update.useMutation();
+  const Expense = trpc.expenseRouter.get.useQuery({ _id: _id });
+
+  return (
+    <Modal opened={Boolean(_id)} onClose={() => onClose()} title='Edit Expense'>
+      {Expense.isLoading ? (
+        <Center>
+          <Loader />
+        </Center>
+      ) : (
+        <Formik
+          initialValues={{
+            category: Expense.data?.category,
+            amount: Expense.data?.amount,
+            date: Expense.data?.date,
+            notes: Expense.data?.notes,
+          }}
+          validationSchema={toFormikValidationSchema(ZExpenseCreateInput)}
+          onSubmit={async (values) => {
+            await updateExpense.mutateAsync({ _id, ...values });
+            onClose();
+          }}
+        >
+          {({ handleSubmit }) => (
+            <Form>
+              <SimpleGrid
+                cols={2}
+                className={classes.wrapper}
+                breakpoints={[
+                  { maxWidth: 'md', cols: 2, spacing: 'sm' },
+                  { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                  { maxWidth: 'xs', cols: 1, spacing: 'sm' },
+                ]}
+              >
+                <ExpenseCategorySelect />
+
+                <FormDate
+                  name='date'
+                  label='Date'
+                  placeholder='Select Date'
+                  withAsterisk
+                />
+                <FormInput
+                  name='amount'
+                  label='Amount'
+                  placeholder='Enter Amount'
+                  withAsterisk
+                  type={'number'}
+                />
+              </SimpleGrid>
+              <Formiktextarea
+                name='notes'
+                label='Notes'
+                placeholder='Enter Notes'
+                mb={'xl'}
+              />
+              <Group position='center'>
+                <Button type='submit' size='xs'>
+                  Submit
+                </Button>
+                <Button
+                  bg={'gray'}
+                  size='xs'
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Group>
+            </Form>
+          )}
+        </Formik>
+      )}
+    </Modal>
+  );
+};
+
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -168,8 +255,11 @@ const Index = () => {
   const Expenses = trpc.expenseRouter.expenses.useQuery({ page: page });
   const deleteExpense = trpc.expenseRouter.delete.useMutation();
   const tabData = Expenses.data;
+  const [editId, setEditId] = useState<string>('');
   const router = useRouter();
   const Data = tabData;
+
+  // console.log(Data);
 
   if (Expenses.isLoading) {
     return (
@@ -186,7 +276,7 @@ const Index = () => {
         setModal={setModal}
         onSubmit={async (inputs) => {
           return CreateExpense.mutateAsync(inputs).then((res) => {
-            console.log(res);
+            // console.log(res);
           });
         }}
         onClose={() => {
@@ -194,6 +284,16 @@ const Index = () => {
           Expenses.refetch();
         }}
       />
+
+      {Boolean(editId) && (
+        <EditExpense
+          _id={editId}
+          onClose={() => {
+            setEditId('');
+            Expenses.refetch();
+          }}
+        />
+      )}
       <Container>
         <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Expenses</Title>
@@ -207,23 +307,36 @@ const Index = () => {
             Add new
           </Button>
         </Group>
-        <TableSelection
-          data={Data?.docs || []}
-          keysandlabels={{
-            category: 'Expense Category',
-            amount: 'Amount',
-            date: 'Date',
-            notes: 'Notes',
-          }}
-          deletable={true}
-          editable={true}
-          onDelete={(id) => {
-            deleteExpense.mutateAsync({ _id: id }).then(() => {
-              router.reload();
-            });
-          }}
-          onEdit={(id) => console.log(id)}
-        />
+        {Expenses.isLoading ? (
+          <Loader />
+        ) : (
+          <>
+            <TableSelection
+              data={Data?.docs || []}
+              keysandlabels={{
+                category: 'Expense Category',
+                amount: 'Amount',
+                date: 'Date',
+                notes: 'Notes',
+              }}
+              deletable={true}
+              editable={true}
+              onDelete={(id) => {
+                deleteExpense.mutateAsync({ _id: id }).then(() => {
+                  router.reload();
+                });
+              }}
+              onEdit={(id) => setEditId(id)}
+            />
+            <Pagination
+              total={Expenses.data?.totalPages || 0}
+              initialPage={1}
+              // {...pagination}
+              page={page}
+              onChange={setPage}
+            />
+          </>
+        )}
       </Container>
     </Layout>
   );
