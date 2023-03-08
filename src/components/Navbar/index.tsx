@@ -281,15 +281,6 @@ export default function NavbarNested({ hide }: Props) {
           ))}
         </div>
       </Navbar.Section>
-      {/* 
-      <Navbar.Section className={classes.footer}>
-        <UserMenu
-          logout={async () => {
-            await logout.mutateAsync();
-            window.location.reload();
-          }}
-        />
-      </Navbar.Section> */}
     </Navbar>
   );
 }
