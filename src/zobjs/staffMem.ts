@@ -37,7 +37,7 @@ export const ZDocWithId = z.object({
 });
 
 export const ZStaffMem = ZStaffMemCreateInput.extend({
-  createdAt: z.date(),
+  createdAt: z.string(),
   ticket: z.string().optional(),
   linkedTo: z.string().optional(),
 });

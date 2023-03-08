@@ -8,6 +8,7 @@ import CategoryModel from '@/models/Category';
 import type { BrandDocument } from '@/models/Brand';
 import { ZProductCreateInput, ZProductUpdateInput } from '@/zobjs/product';
 import { objectkeys } from '@/utils/helpers';
+import mongoose from 'mongoose';
 
 const getAllChildCategories = async (
   category: string
@@ -189,6 +190,7 @@ export const productRouter = router({
           page: z.number(),
           limit: z.number().optional(),
           category: z.string().optional(),
+          warehouse: z.string().optional(),
         })
         .optional()
     )
@@ -228,6 +230,9 @@ export const productRouter = router({
       const query = {
         company: client.company,
         ...(input?.category && { category: input.category }),
+        ...(input?.warehouse && {
+          warehouse: new mongoose.Types.ObjectId(input.warehouse),
+        }),
       };
 
       const products = await ProductModel.paginate(query, options);
@@ -269,6 +274,7 @@ export const productRouter = router({
       z.object({
         search: z.string(),
         limit: z.number().optional(),
+        warehouse: z.string().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -283,6 +289,7 @@ export const productRouter = router({
         {
           company: client.company,
           name: { $regex: input.search, $options: 'i' },
+          ...(input?.warehouse && { warehouse: input.warehouse }),
         },
         null,
         { limit: input.limit || 10 }
