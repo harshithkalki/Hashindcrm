@@ -8,6 +8,7 @@ export type IExpense = ModifyDeep<
   Expense,
   {
     company: mongoose.Types.ObjectId;
+    category: mongoose.Types.ObjectId;
   }
 >;
 
@@ -17,7 +18,7 @@ const ExpenseSchema = new Schema<IExpense, ExpenseModel>(
   {
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
     createdAt: { type: Date, default: Date.now },
-    category: { type: String, required: true },
+    category: { type: Schema.Types.ObjectId, ref: 'ExpenseCategory' },
     amount: { type: Number, required: true },
     date: { type: String, required: true },
     notes: { type: String, required: true },

@@ -93,12 +93,12 @@ export const expenseRouter = router({
 
       const expenses = await ExpenseModel.paginate(query, {
         ...options,
-        populate: 'category',
+        populate: {
+          path: 'category',
+        },
       });
 
-      return expenses as unknown as z.infer<typeof ZExpenseCreateInput> & {
-        category: ExpenseCategory & DocWithId;
-      } & DocWithId[];
+      return expenses;
     }),
 
   get: protectedProcedure
