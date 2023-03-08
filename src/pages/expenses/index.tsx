@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TableSelection from '@/components/Tables';
 import {
   Button,
+  Center,
   Container,
   createStyles,
   FileInput,
   Group,
+  Loader,
   Modal,
   SimpleGrid,
   Title,
@@ -22,6 +24,7 @@ import { ZExpenseCreateInput } from '@/zobjs/expense';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { trpc } from '@/utils/trpc';
 import { z } from 'zod';
+import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -45,41 +48,43 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const ExpensesData = [
-  {
-    id: '1',
-    expenseCategory: 'test',
-    amount: 100,
-    date: '2021-09-09',
-    user: 'test',
-  },
-  {
-    id: '2',
-    expenseCategory: 'test',
-    amount: 100,
-    date: '2021-09-09',
-    user: 'test',
-  },
-  {
-    id: '3',
-    expenseCategory: 'test',
-    amount: 100,
-    date: '2021-09-09',
-    user: 'test',
-  },
-];
-
-type CreateExpenseCategory = z.infer<typeof ZExpenseCreateInput>;
+type CreateExpense = z.infer<typeof ZExpenseCreateInput>;
 
 interface modalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (inputs: CreateExpenseCategory) => Promise<void>;
+  onSubmit: (inputs: CreateExpense) => Promise<void>;
+  onClose: () => void;
 }
 
-const AddExpense = ({ modal, setModal }: modalProps) => {
+const ExpenseCategorySelect = () => {
+  const [search, setSearch] = useState('');
+  const categorys = trpc.expenseCategoryRouter.expenseCategorys.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  return (
+    <FormikSelect
+      label='Expense Category'
+      data={
+        categorys.data?.docs?.map((category) => ({
+          label: category.name,
+          value: category._id.toString(),
+        })) || []
+      }
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='category'
+      withAsterisk
+    />
+  );
+};
+
+const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
   const { classes, cx } = useStyles();
-  const AddExpenseCategory = trpc.expenseRouter.create.useMutation();
+  // const AddExpense = trpc.expenseRouter.create.useMutation();
   return (
     <>
       <Modal
@@ -90,17 +95,15 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
       >
         <Formik
           initialValues={{
-            expensecategory: '',
-            amount: '',
+            category: '',
+            amount: 0,
             date: '',
-            user: '',
-            expensebill: '',
             notes: '',
           }}
           validationSchema={toFormikValidationSchema(ZExpenseCreateInput)}
-          onSubmit={(values) => {
-            AddExpenseCategory.mutateAsync(values);
-            setModal(false);
+          onSubmit={async (values) => {
+            await onSubmit(values);
+            onClose();
           }}
         >
           {({ handleSubmit }) => (
@@ -114,29 +117,8 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
                   { maxWidth: 'xs', cols: 1, spacing: 'sm' },
                 ]}
               >
-                <FormikSelect
-                  name='expensecategory'
-                  label='Expense Category'
-                  placeholder='Select Expense Category'
-                  searchable
-                  data={[
-                    { label: 'test1', value: 'test1' },
-                    { label: 'test2', value: 'test2' },
-                    { label: 'test3', value: 'test3' },
-                  ]}
-                  withAsterisk
-                />
-                <FormikSelect
-                  name='user'
-                  label='User'
-                  placeholder='Select User'
-                  searchable
-                  data={[
-                    { label: 'test1', value: 'test1' },
-                    { label: 'test2', value: 'test2' },
-                    { label: 'test3', value: 'test3' },
-                  ]}
-                />
+                <ExpenseCategorySelect />
+
                 <FormDate
                   name='date'
                   label='Date'
@@ -149,13 +131,6 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
                   placeholder='Enter Amount'
                   withAsterisk
                   type={'number'}
-                />
-                <FileInput
-                  icon={<IconUpload size={14} />}
-                  name='expensebill'
-                  label='Expense Bill'
-                  placeholder='Select Expense Bill'
-                  withAsterisk
                 />
               </SimpleGrid>
               <Formiktextarea
@@ -188,9 +163,37 @@ const AddExpense = ({ modal, setModal }: modalProps) => {
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const [page, setPage] = React.useState(1);
+  const CreateExpense = trpc.expenseRouter.create.useMutation();
+  const Expenses = trpc.expenseRouter.expenses.useQuery({ page: page });
+  const deleteExpense = trpc.expenseRouter.delete.useMutation();
+  const tabData = Expenses.data;
+  const router = useRouter();
+  const Data = tabData;
+
+  if (Expenses.isLoading) {
+    return (
+      <Center h='100%'>
+        <Loader />
+      </Center>
+    );
+  }
+
   return (
     <Layout>
-      <AddExpense modal={modal} setModal={setModal} />
+      <AddExpense
+        modal={modal}
+        setModal={setModal}
+        onSubmit={async (inputs) => {
+          return CreateExpense.mutateAsync(inputs).then((res) => {
+            console.log(res);
+          });
+        }}
+        onClose={() => {
+          setModal(false);
+          Expenses.refetch();
+        }}
+      />
       <Container>
         <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Expenses</Title>
@@ -205,16 +208,20 @@ const Index = () => {
           </Button>
         </Group>
         <TableSelection
-          data={ExpensesData}
+          data={Data?.docs || []}
           keysandlabels={{
-            expenseCategory: 'Expense Category',
+            category: 'Expense Category',
             amount: 'Amount',
             date: 'Date',
-            user: 'User',
+            notes: 'Notes',
           }}
           deletable={true}
           editable={true}
-          onDelete={(id) => console.log(id)}
+          onDelete={(id) => {
+            deleteExpense.mutateAsync({ _id: id }).then(() => {
+              router.reload();
+            });
+          }}
           onEdit={(id) => console.log(id)}
         />
       </Container>

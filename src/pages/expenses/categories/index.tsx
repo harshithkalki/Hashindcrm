@@ -22,29 +22,6 @@ import { trpc } from '@/utils/trpc';
 import { ZExpenseCategoryCreateInput } from '@/zobjs/expenseCategory';
 import { useRouter } from 'next/router';
 
-const ExpensesCategoriesData = [
-  {
-    id: '1',
-    expensecategoryname: 'test',
-    description: 'test',
-  },
-  {
-    id: '2',
-    expensecategoryname: 'test2',
-    description: 'test2',
-  },
-  {
-    id: '3',
-    expensecategoryname: 'test3',
-    description: 'test3',
-  },
-  {
-    id: '4',
-    expensecategoryname: 'test4',
-    description: 'test4',
-  },
-];
-
 type CreateExpenseCategory = z.infer<typeof ZExpenseCategoryCreateInput>;
 
 interface modalProps {
