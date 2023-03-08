@@ -29,8 +29,6 @@ const ExpenseSchema = new Schema<IExpense, ExpenseModel>(
 
 ExpenseSchema.plugin(mongoosePaginate);
 
-ExpenseSchema.index({ name: 1, company: 1 }, { unique: true });
-
 export default (mongoose.models.Expense as ReturnType<
   typeof mongoose.model<IExpense, mongoose.PaginateModel<IExpense>>
 >) ||
