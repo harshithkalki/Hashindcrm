@@ -80,7 +80,7 @@ export const staffRouter = router({
     return staffs.map((val) => {
       return {
         _id: val._id.toString(),
-        name: `${val.firstName} ${val.middleName} ${val.lastName}`,
+        name: val.name,
       };
     });
   }),
@@ -279,5 +279,48 @@ export const staffRouter = router({
           _id: admin._id.toString(),
         })),
       };
+    }),
+
+  getStaff: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'STAFFMEM',
+        { read: true },
+        ctx.clientId,
+        'You are not permitted to read staff'
+      );
+
+      const staff = await StaffModel.findOne({
+        _id: input._id,
+        company: client.company,
+      });
+
+      return staff;
+    }),
+
+  getAdmin: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'You are not authorized to read admin',
+        });
+      }
+
+      const admin = await StaffModel.findOne({
+        _id: input._id,
+      });
+
+      return admin;
     }),
 });

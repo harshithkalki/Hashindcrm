@@ -3,8 +3,10 @@ import FormInput from '@/components/FormikCompo/FormikPass';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
+import TableSelection from '@/components/Tables';
 import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
+import { ZStaffMemCreateInput } from '@/zobjs/staffMem';
 import {
   ActionIcon,
   Button,
@@ -21,12 +23,14 @@ import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 interface modalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+
+  onSubmit?: (values: z.infer<typeof ZStaffMemCreateInput>) => void;
 }
 
 const useStyles = createStyles((theme) => ({
@@ -50,6 +54,18 @@ const useStyles = createStyles((theme) => ({
     width: '100%',
   },
 }));
+
+const initialValues: z.infer<typeof ZStaffMemCreateInput> = {
+  name: '',
+  email: '',
+  phoneNumber: '',
+  address: '',
+  role: '',
+  password: '',
+  warehouse: '',
+  status: '',
+  profile: '',
+};
 
 const WarehousesSelect = () => {
   const [search, setSearch] = useState('');
@@ -124,213 +140,229 @@ const RolesSelect = () => {
   );
 };
 
-const AddCustomer = ({ modal, setModal }: modalProps) => {
-  const { classes, cx } = useStyles();
-  // const [Wmodal, WsetModal] = useState(false);
+const StaffForm = ({
+  formvalues = initialValues,
+  onSubmit,
+}: {
+  formvalues?: z.infer<typeof ZStaffMemCreateInput>;
+  onSubmit: (values: z.infer<typeof ZStaffMemCreateInput>) => void;
+}) => {
   const fileRef = useRef<HTMLInputElement>(null);
-
+  const { classes } = useStyles();
   return (
-    <>
-      <Modal
-        opened={modal}
-        onClose={() => setModal(false)}
-        title='Add New Staffmember'
-        size={'60%'}
-      >
-        <Formik
-          onSubmit={(values) => {
-            console.log(values);
-          }}
-          initialValues={{
-            name: '',
-            email: '',
-            phone: '',
-            address: '',
-            role: '',
-            password: '',
-            warehouse: '',
-            status: '',
-            profile: '',
-          }}
-          validationSchema={toFormikValidationSchema(
-            z.object({
-              name: z.string(),
-              email: z.string().email(),
-              phone: z.number(),
-              address: z.string(),
-              role: z.string(),
-              password: z.string(),
-              warehouse: z.string(),
-              status: z.string(),
-              profile: z.string(),
-            })
-          )}
-        >
-          {({ handleSubmit, handleChange, values, setFieldValue }) => (
-            <Form onSubmit={handleSubmit}>
-              <SimpleGrid
-                m={'md'}
-                cols={3}
-                className={classes.wrapper}
-                breakpoints={[
-                  { maxWidth: 'md', cols: 3, spacing: 'md' },
-                  { maxWidth: 'sm', cols: 2, spacing: 'sm' },
-                  { maxWidth: 'xs', cols: 1, spacing: 'sm' },
-                ]}
-              >
-                <Container className={classes.containerStyles}>
-                  <Center>
-                    <Image
-                      height={150}
-                      width={150}
-                      src={values.profile}
-                      alt=''
-                      withPlaceholder
-                    />
-                    <input
-                      hidden
-                      ref={fileRef}
-                      type='file'
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        if (e.target.files) {
-                          const file = e.target.files[0];
-                          if (file) {
-                            setFieldValue('logo', URL.createObjectURL(file));
-                          }
-                        }
-                      }}
-                    />
-                  </Center>
-                  <Center>
-                    <Button
-                      size='xs'
-                      leftIcon={
-                        values.profile === '' && <IconUpload size={17} />
+    <Formik
+      onSubmit={(values, { resetForm }) => {
+        onSubmit(values);
+        resetForm();
+      }}
+      initialValues={formvalues}
+      validationSchema={toFormikValidationSchema(ZStaffMemCreateInput)}
+    >
+      {({ handleSubmit, handleChange, values, setFieldValue, errors }) => (
+        <Form onSubmit={handleSubmit}>
+          <SimpleGrid
+            m={'md'}
+            cols={3}
+            className={classes.wrapper}
+            breakpoints={[
+              { maxWidth: 'md', cols: 3, spacing: 'md' },
+              { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+              { maxWidth: 'xs', cols: 1, spacing: 'sm' },
+            ]}
+          >
+            <Container className={classes.containerStyles}>
+              <Center>
+                <Image
+                  height={150}
+                  width={150}
+                  src={values.profile}
+                  alt=''
+                  withPlaceholder
+                />
+                <input
+                  hidden
+                  ref={fileRef}
+                  type='file'
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    if (e.target.files) {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setFieldValue('logo', URL.createObjectURL(file));
                       }
-                      onClick={() => {
-                        fileRef.current?.click();
-                      }}
-                      styles={{
-                        root: {
-                          margin: 2,
-                        },
-                      }}
-                    >
-                      {values.profile === '' ? `Upload` : `Change`}
-                    </Button>
-                  </Center>
-                </Container>
-                <WarehousesSelect />
-                <RolesSelect />
-                <FormikInput
-                  label='Name'
-                  placeholder='Name'
-                  name='name'
-                  withAsterisk
+                    }
+                  }}
                 />
-                <FormikInput
-                  label='Email'
-                  placeholder='Email'
-                  name='email'
-                  withAsterisk
-                />
-                <FormikInput
-                  label='Phone'
-                  type={'number'}
-                  placeholder='Phone'
-                  name='phone'
-                  withAsterisk
-                />
-                <FormikSelect
-                  label='Status'
-                  data={[
-                    { label: 'Active', value: 'Active' },
-                    { label: 'Inactive', value: 'Inactive' },
-                  ]}
-                  placeholder='Pick one status'
-                  name='status'
-                  searchable
-                  w={'100%'}
-                  withAsterisk
-                />
-                <FormInput
-                  label='Password'
-                  placeholder='Password'
-                  name='password'
-                  withAsterisk
-                />
-              </SimpleGrid>
-              <Formiktextarea
-                label='Address'
-                placeholder='Address'
-                name='address'
-                withAsterisk
-                mb={'md'}
-              />
-
-              <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
-                <Button type='submit' size='xs'>
-                  Create
-                </Button>
+              </Center>
+              <Center>
                 <Button
                   size='xs'
+                  leftIcon={values.profile === '' && <IconUpload size={17} />}
                   onClick={() => {
-                    setModal(false);
+                    fileRef.current?.click();
+                  }}
+                  styles={{
+                    root: {
+                      margin: 2,
+                    },
                   }}
                 >
-                  Cancel
+                  {values.profile === '' ? `Upload` : `Change`}
                 </Button>
-              </Group>
-            </Form>
-          )}
-        </Formik>
-      </Modal>
-    </>
+              </Center>
+            </Container>
+            <WarehousesSelect />
+            <RolesSelect />
+            <FormikInput
+              label='Name'
+              placeholder='Name'
+              name='name'
+              withAsterisk
+            />
+            <FormikInput
+              label='Email'
+              placeholder='Email'
+              name='email'
+              withAsterisk
+            />
+            <FormikInput
+              label='Phone'
+              placeholder='Phone'
+              name='phoneNumber'
+              withAsterisk
+            />
+            <FormikSelect
+              label='Status'
+              data={[
+                { label: 'Active', value: 'Active' },
+                { label: 'Inactive', value: 'Inactive' },
+              ]}
+              placeholder='Pick one status'
+              name='status'
+              searchable
+              w={'100%'}
+              withAsterisk
+            />
+            <FormInput
+              label='Password'
+              placeholder='Password'
+              name='password'
+              withAsterisk
+            />
+          </SimpleGrid>
+          <Formiktextarea
+            label='Address'
+            placeholder='Address'
+            name='address'
+            withAsterisk
+            mb={'md'}
+          />
+
+          <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
+            <Button type='submit' size='xs'>
+              Create
+            </Button>
+          </Group>
+          {JSON.stringify(errors, null, 2)}
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
+const AddCustomer = ({ modal, setModal }: modalProps) => {
+  const createStaff = trpc.staffRouter.create.useMutation();
+
+  return (
+    <Modal
+      opened={modal}
+      onClose={() => setModal(false)}
+      title='Add New Staffmember'
+      size={'60%'}
+    >
+      <StaffForm
+        onSubmit={(values) => {
+          createStaff.mutateAsync(values);
+          setModal(false);
+        }}
+      />
+    </Modal>
+  );
+};
+
+const UpdateCustomer = ({
+  id,
+  setId,
+}: {
+  id: string | null;
+  setId: (id: string | null) => void;
+}) => {
+  const updateStaff = trpc.staffRouter.update.useMutation();
+
+  const staff = trpc.staffRouter.getStaff.useQuery(
+    {
+      _id: id as string,
+    },
+    { refetchOnWindowFocus: false, enabled: Boolean(id) }
+  );
+
+  if (!staff.data) return <div>loading</div>;
+
+  return (
+    <Modal
+      opened={Boolean(id)}
+      onClose={() => setId(null)}
+      title='Update Staffmember'
+      size={'60%'}
+    >
+      <StaffForm
+        formvalues={{
+          ...staff.data,
+          linkedTo: staff.data.linkedTo?.toString(),
+          role: staff.data.role?.toString(),
+          warehouse: staff.data.warehouse?.toString(),
+        }}
+        onSubmit={(values) => {
+          updateStaff.mutateAsync({
+            ...values,
+            _id: id as string,
+          });
+          setId(null);
+        }}
+      />
+    </Modal>
   );
 };
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const [id, setId] = React.useState<string | null>(null);
+  const staff = trpc.staffRouter.getAllStaffs.useQuery();
+
+  console.log(id);
+
   return (
     <Layout>
       <AddCustomer modal={modal} setModal={setModal} />
+      <UpdateCustomer id={id} setId={setId} />
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Staff Members</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
           Add New
         </Button>
       </Group>
-      <PartiesTable
-        data={[
-          {
-            name: 'John Doe',
-            email: 'harshith@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-        ]}
+      <TableSelection
+        data={
+          staff.data?.map((val) => ({ ...val, _id: val._id.toString() })) ?? []
+        }
+        keysandlabels={{
+          name: 'Name',
+          email: 'Email',
+          status: 'Status',
+        }}
+        onEdit={(id) => {
+          setId(id);
+        }}
+        editable
       />
     </Layout>
   );

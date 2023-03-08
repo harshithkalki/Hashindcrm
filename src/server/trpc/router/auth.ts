@@ -167,6 +167,7 @@ export const auth = router({
           company: staff.role.company.toString(),
         },
         createdAt: staff.createdAt.toISOString(),
+        warehouse: staff.warehouse?.toString(),
       },
     };
   }),

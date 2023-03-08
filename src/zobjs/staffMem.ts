@@ -1,21 +1,16 @@
 import { z } from 'zod';
 
 export const ZStaffMemCreateInput = z.object({
-  firstName: z.string(),
-  middleName: z.string().optional(),
-  lastName: z.string(),
+  name: z.string(),
   phoneNumber: z.string(),
-  addressline1: z.string(),
-  addressline2: z.string().optional(),
-  city: z.string(),
-  state: z.string(),
-  country: z.string(),
-  pincode: z.string(),
+  address: z.string(),
   role: z.string(),
   linkedTo: z.string().optional(),
   email: z.string(),
   password: z.string(),
-  profile: z.string(),
+  profile: z.string().optional(),
+  warehouse: z.string(),
+  status: z.string(),
 });
 
 export const ZAdminCreateInput = ZStaffMemCreateInput.omit({

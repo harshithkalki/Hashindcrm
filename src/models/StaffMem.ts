@@ -15,6 +15,7 @@ export type IStaffMem = ModifyDeep<
     ticket?: mongoose.Types.ObjectId;
     linkedTo?: mongoose.Types.ObjectId;
     createdAt: Date;
+    warehouse: mongoose.Types.ObjectId;
   }
 >;
 
@@ -34,16 +35,9 @@ const StaffMemSchema: Schema = new Schema<
   StaffMemMethods
 >(
   {
-    firstName: { type: String, required: true },
-    middleName: { type: String, required: false },
-    lastName: { type: String, required: true },
+    name: { type: String, required: true },
     phoneNumber: { type: String, required: true, unique: true },
-    addressline1: { type: String, required: true },
-    addressline2: { type: String, required: false },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true },
-    pincode: { type: String, required: true },
+    address: { type: String, required: true },
     role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -51,7 +45,9 @@ const StaffMemSchema: Schema = new Schema<
     linkedTo: { type: Schema.Types.ObjectId, ref: 'StaffMem' },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
     ticket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
-    profile: { type: String, required: true },
+    profile: { type: String, required: false },
+    status: { type: String, required: true },
+    warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse' },
   },
   {
     versionKey: false,
