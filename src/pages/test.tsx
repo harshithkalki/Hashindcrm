@@ -20,9 +20,9 @@ const Example = () => {
 
   return (
     <div>
-      <div style={{ display: 'none' }}>
-        <Invoice invoiceRef={componentRef} data={invoice.data} />
-      </div>
+      {/* <div style={{ display: 'none' }}> */}
+      <Invoice invoiceRef={componentRef} data={invoice.data} />
+      {/* </div> */}
       <Button onClick={handlePrint}>Print this out!</Button>
     </div>
   );
