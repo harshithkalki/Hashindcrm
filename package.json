@@ -17,6 +17,7 @@
     "@mantine/dates": "^5.10.2",
     "@mantine/hooks": "^5.9.5",
     "@mantine/next": "^5.9.5",
+    "@mantine/notifications": "^5.9.5",
     "@paralleldrive/cuid2": "^2.0.1",
     "@reduxjs/toolkit": "^1.9.1",
     "@tabler/icons": "^1.119.0",

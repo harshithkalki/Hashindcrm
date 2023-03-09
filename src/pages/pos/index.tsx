@@ -27,6 +27,7 @@ import { Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Waypoint } from 'react-waypoint';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -86,6 +87,7 @@ const Index = () => {
     },
     {
       enabled: !!warehouse,
+      cacheTime: 0,
     }
   );
 
@@ -131,7 +133,7 @@ const Index = () => {
           notes: '',
           total: 0,
         }}
-        onSubmit={(values) => {
+        onSubmit={(values, { setSubmitting }) => {
           values.products = Array.from(inlineProducts.values());
           values.orderTax =
             [...inlineProducts.values()].reduce(
@@ -148,13 +150,17 @@ const Index = () => {
             ) + values.shipping || 0;
 
           salesSubmit.mutateAsync(values).then((res) => {
-            console.log(res);
+            showNotification({
+              title: 'New Sale',
+              message: 'Sale created successfully',
+            });
+            setSubmitting(false);
           });
 
           console.log(values);
         }}
       >
-        {({ handleSubmit, values }) => (
+        {({ handleSubmit, values, isSubmitting }) => (
           <Form
             onSubmit={handleSubmit}
             style={{
@@ -650,7 +656,12 @@ const Index = () => {
                       }
                       disabled
                     />
-                    <Button w={'30%'} size='sm' type='submit'>
+                    <Button
+                      w={'30%'}
+                      size='sm'
+                      loading={isSubmitting}
+                      type='submit'
+                    >
                       Save & Print
                     </Button>
                     <Button

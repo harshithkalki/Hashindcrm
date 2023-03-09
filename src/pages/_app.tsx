@@ -7,6 +7,7 @@ import { trpc } from '../utils/trpc';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { setClient } from '@/store/clientSlice';
+import { NotificationsProvider } from '@mantine/notifications';
 
 function UserContextProvider({ children }: { children: React.ReactNode }) {
   const me = trpc.auth.me.useQuery(undefined, {
@@ -77,7 +78,9 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
         primaryColor: 'company',
       }}
     >
-      {children}
+      <NotificationsProvider position='top-right'>
+        {children}
+      </NotificationsProvider>
     </MantineProvider>
   );
 }
