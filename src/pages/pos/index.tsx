@@ -374,9 +374,11 @@ const Index = () => {
                   flex: 0.39,
                   display: 'flex',
                   flexDirection: 'column',
+                  overflow: 'hidden',
+                  height: '100%',
                 }}
               >
-                <div style={{ flex: 0.2 }}>
+                <div>
                   <Container w={'100%'}>
                     <FormikSelect
                       name='customer'
@@ -450,7 +452,7 @@ const Index = () => {
                     />
                   </Container>
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, overflow: 'hidden' }}>
                   <ScrollArea
                     style={{ height: '100%', width: '100%' }}
                     scrollbarSize={10}
@@ -600,7 +602,7 @@ const Index = () => {
                     </Table>
                   </ScrollArea>
                 </div>
-                <div style={{ flex: 0.3 }}>
+                <div>
                   <Group w={'100%'}>
                     <FormInput
                       name='discount'
