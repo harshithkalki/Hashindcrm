@@ -10,7 +10,7 @@ import {
   Stack,
   Table,
 } from '@mantine/core';
-import type { DetailedHTMLProps, ThHTMLAttributes } from 'react';
+import { DetailedHTMLProps, ThHTMLAttributes, useMemo } from 'react';
 import type { ZSale } from '@/zobjs/sale';
 import type { z } from 'zod';
 import type { Company } from '@/zobjs/company';
@@ -47,6 +47,7 @@ const useStyles = createStyles((theme) => ({
     '&:last-child': {
       borderBottom: 'none',
     },
+    height: '100%',
   },
 
   cell: {
@@ -76,6 +77,7 @@ const GroupInfoBox = ({ left, right }: InvoiceInfo) => {
           width: 200,
           borderRight: `1px solid ${theme.colors.gray[6]}`,
           padding: theme.spacing.xs,
+          height: '100%',
         }}
       >
         <Text weight={500} size='sm' {...left.titleProps}>
@@ -89,6 +91,7 @@ const GroupInfoBox = ({ left, right }: InvoiceInfo) => {
         style={{
           width: 200,
           padding: theme.spacing.xs,
+          height: '100%',
         }}
       >
         <Text weight={500} size='sm' {...right.titleProps}>
@@ -211,74 +214,6 @@ const Td = ({
 //   invoiceId: '',
 // };
 
-const invoiceInfo: InvoiceInfo[] = [
-  {
-    left: {
-      title: 'Invoice No',
-      value: '123456',
-    },
-    right: {
-      title: 'Date',
-      value: '12/12/2020',
-    },
-  },
-  {
-    left: {
-      title: 'Delivery Note',
-      value: 'dfsadf df asf fasdf /n dfdsfa df ds',
-      valueProps: {
-        color: 'gray.7',
-        weight: 500,
-        size: 'sm',
-      },
-    },
-    right: {
-      title: 'Mode/Terms of Payment',
-      value: 'Cash',
-    },
-  },
-  {
-    left: {
-      title: 'Reference No. & Date',
-      value: '123456',
-    },
-    right: {
-      title: 'Other Reference',
-      value: '123456',
-    },
-  },
-  {
-    left: {
-      title: 'Buyer Order No',
-      value: '123456',
-    },
-    right: {
-      title: 'Dated',
-      value: '123456',
-    },
-  },
-  {
-    left: {
-      title: 'Despatch Document No',
-      value: '123456',
-    },
-    right: {
-      title: 'Despatched Date',
-      value: '123456',
-    },
-  },
-  {
-    left: {
-      title: 'Despatched Through',
-      value: '123456',
-    },
-    right: {
-      title: 'Destination',
-      value: '123456',
-    },
-  },
-];
-
 export default function Invoice({
   invoiceRef,
   data,
@@ -287,6 +222,78 @@ export default function Invoice({
   data: RouterOutputs['saleRouter']['getInvoice'];
 }) {
   const { classes, theme } = useStyles();
+  const invoiceInfo = useMemo(
+    () =>
+      [
+        {
+          left: {
+            title: 'Invoice No',
+            value: `Invoice #${data.invoiceId}`,
+          },
+          right: {
+            title: 'Date',
+            value: data.date.toDateString(),
+          },
+        },
+        {
+          left: {
+            title: 'Delivery Note',
+            value: data.notes,
+            valueProps: {
+              color: 'gray.7',
+              weight: 500,
+              size: 'sm',
+            },
+          },
+          right: {
+            title: 'Mode/Terms of Payment',
+            value: 'Cash',
+          },
+        },
+        {
+          left: {
+            title: 'Reference No. & Date',
+            value: '',
+          },
+          right: {
+            title: 'Other Reference',
+            value: '',
+          },
+        },
+        {
+          left: {
+            title: 'Buyer Order No',
+            value: '',
+          },
+          right: {
+            title: 'Dated',
+            value: '',
+          },
+        },
+        {
+          left: {
+            title: 'Despatch Document No',
+            value: '',
+          },
+          right: {
+            title: 'Despatched Date',
+            value: '',
+          },
+        },
+        {
+          left: {
+            title: 'Despatched Through',
+            value: '',
+          },
+          right: {
+            title: 'Destination',
+            value: '',
+          },
+        },
+      ] as InvoiceInfo[],
+    []
+  );
+
   return (
     <div className={classes.invoice} ref={invoiceRef}>
       <Title
@@ -347,7 +354,7 @@ export default function Invoice({
             </div>
           </div>
           <div>
-            <Flex className={classes.invoiceInfo}>
+            <Flex className={classes.invoiceInfo} h='100%'>
               <Stack spacing={0}>
                 {invoiceInfo.map((info, index) => (
                   <GroupInfoBox key={index} {...info} />
@@ -408,7 +415,6 @@ export default function Invoice({
               >
                 Total
               </Td>
-
               <Td></Td>
               <Td></Td>
               <Td></Td>
