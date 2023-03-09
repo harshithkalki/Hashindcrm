@@ -15,7 +15,7 @@ import type { ZSale } from '@/zobjs/sale';
 import type { z } from 'zod';
 import type { Company } from '@/zobjs/company';
 import type { Warehouse } from '@/zobjs/warehouse';
-import { RouterOutputs } from '@/utils/trpc';
+import type { RouterOutputs } from '@/utils/trpc';
 
 const useStyles = createStyles((theme) => ({
   invoice: {
@@ -66,74 +66,6 @@ type InvoiceInfo = {
   right: InfoBox;
   left: InfoBox;
 };
-
-const invoiceInfo: InvoiceInfo[] = [
-  {
-    left: {
-      title: 'Invoice No',
-      value: '123456',
-    },
-    right: {
-      title: 'Date',
-      value: '12/12/2020',
-    },
-  },
-  {
-    left: {
-      title: 'Delivery Note',
-      value: 'dfsadf df asf fasdf /n dfdsfa df ds',
-      valueProps: {
-        color: 'gray.7',
-        weight: 500,
-        size: 'sm',
-      },
-    },
-    right: {
-      title: 'Mode/Terms of Payment',
-      value: 'Cash',
-    },
-  },
-  {
-    left: {
-      title: 'Reference No. & Date',
-      value: '123456',
-    },
-    right: {
-      title: 'Other Reference',
-      value: '123456',
-    },
-  },
-  {
-    left: {
-      title: 'Buyer Order No',
-      value: '123456',
-    },
-    right: {
-      title: 'Dated',
-      value: '123456',
-    },
-  },
-  {
-    left: {
-      title: 'Despatch Document No',
-      value: '123456',
-    },
-    right: {
-      title: 'Despatched Date',
-      value: '123456',
-    },
-  },
-  {
-    left: {
-      title: 'Despatched Through',
-      value: '123456',
-    },
-    right: {
-      title: 'Destination',
-      value: '123456',
-    },
-  },
-];
 
 const GroupInfoBox = ({ left, right }: InvoiceInfo) => {
   const { classes, theme } = useStyles();
@@ -211,25 +143,6 @@ const Td = ({
   );
 };
 
-const someData = [
-  {
-    name: 'Product 1',
-    description: 'Description 1',
-    quantity: 1,
-    hsn: '123456',
-    disc: 0,
-    amount: 100,
-  },
-  {
-    name: 'Product 2',
-    description: 'Description 2',
-    quantity: 1,
-    hsn: '123456',
-    disc: 0,
-    amount: 100,
-  },
-];
-
 // const test: ModifyDeep<
 //   Omit<z.infer<typeof ZSale>, 'products'>,
 //   {
@@ -297,6 +210,74 @@ const someData = [
 //   notes: undefined,
 //   invoiceId: '',
 // };
+
+const invoiceInfo: InvoiceInfo[] = [
+  {
+    left: {
+      title: 'Invoice No',
+      value: '123456',
+    },
+    right: {
+      title: 'Date',
+      value: '12/12/2020',
+    },
+  },
+  {
+    left: {
+      title: 'Delivery Note',
+      value: 'dfsadf df asf fasdf /n dfdsfa df ds',
+      valueProps: {
+        color: 'gray.7',
+        weight: 500,
+        size: 'sm',
+      },
+    },
+    right: {
+      title: 'Mode/Terms of Payment',
+      value: 'Cash',
+    },
+  },
+  {
+    left: {
+      title: 'Reference No. & Date',
+      value: '123456',
+    },
+    right: {
+      title: 'Other Reference',
+      value: '123456',
+    },
+  },
+  {
+    left: {
+      title: 'Buyer Order No',
+      value: '123456',
+    },
+    right: {
+      title: 'Dated',
+      value: '123456',
+    },
+  },
+  {
+    left: {
+      title: 'Despatch Document No',
+      value: '123456',
+    },
+    right: {
+      title: 'Despatched Date',
+      value: '123456',
+    },
+  },
+  {
+    left: {
+      title: 'Despatched Through',
+      value: '123456',
+    },
+    right: {
+      title: 'Destination',
+      value: '123456',
+    },
+  },
+];
 
 export default function Invoice({
   invoiceRef,
@@ -407,7 +388,9 @@ export default function Invoice({
                 <Td>{product.quantity}</Td>
                 <Td>{data.discount / data.products.length}</Td>
                 <Td>
-                  {(product.price * product.quantity - data.discount) /
+                  {(product.price * product.quantity -
+                    data.discount +
+                    product.tax) /
                     data.products.length}
                 </Td>
               </tr>
@@ -429,7 +412,7 @@ export default function Invoice({
               <Td></Td>
               <Td></Td>
               <Td></Td>
-              <Td>{someData.reduce((acc, curr) => acc + curr.amount, 0)}</Td>
+              <Td>{data.total}</Td>
             </tr>
           </tbody>
         </Table>

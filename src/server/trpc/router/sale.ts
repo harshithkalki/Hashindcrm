@@ -248,7 +248,7 @@ export const saleRouter = router({
           warehouse,
           products: sale.products.map((product) => ({
             ...product,
-            name: product._id.name,
+            ...product._id,
           })),
         };
       }
