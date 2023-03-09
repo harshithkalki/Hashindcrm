@@ -133,6 +133,7 @@ function WarehouseSelect() {
         if (value) dispatch(setWarehouse(value));
       }}
       value={warehouse}
+      nothingFound='No warehouses found'
     />
   );
 }
@@ -142,6 +143,9 @@ export function CustomHeader({ user }: HeaderTabsProps) {
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const logout = trpc.auth.logout.useMutation();
+  const client = useSelector<RootState, RootState['clientState']['client']>(
+    (state) => state.clientState.client
+  );
   const { push } = useRouter();
 
   return (
@@ -164,7 +168,7 @@ export function CustomHeader({ user }: HeaderTabsProps) {
           />
 
           <Group>
-            <WarehouseSelect />
+            {!client?.isSuperAdmin && <WarehouseSelect />}
             <Menu
               width={260}
               position='bottom-end'
