@@ -106,7 +106,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface HeaderTabsProps {
-  user: { name: string; image: string };
+  className?: string;
 }
 
 function WarehouseSelect() {
@@ -138,7 +138,7 @@ function WarehouseSelect() {
   );
 }
 
-export function CustomHeader({ user }: HeaderTabsProps) {
+export function CustomHeader({}: HeaderTabsProps) {
   const { classes, theme, cx } = useStyles();
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
@@ -170,11 +170,12 @@ export function CustomHeader({ user }: HeaderTabsProps) {
           <Group>
             {!client?.isSuperAdmin && <WarehouseSelect />}
             <Menu
-              width={260}
+              width={200}
               position='bottom-end'
               transition='pop-top-right'
-              onClose={() => setUserMenuOpened(false)}
-              onOpen={() => setUserMenuOpened(true)}
+              trigger='hover'
+              openDelay={100}
+              closeDelay={400}
             >
               <Menu.Target>
                 <UnstyledButton
@@ -184,62 +185,28 @@ export function CustomHeader({ user }: HeaderTabsProps) {
                 >
                   <Group spacing={7}>
                     <Avatar
-                      src={user.image}
-                      alt={user.name}
+                      src={client?.profile}
+                      alt={client?.name}
                       radius='xl'
                       size={20}
                     />
                     <Text weight={500} size='sm' sx={{ lineHeight: 1 }} mr={3}>
-                      {user.name}
+                      {client?.name}
                     </Text>
                     <IconChevronDown size={12} stroke={1.5} />
                   </Group>
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Item
-                  icon={
-                    <IconHeart
-                      size={14}
-                      color={theme.colors.red[6]}
-                      stroke={1.5}
-                    />
-                  }
-                >
-                  Liked posts
-                </Menu.Item>
-                <Menu.Item
-                  icon={
-                    <IconStar
-                      size={14}
-                      color={theme.colors.yellow[6]}
-                      stroke={1.5}
-                    />
-                  }
-                >
-                  Saved posts
-                </Menu.Item>
-                <Menu.Item
-                  icon={
-                    <IconMessage
-                      size={14}
-                      color={theme.colors.blue[6]}
-                      stroke={1.5}
-                    />
-                  }
-                >
-                  Your comments
-                </Menu.Item>
-
                 <Menu.Label>Settings</Menu.Label>
                 <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>
                   Account settings
                 </Menu.Item>
-                <Menu.Item
+                {/* <Menu.Item
                   icon={<IconSwitchHorizontal size={14} stroke={1.5} />}
                 >
                   Change account
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item
                   icon={<IconLogout size={14} stroke={1.5} />}
                   onClick={() => {
@@ -250,9 +217,9 @@ export function CustomHeader({ user }: HeaderTabsProps) {
                   Logout
                 </Menu.Item>
 
-                <Menu.Divider />
+                {/* <Menu.Divider /> */}
 
-                <Menu.Label>Danger zone</Menu.Label>
+                {/* <Menu.Label>Danger zone</Menu.Label>
                 <Menu.Item icon={<IconPlayerPause size={14} stroke={1.5} />}>
                   Pause subscription
                 </Menu.Item>
@@ -261,7 +228,7 @@ export function CustomHeader({ user }: HeaderTabsProps) {
                   icon={<IconTrash size={14} stroke={1.5} />}
                 >
                   Delete account
-                </Menu.Item>
+                </Menu.Item> */}
               </Menu.Dropdown>
             </Menu>
           </Group>

@@ -200,6 +200,8 @@ export const staffRouter = router({
         });
       }
 
+      delete input.password;
+
       await StaffModel.updateOne(
         { _id: input._id },
         {
@@ -300,7 +302,9 @@ export const staffRouter = router({
         company: client.company,
       });
 
-      return staff;
+      const { password, ...rest } = staff?.toObject() ?? {};
+
+      return rest;
     }),
 
   getAdmin: protectedProcedure
