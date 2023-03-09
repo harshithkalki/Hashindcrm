@@ -18,11 +18,11 @@ const useStyles = createStyles((theme) => ({
     height: '100vh',
     display: 'grid',
     gridTemplateColumns: '0.8fr 1fr 1fr 1fr',
-
     gridTemplateAreas: `
+    "header header header header"
       "nav main main main"
     `,
-    gridTemplateRows: '1fr',
+    gridTemplateRows: 'auto 1fr',
 
     [theme.fn.smallerThan('sm')]: {
       gridTemplateColumns: '1fr',
@@ -40,6 +40,7 @@ const useStyles = createStyles((theme) => ({
         ? theme.colors.dark[8]
         : theme.colors.gray[0],
     maxHeight: '100%',
+    overflow: 'hidden',
   },
 
   main: {
@@ -48,8 +49,8 @@ const useStyles = createStyles((theme) => ({
       theme.colorScheme === 'dark'
         ? theme.colors.dark[8]
         : theme.colors.gray[0],
-    gridRowStart: 1,
-    gridRowEnd: 2,
+    gridRowStart: 2,
+    gridRowEnd: 3,
   },
 
   header: {
@@ -75,8 +76,8 @@ export default function Layout({
 
   return (
     <div>
-      <CustomHeader user={{ name: 'abhriam', image: '' }} />
       <div className={classes.container}>
+        <CustomHeader />
         <div className={classes.nav}>
           {navBar ?? <NavbarNested hide={!opened} />}
         </div>
