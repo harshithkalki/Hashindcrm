@@ -29,3 +29,5 @@ export const ZProduct = ZProductCreateInput.extend({
   createdAt: z.date(),
   company: z.string(),
 });
+
+export type Product = z.infer<typeof ZProduct>;

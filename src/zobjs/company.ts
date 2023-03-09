@@ -27,3 +27,9 @@ export const ZCompanyUpdateInput = ZCompanyCreateInput.partial().extend({
 export const ZCompany = ZCompanyCreateInput.extend({
   createdAt: z.date(),
 });
+
+export type CompanyCreateInput = z.infer<typeof ZCompanyCreateInput>;
+
+export type CompanyUpdateInput = z.infer<typeof ZCompanyUpdateInput>;
+
+export type Company = z.infer<typeof ZCompany>;

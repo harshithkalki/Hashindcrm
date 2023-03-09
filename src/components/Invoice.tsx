@@ -10,7 +10,12 @@ import {
   Stack,
   Table,
 } from '@mantine/core';
-import { DetailedHTMLProps, ThHTMLAttributes } from 'react';
+import type { DetailedHTMLProps, ThHTMLAttributes } from 'react';
+import type { ZSale } from '@/zobjs/sale';
+import type { z } from 'zod';
+import type { Company } from '@/zobjs/company';
+import type { Warehouse } from '@/zobjs/warehouse';
+import { RouterOutputs } from '@/utils/trpc';
 
 const useStyles = createStyles((theme) => ({
   invoice: {
@@ -225,10 +230,80 @@ const someData = [
   },
 ];
 
+// const test: ModifyDeep<
+//   Omit<z.infer<typeof ZSale>, 'products'>,
+//   {
+//     company?: Company;
+//     warehouse?: Warehouse;
+//     products: {
+//       _id: string;
+//       name: string;
+//       price: number;
+//       quantity: number;
+//     }[];
+//   }
+// > = {
+//   status: 'pending',
+//   date: '',
+//   warehouse: {
+//     name: '',
+//     addressline1: '',
+//     addressline2: '',
+//     email: '',
+//     city: '',
+//     state: '',
+//     pincode: '',
+//     country: '',
+//     primaryColor: '',
+//     secondaryColor: '',
+//     backgroundColor: '',
+//     logo: '',
+//     natureOfBusiness: '',
+//     numbers: [],
+//     createdAt: new Date(),
+//     company: '',
+//   },
+//   company: {
+//     name: '',
+//     addressline1: '',
+//     addressline2: '',
+//     email: '',
+//     city: '',
+//     state: '',
+//     pincode: '',
+//     country: '',
+//     primaryColor: '',
+//     secondaryColor: '',
+//     backgroundColor: '',
+//     logo: '',
+//     natureOfBusiness: '',
+//     numbers: [],
+//     createdAt: new Date(),
+//   },
+//   createdAt: '',
+//   products: [
+//     {
+//       _id: '',
+//       name: '',
+//       price: 0,
+//       quantity: 0,
+//     },
+//   ],
+//   total: 0,
+//   shipping: 0,
+//   orderTax: 0,
+//   discount: 0,
+//   customer: '',
+//   notes: undefined,
+//   invoiceId: '',
+// };
+
 export default function Invoice({
   invoiceRef,
+  data,
 }: {
   invoiceRef: React.RefObject<HTMLDivElement>;
+  data: RouterOutputs['saleRouter']['getInvoice'];
 }) {
   const { classes, theme } = useStyles();
   return (
@@ -260,12 +335,25 @@ export default function Invoice({
               />
               <div>
                 <Text weight={700} size={'lg'}>
-                  Company Name
+                  {data.warehouse?.name ?? data.company?.name}
                 </Text>
-                <Text weight={500}>Address</Text>
-                <Text weight={500}>City, State, Zip</Text>
-                <Text weight={500}>Phone</Text>
-                <Text weight={500}>Email</Text>
+                <Text weight={500}>
+                  {data.warehouse?.addressline1 ?? data.company?.addressline1}
+                </Text>
+                <Text weight={500}>
+                  {data.warehouse?.addressline2 ?? data.company?.addressline2}
+                </Text>
+                <Text weight={500}>
+                  {data.warehouse?.city ?? data.company?.city},
+                  {data.warehouse?.state ?? data.company?.state},
+                  {data.warehouse?.pincode ?? data.company?.pincode}
+                </Text>
+                <Text weight={500}>
+                  {data.warehouse?.numbers?.[0] ?? data.company?.numbers?.[0]}
+                </Text>
+                <Text weight={500}>
+                  {data.warehouse?.email ?? data.company?.email}
+                </Text>
               </div>
             </Group>
             <Divider />
@@ -305,7 +393,7 @@ export default function Invoice({
             </tr>
           </thead>
           <tbody>
-            {someData.map((data, index) => (
+            {data.products.map((product, index) => (
               <tr key={index}>
                 <Td
                   style={{
@@ -314,11 +402,14 @@ export default function Invoice({
                 >
                   {index + 1}
                 </Td>
-                <Td>{data.name}</Td>
-                <Td>{data.hsn}</Td>
-                <Td>{data.quantity}</Td>
-                <Td>{data.disc}</Td>
-                <Td>{data.amount}</Td>
+                <Td>{product.name}</Td>
+                <Td>{}</Td>
+                <Td>{product.quantity}</Td>
+                <Td>{data.discount / data.products.length}</Td>
+                <Td>
+                  {(product.price * product.quantity - data.discount) /
+                    data.products.length}
+                </Td>
               </tr>
             ))}
             <tr>
@@ -344,20 +435,6 @@ export default function Invoice({
         </Table>
         <Table withBorder withColumnBorders>
           <thead>
-            {/* <tr>
-              <Th>HSN/SAC</Th>
-              <Th>Taxable</Th>
-              <Th>Central Tax</Th>
-              <Th>State Tax</Th>
-              <Th>Integrated Tax</Th>
-              <Th>Total</Th>
-            </tr>
-            <tr>
-              <Th></Th>
-              <Th></Th>
-              <Th colSpan={2}>Rate</Th>
-              <Th colSpan={2}>Sp</Th>
-            </tr> */}
             <tr>
               <Th rowSpan={2}>HSN/SAC</Th>
               <Th rowSpan={2}>Taxable</Th>
@@ -379,23 +456,7 @@ export default function Invoice({
               <Th>Amt.</Th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <Td
-                style={{
-                  textAlign: 'right',
-                }}
-              >
-                Total
-              </Td>
-              <Td>100</Td>
-              <Td>0</Td>
-              <Td>0</Td>
-              <Td>0</Td>
-              <Td>0</Td>
-              <Td>100</Td>
-            </tr>
-          </tbody>
+          <tbody>{}</tbody>
         </Table>
       </Flex>
     </div>

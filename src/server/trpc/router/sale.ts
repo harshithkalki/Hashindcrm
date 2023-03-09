@@ -2,8 +2,15 @@ import Sale from '@/models/Sale';
 import Count from '@/models/Count';
 import { protectedProcedure, router } from '@/server/trpc/trpc';
 import checkPermission from '@/utils/checkPermission';
+import type { ZSale } from '@/zobjs/sale';
 import { ZSaleCreateInput, ZSaleUpdateInput } from '@/zobjs/sale';
 import { z } from 'zod';
+import type CompanyModel from '@/models/Company';
+import WarehouseModel from '@/models/Warehouse';
+import type { Warehouse } from '@/zobjs/warehouse';
+import type { Company } from '@/zobjs/company';
+import console from 'console';
+import type { Product } from '@/zobjs/product';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -182,4 +189,68 @@ export const saleRouter = router({
 
       return brands;
     }),
+
+  getInvoice: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(
+      async ({
+        input,
+        ctx,
+        // }): Promise<
+        //   ModifyDeep<
+        //     Omit<z.infer<typeof ZSale>, 'products' | 'warehouse'>,
+        //     {
+        //       company?: Company;
+        //       // warehouse?: Warehouse;
+        //       products: {
+        //         _id: string;
+        //         name: string;
+        //         price: number;
+        //         quantity: number;
+        //       }[];
+        //     }
+        //   >
+        // > => {
+      }) => {
+        const client = await checkPermission(
+          'SALES',
+          {
+            read: true,
+          },
+          ctx.clientId,
+          "You don't have permission to read sales"
+        );
+
+        const sale = await Sale.findById(input._id)
+          .populate<{
+            company: Company;
+            products: {
+              _id: Product & { _id: string };
+              price: number;
+              quantity: number;
+            }[];
+          }>('products._id company')
+          .lean();
+
+        if (!sale) {
+          throw new Error('Sale not found');
+        }
+
+        const warehouse =
+          (await WarehouseModel.findById(sale.warehouse).lean()) ?? undefined;
+
+        return {
+          ...sale,
+          warehouse,
+          products: sale.products.map((product) => ({
+            ...product,
+            name: product._id.name,
+          })),
+        };
+      }
+    ),
 });

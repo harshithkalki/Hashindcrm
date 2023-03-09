@@ -79,7 +79,6 @@ export default function TableSelection<T>({
   editDeleteColumnProps: { groupProps } = {},
   keysandlabels,
 }: TableSelectionProps<T>) {
-  console.log(data);
   const { classes, cx } = useStyles();
   const [filteredData, setFilteredData] = useState(data);
   const [search, setSearch] = useState('');

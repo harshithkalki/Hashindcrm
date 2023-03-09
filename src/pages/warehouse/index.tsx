@@ -10,30 +10,69 @@ import {
   Stack,
   Title,
   Text,
+  Center,
+  Grid,
+  SimpleGrid,
+  Image,
+  createStyles,
 } from '@mantine/core';
-import type { ZWarehouseCreateInput } from '@/zobjs/warehouse';
+import { ZWarehouseCreateInput } from '@/zobjs/warehouse';
 import { trpc } from '@/utils/trpc';
-import FormikInput from '@/components/FormikCompo/FormikInput';
 import { Formik, Form, FieldArray } from 'formik';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TableSelection from '@/components/Tables';
 import Layout from '@/components/Layout';
 import ArrayInput from '@/components/FormikCompo/ArrayInput';
-import { IconMinus, IconPlus } from '@tabler/icons';
-import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
+import FormikColor from '@/components/FormikCompo/FormikColor';
+import FormInput from '@/components/FormikCompo/FormikInput';
+import FormikSelect from '@/components/FormikCompo/FormikSelect';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
 
 const initialValues: WarehouseInput = {
   name: '',
+  addressline1: '',
+  addressline2: '',
+  email: '',
+  city: '',
+  state: '',
+  pincode: '',
+  country: '',
+  primaryColor: '',
+  secondaryColor: '',
+  backgroundColor: '',
+  logo: '',
+  natureOfBusiness: '',
   numbers: [''],
-  landline: [''],
-  address: '',
-  cinNo: '',
-  gstNo: '',
+  cinNo: undefined,
+  gstNo: undefined,
+  pan: undefined,
 };
+
+const useStyles = createStyles((theme) => ({
+  wrapper: {
+    background: 'dark',
+    padding: '15px 20px',
+    borderRadius: '5px',
+    boxShadow: theme.shadows.xs,
+  },
+  profile: {
+    cursor: 'pointer',
+    ':hover': {
+      boxShadow: theme.shadows.sm,
+    },
+  },
+  addressWrapper: {
+    padding: '8px 13px',
+  },
+  containerStyles: {
+    margin: 'auto',
+    width: '100%',
+  },
+}));
 
 const WarehouseForm = ({
   onSubmit,
@@ -42,162 +81,286 @@ const WarehouseForm = ({
   onSubmit: (values: WarehouseInput) => Promise<void>;
   values?: WarehouseInput | null;
 }) => {
+  const { classes, theme, cx } = useStyles();
+  const fileRef = useRef<HTMLInputElement>(null);
+
   return (
     <Formik
-      initialValues={values ?? initialValues}
-      validationSchema={toFormikValidationSchema(
-        z.object({
-          name: z.string().min(3).max(50),
-        })
-      )}
-      onSubmit={async (values, actions) => {
-        await onSubmit(values);
-        actions.resetForm();
-      }}
+      initialValues={values || initialValues}
+      validationSchema={toFormikValidationSchema(ZWarehouseCreateInput)}
+      onSubmit={onSubmit}
     >
-      {({ isSubmitting, values, setFieldValue, errors, touched }) => {
+      {({ values, isSubmitting, setFieldValue, errors, touched }) => {
         return (
           <Form>
-            <FormikInput
-              name='name'
-              label='Warehouse Name'
-              placeholder='Warehouse Name'
-            />
-            <FormikInput name='cinNo' label='CIN No' placeholder='CIN No' />
-            <FormikInput name='gstNo' label='GST No' placeholder='GST No' />
-            <FormikInput name='pan' label='PAN No' placeholder='PAN No' />
-
-            <FieldArray
-              name='numbers'
-              render={(arrayHelpers) => (
-                <div>
-                  <label
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: 500,
-                    }}
-                  >
-                    Mobile
-                  </label>
-                  <Stack spacing='xs'>
-                    {values.numbers.map((num, index) => (
-                      <div key={index}>
-                        <Group spacing={0}>
-                          <ArrayInput
-                            name={`numbers.${index}`}
-                            placeholder='mobile'
-                            style={{
-                              flex: 1,
-                            }}
-                          />
-                          <Group spacing={1} ml={2}>
-                            <ActionIcon
-                              onClick={() => arrayHelpers.remove(index)}
-                              color='red'
-                              variant='light'
-                              size={'lg'}
-                              disabled={values.numbers.length === 1}
-                            >
-                              <IconMinus />
-                            </ActionIcon>
-                            <ActionIcon
-                              onClick={() => arrayHelpers.push('')}
-                              color='blue'
-                              variant='light'
-                              size={'lg'}
-                            >
-                              <IconPlus />
-                            </ActionIcon>
-                          </Group>
-                        </Group>
-                        {
-                          <Text size='xs' color='red'>
-                            {Array.isArray(touched.numbers) &&
-                              (touched.numbers as unknown as boolean[])[
-                                index
-                              ] &&
-                              errors.numbers &&
-                              errors.numbers[index]}
-                          </Text>
-                        }
-                      </div>
-                    ))}
-                  </Stack>
-                </div>
-              )}
-            />
-            <FieldArray
-              name='landline'
-              render={(arrayHelpers) => (
-                <div>
-                  <label
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: 500,
-                    }}
-                  >
-                    Landline
-                  </label>
-                  <Stack spacing='xs'>
-                    {values.landline.map((num, index) => (
-                      <div key={index}>
-                        <Group spacing={0}>
-                          <ArrayInput
-                            name={`landline.${index}`}
-                            placeholder='mobile'
-                            style={{
-                              flex: 1,
-                            }}
-                          />
-                          <Group spacing={1} ml={2}>
-                            <ActionIcon
-                              onClick={() => arrayHelpers.remove(index)}
-                              color='red'
-                              variant='light'
-                              size={'lg'}
-                              disabled={values.landline.length === 1}
-                            >
-                              <IconMinus />
-                            </ActionIcon>
-                            <ActionIcon
-                              onClick={() => arrayHelpers.push('')}
-                              color='blue'
-                              variant='light'
-                              size={'lg'}
-                            >
-                              <IconPlus />
-                            </ActionIcon>
-                          </Group>
-                        </Group>
-                        {
-                          <Text size='xs' color='red'>
-                            {Array.isArray(touched.landline) &&
-                              (touched.landline as unknown as boolean[])[
-                                index
-                              ] &&
-                              errors.landline &&
-                              errors.landline[index]}
-                          </Text>
-                        }
-                      </div>
-                    ))}
-                  </Stack>
-                </div>
-              )}
-            />
-            <Formiktextarea
-              name='address'
-              label='Address'
-              placeholder='Address'
-            />
-            <Button
-              type='submit'
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              mt={'md'}
+            <SimpleGrid
+              m={'md'}
+              cols={2}
+              className={classes.wrapper}
+              breakpoints={[
+                { maxWidth: 'md', cols: 2, spacing: 'md' },
+                { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                { maxWidth: 'xs', cols: 1, spacing: 'sm' },
+              ]}
             >
-              Submit
-            </Button>
+              <FormInput
+                label='Warehouse Name'
+                placeholder='Warehouse Name'
+                name='name'
+                withAsterisk
+              />
+              <FormInput
+                label='email'
+                placeholder='email'
+                name='email'
+                withAsterisk
+              />
+
+              <FieldArray
+                name='numbers'
+                render={(arrayHelpers) => (
+                  <div>
+                    <label
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Mobile
+                    </label>
+                    <Stack spacing='xs'>
+                      {values.numbers.map((num, index) => (
+                        <div key={index}>
+                          <Group spacing={0}>
+                            <ArrayInput
+                              name={`numbers.${index}`}
+                              placeholder='mobile'
+                              style={{
+                                flex: 1,
+                              }}
+                            />
+                            <Group spacing={1} ml={2}>
+                              <ActionIcon
+                                onClick={() => arrayHelpers.remove(index)}
+                                color='red'
+                                variant='light'
+                                size={'lg'}
+                                disabled={values.numbers.length === 1}
+                              >
+                                <IconMinus />
+                              </ActionIcon>
+                              <ActionIcon
+                                onClick={() => arrayHelpers.push('')}
+                                color='blue'
+                                variant='light'
+                                size={'lg'}
+                              >
+                                <IconPlus />
+                              </ActionIcon>
+                            </Group>
+                          </Group>
+                          {
+                            <Text size='xs' color='red'>
+                              {Array.isArray(touched.numbers) &&
+                                (touched.numbers as unknown as boolean[])[
+                                  index
+                                ] &&
+                                errors.numbers &&
+                                errors.numbers[index]}
+                            </Text>
+                          }
+                        </div>
+                      ))}
+                    </Stack>
+                  </div>
+                )}
+              />
+            </SimpleGrid>
+
+            <Grid
+              m={'md'}
+              className={cx(classes.wrapper, {
+                [classes.addressWrapper]: true,
+              })}
+              columns={3}
+            >
+              <Grid.Col lg={1} sm={3}>
+                <Container className={classes.containerStyles}>
+                  <Center>
+                    <Image
+                      height={200}
+                      width={200}
+                      src={values.logo}
+                      alt=''
+                      withPlaceholder
+                    />
+                    <input
+                      hidden
+                      ref={fileRef}
+                      type='file'
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        if (e.target.files) {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setFieldValue('logo', URL.createObjectURL(file));
+                          }
+                        }
+                      }}
+                    />
+                  </Center>
+                  <Center>
+                    <Button
+                      leftIcon={values.logo === '' && <IconUpload size={17} />}
+                      onClick={() => {
+                        fileRef.current?.click();
+                      }}
+                      styles={{
+                        root: {
+                          margin: 2,
+                        },
+                      }}
+                    >
+                      {values.logo === '' ? `Upload` : `Change`}
+                    </Button>
+                  </Center>
+                </Container>
+              </Grid.Col>
+              <Grid.Col lg={2} sm={3}>
+                <Grid
+                  className={cx(classes.wrapper, {
+                    [classes.addressWrapper]: true,
+                  })}
+                  columns={2}
+                >
+                  <Grid.Col lg={1} sm={3}>
+                    <FormInput
+                      label='cin'
+                      placeholder='cin'
+                      name='cinNo'
+                      withAsterisk
+                    />
+                  </Grid.Col>
+                  <Grid.Col lg={1} sm={3}>
+                    <FormInput
+                      label='gst'
+                      placeholder='gst'
+                      name='gstNo'
+                      withAsterisk
+                    />
+                  </Grid.Col>
+                  <Grid.Col lg={1} sm={3}>
+                    <FormInput label='pan' placeholder='pan' name='pan' />
+                  </Grid.Col>
+                </Grid>
+              </Grid.Col>
+              <Grid.Col lg={1} sm={3}>
+                <FormikColor
+                  label='PrimaryColor'
+                  name='primaryColor'
+                  placeholder='Primary Color'
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={3}>
+                <FormikColor
+                  label='SecondaryColor'
+                  name='secondaryColor'
+                  placeholder='Secondary Color'
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={3}>
+                <FormikColor
+                  label='BackgroundColor'
+                  name='backgroundColor'
+                  placeholder='Background Color'
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={3}>
+                <FormikSelect
+                  label='Nature of Business'
+                  name='natureOfBusiness'
+                  placeholder='Nature of Business'
+                  data={[
+                    { label: 'Manufacturing', value: 'Manufacturing' },
+                    { label: 'Trading', value: 'Trading' },
+                    { label: 'Service', value: 'Service' },
+                  ]}
+                />
+              </Grid.Col>
+            </Grid>
+
+            {/* addess form */}
+            <Grid
+              m={'md'}
+              className={cx(classes.wrapper, {
+                [classes.addressWrapper]: true,
+              })}
+              columns={4}
+            >
+              <Grid.Col>
+                <Title order={4}>Address Info</Title>
+              </Grid.Col>
+              <Grid.Col lg={2} sm={4}>
+                <FormInput
+                  label='Address line 1'
+                  placeholder='Address line 1'
+                  name='addressline1'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={2} sm={4}>
+                <FormInput
+                  label='Address line 2'
+                  placeholder='Address line 2'
+                  name='addressline2'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='city'
+                  placeholder='city'
+                  name='city'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='state'
+                  placeholder='state'
+                  name='state'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='country'
+                  placeholder='country'
+                  name='country'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='pincode'
+                  placeholder='pincode'
+                  name='pincode'
+                  withAsterisk
+                />
+              </Grid.Col>
+            </Grid>
+            <Grid
+              m={'md'}
+              className={cx(classes.wrapper, {
+                [classes.addressWrapper]: true,
+              })}
+              columns={2}
+            >
+              <Grid.Col>
+                <Button type='submit' loading={isSubmitting}>
+                  Save
+                </Button>
+              </Grid.Col>
+            </Grid>
           </Form>
         );
       }}
@@ -208,18 +371,21 @@ const WarehouseForm = ({
 const AddWarehouse = ({
   open,
   onClose,
+  refetch,
 }: {
   open: boolean;
   onClose: () => void;
+  refetch: () => void;
 }) => {
   const createWarehouse = trpc.warehouseRouter.create.useMutation();
 
   return (
-    <Modal title='Add Warehouse' opened={open} onClose={onClose} size='md'>
+    <Modal title='Add Warehouse' opened={open} onClose={onClose} fullScreen>
       <WarehouseForm
         onSubmit={async (values) => {
           await createWarehouse.mutateAsync(values);
           onClose();
+          refetch();
         }}
       />
     </Modal>
@@ -241,7 +407,7 @@ const EditWarehouse = ({
       title='Edit Warehouse'
       opened={Boolean(_id)}
       onClose={onClose}
-      size='md'
+      fullScreen
     >
       {warehouse.isLoading ? (
         <Loader />
@@ -282,7 +448,11 @@ export default function Warehouse() {
   return (
     <>
       <Layout>
-        <AddWarehouse open={open} onClose={() => setOpen(false)} />
+        <AddWarehouse
+          open={open}
+          onClose={() => setOpen(false)}
+          refetch={warehouses.refetch}
+        />
         {editId && (
           <EditWarehouse _id={editId} onClose={() => setEditId(null)} />
         )}
@@ -308,6 +478,10 @@ export default function Warehouse() {
               name: 'Name',
             }}
             onEdit={(id) => setEditId(id)}
+            onDelete={async (id) => {
+              await deleteWarehouse.mutateAsync({ _id: id });
+              warehouses.refetch();
+            }}
             editable
             deletable
           />

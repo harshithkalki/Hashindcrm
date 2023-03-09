@@ -16,6 +16,7 @@ export const ZSaleCreateInput = z.object({
   discount: z.number(),
   total: z.number(),
   notes: z.string().optional(),
+  warehouse: z.string().optional(),
 });
 
 export const ZSaleUpdateInput = ZSaleCreateInput.partial().extend({

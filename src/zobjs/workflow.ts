@@ -12,3 +12,9 @@ export const ZWorkflowUpdateInput = ZWorkflowCreateInput.partial().extend({
 export const ZWorkflow = ZWorkflowCreateInput.extend({
   company: z.string(),
 });
+
+export type WorkflowCreateInput = z.infer<typeof ZWorkflowCreateInput>;
+
+export type WorkflowUpdateInput = z.infer<typeof ZWorkflowUpdateInput>;
+
+export type Workflow = z.infer<typeof ZWorkflow>;
