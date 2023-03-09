@@ -30,18 +30,14 @@ interface modalProps {
 }
 
 const initialValues: z.infer<typeof ZAdminCreateInput> = {
-  firstName: '',
-  lastName: 'lastname',
+  name: '',
   phoneNumber: '',
-  addressline1: '',
-  city: 'hyd',
-  state: 'tel',
-  country: 'ind',
-  pincode: '212345',
+  address: '',
   email: '',
   password: '123456',
   company: '',
   profile: 'profile',
+  status: '',
 };
 
 const useStyles = createStyles((theme) => ({
@@ -174,7 +170,7 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
                 <FormikInput
                   label='Name'
                   placeholder='Name'
-                  name='firstName'
+                  name='name'
                   withAsterisk
                 />
                 <FormikInput
@@ -214,7 +210,7 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
               <Formiktextarea
                 label='Address'
                 placeholder='Address'
-                name='addressline1'
+                name='address'
                 withAsterisk
                 mb={'md'}
               />
@@ -262,7 +258,7 @@ const Index = () => {
       <Tables
         data={admin.data?.docs || []}
         keysandlabels={{
-          firstName: 'Name',
+          name: 'Name',
           email: 'Email',
         }}
       />
