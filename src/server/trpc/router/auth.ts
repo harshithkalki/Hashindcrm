@@ -155,6 +155,22 @@ export const auth = router({
 
     staff.company._id = staff.company._id.toString();
 
+    outSchemaForMe.parse({
+      success: true,
+      data: {
+        isSuperAdmin: false,
+        ...staff,
+        linkedTo: staff.linkedTo?.toString(),
+        ticket: staff.ticket?.toString(),
+        role: {
+          ...staff.role,
+          company: staff.role.company.toString(),
+        },
+        createdAt: staff.createdAt.toISOString(),
+        warehouse: staff.warehouse?.toString(),
+      },
+    });
+
     return {
       success: true,
       data: {

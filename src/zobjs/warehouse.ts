@@ -5,8 +5,9 @@ export const ZWarehouseCreateInput = z.object({
   numbers: z.array(z.string()),
   address: z.string(),
   landline: z.array(z.string()),
-  cinNo: z.string(),
-  gstNo: z.string(),
+  cinNo: z.string().optional(),
+  gstNo: z.string().optional(),
+  pan: z.string().optional(),
 });
 
 export const ZWarehouseUpdateInput = ZWarehouseCreateInput.partial().extend({

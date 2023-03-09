@@ -19,7 +19,25 @@ const WarehouseSchema: Schema = new Schema<IWarehouse, WarehouseModel>(
   {
     name: { type: String, required: true },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
+    address: { type: String, required: true },
+    cinNo: { type: String, required: false },
+    gstNo: { type: String, required: false },
+    createdAt: { type: Date, default: Date.now },
+    numbers: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    pan: { type: String, required: false },
+    landline: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
   },
+
   {
     versionKey: false,
   }

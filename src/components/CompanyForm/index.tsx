@@ -217,21 +217,33 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                       </Center>
                     </Container>
                   </Grid.Col>
-                  <Grid.Col lg={1} sm={3}>
-                    <FormInput
-                      label='cin'
-                      placeholder='cin'
-                      name='cinNo'
-                      withAsterisk
-                    />
-                  </Grid.Col>
-                  <Grid.Col lg={1} sm={3}>
-                    <FormInput
-                      label='gst'
-                      placeholder='gst'
-                      name='gstNo'
-                      withAsterisk
-                    />
+                  <Grid.Col lg={2} sm={3}>
+                    <Grid
+                      className={cx(classes.wrapper, {
+                        [classes.addressWrapper]: true,
+                      })}
+                      columns={2}
+                    >
+                      <Grid.Col lg={1} sm={3}>
+                        <FormInput
+                          label='cin'
+                          placeholder='cin'
+                          name='cinNo'
+                          withAsterisk
+                        />
+                      </Grid.Col>
+                      <Grid.Col lg={1} sm={3}>
+                        <FormInput
+                          label='gst'
+                          placeholder='gst'
+                          name='gstNo'
+                          withAsterisk
+                        />
+                      </Grid.Col>
+                      <Grid.Col lg={1} sm={3}>
+                        <FormInput label='pan' placeholder='pan' name='pan' />
+                      </Grid.Col>
+                    </Grid>
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
                     <FormikColor

@@ -22,7 +22,6 @@ import TableSelection from '@/components/Tables';
 import Layout from '@/components/Layout';
 import ArrayInput from '@/components/FormikCompo/ArrayInput';
 import { IconMinus, IconPlus } from '@tabler/icons';
-import { errors } from 'formidable';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
@@ -66,6 +65,7 @@ const WarehouseForm = ({
             />
             <FormikInput name='cinNo' label='CIN No' placeholder='CIN No' />
             <FormikInput name='gstNo' label='GST No' placeholder='GST No' />
+            <FormikInput name='pan' label='PAN No' placeholder='PAN No' />
 
             <FieldArray
               name='numbers'
@@ -136,7 +136,7 @@ const WarehouseForm = ({
                       fontWeight: 500,
                     }}
                   >
-                    Mobile
+                    Landline
                   </label>
                   <Stack spacing='xs'>
                     {values.landline.map((num, index) => (
