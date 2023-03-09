@@ -28,6 +28,7 @@ import { setWarehouse } from '@/store/clientSlice';
 import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -140,6 +141,8 @@ export function CustomHeader({ user }: HeaderTabsProps) {
   const { classes, theme, cx } = useStyles();
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const logout = trpc.auth.logout.useMutation();
+  const { push } = useRouter();
 
   return (
     <div className={classes.header}>
@@ -233,7 +236,13 @@ export function CustomHeader({ user }: HeaderTabsProps) {
                 >
                   Change account
                 </Menu.Item>
-                <Menu.Item icon={<IconLogout size={14} stroke={1.5} />}>
+                <Menu.Item
+                  icon={<IconLogout size={14} stroke={1.5} />}
+                  onClick={() => {
+                    logout.mutateAsync();
+                    push('/login');
+                  }}
+                >
                   Logout
                 </Menu.Item>
 
