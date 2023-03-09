@@ -24,10 +24,12 @@ import {
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons';
 import { Form, Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Waypoint } from 'react-waypoint';
 import { showNotification } from '@mantine/notifications';
+import Invoice from '@/components/Invoice';
+import { useReactToPrint } from 'react-to-print';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -100,12 +102,23 @@ const Index = () => {
   >(new Map());
   const [selectProduct, setSelectProduct] = useState<InlineProduct>();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
+  const [invoiceId, setInvoiceId] = useState<string>('');
   const [products, setProducts] = useState<
     RouterOutputs['productRouter']['getProducts']['docs']
   >([]);
 
   const salesSubmit = trpc.saleRouter.create.useMutation();
+
+  const invoice = trpc.saleRouter.getInvoice.useQuery(
+    {
+      _id: invoiceId,
+    },
+    { enabled: Boolean(invoiceId) }
+  );
+  const componentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   useEffect(() => {
     if (productsQuery.data) {
@@ -121,6 +134,11 @@ const Index = () => {
   const { classes, theme } = useStyles();
   return (
     <Layout>
+      {invoice.data && !invoice.isLoading && (
+        <div style={{ display: 'none' }}>
+          <Invoice invoiceRef={componentRef} data={invoice.data} />
+        </div>
+      )}
       <Formik
         initialValues={{
           customer: '',
@@ -155,6 +173,15 @@ const Index = () => {
               message: 'Sale created successfully',
             });
             setSubmitting(false);
+            console.log(res._id);
+            setInvoiceId(res._id as unknown as string);
+            setTimeout(() => {
+              handlePrint();
+            }, 1000);
+
+            // const invoice = trpc.saleRouter.getInvoice.useQuery({
+            //   _id: res._id as string,
+            // });
           });
 
           console.log(values);
