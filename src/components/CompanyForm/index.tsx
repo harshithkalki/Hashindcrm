@@ -12,6 +12,7 @@ import {
   ActionIcon,
   Stack,
   Text,
+  FileInput,
 } from '@mantine/core';
 import { Formik, Form, FieldArray } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
@@ -19,10 +20,11 @@ import FormInput from '@/components/FormikCompo/FormikInput';
 import type { z } from 'zod';
 import { ZCompanyCreateInput } from '@/zobjs/company';
 import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import FormikColor from '../FormikCompo/FormikColor';
 import ArrayInput from '../FormikCompo/ArrayInput';
+import axios from 'axios';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -56,7 +58,8 @@ interface Props {
 
 const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
   const { classes, cx } = useStyles();
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [logo, setLogo] = useState<File | null>(null);
+  const logoref = useRef<HTMLInputElement>(null);
 
   return (
     <div style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
@@ -70,7 +73,16 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
           //   await new Promise((resolve) => setTimeout(resolve, 1000));
           //   actions.resetForm();
           // }}
-          onSubmit={onSubmit}
+          onSubmit={async (values, { setSubmitting }) => {
+            const file = logo;
+            if (file) {
+              const form = new FormData();
+              form.append('file', file);
+              const { data } = await axios.post('/api/upload-file', form);
+              values.logo = data.url;
+            }
+            onSubmit(values).then(() => setSubmitting(false));
+          }}
         >
           {({ values, isSubmitting, setFieldValue, errors, touched }) => {
             console.log(errors);
@@ -179,24 +191,21 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                           alt=''
                           withPlaceholder
                         />
-                        <input
-                          hidden
-                          ref={fileRef}
-                          type='file'
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            if (e.target.files) {
-                              const file = e.target.files[0];
-                              if (file) {
+                        <div style={{ display: 'none' }}>
+                          <input
+                            type='file'
+                            ref={logoref}
+                            onChange={(e) => {
+                              if (e.target.files) {
+                                setLogo(e.target.files[0] ?? null);
                                 setFieldValue(
                                   'logo',
-                                  URL.createObjectURL(file)
+                                  URL.createObjectURL(e.target.files[0]!)
                                 );
                               }
-                            }
-                          }}
-                        />
+                            }}
+                          />
+                        </div>
                       </Center>
                       <Center>
                         <Button
@@ -204,7 +213,7 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                             values.logo === '' && <IconUpload size={17} />
                           }
                           onClick={() => {
-                            fileRef.current?.click();
+                            logoref.current?.click();
                           }}
                           styles={{
                             root: {

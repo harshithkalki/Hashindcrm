@@ -11,17 +11,7 @@ import {
   Image,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-  IconLogout,
-  IconHeart,
-  IconStar,
-  IconMessage,
-  IconSettings,
-  IconPlayerPause,
-  IconTrash,
-  IconSwitchHorizontal,
-  IconChevronDown,
-} from '@tabler/icons';
+import { IconLogout, IconSettings, IconChevronDown } from '@tabler/icons';
 import InfiniteSelect from '../Custom/InfiniteSelect';
 import { trpc } from '@/utils/trpc';
 import { setWarehouse } from '@/store/clientSlice';
@@ -153,7 +143,7 @@ export function CustomHeader({}: HeaderTabsProps) {
       <Container className={classes.mainSection}>
         <Group position='apart'>
           <Image
-            src='/logo.svg'
+            src={client?.company?.logo}
             height={30}
             width={30}
             alt='Mantine logo'
