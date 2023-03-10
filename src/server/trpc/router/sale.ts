@@ -249,6 +249,7 @@ export const saleRouter = router({
           products: sale.products.map((product) => ({
             ...product,
             ...product._id,
+            quantity: product.quantity,
           })),
         };
       }

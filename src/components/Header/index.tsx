@@ -33,7 +33,11 @@ const useStyles = createStyles((theme) => ({
     gridArea: 'header',
   },
 
-  mainSection: {},
+  mainSection: {
+    maxWidth: '100%',
+    width: '100%',
+    padding: `0 ${theme.spacing.xl}px`,
+  },
 
   user: {
     color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
