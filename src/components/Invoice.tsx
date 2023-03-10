@@ -294,7 +294,7 @@ export default function Invoice({
     []
   );
 
-  console.log(data);
+  // console.log(data);
   const netPrice = data.products.reduce(
     (acc, curr) => acc + curr.salePrice * curr.quantity,
     0
