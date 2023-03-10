@@ -295,6 +295,10 @@ export default function Invoice({
   );
 
   console.log(data);
+  const netPrice = data.products.reduce(
+    (acc, curr) => acc + curr.salePrice * curr.quantity,
+    0
+  );
 
   return (
     <div className={classes.invoice} ref={invoiceRef}>
@@ -383,27 +387,27 @@ export default function Invoice({
             </tr>
           </thead>
           <tbody>
-            {data.products.map((product, index) => (
-              <tr key={index}>
-                <Td
-                  style={{
-                    width: '5%',
-                  }}
-                >
-                  {index + 1}
-                </Td>
-                <Td>{product.name}</Td>
-                <Td>{}</Td>
-                <Td>{product.quantity}</Td>
-                <Td>{data.discount / data.products.length}</Td>
-                <Td>
-                  {(product.price * product.quantity -
-                    data.discount +
-                    product.tax) /
-                    data.products.length}
-                </Td>
-              </tr>
-            ))}
+            {data.products.map((product, index) => {
+              return (
+                <tr key={index}>
+                  <Td
+                    style={{
+                      width: '5%',
+                    }}
+                  >
+                    {index + 1}
+                  </Td>
+                  <Td>{product.name}</Td>
+                  <Td>{}</Td>
+                  <Td>{product.quantity}</Td>
+                  <Td>{data.discount}</Td>
+                  <Td>
+                    {product.salePrice -
+                      (netPrice * (data.discount / 100)) / data.products.length}
+                  </Td>
+                </tr>
+              );
+            })}
             <tr>
               <Td
                 style={{
@@ -420,7 +424,7 @@ export default function Invoice({
               <Td></Td>
               <Td></Td>
               <Td></Td>
-              <Td>{data.total}</Td>
+              <Td>{netPrice - netPrice * (data.discount / 100)}</Td>
             </tr>
           </tbody>
         </Table>
@@ -450,10 +454,8 @@ export default function Invoice({
           <tbody>
             {data.products.map((product, index) => {
               const totalPrice =
-                (product.price * product.quantity -
-                  data.discount +
-                  product.tax) /
-                data.products.length;
+                product.salePrice -
+                (netPrice * (data.discount / 100)) / data.products.length;
               return (
                 <tr key={index}>
                   <Td>{}</Td>
@@ -467,8 +469,89 @@ export default function Invoice({
               );
             })}
           </tbody>
+          <tfoot style={{ borderTop: '2px solid black' }}>
+            <tr>
+              <Td
+                style={{
+                  textAlign: 'right',
+                }}
+              >
+                Total
+              </Td>
+              <Td>{netPrice - netPrice * (data.discount / 100)}</Td>
+              <Td></Td>
+              <Td>
+                {data.products.reduce(
+                  (acc, curr) =>
+                    acc +
+                    ((curr.salePrice -
+                      (netPrice * (data.discount / 100)) /
+                        data.products.length) *
+                      (curr.tax / 2)) /
+                      100,
+                  0
+                )}
+              </Td>
+              <Td></Td>
+              <Td>
+                {data.products.reduce(
+                  (acc, curr) =>
+                    acc +
+                    ((curr.salePrice -
+                      (netPrice * (data.discount / 100)) /
+                        data.products.length) *
+                      (curr.tax / 2)) /
+                      100,
+                  0
+                )}
+              </Td>
+              <Td>
+                {data.products.reduce(
+                  (acc, curr) =>
+                    acc +
+                    ((curr.salePrice -
+                      (netPrice * (data.discount / 100)) /
+                        data.products.length) *
+                      curr.tax) /
+                      100,
+                  0
+                )}
+              </Td>
+            </tr>
+          </tfoot>
         </Table>
+        <Group mt={'md'} mb={'xl'}>
+          <div>
+            <Text weight={500}>{`Total Amount : ${
+              netPrice - netPrice * (data.discount / 100)
+            }`}</Text>
+
+            <Text weight={500}>{`Total Tax : ${data.products.reduce(
+              (acc, curr) =>
+                acc +
+                ((curr.salePrice -
+                  (netPrice * (data.discount / 100)) / data.products.length) *
+                  curr.tax) /
+                  100,
+              0
+            )}`}</Text>
+
+            <Text weight={500}>{`Amount Chargeable : ${data.products.reduce(
+              (acc, curr) =>
+                acc +
+                curr.salePrice -
+                (netPrice * (data.discount / 100)) / data.products.length +
+                (curr.salePrice -
+                  (netPrice * (data.discount / 100)) / data.products.length) *
+                  (curr.tax / 100),
+              0
+            )}`}</Text>
+          </div>
+        </Group>
       </Flex>
     </div>
   );
+}
+function convert(otherNumbers: string) {
+  throw new Error('Function not implemented.');
 }

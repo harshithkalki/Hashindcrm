@@ -177,7 +177,7 @@ const Index = () => {
             setInvoiceId(res._id as unknown as string);
             setTimeout(() => {
               handlePrint();
-            }, 1000);
+            }, 2000);
 
             // const invoice = trpc.saleRouter.getInvoice.useQuery({
             //   _id: res._id as string,
