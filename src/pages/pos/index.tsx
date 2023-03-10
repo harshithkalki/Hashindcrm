@@ -151,7 +151,7 @@ const Index = () => {
           notes: '',
           total: 0,
         }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values, { setSubmitting, resetForm }) => {
           values.products = Array.from(inlineProducts.values());
           values.orderTax =
             [...inlineProducts.values()].reduce(
@@ -184,6 +184,7 @@ const Index = () => {
             // });
           });
 
+          resetForm();
           console.log(values);
         }}
       >
