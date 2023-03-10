@@ -78,9 +78,9 @@ const Index = () => {
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
 
-  console.log(warehouse);
-
-  const categories = trpc.categoryRouter.getAllCategories.useQuery();
+  const categories = trpc.categoryRouter.getAllCategories.useQuery(undefined, {
+    enabled: !!warehouse,
+  });
 
   const productsQuery = trpc.productRouter.getProducts.useQuery(
     {
@@ -187,7 +187,7 @@ const Index = () => {
           console.log(values);
         }}
       >
-        {({ handleSubmit, values, isSubmitting }) => (
+        {({ handleSubmit, values, isSubmitting, resetForm }) => (
           <Form
             onSubmit={handleSubmit}
             style={{
@@ -231,66 +231,73 @@ const Index = () => {
                         gap: '10px',
                       }}
                     >
-                      {categories.data?.map((item) => (
-                        <ActionIcon
-                          key={item._id.toString()}
-                          style={{ width: '70px', height: '60px' }}
-                          onClick={() => {
-                            setQuery((prev) => ({
-                              ...prev,
-                              category: item._id.toString(),
-                            }));
-                            setSelectedCategory(item._id.toString());
-                            productsQuery.refetch();
-                          }}
-                        >
-                          <div
-                            className='categorylist'
-                            style={{
-                              boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
-                              marginTop: '3px',
-                              width: '70px',
-                              height: '70px',
-                              //   border: "1px solid white",
-                              borderRadius: '10px',
-                              backgroundColor: '#25262B',
-                              display: 'inline-block',
+                      {categories.data
+                        ?.filter((cat) =>
+                          Boolean(
+                            products.find((val) => val.category._id === cat._id)
+                          )
+                        )
+                        .map((item) => (
+                          <ActionIcon
+                            key={item._id.toString()}
+                            style={{ width: '70px', height: '60px' }}
+                            onClick={() => {
+                              setQuery((prev) => ({
+                                ...prev,
+                                category: item._id.toString(),
+                              }));
+                              setSelectedCategory(item._id.toString());
+                              productsQuery.refetch();
                             }}
                           >
-                            <Container
-                              p={2}
-                              ta={'center'}
-                              mt={'5px'}
+                            <div
+                              className='categorylist'
                               style={{
-                                textOverflow: 'ellipsis',
-                                overflow: 'hidden',
-                              }}
-                              styles={{
-                                '&:hover': {
-                                  backgroundColor: 'white',
-                                  color: 'black',
-                                  cursor: 'pointer',
-                                },
+                                boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
+                                marginTop: '3px',
+                                width: '70px',
+                                height: '70px',
+                                //   border: "1px solid white",
+                                borderRadius: '10px',
+                                backgroundColor: '#25262B',
+                                display: 'inline-block',
                               }}
                             >
-                              <Image
-                                ml={'14px'}
-                                src={item.logo}
-                                alt={item.name}
-                                height={35}
-                                width={35}
-                                radius='xl'
-                              />
-                              <Truncate
-                                text={item.name}
-                                maxLength={8}
-                                textProps={{ size: 'xs' }}
-                              />
-                              {/* <Text fz={"xs"}>{item.name}</Text> */}
-                            </Container>
-                          </div>
-                        </ActionIcon>
-                      ))}
+                              <Container
+                                p={2}
+                                ta={'center'}
+                                mt={'5px'}
+                                style={{
+                                  textOverflow: 'ellipsis',
+                                  overflow: 'hidden',
+                                }}
+                                styles={{
+                                  '&:hover': {
+                                    backgroundColor: 'white',
+                                    color: 'black',
+                                    cursor: 'pointer',
+                                  },
+                                }}
+                              >
+                                <Image
+                                  ml={'14px'}
+                                  src={item.logo}
+                                  alt={item.name}
+                                  height={35}
+                                  width={35}
+                                  radius='xl'
+                                  withPlaceholder
+                                />
+                                <Truncate
+                                  text={item.name}
+                                  maxLength={8}
+                                  textProps={{ size: 'xs' }}
+                                />
+                                {/* <Text fz={"xs"}>{item.name}</Text> */}
+                              </Container>
+                            </div>
+                          </ActionIcon>
+                        ))}
                     </div>
                   </ScrollArea>
                 </div>
@@ -378,7 +385,7 @@ const Index = () => {
                         </Card.Section>
                         <Card.Section pl={'md'} mt={'xs'}>
                           <Text fw={500} fz={'lg'} mb={'md'}>
-                            $ {item.mrp}
+                            {'\u20B9'} {item.mrp}
                           </Text>
                         </Card.Section>
                         {index === products.length - 5 && (
@@ -695,7 +702,8 @@ const Index = () => {
                       w={'30%'}
                       size='sm'
                       onClick={() => {
-                        console.log(values);
+                        setInlineProducts(new Map());
+                        resetForm();
                       }}
                     >
                       Reset

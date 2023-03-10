@@ -22,14 +22,14 @@ type ProductModel = Model<IProduct, Record<string, never>>;
 const ProductSchema: Schema = new Schema<IProduct, ProductModel>(
   {
     name: { type: String, required: true },
-    slug: { type: String, required: true },
+    slug: { type: String, required: false },
     logo: { type: String },
     quantity: { type: Number, required: true },
     quantityAlert: { type: Number, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
     brand: { type: Schema.Types.ObjectId, ref: 'Brand' },
-    barcodeSymbology: { type: String, required: true },
-    itemCode: { type: String, required: true },
+    barcodeSymbology: { type: String, required: false },
+    itemCode: { type: String, required: false },
     openingStock: { type: Number, required: true },
     openingStockDate: { type: Date, required: true },
     purchasePrice: { type: Number, required: true },

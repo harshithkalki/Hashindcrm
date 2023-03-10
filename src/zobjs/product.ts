@@ -2,14 +2,14 @@ import { z } from 'zod';
 
 export const ZProductCreateInput = z.object({
   name: z.string(),
-  slug: z.string(),
+  slug: z.string().optional(),
   logo: z.string().optional(),
   quantity: z.number(),
   quantityAlert: z.number(),
   category: z.string(),
   brand: z.string(),
-  barcodeSymbology: z.string(),
-  itemCode: z.string(),
+  barcodeSymbology: z.string().optional(),
+  itemCode: z.string().optional(),
   openingStock: z.number(),
   openingStockDate: z.string(),
   purchasePrice: z.number(),
