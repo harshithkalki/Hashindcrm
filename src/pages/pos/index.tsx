@@ -187,7 +187,7 @@ const Index = () => {
           console.log(values);
         }}
       >
-        {({ handleSubmit, values, isSubmitting }) => (
+        {({ handleSubmit, values, isSubmitting, resetForm }) => (
           <Form
             onSubmit={handleSubmit}
             style={{
@@ -378,7 +378,7 @@ const Index = () => {
                         </Card.Section>
                         <Card.Section pl={'md'} mt={'xs'}>
                           <Text fw={500} fz={'lg'} mb={'md'}>
-                            $ {item.mrp}
+                            {'\u20B9'} {item.mrp}
                           </Text>
                         </Card.Section>
                         {index === products.length - 5 && (
@@ -695,7 +695,8 @@ const Index = () => {
                       w={'30%'}
                       size='sm'
                       onClick={() => {
-                        console.log(values);
+                        setInlineProducts(new Map());
+                        resetForm();
                       }}
                     >
                       Reset
