@@ -294,6 +294,8 @@ export default function Invoice({
     []
   );
 
+  console.log(data);
+
   return (
     <div className={classes.invoice} ref={invoiceRef}>
       <Title
@@ -445,7 +447,26 @@ export default function Invoice({
               <Th>Amt.</Th>
             </tr>
           </thead>
-          <tbody>{}</tbody>
+          <tbody>
+            {data.products.map((product, index) => {
+              const totalPrice =
+                (product.price * product.quantity -
+                  data.discount +
+                  product.tax) /
+                data.products.length;
+              return (
+                <tr key={index}>
+                  <Td>{}</Td>
+                  <Td>{totalPrice}</Td>
+                  <Td>{product.tax / 2}</Td>
+                  <Td>{(totalPrice * (product.tax / 2)) / 100}</Td>
+                  <Td>{product.tax / 2}</Td>
+                  <Td>{(totalPrice * (product.tax / 2)) / 100}</Td>
+                  <Td>{totalPrice * (product.tax / 100)}</Td>
+                </tr>
+              );
+            })}
+          </tbody>
         </Table>
       </Flex>
     </div>

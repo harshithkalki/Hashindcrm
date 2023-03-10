@@ -22,6 +22,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import type { BrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
 import { ZBrandCreateInput } from '@/zobjs/brand';
 import type { z } from 'zod';
+import BrandsTableSelection from '@/components/Tables/BrandsTable';
 
 const initialValues: BrandCreateInput = {
   name: '',
@@ -149,7 +150,7 @@ const Brand = () => {
   const [modal, setModal] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const brands = trpc.brandRouter.brands.useInfiniteQuery(
-    { limit: 1 },
+    { limit: 10 },
     {
       getNextPageParam: () => page,
       refetchOnWindowFocus: false,
@@ -192,7 +193,7 @@ const Brand = () => {
         </Group>
         <Divider mt={'xl'} />
 
-        <TableSelection
+        {/* <TableSelection
           data={
             brands.data?.pages
               .find((pageData) => pageData.page === page)
@@ -205,6 +206,19 @@ const Brand = () => {
             logo: 'Logo',
             name: 'Name',
           }}
+          onEdit={(id) => setEditId(id)}
+          editable
+          deletable
+        /> */}
+        <BrandsTableSelection
+          data={
+            brands.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((doc) => ({
+                ...doc,
+                _id: doc._id.toString(),
+              })) || []
+          }
           onEdit={(id) => setEditId(id)}
           editable
           deletable

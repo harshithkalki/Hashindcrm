@@ -187,12 +187,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
                 w={'100%'}
                 withAsterisk
               />
-              <FormInput
-                label='Slug'
-                placeholder='Slug'
-                name='slug'
-                withAsterisk
-              />
+              <FormInput label='Slug' placeholder='Slug' name='slug' />
               <FormInput
                 label='Quantity'
                 placeholder='Quantity'
@@ -224,13 +219,11 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
                 data={barcodeSymbologyOptions}
                 placeholder='Pick one barcode symbology'
                 name='barcodeSymbology'
-                withAsterisk
               />
               <FormInput
                 label='Item Code'
                 placeholder='Item Code'
                 name='itemCode'
-                withAsterisk
               />
               <FormInput
                 label='Opening Stock'
@@ -258,6 +251,15 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               </Grid.Col>
               <Grid.Col lg={1} sm={4}>
                 <FormInput
+                  label='MRP'
+                  type={'number'}
+                  placeholder='MRP'
+                  name='mrp'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={4}>
+                <FormInput
                   label='Purchase Price'
                   type={'number'}
                   placeholder='Purchase Price'
@@ -281,15 +283,6 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
                   name='tax'
                   withAsterisk
                   type={'number'}
-                />
-              </Grid.Col>
-              <Grid.Col lg={1} sm={4}>
-                <FormInput
-                  label='MRP'
-                  type={'number'}
-                  placeholder='MRP'
-                  name='mrp'
-                  withAsterisk
                 />
               </Grid.Col>
             </Grid>

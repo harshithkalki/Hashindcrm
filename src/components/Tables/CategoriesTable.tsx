@@ -90,7 +90,6 @@ export function TableSort({ data, onEdit }: TableSortProps) {
               </ActionIcon>
             )}
           </td>
-          <td>{data.name}</td>
           <td>
             <Image
               src={data.logo}
@@ -100,6 +99,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
               withPlaceholder
             />
           </td>
+          <td>{data.name}</td>
           <td>
             <Group spacing={0}>
               <ActionIcon onClick={() => onEdit(data._id)}>
@@ -148,8 +148,8 @@ export function TableSort({ data, onEdit }: TableSortProps) {
         <thead>
           <tr>
             <th style={{ width: '10%' }}></th>
-            <th>Name</th>
             <th>Logo</th>
+            <th>Name</th>
             <th>Actions</th>
           </tr>
         </thead>
