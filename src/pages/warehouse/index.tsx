@@ -41,11 +41,11 @@ const initialValues: WarehouseInput = {
   state: '',
   pincode: '',
   country: '',
-  primaryColor: '',
-  secondaryColor: '',
-  backgroundColor: '',
+  primaryColor: '#000',
+  secondaryColor: '#fff',
+  backgroundColor: '#fff',
   logo: '',
-  natureOfBusiness: '',
+  natureOfBusiness: 'marketing',
   numbers: [''],
   cinNo: undefined,
   gstNo: undefined,
@@ -253,7 +253,7 @@ const WarehouseForm = ({
                   </Grid.Col>
                 </Grid>
               </Grid.Col>
-              <Grid.Col lg={1} sm={3}>
+              {/* <Grid.Col lg={1} sm={3}>
                 <FormikColor
                   label='PrimaryColor'
                   name='primaryColor'
@@ -285,7 +285,7 @@ const WarehouseForm = ({
                     { label: 'Service', value: 'Service' },
                   ]}
                 />
-              </Grid.Col>
+              </Grid.Col> */}
             </Grid>
 
             {/* addess form */}
