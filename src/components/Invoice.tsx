@@ -520,7 +520,7 @@ export default function Invoice({
             </tr>
           </tfoot>
         </Table>
-        <Group mt={'md'} mb={'xl'}>
+        <Group mt={'md'} mb={'xs'} style={{ justifyContent: 'space-between' }}>
           <div>
             <Text weight={400}>{`Total Amount : ${
               netPrice - netPrice * (data.discount / 100).toFixed(2)
@@ -551,7 +551,29 @@ export default function Invoice({
               )
               .toFixed(2)}`}</Text>
           </div>
+          <div>
+            <Text weight={400}>
+              BankName : {data.warehouse?.bankName || 'XXXX'}
+            </Text>
+            <Text weight={400}>
+              Account Number : {data.warehouse?.accountNumber || 'XXXX'}
+            </Text>
+            <Text weight={400}>
+              IFSC Code : {data.warehouse?.ifscCode || 'XXXX'}
+            </Text>
+            <Text weight={400}>Pan: {data.warehouse?.pan} </Text>
+          </div>
         </Group>
+        <div style={{ justifyContent: 'space-between' }}>
+          <div style={{ width: '50%' }}>
+            <Text weight={400}>Terms and conditions</Text>
+            <Text weight={100}>1. Goods once sold will not be taken back.</Text>
+            <Text weight={100}>
+              2. Interest @ 24% p.a. will be charged if the payment is not made
+              within the stipulated time.
+            </Text>
+          </div>
+        </div>
       </Flex>
     </div>
   );
