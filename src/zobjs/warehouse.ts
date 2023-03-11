@@ -18,6 +18,10 @@ export const ZWarehouseCreateInput = z.object({
   natureOfBusiness: z.string(),
   numbers: z.array(z.string()),
   pan: z.string().optional(),
+  bankName: z.string().optional(),
+  branchName: z.string().optional(),
+  accountNumber: z.string().optional(),
+  ifscCode: z.string().optional(),
 });
 
 export const ZWarehouseUpdateInput = ZWarehouseCreateInput.partial().extend({

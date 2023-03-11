@@ -474,8 +474,10 @@ export default function Warehouse() {
                   _id: doc._id.toString(),
                 })) || []
             }
-            keysandlabels={{
-              name: 'Name',
+            colProps={{
+              name: {
+                label: 'Name',
+              },
             }}
             onEdit={(id) => setEditId(id)}
             onDelete={async (id) => {

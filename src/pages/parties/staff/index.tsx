@@ -317,7 +317,7 @@ const UpdateCustomer = ({
       <StaffForm
         formvalues={{
           ...staff.data,
-          linkedTo: staff.data.linkedTo?.toString(),
+          linkedTo: staff.data?.linkedTo?.toString(),
           role: staff.data.role?.toString(),
           warehouse: staff.data.warehouse?.toString(),
         }}
@@ -343,7 +343,7 @@ const Index = () => {
   return (
     <Layout>
       <AddCustomer modal={modal} setModal={setModal} />
-      <UpdateCustomer id={id} setId={setId} />
+      {id && <UpdateCustomer id={id} setId={setId} />}
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Staff Members</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
@@ -354,10 +354,19 @@ const Index = () => {
         data={
           staff.data?.map((val) => ({ ...val, _id: val._id.toString() })) ?? []
         }
-        keysandlabels={{
-          name: 'Name',
-          email: 'Email',
-          status: 'Status',
+        colProps={{
+          // name: 'Name',
+          // email: 'Email',
+          // status: 'Status',
+          name: {
+            label: 'Name',
+          },
+          email: {
+            label: 'Email',
+          },
+          status: {
+            label: 'Status',
+          },
         }}
         onEdit={(id) => {
           setId(id);

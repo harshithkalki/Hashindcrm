@@ -56,9 +56,15 @@ const Index = () => {
               companies.data.pages.find((pageData) => pageData.page === page)
                 ?.docs || []
             }
-            keysandlabels={{
-              name: 'Company Name',
-              email: 'Email',
+            colProps={{
+              // name: 'Company Name',
+              // email: 'Email',
+              name: {
+                label: 'Company Name',
+              },
+              email: {
+                label: 'Email',
+              },
             }}
             editable={true}
             deletable={true}

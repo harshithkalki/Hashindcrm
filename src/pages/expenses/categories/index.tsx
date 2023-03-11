@@ -222,10 +222,16 @@ const Index = () => {
         ) : (
           <>
             <TableSelection
-              data={Data?.docs}
-              keysandlabels={{
-                name: 'Expense Category Name',
-                description: 'Description',
+              data={Data?.docs ?? []}
+              colProps={{
+                // name: 'Expense Category Name',
+                // description: 'Description',
+                name: {
+                  label: 'Expense Category Name',
+                },
+                description: {
+                  label: 'Description',
+                },
               }}
               key='_id'
               deletable={true}

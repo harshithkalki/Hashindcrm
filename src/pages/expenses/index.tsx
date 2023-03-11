@@ -13,7 +13,6 @@ import {
   SimpleGrid,
   Title,
 } from '@mantine/core';
-
 import { Form, Formik } from 'formik';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
@@ -26,6 +25,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { trpc } from '@/utils/trpc';
 import { z } from 'zod';
 import { useRouter } from 'next/router';
+import dayjs from 'dayjs';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -319,13 +319,26 @@ const Index = () => {
                   ...val,
                   _id: val._id.toString(),
                   category: (val.category as unknown as { name: string }).name,
+                  date: dayjs(val.date).format('DD/MM/YYYY'),
                 })) || []
               }
-              keysandlabels={{
-                category: 'Expense Category',
-                amount: 'Amount',
-                date: 'Date',
-                notes: 'Notes',
+              colProps={{
+                // category: 'Expense Category',
+                // amount: 'Amount',
+                // date: 'Date',
+                // notes: 'Notes',
+                category: {
+                  label: 'Expense Category',
+                },
+                amount: {
+                  label: 'Amount',
+                },
+                date: {
+                  label: 'Date',
+                },
+                notes: {
+                  label: 'Notes',
+                },
               }}
               deletable={true}
               editable={true}
