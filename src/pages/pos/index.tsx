@@ -681,15 +681,15 @@ const Index = () => {
                       w={'30%'}
                       placeholder='Total'
                       size='sm'
-                      value={
+                      value={(
                         [...inlineProducts.values()].reduce(
                           (acc, item) =>
                             acc +
                             (item.discountedPrice + item.taxPrice) *
                               item.quantity,
                           0
-                        ) + values.shipping || 0
-                      }
+                        ) + values.shipping ?? 0
+                      ).toFixed(2)}
                       disabled
                     />
                     <Button
