@@ -15,6 +15,7 @@ import store from '@/store';
 import { useSelector } from 'react-redux';
 import type { z } from 'zod';
 import type { ZRole } from '@/zobjs/role';
+import { useRouter } from 'next/router';
 
 // import { UserMenu } from '../UserMenu';
 
@@ -224,10 +225,10 @@ interface Props {
 export default function NavbarNested({ hide }: Props) {
   const { classes } = useStyles();
   const [active, setActive] = useState('Billing');
-  const logout = trpc.auth.logout.useMutation();
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
   );
+  const { pathname: path } = useRouter();
 
   const links = useMemo(() => {
     if (client && !client.isSuperAdmin) {
@@ -269,16 +270,28 @@ export default function NavbarNested({ hide }: Props) {
     >
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
         <div className={classes.linksInner}>
-          {links.map((item) => (
-            <LinksGroup
-              {...item}
-              key={item.label}
-              onClick={() => {
-                setActive(item.label);
-              }}
-              active={item.label === active}
-            />
-          ))}
+          {links.map((item) => {
+            console.log(item, 'parent');
+            console.log(
+              typeof item.links === 'string'
+                ? item.links === path
+                : item.links.some((link) => link.link === path)
+            );
+            return (
+              <LinksGroup
+                {...item}
+                key={item.label}
+                onClick={() => {
+                  setActive(item.label);
+                }}
+                active={
+                  typeof item.links === 'string'
+                    ? item.links === path
+                    : item.links.some((link) => link.link === path)
+                }
+              />
+            );
+          })}
         </div>
       </Navbar.Section>
     </Navbar>

@@ -11,7 +11,7 @@ import {
 import type { TablerIcon } from '@tabler/icons';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons';
 import { useRouter } from 'next/router';
-import { Permissions } from '@/constants';
+import type { Permissions } from '@/constants';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
@@ -116,17 +116,19 @@ export default function LinksGroup({
   active,
   onClick,
 }: LinksGroupProps) {
+  console.log(active);
   const { classes, theme, cx } = useStyles();
   const [isActive, setActive] = useState<number>();
-  const { push } = useRouter();
+  const { push, pathname } = useRouter();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
+
   const items = (hasLinks ? links : []).map((link, index) => (
     <Text<'a'>
       component='a'
       className={cx(classes.link, {
-        [classes.linkActive]: isActive === index && active,
+        [classes.linkActive]: pathname === link.link && active,
       })}
       key={link.label}
       onClick={(event) => {
