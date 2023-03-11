@@ -156,6 +156,7 @@ const Index = () => {
           shipping: 0,
           notes: '',
           total: 0,
+          warehouse: '',
         }}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           values.products = Array.from(inlineProducts.values());
@@ -172,6 +173,7 @@ const Index = () => {
                 acc + (item.discountedPrice + item.taxPrice) * item.quantity,
               0
             ) + values.shipping || 0;
+          values.warehouse = warehouse as string;
 
           salesSubmit.mutateAsync(values).then((res) => {
             showNotification({

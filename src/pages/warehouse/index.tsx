@@ -51,9 +51,9 @@ const initialValues: WarehouseInput = {
   gstNo: undefined,
   pan: undefined,
   bankName: undefined,
-  bankAccountNo: undefined,
+  accountNumber: undefined,
   ifscCode: undefined,
-  bankBranch: undefined,
+  branchName: undefined,
 };
 
 const useStyles = createStyles((theme) => ({
@@ -293,6 +293,49 @@ const WarehouseForm = ({
                 />
               </Grid.Col> */}
             </Grid>
+            <Grid
+              m={'md'}
+              className={cx(classes.wrapper, {
+                [classes.addressWrapper]: true,
+              })}
+              columns={4}
+            >
+              <Grid.Col>
+                <Title order={4}>Bank Info</Title>
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='Bank Name'
+                  placeholder='Bank Name'
+                  name='bankName'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='Account Number'
+                  placeholder='Account Number'
+                  name='accountNumber'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='IFSC Code'
+                  placeholder='IFSC Code'
+                  name='ifscCode'
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col lg={1} sm={2}>
+                <FormInput
+                  label='Branch Name'
+                  placeholder='Branch Name'
+                  name='branchName'
+                  withAsterisk
+                />
+              </Grid.Col>
+            </Grid>
 
             {/* addess form */}
             <Grid
@@ -418,6 +461,7 @@ const EditWarehouse = ({
 }) => {
   const updateWarehouse = trpc.warehouseRouter.update.useMutation();
   const warehouse = trpc.warehouseRouter.get.useQuery({ _id });
+  console.log(warehouse);
 
   return (
     <Modal
@@ -438,6 +482,7 @@ const EditWarehouse = ({
             onClose();
           }}
           values={warehouse.data}
+          onClose={onClose}
         />
       )}
     </Modal>
