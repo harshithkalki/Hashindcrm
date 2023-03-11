@@ -271,12 +271,6 @@ export default function NavbarNested({ hide }: Props) {
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
         <div className={classes.linksInner}>
           {links.map((item) => {
-            console.log(item, 'parent');
-            console.log(
-              typeof item.links === 'string'
-                ? item.links === path
-                : item.links.some((link) => link.link === path)
-            );
             return (
               <LinksGroup
                 {...item}
