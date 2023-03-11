@@ -137,10 +137,17 @@ const Index = () => {
     }
   }, [productsQuery.data, warehouse]);
 
+  useEffect(() => {
+    if (invoice.data) {
+      handlePrint();
+      setInvoiceId('');
+    }
+  }, [handlePrint, invoice.data]);
+
   const { classes, theme } = useStyles();
   return (
     <Layout>
-      {invoice.data && !invoice.isLoading && (
+      {invoice.data && (
         <div style={{ display: 'none' }}>
           <Invoice invoiceRef={componentRef} data={invoice.data} />
         </div>
@@ -183,9 +190,6 @@ const Index = () => {
             setSubmitting(false);
             console.log(res._id);
             setInvoiceId(res._id as unknown as string);
-            setTimeout(() => {
-              handlePrint();
-            }, 2000);
 
             // const invoice = trpc.saleRouter.getInvoice.useQuery({
             //   _id: res._id as string,
