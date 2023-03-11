@@ -185,6 +185,7 @@ const Index = () => {
           });
 
           resetForm();
+          setInlineProducts(new Map());
           console.log(values);
         }}
       >
