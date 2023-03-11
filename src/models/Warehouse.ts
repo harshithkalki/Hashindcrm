@@ -42,6 +42,10 @@ const WarehouseSchema: Schema = new Schema<IWarehouse, WarehouseModel>(
       type: Schema.Types.ObjectId,
       ref: 'Company',
     },
+    bankName: { type: String, required: false },
+    branchName: { type: String, required: false },
+    accountNumber: { type: String, required: false },
+    ifscCode: { type: String, required: false },
   },
 
   {

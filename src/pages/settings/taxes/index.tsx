@@ -91,8 +91,14 @@ const Index = () => {
         <TableSelection
           data={data}
           keysandlabels={{
-            taxname: 'Tax Name',
-            taxrate: 'Tax Rate',
+            // taxname: 'Tax Name',
+            // taxrate: 'Tax Rate',
+            taxname: {
+              label: 'Tax Name',
+            },
+            taxrate: {
+              label: 'Tax Rate',
+            },
           }}
           editable={true}
           deletable={true}

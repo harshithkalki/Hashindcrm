@@ -257,9 +257,15 @@ const Index = () => {
       </Group>
       <Tables
         data={admin.data?.docs || []}
-        keysandlabels={{
-          name: 'Name',
-          email: 'Email',
+        colProps={{
+          // name: 'Name',
+          // email: 'Email',
+          name: {
+            label: 'Name',
+          },
+          email: {
+            label: 'Email',
+          },
         }}
       />
     </Layout>

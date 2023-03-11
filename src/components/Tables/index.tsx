@@ -37,11 +37,14 @@ interface TableSelectionProps<T> {
   editDeleteColumnProps?: {
     groupProps?: GroupProps;
   };
-  keysandlabels: KeysAndLabels<T>;
+  colProps: ColProps<T>;
 }
 
-type KeysAndLabels<T> = {
-  [K in keyof T]?: string;
+type ColProps<T> = {
+  [K in keyof T]?: {
+    label: string;
+    Component?: React.FC<T>;
+  };
 };
 
 function ConfirmDelete({
@@ -77,7 +80,7 @@ export default function TableSelection<T>({
   onDelete,
   onEdit,
   editDeleteColumnProps: { groupProps } = {},
-  keysandlabels,
+  colProps,
 }: TableSelectionProps<T>) {
   const { classes, cx } = useStyles();
   const [filteredData, setFilteredData] = useState(data);
@@ -123,17 +126,24 @@ export default function TableSelection<T>({
 
     return (
       <tr key={item._id} className={cx({ [classes.rowSelected]: selected })}>
-        {keys(keysandlabels).map((key) => (
-          <td
-            key={`${item[key]}`}
-            style={{
-              whiteSpace: 'nowrap',
-              textAlign: 'center',
-            }}
-          >
-            {item[key] as string}
-          </td>
-        ))}
+        {keys(colProps).map((key) => {
+          const Component = colProps[key]?.Component;
+          return (
+            <td
+              key={`${item[key]}`}
+              style={{
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
+              }}
+            >
+              {Component ? (
+                <Component {...item} />
+              ) : (
+                <Text size='sm'>{item[key] as string}</Text>
+              )}
+            </td>
+          );
+        })}
         <td>
           <Group spacing={0} {...groupProps}>
             {isEditColumn && (
@@ -190,12 +200,12 @@ export default function TableSelection<T>({
           <Table sx={{ minWidth: '100%' }} verticalSpacing='sm'>
             <thead>
               <tr>
-                {keys(keysandlabels)?.map((item) => (
+                {keys(colProps)?.map((item) => (
                   <th
                     key={item.toString()}
                     style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
                   >
-                    {keysandlabels[item]}
+                    {colProps[item]?.label}
                   </th>
                 ))}
                 {(isDeleteColumn || isEditColumn) && <th />}
