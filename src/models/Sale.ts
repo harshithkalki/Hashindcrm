@@ -32,7 +32,12 @@ const SaleSchema: Schema = new Schema<ISale, SaleModel>(
     notes: { type: String, required: false },
     invoiceId: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    company: { type: Schema.Types.ObjectId, ref: 'Company', required: true },
+    company: { type: Schema.Types.ObjectId, ref: 'Company', required: false },
+    warehouse: {
+      type: Schema.Types.ObjectId,
+      ref: 'Warehouse',
+      required: true,
+    },
   },
   {
     versionKey: false,
