@@ -39,9 +39,7 @@ const SaleSchema: Schema = new Schema<ISale, SaleModel>(
       required: true,
     },
   },
-  {
-    versionKey: false,
-  }
+  { versionKey: false }
 );
 
 SaleSchema.plugin(mongoosePaginate);

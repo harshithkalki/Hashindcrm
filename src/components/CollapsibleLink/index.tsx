@@ -104,7 +104,7 @@ export interface NavData {
 
 export interface LinksGroupProps extends NavData {
   initiallyOpened?: boolean;
-  active?: boolean;
+  active: boolean;
   onClick?: () => void;
 }
 
@@ -121,7 +121,7 @@ export default function LinksGroup({
   const [isActive, setActive] = useState<number>();
   const { push, pathname } = useRouter();
   const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
+  const [opened, setOpened] = useState(active);
   const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
 
   const items = (hasLinks ? links : []).map((link, index) => (
