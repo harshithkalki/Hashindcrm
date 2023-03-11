@@ -22,7 +22,12 @@ import {
   Button,
   NumberInput,
 } from '@mantine/core';
-import { IconPlus, IconTrash } from '@tabler/icons';
+import {
+  IconCurrencyRupee,
+  IconPercentage,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -43,6 +48,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const customerOptions = [
+  { label: 'walk-in', value: 'walk-in' },
   { label: 'Customer 1', value: 'Customer 1' },
   { label: 'Customer 2', value: 'Customer 2' },
   { label: 'Customer 3', value: 'Customer 3' },
@@ -386,7 +392,7 @@ const Index = () => {
                         </Card.Section>
                         <Card.Section pl={'md'} mt={'xs'}>
                           <Text fw={500} fz={'lg'} mb={'md'}>
-                            {'\u20B9'} {item.mrp}
+                            {'\u20B9'} {item.salePrice}
                           </Text>
                         </Card.Section>
                         {index === products.length - 5 && (
@@ -426,6 +432,7 @@ const Index = () => {
                       label='Customer'
                       data={customerOptions}
                       placeholder='Select Customer'
+                      defaultValue={'walk-in'}
                       searchable
                       size='sm'
                     />
@@ -652,6 +659,7 @@ const Index = () => {
                       w={'30%'}
                       size='sm'
                       type='number'
+                      rightSection={<IconPercentage />}
                     />
                     <FormInput
                       name='shipping'
@@ -660,6 +668,7 @@ const Index = () => {
                       w={'30%'}
                       size='sm'
                       type='number'
+                      icon={<IconCurrencyRupee />}
                     />
                     <FormikSelect
                       name='paymentmethod'
@@ -667,6 +676,7 @@ const Index = () => {
                       data={[
                         { label: 'Cash', value: 'cash' },
                         { label: 'Card', value: 'card' },
+                        { label: 'UPI', value: 'upi' },
                       ]}
                       placeholder='Payment Method'
                       w={'30%'}
@@ -690,6 +700,7 @@ const Index = () => {
                         ) + values.shipping || 0
                       }
                       disabled
+                      icon={<IconCurrencyRupee />}
                     />
                     <Button
                       w={'30%'}
