@@ -139,6 +139,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
   const categories = trpc.categoryRouter.getAllCategories.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
+  const router = useRouter();
   const [logo, setLogo] = useState<File | null>(null);
 
   return (
@@ -320,9 +321,18 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               columns={2}
             >
               <Grid.Col>
-                <Button type='submit' loading={isSubmitting}>
-                  Save
-                </Button>
+                <Group spacing={'md'}>
+                  <Button type='submit' loading={isSubmitting}>
+                    Save
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      router.back();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Group>
               </Grid.Col>
             </Grid>
           </Form>

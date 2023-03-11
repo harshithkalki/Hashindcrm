@@ -33,9 +33,11 @@ const initialValues: BrandCreateInput = {
 const BrandForm = ({
   onSubmit,
   values = initialValues,
+  onClose,
 }: {
   onSubmit: (values: BrandCreateInput) => Promise<void>;
   values?: BrandCreateInput | null;
+  onClose: () => void;
 }) => {
   const [logo, setLogo] = useState<File | null>(null);
 
@@ -80,9 +82,12 @@ const BrandForm = ({
             placeholder='Select Logo'
             icon={<IconUpload size={14} />}
           />
-          <Group mt={'md'} mb={'xs'}>
+          <Group mt={'md'} mb={'xs'} spacing={'md'}>
             <Button type='submit' mt={'md'} loading={isSubmitting} size={'sm'}>
               Submit
+            </Button>
+            <Button type='button' mt={'md'} size={'sm'} onClick={onClose}>
+              Cancel
             </Button>
           </Group>
         </Form>
@@ -110,6 +115,7 @@ const AddBrand = ({
 
           onClose();
         }}
+        onClose={onClose}
       />
     </Modal>
   );
@@ -140,6 +146,7 @@ const EditBrand = ({ onClose, _id }: { _id: string; onClose: () => void }) => {
             onClose();
           }}
           values={brand.data}
+          onClose={onClose}
         />
       )}
     </Modal>

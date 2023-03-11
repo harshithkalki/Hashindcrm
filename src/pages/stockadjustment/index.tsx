@@ -108,9 +108,20 @@ const Index = () => {
                   placeholder='Note'
                   mt={'md'}
                 />
-                <Button type='submit' mt={'lg'}>
-                  Submit
-                </Button>
+                <Group style={{ justifyContent: 'end' }}>
+                  <Button type='submit' mt={'lg'} size={'xs'}>
+                    Submit
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setModal(false);
+                    }}
+                    mt={'lg'}
+                    size={'xs'}
+                  >
+                    Cancel
+                  </Button>
+                </Group>
               </Form>
             )}
           </Formik>

@@ -143,9 +143,11 @@ const RolesSelect = () => {
 const StaffForm = ({
   formvalues = initialValues,
   onSubmit,
+  setModal,
 }: {
   formvalues?: z.infer<typeof ZStaffMemCreateInput>;
   onSubmit: (values: z.infer<typeof ZStaffMemCreateInput>) => void;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes } = useStyles();
@@ -261,8 +263,16 @@ const StaffForm = ({
             <Button type='submit' size='xs'>
               Create
             </Button>
+            <Button
+              size='xs'
+              onClick={() => {
+                setModal(false);
+              }}
+            >
+              Cancel
+            </Button>
           </Group>
-          {JSON.stringify(errors, null, 2)}
+          {/* {JSON.stringify(errors, null, 2)} */}
         </Form>
       )}
     </Formik>
@@ -284,6 +294,7 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
           createStaff.mutateAsync(values);
           setModal(false);
         }}
+        setModal={setModal}
       />
     </Modal>
   );
@@ -305,7 +316,7 @@ const UpdateCustomer = ({
     { refetchOnWindowFocus: false, enabled: Boolean(id) }
   );
 
-  if (!staff.data) return <div>loading</div>;
+  if (staff.isLoading) return <div>loading</div>;
 
   return (
     <Modal
@@ -338,7 +349,7 @@ const Index = () => {
   const [id, setId] = React.useState<string | null>(null);
   const staff = trpc.staffRouter.getAllStaffs.useQuery();
 
-  console.log(id);
+  // console.log(id);
 
   return (
     <Layout>

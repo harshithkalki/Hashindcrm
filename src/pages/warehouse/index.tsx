@@ -50,6 +50,10 @@ const initialValues: WarehouseInput = {
   cinNo: undefined,
   gstNo: undefined,
   pan: undefined,
+  bankName: undefined,
+  bankAccountNo: undefined,
+  ifscCode: undefined,
+  bankBranch: undefined,
 };
 
 const useStyles = createStyles((theme) => ({
@@ -77,9 +81,11 @@ const useStyles = createStyles((theme) => ({
 const WarehouseForm = ({
   onSubmit,
   values = initialValues,
+  onClose,
 }: {
   onSubmit: (values: WarehouseInput) => Promise<void>;
   values?: WarehouseInput | null;
+  onClose: () => void;
 }) => {
   const { classes, theme, cx } = useStyles();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -356,9 +362,19 @@ const WarehouseForm = ({
               columns={2}
             >
               <Grid.Col>
-                <Button type='submit' loading={isSubmitting}>
-                  Save
-                </Button>
+                <Group>
+                  <Button type='submit' loading={isSubmitting} size={'xs'}>
+                    Save
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      onClose();
+                    }}
+                    size={'xs'}
+                  >
+                    Cancel
+                  </Button>
+                </Group>
               </Grid.Col>
             </Grid>
           </Form>
@@ -387,6 +403,7 @@ const AddWarehouse = ({
           onClose();
           refetch();
         }}
+        onClose={onClose}
       />
     </Modal>
   );

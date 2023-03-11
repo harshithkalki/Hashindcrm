@@ -10,6 +10,7 @@ import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 // import { trpc } from "@/utils/trpc";
 import { Permissions } from '@/constants';
 import { ZRoleCreateInput } from '@/zobjs/role';
+import { useRouter } from 'next/router';
 
 // const permissionsDemo: Permission = [
 //   {
@@ -55,6 +56,7 @@ interface props {
 const RoleForm = ({ formInputs, onSubmit, title }: props) => {
   const matches = useMediaQuery('(max-width: 800px)');
   const formpermissions: Permission = formInputs.permissions;
+  const router = useRouter();
 
   const PermissonsValues = Permissions.map((permission) => {
     const permissionIndex = formpermissions.findIndex(
@@ -155,10 +157,19 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                   </div>
                 );
               })}
-
-              <Button disabled={isSubmitting} type='submit' mt={'md'}>
-                Save
-              </Button>
+              <Group spacing={'xs'} mt={'md'} mb={'xl'}>
+                <Button disabled={isSubmitting} type='submit' size={'xs'}>
+                  Save
+                </Button>
+                <Button
+                  size='xs'
+                  onClick={() => {
+                    router.back();
+                  }}
+                >
+                  cancel
+                </Button>
+              </Group>
             </Form>
           )}
         </Formik>

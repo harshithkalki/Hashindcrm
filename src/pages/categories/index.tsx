@@ -30,9 +30,11 @@ const initialValues: CategoryCreateInput = {
 const CategoryForm = ({
   onSubmit,
   values = initialValues,
+  onClose,
 }: {
   onSubmit: (values: CategoryCreateInput) => Promise<void>;
   values?: (CategoryCreateInput & { _id?: string }) | null;
+  onClose: () => void;
 }) => {
   const allCategories = trpc.categoryRouter.getAllCategories.useQuery(
     undefined,
@@ -105,9 +107,12 @@ const CategoryForm = ({
             icon={<IconUpload size={14} />}
             onChange={setLogo}
           />
-          <Group mt={'md'} mb={'xs'}>
+          <Group mt={'md'} mb={'xs'} spacing={'md'}>
             <Button type='submit' mt={'md'} loading={isSubmitting} size={'sm'}>
               Submit
+            </Button>
+            <Button type='button' mt={'md'} size={'sm'} onClick={onClose}>
+              Cancel
             </Button>
           </Group>
         </Form>
@@ -136,6 +141,7 @@ const AddCategory = ({
 
             onClose();
           }}
+          onClose={onClose}
         />
       </Modal>
     </>
@@ -182,6 +188,7 @@ const EditCategory = ({
                 }
               : null
           }
+          onClose={onClose}
         />
       )}
     </Modal>

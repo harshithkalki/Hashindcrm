@@ -522,30 +522,34 @@ export default function Invoice({
         </Table>
         <Group mt={'md'} mb={'xl'}>
           <div>
-            <Text weight={500}>{`Total Amount : ${
-              netPrice - netPrice * (data.discount / 100)
+            <Text weight={400}>{`Total Amount : ${
+              netPrice - netPrice * (data.discount / 100).toFixed(2)
             }`}</Text>
 
-            <Text weight={500}>{`Total Tax : ${data.products.reduce(
-              (acc, curr) =>
-                acc +
-                ((curr.salePrice -
-                  (netPrice * (data.discount / 100)) / data.products.length) *
-                  curr.tax) /
-                  100,
-              0
-            )}`}</Text>
+            <Text weight={400}>{`Total Tax : ${data.products
+              .reduce(
+                (acc, curr) =>
+                  acc +
+                  ((curr.salePrice -
+                    (netPrice * (data.discount / 100)) / data.products.length) *
+                    curr.tax) /
+                    100,
+                0
+              )
+              .toFixed(2)}`}</Text>
 
-            <Text weight={500}>{`Amount Chargeable : ${data.products.reduce(
-              (acc, curr) =>
-                acc +
-                curr.salePrice -
-                (netPrice * (data.discount / 100)) / data.products.length +
-                (curr.salePrice -
-                  (netPrice * (data.discount / 100)) / data.products.length) *
-                  (curr.tax / 100),
-              0
-            )}`}</Text>
+            <Text weight={400}>{`Amount Chargeable : ${data.products
+              .reduce(
+                (acc, curr) =>
+                  acc +
+                  curr.salePrice -
+                  (netPrice * (data.discount / 100)) / data.products.length +
+                  (curr.salePrice -
+                    (netPrice * (data.discount / 100)) / data.products.length) *
+                    (curr.tax / 100),
+                0
+              )
+              .toFixed(2)}`}</Text>
           </div>
         </Group>
       </Flex>

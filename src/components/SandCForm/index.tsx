@@ -508,6 +508,15 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 <Button type='submit' mb={'md'} loading={isSubmitting}>
                   Submit
                 </Button>
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    setModal(false);
+                  }}
+                  mb={'md'}
+                >
+                  Cancel
+                </Button>
               </Group>
             </Form>
           )}

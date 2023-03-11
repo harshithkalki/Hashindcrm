@@ -5,7 +5,7 @@ import { trpc } from '@/utils/trpc';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
-import { Pagination, ScrollArea } from '@mantine/core';
+import { Group, Pagination, ScrollArea, Title } from '@mantine/core';
 import RolesTable from '@/components/Tables/RolesTable';
 import { usePagination } from '@mantine/hooks';
 
@@ -17,7 +17,7 @@ interface props {
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
-  const getAllRoles = trpc.roleRouter.roles.useQuery({ page: page, limit: 1 });
+  const getAllRoles = trpc.roleRouter.roles.useQuery({ page: page, limit: 10 });
 
   const tabData = getAllRoles.data;
   const Data = tabData;
@@ -26,6 +26,9 @@ const Index = () => {
 
   return (
     <Layout>
+      <Group mb={'lg'}>
+        <Title fw={400}>Roles</Title>
+      </Group>
       {Data && (
         <ScrollArea style={{ height: '100%' }}>
           <div>
