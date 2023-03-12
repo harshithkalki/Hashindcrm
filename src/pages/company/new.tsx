@@ -23,6 +23,8 @@ const initialFormInputs: z.infer<typeof ZCompanyCreateInput> = {
   logo: '',
   natureOfBusiness: '',
   numbers: [''],
+  domain: '',
+  pan: '',
 };
 
 const Index = () => {

@@ -12,7 +12,6 @@ import {
   ActionIcon,
   Stack,
   Text,
-  FileInput,
 } from '@mantine/core';
 import { Formik, Form, FieldArray } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
@@ -68,11 +67,6 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
         <Formik
           initialValues={formInputs}
           validationSchema={toFormikValidationSchema(ZCompanyCreateInput)}
-          // onSubmit={async (values, actions) => {
-          //   console.log(values);
-          //   await new Promise((resolve) => setTimeout(resolve, 1000));
-          //   actions.resetForm();
-          // }}
           onSubmit={async (values, { setSubmitting }) => {
             const file = logo;
             if (file) {
@@ -172,6 +166,12 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                       </div>
                     )}
                   />
+                  <FormInput
+                    label='Domain'
+                    placeholder='Domain'
+                    name='domain'
+                    withAsterisk
+                  />
                 </SimpleGrid>
 
                 <Grid
@@ -196,11 +196,12 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                             type='file'
                             ref={logoref}
                             onChange={(e) => {
-                              if (e.target.files) {
-                                setLogo(e.target.files[0] ?? null);
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setLogo(file);
                                 setFieldValue(
                                   'logo',
-                                  URL.createObjectURL(e.target.files[0]!)
+                                  URL.createObjectURL(file)
                                 );
                               }
                             }}

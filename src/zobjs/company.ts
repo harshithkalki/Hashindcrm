@@ -14,10 +14,11 @@ export const ZCompanyCreateInput = z.object({
   primaryColor: z.string(),
   secondaryColor: z.string(),
   backgroundColor: z.string(),
-  logo: z.string(),
+  logo: z.string().optional(),
   natureOfBusiness: z.string(),
   numbers: z.array(z.string()),
   pan: z.string().optional(),
+  domain: z.string(),
 });
 
 export const ZCompanyUpdateInput = ZCompanyCreateInput.partial().extend({

@@ -35,6 +35,7 @@ const CompanySchema: Schema = new Schema<ICompany, CompanyModel>(
       },
     ],
     pan: { type: String, required: false },
+    domain: { type: String, required: true },
   },
   {
     versionKey: false,

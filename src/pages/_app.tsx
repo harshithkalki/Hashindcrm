@@ -27,7 +27,6 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (me.data && !store.getState().clientState.client) {
       dispatch(setClient(me.data.data));
-      router.push('/pos');
     }
   }, [dispatch, me.data, me.error?.data?.code, router]);
 
