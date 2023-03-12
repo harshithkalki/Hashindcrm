@@ -1,23 +1,17 @@
 import { Navbar, ScrollArea, createStyles } from '@mantine/core';
 import {
-  IconFileAnalytics,
   IconBuildingStore,
+  IconFileAnalytics,
   IconReceipt2,
-  IconUser,
 } from '@tabler/icons';
 import type { NavData } from '../CollapsibleLink';
 import LinksGroup from '../CollapsibleLink';
-import { useMemo, useState } from 'react';
-import { UserMenu } from '../UserMenu';
-import { trpc } from '@/utils/trpc';
+import { useMemo } from 'react';
 import type { RootState } from '@/store';
-import store from '@/store';
 import { useSelector } from 'react-redux';
 import type { z } from 'zod';
 import type { ZRole } from '@/zobjs/role';
 import { useRouter } from 'next/router';
-
-// import { UserMenu } from '../UserMenu';
 
 const allLinks = [
   '/company',
@@ -66,7 +60,7 @@ const ProductManagerData: NavData['links'] = [
   { label: 'Products', link: '/products', permissionName: 'PRODUCT' },
   { label: 'Brands', link: '/brands', permissionName: 'BRAND' },
   { label: 'Categories', link: '/categories', permissionName: 'CATEGORY' },
-  // { label: "Create Role", link: "/roles/new" },
+  { label: 'Create Role', link: '/roles/new' },
 ];
 const Stockdata: NavData['links'] = [
   {
@@ -74,14 +68,14 @@ const Stockdata: NavData['links'] = [
     link: '/stockadjustment',
     permissionName: 'STOCKADJUST',
   },
-  // {
-  //   label: 'Stock Transfer',
-  //   link: '/stocktransfer',
-  //   permissionName: 'STOCKTRANSFER',
-  // },
+  {
+    label: 'Stock Transfer',
+    link: '/stocktransfer',
+    permissionName: 'STOCKTRANSFER',
+  },
 ];
 const PartiesData: NavData['links'] = [
-  // { label: 'Suppliers', link: '/parties/supplier', permissionName: 'SUPPLIER' },
+  { label: 'Suppliers', link: '/parties/supplier', permissionName: 'SUPPLIER' },
   {
     label: 'Staff Members',
     link: '/parties/staff',
@@ -91,7 +85,7 @@ const PartiesData: NavData['links'] = [
 ];
 const SalesData: NavData['links'] = [
   { label: 'Sales', link: '/sales', permissionName: 'SALES' },
-  // { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
+  { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
 ];
 const PurchaseData: NavData['links'] = [
   { label: 'Purchase', link: '/purchases' },
@@ -117,12 +111,12 @@ const ReportDate: NavData['links'] = [
 ];
 
 const mockdata: NavData[] = [
-  // {
-  //   links: '/dashboard',
-  //   label: 'DashBoard',
-  //   icon: IconFileAnalytics,
-  //   permissionName: 'DASHBOARD',
-  // },
+  {
+    links: '/dashboard',
+    label: 'DashBoard',
+    icon: IconFileAnalytics,
+    permissionName: 'DASHBOARD',
+  },
   {
     links: CompanyData,
     label: 'Companies',
@@ -139,37 +133,37 @@ const mockdata: NavData[] = [
     label: 'Product Manager',
     icon: IconReceipt2,
   },
-  // {
-  //   links: '/workflow',
-  //   label: 'WorkFlow',
-  //   icon: IconFileAnalytics,
-  //   permissionName: 'WORKFLOW',
-  // },
-  // {
-  //   links: '/tickets',
-  //   label: 'Tickets',
-  //   icon: IconReceipt2,
-  //   permissionName: 'TICKET',
-  // },
+  {
+    links: '/workflow',
+    label: 'WorkFlow',
+    icon: IconFileAnalytics,
+    permissionName: 'WORKFLOW',
+  },
+  {
+    links: '/tickets',
+    label: 'Tickets',
+    icon: IconReceipt2,
+    permissionName: 'TICKET',
+  },
   { links: Stockdata, label: 'Stock', icon: IconReceipt2 },
   { links: '/pos', label: 'POS', icon: IconReceipt2, permissionName: 'POS' },
   { links: PartiesData, label: 'Parties', icon: IconReceipt2 },
   { links: SalesData, label: 'Sales', icon: IconReceipt2 },
   { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
-  // {
-  //   links: '/cashandbank',
-  //   label: 'Cash and Bank',
-  //   icon: IconReceipt2,
-  //   permissionName: 'CASHANDBANK',
-  // },
+  {
+    links: '/cashandbank',
+    label: 'Cash and Bank',
+    icon: IconReceipt2,
+    permissionName: 'CASHANDBANK',
+  },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
   { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
-  // {
-  //   links: '/settings/paymentmodes',
-  //   label: 'Settings',
-  //   icon: IconReceipt2,
-  //   permissionName: 'SETTINGS',
-  // },
+  {
+    links: '/settings/paymentmodes',
+    label: 'Settings',
+    icon: IconReceipt2,
+    permissionName: 'SETTINGS',
+  },
   { label: 'Admin', icon: IconReceipt2, links: '/admin' },
   {
     label: 'Warehouse',
@@ -177,7 +171,7 @@ const mockdata: NavData[] = [
     links: '/warehouse',
     permissionName: 'WAREHOUSE',
   },
-  //   { links: "/logs", label: "Audit Logs", icon: IconFileAnalytics },
+  { links: '/logs', label: 'Audit Logs', icon: IconFileAnalytics },
 ];
 
 const useStyles = createStyles((theme) => ({
@@ -224,7 +218,7 @@ interface Props {
 
 export default function NavbarNested({ hide }: Props) {
   const { classes } = useStyles();
-  const [active, setActive] = useState('Billing');
+
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
   );
@@ -275,9 +269,6 @@ export default function NavbarNested({ hide }: Props) {
               <LinksGroup
                 {...item}
                 key={item.label}
-                onClick={() => {
-                  setActive(item.label);
-                }}
                 active={
                   typeof item.links === 'string'
                     ? item.links === path
@@ -297,13 +288,9 @@ function filterNavLinks(
   permissions: z.infer<typeof ZRole>['permissions']
 ) {
   const filter1 = navLinks.filter((navLink) => {
-    // filter out any navLinks that don't have a permissionName
     if (typeof navLink.links === 'string' && !navLink.permissionName) {
       return false;
     }
-
-    // console.log(navLink);
-    // check if any of the CRUD operations are enabled for the navLink's permissionName
     const permission = permissions.find(
       (p) => p.permissionName === navLink.permissionName
     );

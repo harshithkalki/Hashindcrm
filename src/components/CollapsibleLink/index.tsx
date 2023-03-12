@@ -50,6 +50,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
           ? theme.colors.dark[4]
           : theme.colors.gray[3]
       }`,
+      cursor: 'pointer',
 
       '&:hover': {
         backgroundColor:
@@ -103,28 +104,23 @@ export interface NavData {
 }
 
 export interface LinksGroupProps extends NavData {
-  initiallyOpened?: boolean;
   active: boolean;
-  onClick?: () => void;
 }
 
 export default function LinksGroup({
   icon: Icon,
   label,
-  initiallyOpened,
   links,
   active,
-  onClick,
 }: LinksGroupProps) {
-  console.log(active);
   const { classes, theme, cx } = useStyles();
-  const [isActive, setActive] = useState<number>();
+
   const { push, pathname } = useRouter();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(active);
   const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
 
-  const items = (hasLinks ? links : []).map((link, index) => (
+  const items = (hasLinks ? links : []).map((link) => (
     <Text<'a'>
       component='a'
       className={cx(classes.link, {
@@ -133,10 +129,7 @@ export default function LinksGroup({
       key={link.label}
       onClick={(event) => {
         event.preventDefault();
-        if (onClick) {
-          onClick();
-        }
-        setActive(index);
+
         push(link.link);
       }}
     >
@@ -152,15 +145,11 @@ export default function LinksGroup({
 
           if (!hasLinks) {
             push(links);
-            if (onClick) {
-              onClick();
-            }
           }
         }}
         className={cx(classes.control, {
           [classes.linkActive]: active && !hasLinks,
         })}
-        // style={{ cursor: "pointer" }}
       >
         <Group position='apart' spacing={0}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
