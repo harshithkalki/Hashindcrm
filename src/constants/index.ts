@@ -19,6 +19,7 @@ export const Permissions = [
   'SALES',
   'STOCKTRANSFER',
   'PURCHASE',
+  'REPORT',
 ] as const;
 
 export const Roles = ['ADMIN'] as const;

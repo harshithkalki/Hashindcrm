@@ -189,7 +189,7 @@ const StaffForm = ({
                     if (e.target.files) {
                       const file = e.target.files[0];
                       if (file) {
-                        setFieldValue('logo', URL.createObjectURL(file));
+                        setFieldValue('profile', URL.createObjectURL(file));
                       }
                     }
                   }}

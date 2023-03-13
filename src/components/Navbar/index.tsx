@@ -88,8 +88,12 @@ const SalesData: NavData['links'] = [
   { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
 ];
 const PurchaseData: NavData['links'] = [
-  { label: 'Purchase', link: '/purchases' },
-  { label: 'Purchase Returns', link: '/purchases/return' },
+  { label: 'Purchase', link: '/purchases', permissionName: 'PURCHASE' },
+  {
+    label: 'Purchase Returns',
+    link: '/purchases/return',
+    permissionName: 'PURCHASE',
+  },
 ];
 const ExpensesData: NavData['links'] = [
   { label: 'Expenses', link: '/expenses', permissionName: 'EXPENSE' },
@@ -100,14 +104,35 @@ const ExpensesData: NavData['links'] = [
   },
 ];
 const ReportDate: NavData['links'] = [
-  { label: 'Payment Report', link: '/reports/payments' },
-  { label: 'Stock Alert', link: '/reports/stockalert' },
-  { label: 'sales', link: '/reports/sales' },
-  { label: 'Stock Reports', link: '/reports/stock' },
-  { label: 'Rate List', link: '/reports/ratelist' },
-  { label: 'Product Sales', link: '/reports/productsales' },
-  { label: 'UserReports', link: '/reports/userreports' },
-  { label: 'Profit & Loss', link: '/reports/profitandloss' },
+  {
+    label: 'Payment Report',
+    link: '/reports/payments',
+    permissionName: 'REPORT',
+  },
+  {
+    label: 'Stock Alert',
+    link: '/reports/stockalert',
+    permissionName: 'REPORT',
+  },
+  { label: 'sales', link: '/reports/sales', permissionName: 'REPORT' },
+
+  { label: 'Stock Reports', link: '/reports/stock', permissionName: 'REPORT' },
+  { label: 'Rate List', link: '/reports/ratelist', permissionName: 'REPORT' },
+  {
+    label: 'Product Sales',
+    link: '/reports/productsales',
+    permissionName: 'REPORT',
+  },
+  {
+    label: 'UserReports',
+    link: '/reports/userreports',
+    permissionName: 'REPORT',
+  },
+  {
+    label: 'Profit & Loss',
+    link: '/reports/profitandloss',
+    permissionName: 'REPORT',
+  },
 ];
 
 const mockdata: NavData[] = [
