@@ -10,8 +10,9 @@ import {
 import React, { useEffect } from 'react';
 import Tables from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
+import { useRouter } from 'next/router';
 
-const useStyle = createStyles((theme) => ({
+const useStyle = createStyles(() => ({
   contianer: {
     display: 'flex',
     flexDirection: 'column',
@@ -30,6 +31,7 @@ const Index = () => {
   );
 
   const deleteCompany = trpc.companyRouter.delete.useMutation();
+  const router = useRouter();
 
   useEffect(() => {
     if (!companies.data?.pages.find((pageData) => pageData.page === page)) {
@@ -72,8 +74,10 @@ const Index = () => {
               await deleteCompany.mutateAsync({
                 _id,
               });
-
               companies.refetch();
+            }}
+            onEdit={async (_id) => {
+              router.push(`/company/${_id}`);
             }}
           />
           <Pagination

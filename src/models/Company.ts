@@ -44,6 +44,10 @@ const CompanySchema: Schema = new Schema<ICompany, CompanyModel>(
 
 CompanySchema.plugin(mongoosePaginate);
 
+CompanySchema.index({
+  domain: 1,
+});
+
 export default (mongoose.models.Company as ReturnType<
   typeof mongoose.model<ICompany, mongoose.PaginateModel<ICompany>>
 >) ||

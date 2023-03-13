@@ -96,4 +96,33 @@ export const companyRouter = router({
         })),
       };
     }),
+
+  company: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You are not permitted to create company',
+        });
+      }
+
+      const company = await CompanyModel.findById(input._id).lean();
+
+      if (!company) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Company not found',
+        });
+      }
+
+      return {
+        ...company,
+        _id: company?._id.toString(),
+      };
+    }),
 });
