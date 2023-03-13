@@ -4,7 +4,6 @@ import { useField } from 'formik';
 
 interface Props extends TextInputProps {
   name: string;
-
   label?: string;
 }
 
