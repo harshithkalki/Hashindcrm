@@ -106,13 +106,11 @@ export const staffRouter = router({
 
   staffs: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
@@ -122,10 +120,10 @@ export const staffRouter = router({
         'You are not permitted to read warehouse'
       );
 
-      const { page = 1, limit = 10, search } = input || {};
+      const { cursor: page = 1, limit = 10, search } = input || {};
 
       const options = {
-        page: page,
+        page: page ?? undefined,
         limit: limit,
       };
 
@@ -326,5 +324,26 @@ export const staffRouter = router({
       });
 
       return admin;
+    }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await checkPermission(
+        'STAFFMEM',
+        {
+          delete: true,
+        },
+        ctx.clientId,
+        'You are not permitted to delete staff'
+      );
+
+      const staff = await StaffModel.findByIdAndDelete(input._id);
+
+      return staff;
     }),
 });

@@ -88,7 +88,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           validationSchema={toFormikValidationSchema(ZRoleCreateInput)}
           onSubmit={onSubmit}
         >
-          {({ values, setFieldValue, isSubmitting }) => (
+          {({ isSubmitting }) => (
             <Form>
               <FormInput
                 label='Role Name'

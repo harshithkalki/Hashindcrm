@@ -4,10 +4,8 @@ import StockAdjustModel from '@/models/StockAdjust';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
 import ProductModel from '@/models/Product';
-import {
-  ZStockAdjustCreateInput,
-  ZStockAdjustUpdateInput,
-} from '@/zobjs/stockAdjust';
+import { ZStockAdjustCreateInput } from '@/zobjs/stockAdjust';
+import StockAdjust from '@/models/StockAdjust';
 
 export const stockAdjustRouter = router({
   create: protectedProcedure
@@ -62,6 +60,39 @@ export const stockAdjustRouter = router({
       const stockAdjust = await StockAdjustModel.findByIdAndDelete(input._id);
 
       return stockAdjust;
+    }),
+
+  stockadjusts: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'STOCKADJUST',
+        { read: true },
+        ctx.clientId,
+        'You are not permitted to read warehouse'
+      );
+
+      const { cursor: page = 1, limit = 10, search } = input || {};
+
+      const options = {
+        page: page ?? undefined,
+        limit: limit,
+      };
+
+      const query = {
+        company: client.company,
+        ...(search && { name: { $regex: search, $options: 'i' } }),
+      };
+
+      const stockadjusts = await StockAdjustModel.paginate(query, options);
+
+      return stockadjusts;
     }),
 
   getAllStockAdjusts: protectedProcedure.query(async ({ ctx }) => {

@@ -68,29 +68,26 @@ export const expenseCategoryRouter = router({
       return expenseCategory;
     }),
 
-  // pagination with search expenseCategorys by name
-  expenseCategorys: protectedProcedure
+  expenseCategories: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'EXPENSECATEGORY',
+        'EXPENSE',
         { read: true },
         ctx.clientId,
-        'You are not permitted to read expenseCategory'
+        'You are not permitted to read warehouse'
       );
 
-      const { page = 1, limit = 10, search } = input || {};
+      const { cursor: page = 1, limit = 10, search } = input || {};
 
       const options = {
-        page: page,
+        page: page ?? undefined,
         limit: limit,
       };
 
@@ -99,12 +96,12 @@ export const expenseCategoryRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const expenseCategorys = await ExpenseCategoryModel.paginate(
+      const expenseCategories = await ExpenseCategoryModel.paginate(
         query,
         options
       );
 
-      return expenseCategorys;
+      return expenseCategories;
     }),
 
   get: protectedProcedure

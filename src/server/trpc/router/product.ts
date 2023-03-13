@@ -185,14 +185,12 @@ export const productRouter = router({
 
   getProducts: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number(),
-          limit: z.number().optional(),
-          category: z.string().optional(),
-          warehouse: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number(),
+        limit: z.number().optional(),
+        category: z.string().optional(),
+        warehouse: z.string().optional(),
+      })
     )
 
     .query(async ({ input, ctx }) => {
@@ -203,10 +201,10 @@ export const productRouter = router({
         'You are not permitted to read products'
       );
 
-      const { page, limit } = input || {};
+      const { cursor: page, limit } = input || {};
 
       const options = {
-        page: page || 1,
+        page: page ?? undefined,
         limit: limit || 10,
         sort: {
           name: 1,

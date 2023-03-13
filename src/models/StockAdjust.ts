@@ -2,6 +2,7 @@ import type { Model } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import type { z } from 'zod';
 import type { ZStockAdjust } from '@/zobjs/stockAdjust';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type IStockAdjust = ModifyDeep<
   z.infer<typeof ZStockAdjust>,
@@ -27,10 +28,12 @@ const StockAdjustSchema: Schema = new Schema<IStockAdjust, StockAdjustModel>(
   }
 );
 
+StockAdjustSchema.plugin(mongoosePaginate);
+
 export default (mongoose.models.StockAdjust as ReturnType<
-  typeof mongoose.model<IStockAdjust, StockAdjustModel>
+  typeof mongoose.model<IStockAdjust, mongoose.PaginateModel<IStockAdjust>>
 >) ||
-  mongoose.model<IStockAdjust, StockAdjustModel>(
+  mongoose.model<IStockAdjust, mongoose.PaginateModel<IStockAdjust>>(
     'StockAdjust',
     StockAdjustSchema
   );
