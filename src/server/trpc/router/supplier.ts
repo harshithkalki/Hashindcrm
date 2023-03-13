@@ -81,39 +81,34 @@ export const supplierRouter = router({
 
   suppliers: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
-    .query(async ({ ctx, input }) => {
-      await checkPermission(
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
         'SUPPLIER',
-        {
-          read: true,
-        },
+        { read: true },
         ctx.clientId,
-        "You don't have permission to read suppliers"
+        'You are not permitted to read warehouse'
       );
 
-      const { page = 1, limit = 10, search = '' } = input ?? {};
+      const { cursor: page = 1, limit = 10, search } = input || {};
 
-      const suppliers = await Supplier.find({
-        name: { $regex: search, $options: 'i' },
-      })
-        .skip((page - 1) * limit)
-        .limit(limit);
-
-      const total = await Supplier.countDocuments({
-        name: { $regex: search, $options: 'i' },
-      });
-
-      return {
-        suppliers: suppliers.map((supplier) => supplier.toObject()),
-        total,
+      const options = {
+        page: page ?? undefined,
+        limit: limit,
       };
+
+      const query = {
+        company: client.company,
+        ...(search && { name: { $regex: search, $options: 'i' } }),
+      };
+
+      const suppliers = await Supplier.paginate(query, options);
+
+      return suppliers;
     }),
 });

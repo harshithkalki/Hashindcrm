@@ -81,39 +81,34 @@ export const customerRouter = router({
 
   customers: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
-    .query(async ({ ctx, input }) => {
-      await checkPermission(
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
         'CUSTOMER',
-        {
-          read: true,
-        },
+        { read: true },
         ctx.clientId,
-        "You don't have permission to read customers"
+        'You are not permitted to read warehouse'
       );
 
-      const { page = 1, limit = 10, search = '' } = input ?? {};
+      const { cursor: page = 1, limit = 10, search } = input || {};
 
-      const customers = await Customer.find({
-        name: { $regex: search, $options: 'i' },
-      })
-        .skip((page - 1) * limit)
-        .limit(limit);
-
-      const total = await Customer.countDocuments({
-        name: { $regex: search, $options: 'i' },
-      });
-
-      return {
-        customers: customers.map((customer) => customer.toObject()),
-        total,
+      const options = {
+        page: page ?? undefined,
+        limit: limit,
       };
+
+      const query = {
+        company: client.company,
+        ...(search && { name: { $regex: search, $options: 'i' } }),
+      };
+
+      const customers = await Customer.paginate(query, options);
+
+      return customers;
     }),
 });
