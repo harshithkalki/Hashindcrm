@@ -26,9 +26,7 @@ import TableSelection from '@/components/Tables';
 import Layout from '@/components/Layout';
 import ArrayInput from '@/components/FormikCompo/ArrayInput';
 import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
-import FormikColor from '@/components/FormikCompo/FormikColor';
 import FormInput from '@/components/FormikCompo/FormikInput';
-import FormikSelect from '@/components/FormikCompo/FormikSelect';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
 
@@ -437,6 +435,7 @@ const AddWarehouse = ({
   refetch: () => void;
 }) => {
   const createWarehouse = trpc.warehouseRouter.create.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <Modal title='Add Warehouse' opened={open} onClose={onClose} fullScreen>
@@ -444,7 +443,7 @@ const AddWarehouse = ({
         onSubmit={async (values) => {
           await createWarehouse.mutateAsync(values);
           onClose();
-          refetch();
+          utils.warehouseRouter.warehouses.refetch();
         }}
         onClose={onClose}
       />

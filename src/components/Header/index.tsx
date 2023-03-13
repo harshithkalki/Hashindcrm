@@ -9,6 +9,7 @@ import {
   Menu,
   Burger,
   Image,
+  Loader,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconLogout, IconSettings, IconChevronDown } from '@tabler/icons';
@@ -104,9 +105,15 @@ interface HeaderTabsProps {
 }
 
 function WarehouseSelect() {
-  const warehouses = trpc.warehouseRouter.warehouses.useQuery(
-    {},
-    { refetchOnWindowFocus: false }
+  const [searchValue, onSearchChange] = useState('');
+  const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
+    {
+      search: searchValue,
+    },
+    {
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    }
   );
   const warehouse = useSelector<
     RootState,
@@ -118,16 +125,30 @@ function WarehouseSelect() {
     <InfiniteSelect
       placeholder='Select warehouse'
       data={
-        warehouses.data?.docs.map((warehouse) => ({
-          label: warehouse.name,
-          value: warehouse._id.toString(),
-        })) ?? []
+        warehouses.data?.pages
+          .flatMap((page) => page.docs)
+          .map((warehouse, index) => ({
+            label: warehouse.name,
+            value: warehouse._id.toString(),
+            index,
+          })) ?? []
       }
       onChange={(value) => {
         if (value) dispatch(setWarehouse(value));
       }}
       value={warehouse}
       nothingFound='No warehouses found'
+      onWaypointEnter={() => {
+        if (
+          warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
+        ) {
+          warehouses.fetchNextPage();
+        }
+      }}
+      rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
+      onSearchChange={onSearchChange}
+      searchValue={searchValue}
+      searchable
     />
   );
 }

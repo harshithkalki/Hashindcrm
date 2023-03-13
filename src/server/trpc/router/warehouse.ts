@@ -112,7 +112,7 @@ export const warehouseRouter = router({
       const { cursor: page = 1, limit = 10, search } = input || {};
 
       const options = {
-        page: page ?? 1,
+        page: page ?? undefined,
         limit: limit,
       };
 
