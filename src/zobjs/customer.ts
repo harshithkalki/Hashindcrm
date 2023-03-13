@@ -9,11 +9,11 @@ export const ZCustomerCreateInput = z.object({
   warehouse: z.string(),
   status: z.enum(['active', 'inactive']),
   taxNumber: z.string(),
-  profile: z.string(),
+  profile: z.string().optional(),
   openingBalance: z.number(),
   creditLimit: z.number(),
   creditPeriod: z.number(),
-  natureOfBusiness: z.string(),
+  // natureOfBusiness: z.string(),
 });
 
 export type CustomerCreateInput = z.infer<typeof ZCustomerCreateInput>;

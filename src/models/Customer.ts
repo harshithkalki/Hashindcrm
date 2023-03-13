@@ -30,7 +30,7 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>(
     warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse' },
     status: { type: String, required: true },
     taxNumber: { type: String, required: true },
-    profile: { type: String, required: true },
+    profile: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     openingBalance: { type: Number, required: true },
     creditLimit: { type: Number, required: true },

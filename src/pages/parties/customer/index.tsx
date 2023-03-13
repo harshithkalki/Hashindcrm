@@ -11,17 +11,26 @@ import {
   createStyles,
   Group,
   Image,
+  Loader,
   Modal,
   SimpleGrid,
   Title,
 } from '@mantine/core';
-import { IconPlus, IconUpload } from '@tabler/icons';
-import { Form, Formik } from 'formik';
+import { IconUpload } from '@tabler/icons';
+import { FieldArray, Form, Formik } from 'formik';
 import React, { useRef, useState } from 'react';
+import type { CustomerCreateInput } from '@/zobjs/customer';
+import { ZCustomerCreateInput } from '@/zobjs/customer';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+import FormikInfiniteSelect from '@/components/FormikCompo/InfiniteSelect';
+import type { RootState } from '@/store';
+import { setWarehouse } from '@/store/clientSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import FormikArray from '@/components/FormikCompo/FormikArray';
 
-interface modalProps {
+interface ModalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -48,255 +57,260 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const AddCustomer = ({ modal, setModal }: modalProps) => {
-  const { classes, cx } = useStyles();
-  const [Wmodal, WsetModal] = useState(false);
-  const createWarehouse = trpc.productRouter.createWarehouse.useMutation();
-  const warehouses = trpc.productRouter.getAllWarehouse.useQuery();
-  const fileRef = useRef<HTMLInputElement>(null);
+const initialValues: CustomerCreateInput = {
+  status: 'active',
+  name: '',
+  email: '',
+  profile: '',
+  warehouse: '',
+  // natureOfBusiness: '',
+  numbers: [''],
+  billingAddress: '',
+  shippingAddress: '',
+  taxNumber: '',
+  openingBalance: 0,
+  creditLimit: 0,
+  creditPeriod: 0,
+};
 
-  const AddWarehouse = () => {
-    return (
-      <>
-        <Modal
-          opened={Wmodal}
-          onClose={() => WsetModal(false)}
-          title='Add Warehouse'
-        >
-          <Formik
-            initialValues={{
-              name: '',
-            }}
-            validationSchema={toFormikValidationSchema(
-              z.object({
-                name: z.string().min(3).max(50),
-              })
-            )}
-            onSubmit={async (values, actions) => {
-              await createWarehouse.mutateAsync(values);
-              actions.resetForm();
-              actions.setSubmitting(false);
-              setModal(false);
-              warehouses.refetch();
-            }}
-          >
-            {({ isSubmitting }) => {
-              return (
-                <Form>
-                  <FormikInput
-                    name='name'
-                    label='Warehouse Name'
-                    placeholder='Warehouse Name'
-                  />
-                  <Button
-                    type='submit'
-                    disabled={isSubmitting}
-                    loading={isSubmitting}
-                    mt={'md'}
-                  >
-                    Submit
-                  </Button>
-                </Form>
-              );
-            }}
-          </Formik>
-        </Modal>
-      </>
-    );
-  };
+function WarehouseSelect() {
+  const [searchValue, onSearchChange] = useState('');
+  const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
+    {
+      search: searchValue,
+    },
+    {
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    }
+  );
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+  const dispatch = useDispatch();
 
   return (
+    <FormikInfiniteSelect
+      name='warehouse'
+      placeholder='Pick one warehouse'
+      label='Warehouse'
+      data={
+        warehouses.data?.pages
+          .flatMap((page) => page.docs)
+          .map((warehouse, index) => ({
+            label: warehouse.name,
+            value: warehouse._id.toString(),
+            index,
+          })) ?? []
+      }
+      onChange={(value) => {
+        if (value) dispatch(setWarehouse(value));
+      }}
+      value={warehouse}
+      nothingFound='No warehouses found'
+      onWaypointEnter={() => {
+        if (
+          warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
+        ) {
+          warehouses.fetchNextPage();
+        }
+      }}
+      rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
+      onSearchChange={onSearchChange}
+      searchValue={searchValue}
+      w={'100%'}
+      searchable
+    />
+  );
+}
+
+function CustomerForm({
+  values = initialValues,
+  onSubmit,
+}: {
+  values?: CustomerCreateInput;
+  onSubmit: (values: CustomerCreateInput) => Promise<void>;
+}) {
+  const { classes } = useStyles();
+  const [profile, setProfile] = useState<File | null>(null);
+  const profileref = useRef<HTMLInputElement>(null);
+
+  return (
+    <Formik
+      onSubmit={async (values, { setSubmitting, resetForm }) => {
+        const file = profile;
+        if (file) {
+          const form = new FormData();
+          form.append('file', file);
+          const { data } = await axios.post('/api/upload-file', form);
+          values.profile = data.url;
+        }
+        await onSubmit(values);
+        setSubmitting(false);
+        resetForm();
+      }}
+      initialValues={values}
+      validationSchema={toFormikValidationSchema(ZCustomerCreateInput)}
+    >
+      {(props) => {
+        const { handleSubmit, values, setFieldValue } = props;
+        return (
+          <Form onSubmit={handleSubmit}>
+            <SimpleGrid
+              m={'md'}
+              cols={3}
+              className={classes.wrapper}
+              breakpoints={[
+                { maxWidth: 'md', cols: 3, spacing: 'md' },
+                { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                { maxWidth: 'xs', cols: 1, spacing: 'sm' },
+              ]}
+            >
+              <Container className={classes.containerStyles}>
+                <Center>
+                  <Image
+                    height={150}
+                    width={150}
+                    src={values.profile}
+                    alt=''
+                    withPlaceholder
+                  />
+                  <div style={{ display: 'none' }}>
+                    <input
+                      type='file'
+                      ref={profileref}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setProfile(file);
+                          setFieldValue('profile', URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                  </div>
+                </Center>
+                <Center>
+                  <Button
+                    size='xs'
+                    leftIcon={!!values.profile && <IconUpload size={17} />}
+                    onClick={() => {
+                      profileref.current?.click();
+                    }}
+                    styles={{
+                      root: {
+                        margin: 2,
+                      },
+                    }}
+                  >
+                    {!!values.profile ? `Change` : `Upload`}
+                  </Button>
+                </Center>
+              </Container>
+              <WarehouseSelect />
+              <FormikInput
+                label='Name'
+                placeholder='Name'
+                name='name'
+                withAsterisk
+              />
+              <FormikInput
+                label='Email'
+                placeholder='Email'
+                name='email'
+                withAsterisk
+              />
+              <FieldArray
+                name='numbers'
+                render={(arrayHelpers) => (
+                  <FormikArray
+                    arrayHelpers={arrayHelpers}
+                    label='Phone'
+                    placeholder='Phone'
+                  />
+                )}
+              />
+              <FormikSelect
+                label='Status'
+                data={[
+                  { label: 'Active', value: 'active' },
+                  { label: 'Inactive', value: 'inactive' },
+                ]}
+                placeholder='Pick one status'
+                name='status'
+                searchable
+                w={'100%'}
+                withAsterisk
+              />
+              <FormikInput
+                label='Tax Number'
+                placeholder='Tax Number'
+                name='taxNumber'
+                withAsterisk
+              />
+              <FormikInput
+                type={'number'}
+                label='Opening Balance'
+                placeholder='Opening Balance'
+                name='openingBalance'
+                withAsterisk
+              />
+              <FormikInput
+                type={'number'}
+                label='Credit Limit'
+                placeholder='Credit Limit'
+                name='creditLimit'
+                withAsterisk
+              />
+              <FormikInput
+                type={'number'}
+                label='Credit Period'
+                placeholder='Credit Period'
+                name='creditPeriod'
+                withAsterisk
+              />
+            </SimpleGrid>
+            <Formiktextarea
+              label='Billing Address'
+              placeholder='Billing Address'
+              name='billingAddress'
+              withAsterisk
+              mb={'md'}
+            />
+            <Formiktextarea
+              label='Shipping Address'
+              placeholder='Shipping Address'
+              name='shippingAddress'
+              withAsterisk
+            />
+            <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
+              <Button type='submit' size='xs' loading={props.isSubmitting}>
+                Create
+              </Button>
+            </Group>
+            <pre>{JSON.stringify(props, null, 2)}</pre>
+          </Form>
+        );
+      }}
+    </Formik>
+  );
+}
+
+const AddCustomer = ({ modal, setModal }: ModalProps) => {
+  const create = trpc.customerRouter.create.useMutation();
+  return (
     <>
-      <AddWarehouse />
       <Modal
         opened={modal}
         onClose={() => setModal(false)}
         title='Add New Customer'
         size={'60%'}
       >
-        <Formik
-          onSubmit={(values) => {
-            console.log(values);
+        <CustomerForm
+          onSubmit={async (values) => {
+            await create.mutateAsync(values);
           }}
-          initialValues={{
-            name: '',
-            email: '',
-            phone: '',
-            billingAddress: '',
-            shippingAddress: '',
-            warehouse: '',
-            status: '',
-            taxnumber: '',
-            profile: '',
-            openingBalance: 0,
-            creditLimit: 0,
-            creditperiod: 0,
-          }}
-        >
-          {({ handleSubmit, handleChange, values, setFieldValue }) => (
-            <Form onSubmit={handleSubmit}>
-              <SimpleGrid
-                m={'md'}
-                cols={3}
-                className={classes.wrapper}
-                breakpoints={[
-                  { maxWidth: 'md', cols: 3, spacing: 'md' },
-                  { maxWidth: 'sm', cols: 2, spacing: 'sm' },
-                  { maxWidth: 'xs', cols: 1, spacing: 'sm' },
-                ]}
-              >
-                <Container className={classes.containerStyles}>
-                  <Center>
-                    <Image
-                      height={150}
-                      width={150}
-                      src={values.profile}
-                      alt=''
-                      withPlaceholder
-                    />
-                    <input
-                      hidden
-                      ref={fileRef}
-                      type='file'
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        if (e.target.files) {
-                          const file = e.target.files[0];
-                          if (file) {
-                            setFieldValue('logo', URL.createObjectURL(file));
-                          }
-                        }
-                      }}
-                    />
-                  </Center>
-                  <Center>
-                    <Button
-                      size='xs'
-                      leftIcon={
-                        values.profile === '' && <IconUpload size={17} />
-                      }
-                      onClick={() => {
-                        fileRef.current?.click();
-                      }}
-                      styles={{
-                        root: {
-                          margin: 2,
-                        },
-                      }}
-                    >
-                      {values.profile === '' ? `Upload` : `Change`}
-                    </Button>
-                  </Center>
-                </Container>
-                <FormikSelect
-                  label='Warehouse'
-                  data={
-                    warehouses.data?.map((warehouse) => ({
-                      label: warehouse.name,
-                      value: warehouse._id.toString(),
-                    })) || []
-                  }
-                  placeholder='Pick one warehouse'
-                  name='warehouse'
-                  searchable
-                  w={'100%'}
-                  rightSection={
-                    <IconPlus
-                      size={20}
-                      onClick={() => {
-                        WsetModal(true);
-                      }}
-                      cursor={'pointer'}
-                    />
-                  }
-                  withAsterisk
-                />
-                <FormikInput
-                  label='Name'
-                  placeholder='Name'
-                  name='name'
-                  withAsterisk
-                />
-                <FormikInput
-                  label='Email'
-                  placeholder='Email'
-                  name='email'
-                  withAsterisk
-                />
-                <FormikInput
-                  label='Phone'
-                  placeholder='Phone'
-                  name='phone'
-                  withAsterisk
-                />
-                <FormikSelect
-                  label='Status'
-                  data={[
-                    { label: 'Active', value: 'Active' },
-                    { label: 'Inactive', value: 'Inactive' },
-                  ]}
-                  placeholder='Pick one status'
-                  name='status'
-                  searchable
-                  w={'100%'}
-                  withAsterisk
-                />
-                <FormikInput
-                  label='Tax Number'
-                  placeholder='Tax Number'
-                  name='taxnumber'
-                  withAsterisk
-                />
-                <FormikInput
-                  type={'number'}
-                  label='Opening Balance'
-                  placeholder='Opening Balance'
-                  name='openingBalance'
-                  withAsterisk
-                />
-                <FormikInput
-                  type={'number'}
-                  label='Credit Limit'
-                  placeholder='Credit Limit'
-                  name='creditLimit'
-                  withAsterisk
-                />
-                <FormikInput
-                  type={'number'}
-                  label='Credit Period'
-                  placeholder='Credit Period'
-                  name='creditperiod'
-                  withAsterisk
-                />
-              </SimpleGrid>
-              <Formiktextarea
-                label='Billing Address'
-                placeholder='Billing Address'
-                name='billingAddress'
-                withAsterisk
-                mb={'md'}
-              />
-              <Formiktextarea
-                label='Shipping Address'
-                placeholder='Shipping Address'
-                name='shippingAddress'
-                withAsterisk
-              />
-              <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
-                <Button type='submit' size='xs'>
-                  Create
-                </Button>
-                <Button
-                  size='xs'
-                  onClick={() => {
-                    setModal(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Group>
-            </Form>
-          )}
-        </Formik>
+        />
       </Modal>
     </>
   );

@@ -8,7 +8,7 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   index: number;
 }
 
-interface InfiniteSelectProps
+export interface InfiniteSelectProps
   extends Omit<SelectProps, 'itemComponent' | 'data'> {
   onWaypointEnter: () => void;
   data: (string | (SelectItem & { index: number }))[];
