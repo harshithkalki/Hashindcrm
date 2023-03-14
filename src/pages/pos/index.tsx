@@ -121,6 +121,56 @@ function ProductsSelect({
               gap: '10px',
             }}
           >
+            <ActionIcon
+              style={{ width: '70px', height: '60px' }}
+              onClick={() => {
+                setCategory(undefined);
+              }}
+            >
+              <div
+                className='categorylist'
+                style={{
+                  boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
+                  marginTop: '3px',
+                  width: '70px',
+                  height: '70px',
+                  borderRadius: '10px',
+                  backgroundColor: '#25262B',
+                  display: 'inline-block',
+                }}
+              >
+                <Container
+                  p={2}
+                  ta={'center'}
+                  mt={'5px'}
+                  style={{
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                  }}
+                  styles={{
+                    '&:hover': {
+                      backgroundColor: 'white',
+                      color: 'black',
+                      cursor: 'pointer',
+                    },
+                  }}
+                >
+                  <Image
+                    ml={'14px'}
+                    alt='All'
+                    height={35}
+                    width={35}
+                    radius='xl'
+                    withPlaceholder
+                  />
+                  <Truncate
+                    text='All'
+                    maxLength={8}
+                    textProps={{ size: 'xs' }}
+                  />
+                </Container>
+              </div>
+            </ActionIcon>
             {categories.data?.map((item) => (
               <ActionIcon
                 key={item._id.toString()}
@@ -336,6 +386,7 @@ const Index = () => {
           notes: '',
           total: 0,
           warehouse: '',
+          paymentMode: 'cash',
         }}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           values.products = Array.from(inlineProducts.values());
@@ -680,7 +731,7 @@ const Index = () => {
                       icon={<IconCurrencyRupee />}
                     />
                     <FormikSelect
-                      name='paymentMethod'
+                      name='paymentMode'
                       label='Payment Method'
                       data={[
                         { label: 'Cash', value: 'cash' },
