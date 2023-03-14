@@ -16,3 +16,5 @@ export const ZCategoryUpdateInput = ZCategoryCreateInput.partial().extend({
 export const ZCategory = ZCategoryCreateInput.extend({
   company: z.string(),
 });
+
+export type Category = z.infer<typeof ZCategory>;

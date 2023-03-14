@@ -38,6 +38,7 @@ const SaleSchema: Schema = new Schema<ISale, SaleModel>(
       ref: 'Warehouse',
       required: true,
     },
+    paymentMode: { type: String, required: true },
   },
   { versionKey: false }
 );

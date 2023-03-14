@@ -6,9 +6,16 @@ import checkPermission from '@/utils/checkPermission';
 import type { CategoryDocument } from '@/models/Category';
 import CategoryModel from '@/models/Category';
 import type { BrandDocument } from '@/models/Brand';
-import { ZProductCreateInput, ZProductUpdateInput } from '@/zobjs/product';
+import {
+  ZProduct,
+  ZProductCreateInput,
+  ZProductUpdateInput,
+} from '@/zobjs/product';
 import { objectkeys } from '@/utils/helpers';
 import mongoose from 'mongoose';
+import { ZCategory } from '@/zobjs/category';
+import { ZBrand } from '@/zobjs/brand';
+import { ZWarehouse } from '@/zobjs/warehouse';
 
 const getAllChildCategories = async (
   category: string
@@ -186,7 +193,7 @@ export const productRouter = router({
   getProducts: protectedProcedure
     .input(
       z.object({
-        cursor: z.number(),
+        cursor: z.number().nullish(),
         limit: z.number().optional(),
         category: z.string().optional(),
         warehouse: z.string().optional(),
@@ -233,7 +240,10 @@ export const productRouter = router({
         }),
       };
 
-      const products = await ProductModel.paginate(query, options);
+      const products = await ProductModel.paginate(query, {
+        ...options,
+        lean: true,
+      });
 
       return products;
     }),

@@ -115,4 +115,28 @@ export const categoryRouter = router({
 
     return categorys;
   }),
+
+  allLeafNodes: protectedProcedure.query(async ({ ctx }) => {
+    const client = await checkPermission(
+      'CATEGORY',
+      {
+        read: true,
+      },
+      ctx.clientId,
+      'You are not permitted to read categorys'
+    );
+
+    const categories = await CategoryModel.find({
+      company: client.company,
+    });
+
+    const leafNodes = categories.filter((node) => {
+      const hasChildren = categories.some(
+        (child) => child.parentCategory?.toString() === node._id.toString()
+      );
+      return !hasChildren;
+    });
+
+    return leafNodes;
+  }),
 });

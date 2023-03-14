@@ -10,7 +10,8 @@ import {
   Stack,
   Table,
 } from '@mantine/core';
-import { DetailedHTMLProps, ThHTMLAttributes, useMemo } from 'react';
+import type { DetailedHTMLProps, ThHTMLAttributes } from 'react';
+import { useMemo } from 'react';
 import type { ZSale } from '@/zobjs/sale';
 import type { z } from 'zod';
 import type { Company } from '@/zobjs/company';
@@ -146,74 +147,6 @@ const Td = ({
   );
 };
 
-// const test: ModifyDeep<
-//   Omit<z.infer<typeof ZSale>, 'products'>,
-//   {
-//     company?: Company;
-//     warehouse?: Warehouse;
-//     products: {
-//       _id: string;
-//       name: string;
-//       price: number;
-//       quantity: number;
-//     }[];
-//   }
-// > = {
-//   status: 'pending',
-//   date: '',
-//   warehouse: {
-//     name: '',
-//     addressline1: '',
-//     addressline2: '',
-//     email: '',
-//     city: '',
-//     state: '',
-//     pincode: '',
-//     country: '',
-//     primaryColor: '',
-//     secondaryColor: '',
-//     backgroundColor: '',
-//     logo: '',
-//     natureOfBusiness: '',
-//     numbers: [],
-//     createdAt: new Date(),
-//     company: '',
-//   },
-//   company: {
-//     name: '',
-//     addressline1: '',
-//     addressline2: '',
-//     email: '',
-//     city: '',
-//     state: '',
-//     pincode: '',
-//     country: '',
-//     primaryColor: '',
-//     secondaryColor: '',
-//     backgroundColor: '',
-//     logo: '',
-//     natureOfBusiness: '',
-//     numbers: [],
-//     createdAt: new Date(),
-//   },
-//   createdAt: '',
-//   products: [
-//     {
-//       _id: '',
-//       name: '',
-//       price: 0,
-//       quantity: 0,
-//     },
-//   ],
-//   total: 0,
-//   shipping: 0,
-//   orderTax: 0,
-//   discount: 0,
-//   customer: '',
-//   notes: undefined,
-//   invoiceId: '',
-// };
-
 export default function Invoice({
   invoiceRef,
   data,
@@ -247,7 +180,7 @@ export default function Invoice({
           },
           right: {
             title: 'Mode/Terms of Payment',
-            value: 'Cash',
+            value: data.paymentMode ?? 'Cash',
           },
         },
         {
@@ -522,9 +455,10 @@ export default function Invoice({
         </Table>
         <Group mt={'md'} mb={'xs'} style={{ justifyContent: 'space-between' }}>
           <div>
-            <Text weight={400}>{`Total Amount : ${
-              netPrice - netPrice * (data.discount / 100).toFixed(2)
-            }`}</Text>
+            <Text weight={400}>{`Total Amount : ${(
+              netPrice -
+              netPrice * (data.discount / 100)
+            ).toFixed(2)}`}</Text>
 
             <Text weight={400}>{`Total Tax : ${data.products
               .reduce(
