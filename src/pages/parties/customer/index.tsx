@@ -29,10 +29,12 @@ import { setWarehouse } from '@/store/clientSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import FormikArray from '@/components/FormikCompo/FormikArray';
+import TableSelection from '@/components/Tables';
 
 interface ModalProps {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
 }
 
 const useStyles = createStyles((theme) => ({
@@ -288,7 +290,7 @@ function CustomerForm({
                 Create
               </Button>
             </Group>
-            <pre>{JSON.stringify(props, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(props, null, 2)}</pre> */}
           </Form>
         );
       }}
@@ -296,19 +298,20 @@ function CustomerForm({
   );
 }
 
-const AddCustomer = ({ modal, setModal }: ModalProps) => {
+const AddCustomer = ({ modal, setModal, onClose }: ModalProps) => {
   const create = trpc.customerRouter.create.useMutation();
   return (
     <>
       <Modal
         opened={modal}
-        onClose={() => setModal(false)}
+        onClose={() => onClose()}
         title='Add New Customer'
         size={'60%'}
       >
         <CustomerForm
           onSubmit={async (values) => {
             await create.mutateAsync(values);
+            onClose();
           }}
         />
       </Modal>
@@ -316,48 +319,95 @@ const AddCustomer = ({ modal, setModal }: ModalProps) => {
   );
 };
 
+const UpdateCustomer = ({
+  id,
+  setId,
+  onClose,
+}: {
+  id: string | null;
+  setId: (id: string | null) => void;
+  onClose: () => void;
+}) => {
+  const customer = trpc.customerRouter.get.useQuery(
+    {
+      _id: id as string,
+    },
+    { refetchOnWindowFocus: false, enabled: Boolean(id) }
+  );
+  const update = trpc.customerRouter.update.useMutation();
+  if (customer.isLoading)
+    return (
+      <center>
+        <Loader />
+      </center>
+    );
+  // console.log(customer.data);
+  return (
+    <Modal
+      opened={Boolean(id)}
+      onClose={() => onClose()}
+      title='Update Customer'
+      size={'60%'}
+    >
+      <CustomerForm
+        onSubmit={async (values) => {
+          await update.mutateAsync({ _id: id as string, ...values });
+          onClose();
+        }}
+        values={customer.data}
+      />
+    </Modal>
+  );
+};
+
 const Index = () => {
   const [modal, setModal] = React.useState(false);
+  const [id, setId] = React.useState<string | null>(null);
+  const customers = trpc.customerRouter.customers.useQuery({
+    limit: 10,
+  });
+  console.log(customers.data);
+  const onClose = () => {
+    setId(null);
+    setModal(false);
+    customers.refetch();
+  };
   return (
     <Layout>
-      <AddCustomer modal={modal} setModal={setModal} />
+      <AddCustomer modal={modal} setModal={setModal} onClose={onClose} />
+
+      {id && <UpdateCustomer id={id} setId={setId} onClose={onClose} />}
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Customers</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
           Add New
         </Button>
       </Group>
-      <PartiesTable
-        data={[
-          {
-            name: 'John Doe',
-            email: 'harshith@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
+      <TableSelection
+        data={
+          customers.data?.docs.map((val) => ({
+            ...val,
+            _id: val._id.toString(),
+          })) ?? []
+        }
+        colProps={{
+          // name: 'Name',
+          // email: 'Email',
+          // status: 'Status',
+          name: {
+            label: 'Name',
           },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
+          email: {
+            label: 'Email',
           },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
+          status: {
+            label: 'Status',
           },
-          {
-            name: 'John Doe',
-            email: 'jjjjj@gmail.com',
-            created: '2021-01-01',
-            balance: '1000',
-            status: 'Active',
-          },
-        ]}
+        }}
+        onEdit={(id) => {
+          setId(id);
+        }}
+        editable
       />
     </Layout>
   );

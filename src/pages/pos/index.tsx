@@ -91,6 +91,7 @@ const Index = () => {
   const productsQuery = trpc.productRouter.getProducts.useQuery(
     {
       ...query,
+      cursor: query.page,
       warehouse,
     },
     {
@@ -704,7 +705,7 @@ const Index = () => {
                             (item.discountedPrice + item.taxPrice) *
                               item.quantity,
                           0
-                        ) + values.shipping ?? 0
+                        ) + (values.shipping ? values.shipping : 0) ?? 0
                       ).toFixed(2)}
                       disabled
                       icon={<IconCurrencyRupee />}

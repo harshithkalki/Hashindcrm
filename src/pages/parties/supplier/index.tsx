@@ -315,7 +315,7 @@ const UpdateSupplier = ({
     },
     { refetchOnWindowFocus: false, enabled: Boolean(id) }
   );
-  console.log(supplier.data);
+  // console.log(supplier.data);
   return (
     <Modal
       opened={Boolean(id)}
@@ -337,8 +337,10 @@ const UpdateSupplier = ({
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [id, setId] = React.useState<string | null>(null);
-  const suppliers = trpc.supplierRouter.suppliers.useQuery();
-  // console.log(suppliers.data);
+  const suppliers = trpc.supplierRouter.suppliers.useQuery({
+    limit: 10,
+  });
+  console.log(suppliers.data);
   const onClose = () => {
     setId(null);
     suppliers.refetch();
@@ -355,7 +357,7 @@ const Index = () => {
       </Group>
       <TableSelection
         data={
-          suppliers.data?.suppliers.map((val) => ({
+          suppliers.data?.docs.map((val) => ({
             ...val,
             _id: val._id.toString(),
           })) ?? []

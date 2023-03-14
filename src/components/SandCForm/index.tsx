@@ -1,4 +1,6 @@
-import { trpc } from '@/utils/trpc';
+import { RootState } from '@/store';
+import { setWarehouse } from '@/store/clientSlice';
+import { RouterOutputs, trpc } from '@/utils/trpc';
 import {
   Modal,
   Button,
@@ -13,17 +15,23 @@ import {
   TextInput,
   Textarea,
   createStyles,
+  Loader,
 } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import { IconPlus, IconTrash } from '@tabler/icons';
 import { Formik, Form, FieldArray } from 'formik';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useReactToPrint } from 'react-to-print';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import FormDate from '../FormikCompo/FormikDate';
 import FormInput from '../FormikCompo/FormikInput';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import Formiktextarea from '../FormikCompo/FormikTextarea';
+import FormikInfiniteSelect from '../FormikCompo/InfiniteSelect';
+import Invoice from '../Invoice';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -55,44 +63,135 @@ interface modalProps {
 }
 
 type InlineProduct = {
-  product: string;
-  quantity: number;
+  _id: string;
+  name: string;
+  discountedPrice?: number;
+  taxPrice?: number;
   subtotal: number;
+  quantity: number;
   price: number;
   tax: number;
-  name: string;
 };
 
 type InitialValues = {
+  customer: string;
   products: InlineProduct[];
-  note: string;
+  notes: string;
   total: number;
-  status: string;
+  status: 'approved' | 'pending' | 'rejected';
   shipping: number;
   orderTax: number;
   discount: number;
-  name: string;
   date: string;
+  warehouse: string;
+  invoiceId?: string;
 };
 
 const initialValues: InitialValues = {
-  products: [],
-  note: '',
-  total: 0,
-  status: 'pending',
-  shipping: 0,
-  orderTax: 0,
-  discount: 0,
-  name: '',
+  customer: '',
   date: new Date().toISOString(),
+  products: [],
+  orderTax: 0,
+  status: 'approved' as 'approved' | 'pending' | 'rejected',
+  discount: 0,
+  shipping: 0,
+  notes: '',
+  total: 0,
+  warehouse: '',
 };
+
+function WarehouseSelect() {
+  const [searchValue, onSearchChange] = useState('');
+  const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
+    {
+      search: searchValue,
+    },
+    {
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    }
+  );
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+  const dispatch = useDispatch();
+
+  return (
+    <FormikInfiniteSelect
+      name='warehouse'
+      placeholder='Pick one warehouse'
+      label='Warehouse'
+      data={
+        warehouses.data?.pages
+          .flatMap((page) => page.docs)
+          .map((warehouse, index) => ({
+            label: warehouse.name,
+            value: warehouse._id.toString(),
+            index,
+          })) ?? []
+      }
+      onChange={(value) => {
+        if (value) dispatch(setWarehouse(value));
+      }}
+      value={warehouse}
+      nothingFound='No warehouses found'
+      onWaypointEnter={() => {
+        if (
+          warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
+        ) {
+          warehouses.fetchNextPage();
+        }
+      }}
+      rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
+      onSearchChange={onSearchChange}
+      searchValue={searchValue}
+      w={'100%'}
+      searchable
+    />
+  );
+}
 
 const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const { classes, cx } = useStyles();
-  const products = trpc.productRouter.getAllProducts.useQuery();
+  // const products = trpc.productRouter.getAllProducts.useQuery();
+  const [search, setSearch] = useState<string>('');
   const [selectProduct, setSelectProduct] = useState<InlineProduct>();
   const terms =
     '1.Goods once sold will not be takenback or exchanged\n2.All disputes are subject to Mumbai Jurisdiction';
+
+  const searchProducts = trpc.productRouter.searchProducts.useQuery({
+    search: search,
+  });
+
+  const [inlineProducts, setInlineProducts] = useState<
+    Map<string, InlineProduct>
+  >(new Map());
+
+  const [invoiceId, setInvoiceId] = useState<string>('');
+  const [products, setProducts] = useState<
+    RouterOutputs['productRouter']['getProducts']['docs']
+  >([]);
+
+  const salesSubmit = trpc.saleRouter.create.useMutation();
+
+  const invoice = trpc.saleRouter.getInvoice.useQuery(
+    {
+      _id: invoiceId,
+    },
+    { enabled: Boolean(invoiceId) }
+  );
+  const componentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  useEffect(() => {
+    if (invoice.data) {
+      handlePrint();
+      setInvoiceId('');
+    }
+  }, [handlePrint, invoice.data]);
 
   return (
     <>
@@ -106,30 +205,67 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
       >
         <Formik
           initialValues={initialValues}
-          onSubmit={async (values) => {
+          // validationSchema={toFormikValidationSchema(
+          //   z.object({
+          //     products: z.array(
+          //       z.object({
+          //         product: z.string(),
+          //         quantity: z.number(),
+          //       })
+          //     ),
+          //     note: z.string(),
+          //     total: z.number(),
+          //     status: z.string(),
+          //     shipping: z.number(),
+          //     orderTax: z.number(),
+          //     discount: z.number(),
+          //     warehouse: z.string(),
+          //     date: z.string(),
+          //   })
+          // )}
+          onSubmit={(values, { setSubmitting, resetForm }) => {
+            console.log(inlineProducts);
+            values.products = Array.from(inlineProducts.values());
+            values.orderTax =
+              [...inlineProducts.values()].reduce(
+                (acc, item) => acc + item.taxPrice * item.quantity,
+                0
+              ) -
+                values.discount +
+                values.shipping || 0;
+            values.total =
+              [...inlineProducts.values()].reduce(
+                (acc, item) =>
+                  acc + (item.discountedPrice + item.taxPrice) * item.quantity,
+                0
+              ) + values.shipping || 0;
+
+            salesSubmit.mutateAsync(values).then((res) => {
+              showNotification({
+                title: 'New Sale',
+                message: 'Sale created successfully',
+              });
+              setSubmitting(false);
+              console.log(res._id);
+              setInvoiceId(res._id as unknown as string);
+
+              // const invoice = trpc.saleRouter.getInvoice.useQuery({
+              //   _id: res._id as string,
+              // });
+            });
+
+            resetForm();
+            setInlineProducts(new Map());
             console.log(values);
           }}
-          validationSchema={toFormikValidationSchema(
-            z.object({
-              products: z.array(
-                z.object({
-                  product: z.string(),
-                  quantity: z.number(),
-                })
-              ),
-              note: z.string(),
-              total: z.number(),
-              status: z.string(),
-              shipping: z.number(),
-              orderTax: z.number(),
-              discount: z.number(),
-              warehouse: z.string(),
-              date: z.string(),
-            })
-          )}
         >
           {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
+              {invoice.data && (
+                <div style={{ display: 'none' }}>
+                  <Invoice invoiceRef={componentRef} data={invoice.data} />
+                </div>
+              )}
               <SimpleGrid
                 m={'md'}
                 cols={3}
@@ -147,32 +283,11 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   placeholder='Invoice Number'
                   description='Leave blank to auto generate'
                 />
-                <FormikSelect
-                  label={props.isCustomer ? 'Customer' : 'Supplier'}
-                  name='warehouse'
-                  data={[
-                    { label: 'Customer 1', value: '1' },
-                    { label: 'Customer 2', value: '2' },
-                  ]}
-                  // data={
-                  //   warehouses.data?.map((warehouse) => ({
-                  //     label: warehouse.name,
-                  //     value: warehouse._id.toString(),
-                  //   })) || []
-                  // }
-                  placeholder='Pick one'
-                  searchable
-                  w={'100%'}
-                  rightSection={
-                    <IconPlus
-                      size={20}
-                      onClick={() => {
-                        console.log('clicked');
-                      }}
-                      cursor={'pointer'}
-                    />
-                  }
-                  withAsterisk
+                <WarehouseSelect />
+                <FormInput
+                  label='Customer Name'
+                  name='customer'
+                  placeholder='Customer Name'
                 />
                 <FormDate
                   label='Date'
@@ -183,26 +298,36 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
               </SimpleGrid>
               <Select
                 label='Products'
-                m={'md'}
                 data={
-                  products.data?.map((item) => ({
+                  searchProducts.data?.map((item) => ({
                     label: item.name,
                     value: item._id.toString(),
                   })) || []
                 }
-                name='products'
                 placeholder='Select Products'
                 searchable
                 size='sm'
-                value={selectProduct?.product.toString() || ''}
+                value={selectProduct?._id.toString() || ''}
                 rightSection={
                   <ActionIcon
                     onClick={() => {
                       if (selectProduct) {
-                        setFieldValue('products', [
-                          ...values.products,
-                          selectProduct,
-                        ]);
+                        const inlineProduct = inlineProducts.get(
+                          selectProduct._id.toString()
+                        );
+                        if (!inlineProduct) {
+                          inlineProducts.set(
+                            selectProduct._id.toString(),
+                            selectProduct
+                          );
+                        } else {
+                          return;
+                        }
+                        inlineProducts.set(
+                          selectProduct._id.toString(),
+                          selectProduct
+                        );
+                        setInlineProducts(new Map(inlineProducts));
                         setSelectProduct(undefined);
                       }
                     }}
@@ -211,21 +336,27 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   </ActionIcon>
                 }
                 onChange={(value) => {
-                  const product = products.data?.find(
+                  const product = searchProducts.data?.find(
                     (item) => item._id.toString() === value
                   );
 
                   if (product) {
                     setSelectProduct({
+                      _id: product._id.toString(),
                       name: product.name,
-                      product: product._id.toString(),
                       quantity: 1,
+                      subtotal: product.salePrice,
+                      // discountedPrice:
+                      //   product.salePrice -
+                      //   (totalPrice * (values.orderdiscount / 100)) /
+                      //     (inlineProducts.size + 1),
                       price: product.salePrice,
                       tax: product.tax,
-                      subtotal: product.salePrice + product.tax,
                     });
                   }
                 }}
+                searchValue={search}
+                onSearchChange={setSearch}
               />
               <div style={{ height: '30vh' }}>
                 <ScrollArea
@@ -299,102 +430,104 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <FieldArray
-                        name='products'
-                        render={(arrayHelpers) => (
-                          <React.Fragment>
-                            {values.products.map((item, index) => (
-                              <tr key={item.product}>
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {index + 1}
-                                </td>
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {item.name}
-                                </td>
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  <NumberInput
-                                    size='sm'
-                                    value={item.quantity}
-                                    onChange={(value) => {
-                                      if (!value) return;
-                                      item.quantity = value;
-                                      item.subtotal =
-                                        (item.price + item.tax) * value;
-                                      setFieldValue(
-                                        `products[${index}].quantity`,
-                                        value
-                                      );
-                                      setFieldValue(
-                                        `products[${index}].subtotal`,
-                                        item.subtotal
-                                      );
-                                    }}
-                                    name={`products[${index}].quantity`}
-                                    min={1}
-                                  />
-                                </td>
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {item.price}
-                                </td>
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {item.tax}
-                                </td>
+                      {[...inlineProducts.values()].map((item, index) => {
+                        const totalPrice = [...inlineProducts.values()].reduce(
+                          (acc, item) => acc + item.price,
+                          0
+                        );
+                        const discountedPrice =
+                          item.subtotal -
+                          (totalPrice * (values.discount / 100)) /
+                            inlineProducts.size;
+                        item.discountedPrice = discountedPrice;
+                        // console.log(item);
+                        const taxedPrice =
+                          item.discountedPrice * (item.tax / 100);
+                        item.taxPrice = taxedPrice;
+                        // item.subtotal = item.discountedPrice + taxedPrice;
+                        return (
+                          <tr key={item._id}>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              {index + 1}
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              {item.name}
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <NumberInput
+                                size='sm'
+                                value={item.quantity}
+                                onChange={(value) => {
+                                  // console.log(item);
+                                  if (!value) return;
+                                  item.quantity = value;
 
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {item.subtotal}
-                                </td>
-                                <td
-                                  style={{
-                                    whiteSpace: 'nowrap',
-                                    textAlign: 'center',
-                                    // justifyItems: 'center',
-                                  }}
-                                >
-                                  <ActionIcon
-                                    variant='filled'
-                                    color={'blue'}
-                                    onClick={() => {
-                                      arrayHelpers.remove(index);
-                                    }}
-                                  >
-                                    <IconTrash />
-                                  </ActionIcon>
-                                </td>
-                              </tr>
-                            ))}
-                          </React.Fragment>
-                        )}
-                      />
+                                  // item.discountedPrice =
+                                  //   item.discountedPrice * value;
+                                  setInlineProducts(new Map(inlineProducts));
+                                }}
+                                min={1}
+                              />
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              {item.price}
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              {item.tax}
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              {(discountedPrice + taxedPrice) * item.quantity}
+                            </td>
+                            <td
+                              style={{
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <ActionIcon
+                                variant='filled'
+                                color={'blue'}
+                                onClick={() => {
+                                  inlineProducts.delete(item._id);
+                                  setInlineProducts(new Map(inlineProducts));
+                                }}
+                              >
+                                <IconTrash />
+                              </ActionIcon>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </Table>
                 </ScrollArea>
@@ -451,15 +584,17 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       ]}
                     />
                     <FormikSelect
+                      name='paymentmethod'
+                      label='Payment Method'
                       w={'46%'}
-                      label={'Order Tax'}
-                      placeholder={'Select Tax'}
-                      name={'tax'}
                       data={[
-                        { label: 'Tax 1', value: 'tax1' },
-                        { label: 'Tax 2', value: 'tax2' },
-                        { label: 'Tax 3', value: 'tax3' },
+                        { label: 'Cash', value: 'cash' },
+                        { label: 'Card', value: 'card' },
+                        { label: 'UPI', value: 'upi' },
                       ]}
+                      placeholder='Payment Method'
+                      searchable
+                      size='sm'
                     />
                   </Group>
                   <Group w={'100%'} mt={'sm'}>
@@ -484,6 +619,10 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       label={'Order Tax'}
                       placeholder={'Order Tax'}
                       name={'orderTax'}
+                      value={[...inlineProducts.values()].reduce(
+                        (acc, curr) => acc + curr.taxPrice * curr.quantity,
+                        0
+                      )}
                       type={'number'}
                     />
                     <TextInput
@@ -491,14 +630,15 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       label={'Total'}
                       placeholder={'Total'}
                       readOnly
-                      value={
-                        values.products.reduce(
-                          (acc, item) => acc + item.subtotal,
+                      value={(
+                        [...inlineProducts.values()].reduce(
+                          (acc, item) =>
+                            acc +
+                            (item.discountedPrice + item.taxPrice) *
+                              item.quantity,
                           0
-                        ) -
-                          values.discount +
-                          values.shipping || 0
-                      }
+                        ) + (values.shipping ? values.shipping : 0) ?? 0
+                      ).toFixed(2)}
                       type={'number'}
                     />
                   </Group>
