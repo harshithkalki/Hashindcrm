@@ -35,6 +35,7 @@ import { Waypoint } from 'react-waypoint';
 import { showNotification } from '@mantine/notifications';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
+import type { IProduct } from '@/models/Product';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -73,6 +74,178 @@ type Query = {
   category?: string;
 };
 
+function ProductsSelect({
+  onClickProduct,
+}: {
+  onClickProduct: (
+    product: IProduct & {
+      _id: string;
+    }
+  ) => void;
+}) {
+  const { classes } = useStyles();
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+  const categories = trpc.categoryRouter.allLeafNodes.useQuery();
+  const [category, setCategory] = useState<string | undefined>(undefined);
+  const products = trpc.productRouter.getProducts.useInfiniteQuery(
+    {
+      warehouse: warehouse,
+      category,
+    },
+    {
+      enabled: !!warehouse,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    }
+  );
+
+  return (
+    <div
+      style={{
+        flex: 0.59,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      <div>
+        <ScrollArea scrollbarSize={5}>
+          <div
+            style={{
+              display: 'flex',
+              padding: '15px',
+              overflow: 'hidden',
+              gap: '10px',
+            }}
+          >
+            {categories.data?.map((item) => (
+              <ActionIcon
+                key={item._id.toString()}
+                style={{ width: '70px', height: '60px' }}
+                onClick={() => {
+                  setCategory(item._id.toString());
+                }}
+              >
+                <div
+                  className='categorylist'
+                  style={{
+                    boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
+                    marginTop: '3px',
+                    width: '70px',
+                    height: '70px',
+                    borderRadius: '10px',
+                    backgroundColor: '#25262B',
+                    display: 'inline-block',
+                  }}
+                >
+                  <Container
+                    p={2}
+                    ta={'center'}
+                    mt={'5px'}
+                    style={{
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                    }}
+                    styles={{
+                      '&:hover': {
+                        backgroundColor: 'white',
+                        color: 'black',
+                        cursor: 'pointer',
+                      },
+                    }}
+                  >
+                    <Image
+                      ml={'14px'}
+                      src={item.logo}
+                      alt={item.name}
+                      height={35}
+                      width={35}
+                      radius='xl'
+                      withPlaceholder
+                    />
+                    <Truncate
+                      text={item.name}
+                      maxLength={8}
+                      textProps={{ size: 'xs' }}
+                    />
+                  </Container>
+                </div>
+              </ActionIcon>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      <ScrollArea
+        style={{
+          flex: '1',
+          width: '45vw',
+          marginTop: '15px',
+        }}
+        scrollbarSize={10}
+        offsetScrollbars
+      >
+        <div className={classes.products}>
+          {products.data?.pages.map((page) =>
+            page.docs.map((item, index) => (
+              <Card
+                shadow='sm'
+                key={item._id.toString()}
+                p={'xl'}
+                radius={'md'}
+                withBorder
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  onClickProduct({
+                    ...item,
+                    _id: item._id.toString(),
+                  });
+                }}
+              >
+                <Card.Section>
+                  <Image
+                    src={item.logo}
+                    alt={item.name}
+                    height={160}
+                    // width={0}
+                  />
+                </Card.Section>
+                <Card.Section pl={'md'} mt={'sm'}>
+                  <Text fw={500}>{item.name}</Text>
+                </Card.Section>
+                <Card.Section pl={'md'}>
+                  <Text fw={300} fz={'xs'}>
+                    {(item.category as unknown as { name: string }).name}
+                  </Text>
+                </Card.Section>
+                <Card.Section pl={'md'} mt={'xs'}>
+                  <Text fw={500} fz={'lg'} mb={'md'}>
+                    {'\u20B9'} {item.salePrice}
+                  </Text>
+                </Card.Section>
+                {index === page.docs.length - 5 && (
+                  <Waypoint
+                    onEnter={() => {
+                      if (!page.hasNextPage) return;
+
+                      if (page.hasNextPage) {
+                        products.fetchNextPage();
+                      }
+                    }}
+                  />
+                )}
+              </Card>
+            ))
+          )}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
 const Index = () => {
   const [query, setQuery] = useState<Query>({
     page: 1,
@@ -107,7 +280,6 @@ const Index = () => {
     Map<string, InlineProduct>
   >(new Map());
   const [selectProduct, setSelectProduct] = useState<InlineProduct>();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [products, setProducts] = useState<
     RouterOutputs['productRouter']['getProducts']['docs']
@@ -226,203 +398,30 @@ const Index = () => {
                 overflow: 'hidden',
               }}
             >
-              <div
-                style={{
-                  flex: 0.59,
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
+              <ProductsSelect
+                onClickProduct={(item) => {
+                  const product = item;
+                  const pushItem: InlineProduct = {
+                    _id: product._id.toString(),
+                    name: product.name,
+                    quantity: 1,
+                    subtotal: product.salePrice,
+                    price: product.salePrice,
+                    tax: product.tax,
+                  };
+                  const inlineProduct = inlineProducts.get(
+                    pushItem._id.toString()
+                  );
+                  if (!inlineProduct) {
+                    inlineProducts.set(pushItem._id.toString(), pushItem);
+                  } else {
+                    return;
+                  }
+                  inlineProducts.set(pushItem._id.toString(), pushItem);
+                  setInlineProducts(new Map(inlineProducts));
+                  setSelectProduct(undefined);
                 }}
-              >
-                <div>
-                  <ScrollArea scrollbarSize={5}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        padding: '15px',
-                        overflow: 'hidden',
-                        gap: '10px',
-                      }}
-                    >
-                      {categories.data
-                        ?.filter((cat) =>
-                          Boolean(
-                            products.find((val) => val.category._id === cat._id)
-                          )
-                        )
-                        .map((item) => (
-                          <ActionIcon
-                            key={item._id.toString()}
-                            style={{ width: '70px', height: '60px' }}
-                            onClick={() => {
-                              setQuery((prev) => ({
-                                ...prev,
-                                category: item._id.toString(),
-                              }));
-                              setSelectedCategory(item._id.toString());
-                              productsQuery.refetch();
-                            }}
-                          >
-                            <div
-                              className='categorylist'
-                              style={{
-                                boxShadow: '1px 1px 1px 1px rgba(0,0,0,0)',
-                                marginTop: '3px',
-                                width: '70px',
-                                height: '70px',
-                                //   border: "1px solid white",
-                                borderRadius: '10px',
-                                backgroundColor: '#25262B',
-                                display: 'inline-block',
-                              }}
-                            >
-                              <Container
-                                p={2}
-                                ta={'center'}
-                                mt={'5px'}
-                                style={{
-                                  textOverflow: 'ellipsis',
-                                  overflow: 'hidden',
-                                }}
-                                styles={{
-                                  '&:hover': {
-                                    backgroundColor: 'white',
-                                    color: 'black',
-                                    cursor: 'pointer',
-                                  },
-                                }}
-                              >
-                                <Image
-                                  ml={'14px'}
-                                  src={item.logo}
-                                  alt={item.name}
-                                  height={35}
-                                  width={35}
-                                  radius='xl'
-                                  withPlaceholder
-                                />
-                                <Truncate
-                                  text={item.name}
-                                  maxLength={8}
-                                  textProps={{ size: 'xs' }}
-                                />
-                                {/* <Text fz={"xs"}>{item.name}</Text> */}
-                              </Container>
-                            </div>
-                          </ActionIcon>
-                        ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                <ScrollArea
-                  style={{
-                    flex: '1',
-                    width: '45vw',
-                    marginTop: '15px',
-                  }}
-                  scrollbarSize={10}
-                  offsetScrollbars
-                >
-                  <div className={classes.products}>
-                    {(selectedCategory
-                      ? products.sort((a, b) =>
-                          a.category._id === selectedCategory ? -1 : 1
-                        )
-                      : products
-                    ).map((item, index) => (
-                      <Card
-                        shadow='sm'
-                        key={item._id.toString()}
-                        p={'xl'}
-                        radius={'md'}
-                        withBorder
-                        style={{ cursor: 'pointer' }}
-                        onClick={(e) => {
-                          console.log(item);
-                          const _id = item._id.toString();
-                          const product = searchProducts.data?.find(
-                            (item) => item._id.toString() === _id
-                          );
-                          let pushItem: InlineProduct;
-                          if (product) {
-                            pushItem = {
-                              _id: product._id.toString(),
-                              name: product.name,
-                              quantity: 1,
-                              subtotal: product.salePrice,
-                              // discountedPrice:
-                              //   product.salePrice -
-                              //   (totalPrice * (values.orderdiscount / 100)) /
-                              //     (inlineProducts.size + 1),
-                              price: product.salePrice,
-                              tax: product.tax,
-                            };
-                          }
-                          if (pushItem) {
-                            const inlineProduct = inlineProducts.get(
-                              pushItem._id.toString()
-                            );
-                            if (!inlineProduct) {
-                              inlineProducts.set(
-                                pushItem._id.toString(),
-                                pushItem
-                              );
-                            } else {
-                              return;
-                            }
-                            inlineProducts.set(
-                              pushItem._id.toString(),
-                              pushItem
-                            );
-                            setInlineProducts(new Map(inlineProducts));
-                            setSelectProduct(undefined);
-                          }
-                        }}
-                      >
-                        <Card.Section>
-                          <Image
-                            src={item.logo}
-                            alt={item.name}
-                            height={160}
-                            // width={0}
-                          />
-                        </Card.Section>
-                        <Card.Section pl={'md'} mt={'sm'}>
-                          <Text fw={500}>{item.name}</Text>
-                        </Card.Section>
-                        <Card.Section pl={'md'}>
-                          <Text fw={300} fz={'xs'}>
-                            {'name' in item.category && item.category.name}
-                          </Text>
-                        </Card.Section>
-                        <Card.Section pl={'md'} mt={'xs'}>
-                          <Text fw={500} fz={'lg'} mb={'md'}>
-                            {'\u20B9'} {item.salePrice}
-                          </Text>
-                        </Card.Section>
-                        {index === products.length - 5 && (
-                          <Waypoint
-                            onEnter={() => {
-                              if (!productsQuery.data?.hasNextPage) return;
-
-                              setQuery((prev) => ({
-                                ...prev,
-                                page: prev.page + 1,
-                              }));
-
-                              if (productsQuery.data?.hasNextPage) {
-                                productsQuery.refetch();
-                              }
-                            }}
-                          />
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
+              />
               <div
                 style={{
                   flex: 0.39,
@@ -631,7 +630,10 @@ const Index = () => {
                                   textAlign: 'center',
                                 }}
                               >
-                                {(discountedPrice + taxedPrice) * item.quantity}
+                                {(
+                                  (discountedPrice + taxedPrice) *
+                                  item.quantity
+                                ).toFixed(2)}
                               </td>
                               <td
                                 style={{
@@ -678,7 +680,7 @@ const Index = () => {
                       icon={<IconCurrencyRupee />}
                     />
                     <FormikSelect
-                      name='paymentmethod'
+                      name='paymentMethod'
                       label='Payment Method'
                       data={[
                         { label: 'Cash', value: 'cash' },
