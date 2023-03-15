@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 export type ICount = {
   count: number;
   company: mongoose.Types.ObjectId;
-  name: 'invoice';
+  name: 'invoice' | 'purchase';
 };
 
 type CountModel = Model<ICount, Record<string, never>>;
