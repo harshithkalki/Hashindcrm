@@ -1,6 +1,7 @@
 import { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
 import { RouterOutputs, trpc } from '@/utils/trpc';
+import { ZPurchaseCreateInput } from '@/zobjs/purchase';
 import { ZSaleCreateInput } from '@/zobjs/sale';
 import {
   Modal,
@@ -32,7 +33,8 @@ import FormInput from '../FormikCompo/FormikInput';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import Formiktextarea from '../FormikCompo/FormikTextarea';
 import FormikInfiniteSelect from '../FormikCompo/InfiniteSelect';
-import Invoice from '../Invoice';
+// import Invoice from '../Invoice';
+import Invoice from '../PurchaseInvoice';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -75,7 +77,7 @@ type InlineProduct = {
 };
 
 type InitialValues = {
-  customer: string;
+  supplier: string;
   products: InlineProduct[];
   notes: string;
   total: number;
@@ -90,7 +92,7 @@ type InitialValues = {
 };
 
 const initialValues: InitialValues = {
-  customer: '',
+  supplier: '',
   date: new Date().toISOString(),
   products: [],
   orderTax: 0,
@@ -155,7 +157,32 @@ function WarehouseSelect() {
   );
 }
 
-const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
+const SupplierSelect = () => {
+  const [search, setSearch] = useState('');
+  const suppliers = trpc.supplierRouter.suppliers.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  return (
+    <FormikSelect
+      label='Supplier'
+      data={
+        suppliers.data?.docs?.map((supplier) => ({
+          label: supplier.name,
+          value: supplier._id.toString(),
+        })) || []
+      }
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='supplier'
+      withAsterisk
+    />
+  );
+};
+
+const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const { classes, cx } = useStyles();
   // const products = trpc.productRouter.getAllProducts.useQuery();
   const [search, setSearch] = useState<string>('');
@@ -176,9 +203,9 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
     RouterOutputs['productRouter']['getProducts']['docs']
   >([]);
 
-  const salesSubmit = trpc.saleRouter.create.useMutation();
+  const PurchasesSubmit = trpc.purchaseRouter.create.useMutation();
 
-  const invoice = trpc.saleRouter.getInvoice.useQuery(
+  const invoice = trpc.purchaseRouter.getInvoice.useQuery(
     {
       _id: invoiceId,
     },
@@ -208,7 +235,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
       >
         <Formik
           initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(ZSaleCreateInput)}
+          validationSchema={toFormikValidationSchema(ZPurchaseCreateInput)}
           onSubmit={(values, { setSubmitting, resetForm }) => {
             console.log(inlineProducts);
             values.products = Array.from(inlineProducts.values());
@@ -226,7 +253,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 0
               ) + values.shipping || 0;
 
-            salesSubmit.mutateAsync(values).then((res) => {
+            PurchasesSubmit.mutateAsync(values).then((res) => {
               showNotification({
                 title: 'New Sale',
                 message: 'Sale created successfully',
@@ -270,11 +297,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   description='Leave blank to auto generate'
                 />
                 <WarehouseSelect />
-                <FormInput
-                  label='Customer Name'
-                  name='customer'
-                  placeholder='Customer Name'
-                />
+                <SupplierSelect />
                 <FormDate
                   label='Date'
                   placeholder='Date'
@@ -654,4 +677,4 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
   );
 };
 
-export default SalesForm;
+export default PurchaseForm;

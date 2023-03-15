@@ -123,12 +123,6 @@ const Index = () => {
         </Group>
         <TableSelection
           data={data}
-          keysandlabels={{
-            currencyname: 'Currency Name',
-            currencycode: 'Currency Code',
-            currencysymbol: 'Currency Symbol',
-            currencypoistion: 'Currency Position',
-          }}
           colProps={{
             currencyname: {
               label: 'Currency Name',

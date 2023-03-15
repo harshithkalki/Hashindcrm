@@ -106,10 +106,6 @@ const Index = () => {
                     </Group>
                   ),
                 },
-                // date: 'Date',
-                // customer: 'Customer',
-                // status: 'Payment Status',
-                // total: 'Total Amount',
               }}
             />
             <Pagination
