@@ -30,6 +30,7 @@ export const saleRouter = router({
       const count = await Count.findOneAndUpdate(
         {
           company: client.company,
+          name: 'invoice',
         },
         {
           $inc: {
@@ -47,6 +48,7 @@ export const saleRouter = router({
         const newCount = await Count.create({
           count: 1,
           company: client.company,
+          name: 'invoice',
         });
 
         invoiceId = `${newCount.count}`;
