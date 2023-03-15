@@ -76,6 +76,7 @@ export default function ProductTable<T>({
               alt={item.name}
               radius='lg'
               style={{ width: 32, height: 32 }}
+              withPlaceholder
             />
             {item.name}
           </Group>

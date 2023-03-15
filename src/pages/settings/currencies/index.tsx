@@ -129,6 +129,20 @@ const Index = () => {
             currencysymbol: 'Currency Symbol',
             currencypoistion: 'Currency Position',
           }}
+          colProps={{
+            currencyname: {
+              label: 'Currency Name',
+            },
+            currencycode: {
+              label: 'Currency Code',
+            },
+            currencysymbol: {
+              label: 'Currency Symbol',
+            },
+            currencypoistion: {
+              label: 'Currency Position',
+            },
+          }}
           editable={true}
           deletable={true}
         />

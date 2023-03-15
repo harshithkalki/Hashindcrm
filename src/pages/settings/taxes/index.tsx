@@ -90,9 +90,7 @@ const Index = () => {
         </Group>
         <TableSelection
           data={data}
-          keysandlabels={{
-            // taxname: 'Tax Name',
-            // taxrate: 'Tax Rate',
+          colProps={{
             taxname: {
               label: 'Tax Name',
             },

@@ -105,9 +105,13 @@ const Index = () => {
         </Group>
         <TableSelection
           data={data}
-          keysandlabels={{
-            modename: 'Mode Name',
-            modetype: 'Mode Type',
+          colProps={{
+            modename: {
+              label: 'Mode Name',
+            },
+            modetype: {
+              label: 'Mode Type',
+            },
           }}
           editable={true}
           deletable={true}

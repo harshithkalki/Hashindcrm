@@ -90,9 +90,13 @@ const Index = () => {
         </Group>
         <TableSelection
           data={data}
-          keysandlabels={{
-            unitname: 'Unit Name',
-            shortname: 'Short Name',
+          colProps={{
+            unitname: {
+              label: 'Unit Name',
+            },
+            shortname: {
+              label: 'Short Name',
+            },
           }}
           editable={true}
           deletable={true}
