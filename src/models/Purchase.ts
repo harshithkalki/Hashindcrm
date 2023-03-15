@@ -15,7 +15,7 @@ type PurchaseModel = Model<IPurchase, Record<string, never>>;
 
 const PurchaseSchema: Schema = new Schema<IPurchase, PurchaseModel>(
   {
-    customer: { type: String, required: true },
+    supplier: { type: String, required: true },
     date: { type: Date, required: true },
     products: [
       {

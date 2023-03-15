@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZPurchaseCreateInput = z.object({
-  customer: z.string(),
+  supplier: z.string(),
   date: z.string(),
   products: z.array(
     z.object({
