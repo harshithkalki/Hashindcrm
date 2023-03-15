@@ -65,8 +65,8 @@ interface modalProps {
 type InlineProduct = {
   _id: string;
   name: string;
-  discountedPrice?: number;
-  taxPrice?: number;
+  discountedPrice: number;
+  taxPrice: number;
   subtotal: number;
   quantity: number;
   price: number;
