@@ -106,66 +106,6 @@ const initialValues: z.infer<typeof ZStockTransferCreateInput> = {
   //   paymentMode: '',
 };
 
-// function WarehouseSelect({
-//   name,
-//   label,
-//   placeholder,
-// }: {
-//   name: string;
-//   label: string;
-//   placeholder: string;
-// }) {
-//   const [searchValue, onSearchChange] = useState('');
-//   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
-//     {
-//       search: searchValue,
-//     },
-//     {
-//       refetchOnWindowFocus: false,
-//       getNextPageParam: (lastPage) => lastPage.nextPage,
-//     }
-//   );
-//   const warehouse = useSelector<
-//     RootState,
-//     RootState['clientState']['warehouse']
-//   >((state) => state.clientState.warehouse);
-//   const dispatch = useDispatch();
-
-//   return (
-//     <FormikInfiniteSelect
-//       name={name}
-//       placeholder={placeholder}
-//       label={label}
-//       data={
-//         warehouses.data?.pages
-//           .flatMap((page) => page.docs)
-//           .map((warehouse, index) => ({
-//             label: warehouse.name,
-//             value: warehouse._id.toString(),
-//             index,
-//           })) ?? []
-//       }
-//       onChange={(value) => {
-//         if (value) dispatch(setWarehouse(value));
-//       }}
-//       value={warehouse}
-//       nothingFound='No warehouses found'
-//       onWaypointEnter={() => {
-//         if (
-//           warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
-//         ) {
-//           warehouses.fetchNextPage();
-//         }
-//       }}
-//       rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
-//       onSearchChange={onSearchChange}
-//       searchValue={searchValue}
-//       w={'100%'}
-//       searchable
-//     />
-//   );
-// }
-
 const WarehouseSelect = () => {
   const [search, setSearch] = useState('');
   const warehouses = trpc.warehouseRouter.warehouses.useQuery(
@@ -213,29 +153,15 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
     Map<string, InlineProduct>
   >(new Map());
 
-  const [invoiceId, setInvoiceId] = useState<string>('');
   const [products, setProducts] = useState<
     RouterOutputs['productRouter']['getProducts']['docs']
   >([]);
 
   const transferSubmit = trpc.stockTransferRouter.create.useMutation();
-  const invoice = trpc.saleRouter.getInvoice.useQuery(
-    {
-      _id: invoiceId,
-    },
-    { enabled: Boolean(invoiceId) }
-  );
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-
-  useEffect(() => {
-    if (invoice.data) {
-      handlePrint();
-      setInvoiceId('');
-    }
-  }, [handlePrint, invoice.data]);
 
   useEffect(() => {
     if (warehouse) {
@@ -279,13 +205,12 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 message: 'Sale created successfully',
               });
               setSubmitting(false);
-              console.log(res._id);
-              setInvoiceId(res._id as unknown as string);
+
+              setModal(false);
             });
 
             resetForm();
             setInlineProducts(new Map());
-            console.log(values);
           }}
           //  onSubmit={(values, { setSubmitting, resetForm }) => {
           //    console.log(values);
@@ -303,11 +228,6 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
 
             return (
               <Form onSubmit={handleSubmit}>
-                {invoice.data && (
-                  <div style={{ display: 'none' }}>
-                    <Invoice invoiceRef={componentRef} data={invoice.data} />
-                  </div>
-                )}
                 <SimpleGrid
                   m={'md'}
                   cols={3}

@@ -88,6 +88,10 @@ const StockTransferSchema: Schema = new Schema<
       type: String,
       required: true,
     },
+    invoiceId: {
+      type: String,
+      required: true,
+    },
   },
   {
     versionKey: false,
