@@ -2,58 +2,10 @@ import CardTable from '@/components/Cash,BankandUpi/BankTable';
 import CashTable from '@/components/Cash,BankandUpi/CashTable';
 import UPITable from '@/components/Cash,BankandUpi/UPITable';
 import Layout from '@/components/Layout';
-import CashandBankTable from '@/components/Tables/CashAndBankTable';
-import { trpc } from '@/utils/trpc';
+
 import { Flex, Group, ScrollArea, Tabs, Title } from '@mantine/core';
 import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
 import React from 'react';
-const cashData = [
-  {
-    paymentdate: '2021-01-01',
-    referencenumber: 'INV-0001',
-    paymenttype: 'Cash',
-    user: 'John Doe',
-    userprofile: 'https://i.pravatar.cc/150?img=1',
-    modetype: 'Cash',
-    amount: 1000,
-  },
-  {
-    paymentdate: '2021-01-01',
-    referencenumber: 'INV-0002',
-    paymenttype: 'Cash',
-    user: 'John Doe',
-    userprofile: 'https://i.pravatar.cc/150?img=1',
-    modetype: 'Cash',
-    amount: 1000,
-  },
-  {
-    paymentdate: '2021-01-01',
-    referencenumber: 'INV-0002',
-    paymenttype: 'Cash',
-    user: 'John Doe',
-    userprofile: 'https://i.pravatar.cc/150?img=1',
-    modetype: 'Cash',
-    amount: 1000,
-  },
-  {
-    paymentdate: '2021-01-01',
-    referencenumber: 'INV-0002',
-    paymenttype: 'Cash',
-    user: 'John Doe',
-    userprofile: 'https://i.pravatar.cc/150?img=1',
-    modetype: 'Cash',
-    amount: 1000,
-  },
-  {
-    paymentdate: '2021-01-01',
-    referencenumber: 'INV-0002',
-    paymenttype: 'Cash',
-    user: 'John Doe',
-    userprofile: 'https://i.pravatar.cc/150?img=1',
-    modetype: 'Cash',
-    amount: 1000,
-  },
-];
 
 const Index = () => {
   return (

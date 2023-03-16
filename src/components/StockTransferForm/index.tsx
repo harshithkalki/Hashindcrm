@@ -106,65 +106,90 @@ const initialValues: z.infer<typeof ZStockTransferCreateInput> = {
   //   paymentMode: '',
 };
 
-function WarehouseSelect({
-  name,
-  label,
-  placeholder,
-}: {
-  name: string;
-  label: string;
-  placeholder: string;
-}) {
-  const [searchValue, onSearchChange] = useState('');
-  const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
-    {
-      search: searchValue,
-    },
-    {
-      refetchOnWindowFocus: false,
-      getNextPageParam: (lastPage) => lastPage.nextPage,
-    }
-  );
-  const warehouse = useSelector<
-    RootState,
-    RootState['clientState']['warehouse']
-  >((state) => state.clientState.warehouse);
-  const dispatch = useDispatch();
+// function WarehouseSelect({
+//   name,
+//   label,
+//   placeholder,
+// }: {
+//   name: string;
+//   label: string;
+//   placeholder: string;
+// }) {
+//   const [searchValue, onSearchChange] = useState('');
+//   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
+//     {
+//       search: searchValue,
+//     },
+//     {
+//       refetchOnWindowFocus: false,
+//       getNextPageParam: (lastPage) => lastPage.nextPage,
+//     }
+//   );
+//   const warehouse = useSelector<
+//     RootState,
+//     RootState['clientState']['warehouse']
+//   >((state) => state.clientState.warehouse);
+//   const dispatch = useDispatch();
 
+//   return (
+//     <FormikInfiniteSelect
+//       name={name}
+//       placeholder={placeholder}
+//       label={label}
+//       data={
+//         warehouses.data?.pages
+//           .flatMap((page) => page.docs)
+//           .map((warehouse, index) => ({
+//             label: warehouse.name,
+//             value: warehouse._id.toString(),
+//             index,
+//           })) ?? []
+//       }
+//       onChange={(value) => {
+//         if (value) dispatch(setWarehouse(value));
+//       }}
+//       value={warehouse}
+//       nothingFound='No warehouses found'
+//       onWaypointEnter={() => {
+//         if (
+//           warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
+//         ) {
+//           warehouses.fetchNextPage();
+//         }
+//       }}
+//       rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
+//       onSearchChange={onSearchChange}
+//       searchValue={searchValue}
+//       w={'100%'}
+//       searchable
+//     />
+//   );
+// }
+
+const WarehouseSelect = () => {
+  const [search, setSearch] = useState('');
+  const warehouses = trpc.warehouseRouter.warehouses.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
   return (
-    <FormikInfiniteSelect
-      name={name}
-      placeholder={placeholder}
-      label={label}
+    <FormikSelect
+      label='To Warehouse'
       data={
-        warehouses.data?.pages
-          .flatMap((page) => page.docs)
-          .map((warehouse, index) => ({
-            label: warehouse.name,
-            value: warehouse._id.toString(),
-            index,
-          })) ?? []
+        warehouses.data?.docs?.map((warehouse) => ({
+          label: warehouse.name,
+          value: warehouse._id.toString(),
+        })) || []
       }
-      onChange={(value) => {
-        if (value) dispatch(setWarehouse(value));
-      }}
-      value={warehouse}
-      nothingFound='No warehouses found'
-      onWaypointEnter={() => {
-        if (
-          warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
-        ) {
-          warehouses.fetchNextPage();
-        }
-      }}
-      rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
-      onSearchChange={onSearchChange}
-      searchValue={searchValue}
-      w={'100%'}
       searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='toWarehouse'
+      withAsterisk
     />
   );
-}
+};
 
 const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const { classes, cx } = useStyles();
@@ -279,18 +304,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   placeholder='Invoice Number'
                   description='Leave blank to auto generate'
                 />
-                <WarehouseSelect
-                  label='From Warehouse'
-                  name='formWarehouse'
-                  placeholder='From Warehouse'
-                />
-
-                <WarehouseSelect
-                  label='To Warehouse'
-                  name='toWarehouse'
-                  placeholder='To Warehouse'
-                />
-
+                <WarehouseSelect />
                 <FormDate
                   label='openingStockDate'
                   placeholder='openingStockDate'

@@ -7,7 +7,7 @@ const UPITable = () => {
   const [page, setPage] = React.useState(1);
   const UPIData = trpc.saleRouter.getUPISales.useInfiniteQuery(
     { limit: 8 },
-    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+    { getNextPageParam: () => page, refetchOnWindowFocus: false, cacheTime: 0 }
   );
   useEffect(() => {
     if (!UPIData.data?.pages.find((pageData) => pageData.page === page)) {
