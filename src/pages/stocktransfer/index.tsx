@@ -27,38 +27,25 @@ const Index = () => {
       getNextPageParam: () => page,
     }
   );
-  const invoice = trpc.saleRouter.getInvoice.useQuery(
-    {
-      _id: invoiceId,
-    },
-    { enabled: Boolean(invoiceId) }
-  );
+
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
   useEffect(() => {
-    if (invoice.data) {
-      handlePrint();
-      setInvoiceId('');
-    }
-  }, [handlePrint, invoice.data]);
-
-  useEffect(() => {
     if (!transfers.data?.pages.find((pageData) => pageData.page === page)) {
       transfers.fetchNextPage();
     }
   }, [transfers, page]);
-  console.log(transfers);
 
   return (
     <>
-      {invoice.data && (
+      {/* {invoice.data && (
         <div style={{ display: 'none' }}>
           <Invoice invoiceRef={componentRef} data={invoice.data} />
         </div>
-      )}
+      )} */}
       <Layout>
         <div
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
@@ -82,17 +69,17 @@ const Index = () => {
                   ?.docs.map((doc) => ({
                     ...doc,
                     _id: doc._id.toString(),
+                    openingStockDate: dayjs(doc.openingStockDate).format(
+                      'DD/MM/YYYY'
+                    ),
                   })) || []
               }
               colProps={{
                 invoiceId: {
                   label: 'Invoice ID',
                 },
-                date: {
-                  label: 'Date',
-                },
-                customer: {
-                  label: 'Customer',
+                openingStockDate: {
+                  label: 'Opening Stock Date',
                 },
                 status: {
                   label: 'Payment Status',

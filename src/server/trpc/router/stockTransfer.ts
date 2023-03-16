@@ -23,11 +23,18 @@ export const stockTransferRouter = router({
         'You are not permitted to create stocktransfer'
       );
 
-      const counter = await Count.findOneAndUpdate(
+      let counter = await Count.findOneAndUpdate(
         { name: 'stocktransfer' },
         { $inc: { count: 1 } },
         { new: true }
       );
+
+      if (!counter) {
+        counter = await new Count({
+          name: 'stocktransfer',
+          count: 1,
+        }).save();
+      }
 
       const stocktransfer = await StockTransferModel.create({
         ...input,
@@ -99,8 +106,10 @@ export const stockTransferRouter = router({
             (product) => product.product.toString() === p._id.toString()
           );
 
+          const { _id: _, ...rest } = p;
+
           ProductModel.create({
-            ...p,
+            ...rest,
             warehouse: input.toWarehouse,
             quantity: product?.quantity,
             openingStockDate: p.openingStockDate.toISOString(),
