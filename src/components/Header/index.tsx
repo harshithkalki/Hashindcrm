@@ -101,6 +101,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface HeaderTabsProps {
+  navopen: boolean;
+  setNavOpen: (value: boolean) => void;
   className?: string;
 }
 
@@ -153,7 +155,7 @@ function WarehouseSelect() {
   );
 }
 
-export function CustomHeader({}: HeaderTabsProps) {
+export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
   const { classes, theme, cx } = useStyles();
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
@@ -167,13 +169,17 @@ export function CustomHeader({}: HeaderTabsProps) {
     <div className={classes.header}>
       <Container className={classes.mainSection}>
         <Group position='apart'>
-          <Image
-            src={client?.company?.logo}
-            height={30}
-            width={30}
-            alt='Mantine logo'
-            withPlaceholder
-          />
+          <Group>
+            <Burger opened={navopen} onClick={() => setNavOpen(!navopen)} />
+
+            <Image
+              src={client?.company?.logo}
+              height={30}
+              width={30}
+              alt='Mantine logo'
+              withPlaceholder
+            />
+          </Group>
 
           <Burger
             opened={opened}

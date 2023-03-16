@@ -33,6 +33,25 @@ const useStyles = createStyles((theme) => ({
     },
   },
 
+  closeNav: {
+    height: '100vh',
+    display: 'grid',
+    gridTemplateColumns: '0.8fr 1fr 1fr 1fr',
+    gridTemplateAreas: `
+    "header header header header"
+      "main main main main"
+    `,
+    gridTemplateRows: 'auto 1fr',
+
+    [theme.fn.smallerThan('sm')]: {
+      gridTemplateColumns: '1fr',
+      gridTemplateAreas: `
+        "nav"
+        "main"
+      `,
+    },
+  },
+
   nav: {
     gridArea: 'nav',
     backgroundColor:
@@ -70,21 +89,23 @@ export default function Layout({
   hide,
   navBar,
 }: Props) {
-  const [opened, setOpened] = useState(false);
+  const [opened, setOpened] = useState(true);
   const theme = useMantineTheme();
-  const { classes } = useStyles();
+  const { classes, cx } = useStyles();
 
   return (
     <div>
-      <div className={classes.container}>
-        <CustomHeader />
-        <div className={classes.nav}>
-          {navBar ?? <NavbarNested hide={!opened} />}
-        </div>
+      <div className={cx(classes.closeNav, { [classes.container]: opened })}>
+        <CustomHeader navopen={opened} setNavOpen={setOpened} />
+        {opened && (
+          <div className={classes.nav}>
+            {navBar ?? <NavbarNested hide={!opened} />}
+          </div>
+        )}
         <main
           className={classes.main}
           style={{
-            display: opened ? 'none' : 'block',
+            display: 'block',
             padding: theme.spacing.xs,
             overflow: 'hidden',
             maxHeight: '100%',
