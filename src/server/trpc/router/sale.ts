@@ -283,7 +283,7 @@ export const saleRouter = router({
 
       const query = {
         company: client.company,
-        paymentMethod: 'cash',
+        paymentMode: 'cash',
       };
 
       const sales = await Sale.paginate(query, options);
@@ -317,7 +317,7 @@ export const saleRouter = router({
 
       const query = {
         company: client.company,
-        paymentMethod: 'card',
+        paymentMode: 'card',
       };
 
       const sales = await Sale.paginate(query, options);
@@ -351,7 +351,7 @@ export const saleRouter = router({
 
       const query = {
         company: client.company,
-        paymentMethod: 'upi',
+        paymentMode: 'upi',
       };
 
       const sales = await Sale.paginate(query, options);
