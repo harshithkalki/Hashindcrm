@@ -2,23 +2,31 @@ import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import type { z } from 'zod';
 import type { ZStockTransfer } from '@/zobjs/stockTransfer';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
-export type IStockTransfer = ModifyDeep<
-  z.infer<typeof ZStockTransfer>,
-  {
-    company: Types.ObjectId;
-    products: {
-      product: Types.ObjectId;
-      quantity: number;
-    }[];
-    warehouse: Types.ObjectId;
-    openingStockDate: Date;
-  }
->;
+export type IStockTransfer = Omit<
+  ModifyDeep<
+    z.infer<typeof ZStockTransfer>,
+    {
+      company: Types.ObjectId;
+      warehouse: Types.ObjectId;
+      openingStockDate: Date;
+    }
+  >,
+  'products'
+> & {
+  products: {
+    product: Types.ObjectId;
+    quantity: number;
+  }[];
+};
 
-type StockAdjustModel = Model<IStockTransfer, Record<string, never>>;
+type StockTransferModel = Model<IStockTransfer, Record<string, never>>;
 
-const StockAdjustSchema: Schema = new Schema<IStockTransfer, StockAdjustModel>(
+const StockTransferSchema: Schema = new Schema<
+  IStockTransfer,
+  StockTransferModel
+>(
   {
     products: [
       {
@@ -72,15 +80,13 @@ const StockAdjustSchema: Schema = new Schema<IStockTransfer, StockAdjustModel>(
       type: Date,
       required: true,
     },
-    paidAmount: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    paymentStatus: {
+    formWarehouse: {
       type: String,
       required: true,
-      default: 'pending',
+    },
+    toWarehouse: {
+      type: String,
+      required: true,
     },
   },
   {
@@ -88,10 +94,12 @@ const StockAdjustSchema: Schema = new Schema<IStockTransfer, StockAdjustModel>(
   }
 );
 
+StockTransferSchema.plugin(mongoosePaginate);
+
 export default (mongoose.models.StockTransfer as ReturnType<
-  typeof mongoose.model<IStockTransfer, StockAdjustModel>
+  typeof mongoose.model<IStockTransfer, mongoose.PaginateModel<IStockTransfer>>
 >) ||
-  mongoose.model<IStockTransfer, StockAdjustModel>(
+  mongoose.model<IStockTransfer, mongoose.PaginateModel<IStockTransfer>>(
     'StockTransfer',
-    StockAdjustSchema
+    StockTransferSchema
   );

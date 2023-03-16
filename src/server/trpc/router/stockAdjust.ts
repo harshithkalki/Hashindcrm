@@ -83,6 +83,10 @@ export const stockAdjustRouter = router({
       const options = {
         page: page ?? undefined,
         limit: limit,
+        populate: {
+          path: 'product',
+          select: 'name logo',
+        },
       };
 
       const query = {

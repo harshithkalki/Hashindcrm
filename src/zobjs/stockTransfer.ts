@@ -17,7 +17,8 @@ export const ZStockTransferCreateInput = z.object({
   shipping: z.number(),
   orderTax: z.number(),
   discount: z.number(),
-  warehouse: z.string(),
+  formWarehouse: z.string(),
+  toWarehouse: z.string(),
   openingStockDate: z.string(),
 });
 
@@ -29,4 +30,5 @@ export const ZStockTransferUpdateInput =
 export const ZStockTransfer = ZStockTransferCreateInput.extend({
   createdAt: z.date(),
   company: z.string(),
+  invoiceId: z.string(),
 });

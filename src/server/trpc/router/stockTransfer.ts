@@ -3,30 +3,19 @@ import { protectedProcedure, router } from '../trpc';
 import StockTransferModel from '@/models/StockTransfer';
 import checkPermission from '@/utils/checkPermission';
 import ProductModel from '@/models/Product';
+import {
+  ZStockTransferCreateInput,
+  ZStockTransferUpdateInput,
+} from '@/zobjs/stockTransfer';
+import Count from '@/models/Count';
+import type { ProductCreateInput } from '@/zobjs/product';
 
 export const stockTransferRouter = router({
   create: protectedProcedure
-    .input(
-      z.object({
-        products: z.array(
-          z.object({
-            product: z.string(),
-            quantity: z.number(),
-          })
-        ),
-        note: z.string(),
-        total: z.number(),
-        status: z.string(),
-        shipping: z.number(),
-        orderTax: z.number(),
-        discount: z.number(),
-        warehouse: z.string(),
-        openingStockDate: z.string(),
-      })
-    )
+    .input(ZStockTransferCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'STOCKADJUST',
+        'STOCKTRANSFER',
         {
           create: true,
         },
@@ -34,20 +23,106 @@ export const stockTransferRouter = router({
         'You are not permitted to create stocktransfer'
       );
 
+      const counter = await Count.findOneAndUpdate(
+        { name: 'stocktransfer' },
+        { $inc: { count: 1 } },
+        { new: true }
+      );
+
       const stocktransfer = await StockTransferModel.create({
         ...input,
         company: client.company,
+        invoiceId: `ST-${counter?.count}`,
       });
 
-      await Promise.all(
-        input.products.map(async (product) => {
-          const productData = await ProductModel.findById(product.product);
-          if (productData) {
-            productData.quantity = productData.quantity - product.quantity;
-            await productData.save();
-          }
-          return product;
-        })
+      const products = await ProductModel.find({
+        _id: { $in: stocktransfer.products.map((p) => p.product) },
+        warehouse: input.formWarehouse,
+      });
+
+      const updatedProducts = products.map((p) => {
+        const product = stocktransfer.products.find(
+          (product) => product.product.toString() === p._id.toString()
+        );
+
+        if (!product) throw new Error('Product not found');
+
+        return {
+          ...p,
+          quantity: p.quantity - product.quantity,
+        };
+      });
+
+      await ProductModel.bulkWrite(
+        updatedProducts.map((p) => ({
+          updateOne: {
+            filter: { _id: p._id },
+            update: { $set: { quantity: p.quantity } },
+          },
+        }))
+      );
+
+      const productsTo = await ProductModel.find({
+        name: { $in: products.map((p) => p.name) },
+        warehouse: input.toWarehouse,
+      });
+
+      if (productsTo.length === 0) {
+        const newProducts: ProductCreateInput[] = products.map((p) => {
+          const product = stocktransfer.products.find(
+            (product) => product.product.toString() === p._id.toString()
+          );
+
+          if (!product) throw new Error('Product not found');
+
+          return {
+            ...p,
+            warehouse: input.toWarehouse,
+            quantity: product.quantity,
+            openingStockDate: p.openingStockDate.toISOString(),
+            category: p.category.toString(),
+            brand: p.brand.toString(),
+          };
+        });
+
+        await ProductModel.create(newProducts);
+
+        return stocktransfer;
+      }
+
+      const updatedProductsTo = products.map((p) => {
+        const product = productsTo.find((product) => product.name === p.name);
+
+        if (!product) {
+          const product = stocktransfer.products.find(
+            (product) => product.product.toString() === p._id.toString()
+          );
+
+          ProductModel.create({
+            ...p,
+            warehouse: input.toWarehouse,
+            quantity: product?.quantity,
+            openingStockDate: p.openingStockDate.toISOString(),
+            category: p.category.toString(),
+            brand: p.brand.toString(),
+          }).then((res) => null);
+
+          return;
+        }
+
+        return {
+          ...product,
+          quantity: product.quantity + p.quantity,
+        };
+      });
+
+      await ProductModel.bulkWrite(
+        updatedProductsTo.map((p) => ({
+          updateOne: {
+            filter: { _id: p?._id },
+            update: { $set: { quantity: p?.quantity } },
+          },
+        }))
       );
 
       return stocktransfer;
@@ -56,12 +131,12 @@ export const stockTransferRouter = router({
   delete: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        _id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'STOCKADJUST',
+        'STOCKTRANSFER',
         {
           delete: true,
         },
@@ -70,7 +145,7 @@ export const stockTransferRouter = router({
       );
 
       const stocktransfer = await StockTransferModel.findByIdAndDelete(
-        input.id
+        input._id
       );
 
       return stocktransfer;
@@ -78,7 +153,7 @@ export const stockTransferRouter = router({
 
   getAllStockTransfers: protectedProcedure.query(async ({ ctx }) => {
     const client = await checkPermission(
-      'STOCKADJUST',
+      'STOCKTRANSFER',
       {
         read: true,
       },
@@ -94,4 +169,60 @@ export const stockTransferRouter = router({
 
     return stocktransfers;
   }),
+
+  stockTransfers: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'BRAND',
+        { read: true },
+        ctx.clientId,
+        'You are not permitted to read stocktransfers'
+      );
+
+      const { cursor: page, limit = 10, search } = input || {};
+
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+      };
+
+      const query = {
+        company: client.company,
+        ...(search && { name: { $regex: search, $options: 'i' } }),
+      };
+
+      const stocktransfers = await StockTransferModel.paginate(query, options);
+
+      return stocktransfers;
+    }),
+
+  update: protectedProcedure
+    .input(ZStockTransferUpdateInput)
+    .mutation(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'STOCKTRANSFER',
+        {
+          update: true,
+        },
+        ctx.clientId,
+        'You are not permitted to update stocktransfer'
+      );
+
+      const stocktransfer = await StockTransferModel.findByIdAndUpdate(
+        input._id,
+        input,
+        {
+          new: true,
+        }
+      );
+
+      return stocktransfer;
+    }),
 });

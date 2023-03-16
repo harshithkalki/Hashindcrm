@@ -21,6 +21,8 @@ export const ZProductCreateInput = z.object({
   warehouse: z.string(),
 });
 
+export type ProductCreateInput = z.infer<typeof ZProductCreateInput>;
+
 export const ZProductUpdateInput = ZProductCreateInput.partial().extend({
   _id: z.string(),
 });
