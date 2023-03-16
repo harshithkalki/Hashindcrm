@@ -2,6 +2,7 @@ import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
+import TableSelection from '@/components/Tables';
 import StockadjustmentTable from '@/components/Tables/StockAdjustTable';
 import { trpc } from '@/utils/trpc';
 import { ZStockAdjustCreateInput } from '@/zobjs/stockAdjust';
@@ -12,11 +13,12 @@ import {
   Group,
   Loader,
   Modal,
+  Pagination,
   TextInput,
   Title,
 } from '@mantine/core';
 import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
@@ -109,12 +111,22 @@ function StockAdjustmentForm({
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
-  const stockadjustments = trpc.stockAdjustRouter.getAllStockAdjusts.useQuery(
-    undefined,
+  const [page, setPage] = React.useState(1);
+  const stockadjustments = trpc.stockAdjustRouter.stockadjusts.useInfiniteQuery(
+    { limit: 10 },
     {
       refetchOnWindowFocus: false,
     }
   );
+
+  useEffect(() => {
+    if (
+      !stockadjustments.data?.pages.find((pageData) => pageData.page === page)
+    ) {
+      stockadjustments.fetchNextPage();
+    }
+  }, [stockadjustments, page]);
+
   const createAdjustment = trpc.stockAdjustRouter.create.useMutation();
 
   if (stockadjustments.isLoading)
@@ -125,6 +137,8 @@ const Index = () => {
         </Center>
       </Layout>
     );
+
+  console.log(stockadjustments.data);
 
   return (
     <Layout>
@@ -153,7 +167,39 @@ const Index = () => {
             Add Adjustment
           </Button>
         </Group>
-        <StockadjustmentTable data={stockadjustments.data ?? []} />
+        <TableSelection
+          data={
+            stockadjustments.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((doc) => ({
+                ...doc,
+                _id: doc._id.toString(),
+                product: (doc.product as unknown as { name: string }).name,
+              })) || []
+          }
+          colProps={{
+            product: {
+              label: 'Product',
+            },
+            quantity: {
+              label: 'Quantity',
+            },
+            operation: {
+              label: 'Operation',
+            },
+          }}
+        />
+        <Pagination
+          total={
+            stockadjustments.data?.pages.find(
+              (pageData) => pageData.page === page
+            )?.totalPages || 0
+          }
+          initialPage={1}
+          // {...pagination}
+          page={page}
+          onChange={setPage}
+        />
       </Container>
     </Layout>
   );
