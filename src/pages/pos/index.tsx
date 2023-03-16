@@ -36,6 +36,8 @@ import { showNotification } from '@mantine/notifications';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import type { IProduct } from '@/models/Product';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { ZSaleCreateInput } from '@/zobjs/sale';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -296,6 +298,53 @@ function ProductsSelect({
   );
 }
 
+const StaffMemSelect = () => {
+  const [search, setSearch] = useState('');
+  const staffMem = trpc.staffRouter.staffs.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  return (
+    <FormikSelect
+      label='Staff Member'
+      data={
+        staffMem.data?.docs?.map((staff) => ({
+          label: staff.name,
+          value: staff._id.toString(),
+        })) || []
+      }
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='staffMem'
+    />
+  );
+};
+
+const CustomerSelect = () => {
+  const [search, setSearch] = useState('');
+  const customers = trpc.customerRouter.customers.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  const customerData = customers.data?.docs?.map((customer) => ({
+    label: customer.name,
+    value: customer._id.toString(),
+  }));
+  return (
+    <FormikSelect
+      label='Customer'
+      data={[{ label: 'walkin', value: 'walkin' }, ...(customerData || [])]}
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='customer'
+    />
+  );
+};
+
 const Index = () => {
   const [query, setQuery] = useState<Query>({
     page: 1,
@@ -377,7 +426,7 @@ const Index = () => {
       )}
       <Formik
         initialValues={{
-          customer: '',
+          customer: 'walkin',
           date: new Date().toISOString(),
           products: [],
           orderTax: 0,
@@ -388,7 +437,9 @@ const Index = () => {
           total: 0,
           warehouse: '',
           paymentMode: 'cash',
+          staffMem: '',
         }}
+        validationSchema={toFormikValidationSchema(ZSaleCreateInput)}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           values.products = Array.from(inlineProducts.values());
           values.orderTax =
@@ -435,8 +486,9 @@ const Index = () => {
             }}
           >
             <div>
-              <Group>
+              <Group style={{ justifyContent: 'space-between' }}>
                 <Title fw={400}>POS</Title>
+                <StaffMemSelect />
               </Group>
               <Divider mt={'md'} />
             </div>
@@ -485,15 +537,7 @@ const Index = () => {
               >
                 <div>
                   <Container w={'100%'}>
-                    <FormikSelect
-                      name='customer'
-                      label='Customer'
-                      data={customerOptions}
-                      placeholder='Select Customer'
-                      defaultValue={'walk-in'}
-                      searchable
-                      size='sm'
-                    />
+                    <CustomerSelect />
                     <Select
                       label='Products'
                       data={
