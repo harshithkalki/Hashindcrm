@@ -35,12 +35,11 @@ export const stockTransferRouter = router({
         invoiceId: `ST-${counter?.count}`,
       });
 
-      const products = await ProductModel.find({
+      const fromproducts = await ProductModel.find({
         _id: { $in: stocktransfer.products.map((p) => p.product) },
-        warehouse: input.formWarehouse,
-      });
+      }).lean();
 
-      const updatedProducts = products.map((p) => {
+      const updatedProducts = fromproducts.map((p) => {
         const product = stocktransfer.products.find(
           (product) => product.product.toString() === p._id.toString()
         );
@@ -63,20 +62,22 @@ export const stockTransferRouter = router({
       );
 
       const productsTo = await ProductModel.find({
-        name: { $in: products.map((p) => p.name) },
+        name: { $in: fromproducts.map((p) => p.name) },
         warehouse: input.toWarehouse,
-      });
+      }).lean();
 
       if (productsTo.length === 0) {
-        const newProducts: ProductCreateInput[] = products.map((p) => {
+        const newProducts: ProductCreateInput[] = fromproducts.map((p) => {
           const product = stocktransfer.products.find(
             (product) => product.product.toString() === p._id.toString()
           );
 
           if (!product) throw new Error('Product not found');
 
+          const { _id: _, ...rest } = p;
+
           return {
-            ...p,
+            ...rest,
             warehouse: input.toWarehouse,
             quantity: product.quantity,
             openingStockDate: p.openingStockDate.toISOString(),
@@ -90,7 +91,7 @@ export const stockTransferRouter = router({
         return stocktransfer;
       }
 
-      const updatedProductsTo = products.map((p) => {
+      const updatedProductsTo = fromproducts.map((p) => {
         const product = productsTo.find((product) => product.name === p.name);
 
         if (!product) {
@@ -110,9 +111,15 @@ export const stockTransferRouter = router({
           return;
         }
 
+        const inputQuantity = stocktransfer.products.find(
+          (product) => product.product.toString() === p._id.toString()
+        );
+
+        if (!inputQuantity) throw new Error('Product not found');
+
         return {
           ...product,
-          quantity: product.quantity + p.quantity,
+          quantity: product.quantity + inputQuantity.quantity,
         };
       });
 

@@ -178,7 +178,7 @@ const mockdata: NavData[] = [
   { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
   {
     links: '/cashandbank',
-    label: 'Cash and Bank',
+    label: 'Cash , Bank and UPI',
     icon: IconReceipt2,
     permissionName: 'CASHANDBANK',
   },
