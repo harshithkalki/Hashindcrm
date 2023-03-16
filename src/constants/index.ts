@@ -15,7 +15,6 @@ export const Permissions = [
   'EXPENSE',
   'POS',
   'CASHANDBANK',
-  'SETTINGS',
   'SALES',
   'STOCKTRANSFER',
   'PURCHASE',
