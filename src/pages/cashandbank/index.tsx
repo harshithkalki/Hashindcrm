@@ -1,5 +1,6 @@
 import CardTable from '@/components/Cash,BankandUpi/BankTable';
 import CashTable from '@/components/Cash,BankandUpi/CashTable';
+import UPITable from '@/components/Cash,BankandUpi/UPITable';
 import Layout from '@/components/Layout';
 import CashandBankTable from '@/components/Tables/CashAndBankTable';
 import { trpc } from '@/utils/trpc';
@@ -77,10 +78,10 @@ const Index = () => {
             <CashTable />
           </Tabs.Panel>
           <Tabs.Panel value='bank' mt={'lg'}>
-            {/* <CardTable /> */}
+            <CardTable />
           </Tabs.Panel>
           <Tabs.Panel value='upi' mt={'lg'}>
-            <CashandBankTable data={cashData} />
+            <UPITable />
           </Tabs.Panel>
         </Tabs>
       </Flex>
