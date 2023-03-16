@@ -82,6 +82,7 @@ const PartiesData: NavData['links'] = [
     permissionName: 'STAFFMEM',
   },
   { label: 'Customers', link: '/parties/customer', permissionName: 'CUSTOMER' },
+  { label: 'Cars', link: '/parties/customer/cars', permissionName: 'CUSTOMER' },
 ];
 const SalesData: NavData['links'] = [
   { label: 'Sales', link: '/sales', permissionName: 'SALES' },

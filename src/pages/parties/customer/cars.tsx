@@ -1,11 +1,16 @@
 import Layout from '@/components/Layout';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Container,
   createStyles,
+  Divider,
   Flex,
   Grid,
+  Group,
+  Loader,
+  Modal,
+  Pagination,
   ScrollArea,
   SimpleGrid,
   Title,
@@ -17,6 +22,9 @@ import FormDate from '@/components/FormikCompo/FormikDate';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import { trpc } from '@/utils/trpc';
 import { ZCarCreateInput } from '@/zobjs/car';
+import TableSelection from '@/components/Tables';
+import { z } from 'zod';
+import FormikColor from '@/components/FormikCompo/FormikColor';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -63,34 +71,44 @@ const CustomerSelect = () => {
   );
 };
 
-const CarsFrom = () => {
+type carsInput = z.infer<typeof ZCarCreateInput>;
+
+const initialValues = {
+  maker: '',
+  model: '',
+  purchaseDate: '',
+  registrationNumber: '',
+  vehicleType: '',
+  meterReading: '',
+  wheelDriveType: '',
+  fuelType: '',
+  transmissionType: '',
+  emissionType: '',
+  insuranceDate: '',
+  insurancePeriod: '',
+  renewalDate: '',
+  interiorColor: '',
+  exteriorColor: '',
+  customer: '',
+};
+
+const CarsForm = ({
+  onSubmit,
+  values = initialValues,
+  onClose,
+}: {
+  onSubmit: (values: carsInput) => Promise<void>;
+  values?: carsInput | null;
+  onClose: () => void;
+}) => {
   const { classes, cx } = useStyles();
   return (
     <Flex style={{ flexDirection: 'column' }}>
       <ScrollArea style={{ height: '80vh' }}>
         <Container>
           <Formik
-            initialValues={{
-              maker: '',
-              model: '',
-              purchaseDate: '',
-              registrationNumber: '',
-              vehicleType: '',
-              meterReading: '',
-              wheelDriveType: '',
-              fuelType: '',
-              transmissionType: '',
-              emissionType: '',
-              insuranceDate: '',
-              insurancePeriod: '',
-              renewalDate: '',
-              interiorColor: '',
-              exteriorColor: '',
-              customer: '',
-            }}
-            onSubmit={(values) => {
-              console.log(values);
-            }}
+            initialValues={values}
+            onSubmit={onSubmit}
             validationSchema={toFormikValidationSchema(ZCarCreateInput)}
           >
             {({ handleSubmit }) => (
@@ -155,19 +173,17 @@ const CarsFrom = () => {
                     <Title order={3}>Color</Title>
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput
+                    <FormikColor
                       name='interiorColor'
                       label='Interior Color'
                       placeholder='Interior Color'
-                      type='text'
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput
+                    <FormikColor
                       name='exteriorColor'
                       label='Exterior Color'
                       placeholder='Exterior Color'
-                      type='text'
                     />
                   </Grid.Col>
                 </Grid>
@@ -249,10 +265,129 @@ const CarsFrom = () => {
   );
 };
 
+const AddCar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
+  const createCar = trpc.carRouter.create.useMutation();
+  // const { classes } = useStyles();
+  return (
+    <Modal opened={open} title={'ADD CAR DATA'} onClose={onClose} size={'50'}>
+      <CarsForm
+        onClose={onClose}
+        onSubmit={async (values) => {
+          await createCar.mutateAsync(values);
+          onClose();
+        }}
+      />
+    </Modal>
+  );
+};
+
+const Editcar = ({ _id, onClose }: { _id: string; onClose: () => void }) => {
+  const car = trpc.carRouter.get.useQuery({ _id });
+  const updateCar = trpc.carRouter.update.useMutation();
+
+  console.log(car.data);
+  return (
+    <Modal opened={true} title={'EDIT CAR DATA'} onClose={onClose} size={'50'}>
+      {car.isLoading ? (
+        <Loader />
+      ) : (
+        <CarsForm
+          values={car.data}
+          onClose={onClose}
+          onSubmit={async (values) => {
+            await updateCar.mutateAsync({ _id, ...values });
+            onClose();
+          }}
+        />
+      )}
+    </Modal>
+  );
+};
+
 const Index = () => {
+  const [page, setPage] = useState(1);
+  const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const CarsData = trpc.carRouter.cars.useInfiniteQuery(
+    {},
+    {
+      refetchOnWindowFocus: false,
+      getNextPageParam: () => page,
+    }
+  );
+
+  const deleteCar = trpc.carRouter.delete.useMutation();
+
+  useEffect(() => {
+    if (!CarsData.data?.pages.find((pageData) => pageData.page === page)) {
+      CarsData.fetchNextPage();
+    }
+  }, [CarsData, page]);
+  // console.log(CarsData);
+
   return (
     <Layout>
-      <CarsFrom />
+      <AddCar
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          CarsData.refetch();
+        }}
+      />
+      {editId && <Editcar _id={editId} onClose={() => setEditId(null)} />}
+      <Container mt={'xs'}>
+        <Group style={{ justifyContent: 'space-between' }}>
+          <Title fw={400}>Cars</Title>
+          <Button size='xs' onClick={() => setOpen(true)}>
+            Add CAR
+          </Button>
+        </Group>
+        <Divider mt={'xl'} />
+
+        <TableSelection
+          data={
+            CarsData.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((doc) => ({
+                ...doc,
+                _id: doc._id.toString(),
+              })) || []
+          }
+          colProps={{
+            customer: {
+              label: 'Customer',
+            },
+            maker: {
+              label: 'Maker',
+            },
+            model: {
+              label: 'Model',
+            },
+            registrationNumber: {
+              label: 'Registration Number',
+            },
+            vehicleType: {
+              label: 'Vehicle Type',
+            },
+          }}
+          onEdit={(id) => setEditId(id)}
+          onDelete={async (id) => {
+            await deleteCar.mutateAsync({ _id: id });
+            CarsData.refetch();
+          }}
+          editable
+          deletable
+        />
+        <Pagination
+          total={
+            CarsData.data?.pages.find((pageData) => pageData.page === page)
+              ?.totalPages || 0
+          }
+          initialPage={1}
+          page={page}
+          onChange={setPage}
+        />
+      </Container>
     </Layout>
   );
 };
