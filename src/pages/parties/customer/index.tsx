@@ -30,6 +30,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import FormikArray from '@/components/FormikCompo/FormikArray';
 import TableSelection from '@/components/Tables';
+import { useRouter } from 'next/router';
 
 interface ModalProps {
   modal: boolean;
@@ -372,6 +373,8 @@ const Index = () => {
     setModal(false);
     customers.refetch();
   };
+
+  const router = useRouter();
   return (
     <Layout>
       <AddCustomer modal={modal} setModal={setModal} onClose={onClose} />
@@ -379,9 +382,21 @@ const Index = () => {
       {id && <UpdateCustomer id={id} setId={setId} onClose={onClose} />}
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Customers</Title>
-        <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-          Add New
-        </Button>
+        <Group>
+          <Button
+            size='xs'
+            mr={'md'}
+            onClick={() => {
+              router.push('customer/cars');
+            }}
+          >
+            To Cars
+          </Button>
+
+          <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+            Add New
+          </Button>
+        </Group>
       </Group>
       <TableSelection
         data={

@@ -1,6 +1,7 @@
 import Layout from '@/components/Layout';
 import React, { useEffect, useState } from 'react';
 import {
+  ActionIcon,
   Button,
   Container,
   createStyles,
@@ -25,6 +26,8 @@ import { ZCarCreateInput } from '@/zobjs/car';
 import TableSelection from '@/components/Tables';
 import type { z } from 'zod';
 import FormikColor from '@/components/FormikCompo/FormikColor';
+import { IconArrowLeft } from '@tabler/icons';
+import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -318,6 +321,8 @@ const Index = () => {
     }
   );
 
+  const router = useRouter();
+
   const deleteCar = trpc.carRouter.delete.useMutation();
 
   useEffect(() => {
@@ -339,12 +344,17 @@ const Index = () => {
       {editId && <Editcar _id={editId} onClose={() => setEditId(null)} />}
       <Container mt={'xs'}>
         <Group style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Cars</Title>
+          <Group>
+            <ActionIcon onClick={() => router.back()} size='lg'>
+              <IconArrowLeft />
+            </ActionIcon>
+            <Title fw={400}>Cars</Title>
+          </Group>
           <Button size='xs' onClick={() => setOpen(true)}>
             Add CAR
           </Button>
         </Group>
-        <Divider mt={'xl'} />
+        <Divider mt={'sm'} />
 
         <TableSelection
           data={

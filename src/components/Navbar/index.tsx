@@ -82,7 +82,6 @@ const PartiesData: NavData['links'] = [
     permissionName: 'STAFFMEM',
   },
   { label: 'Customers', link: '/parties/customer', permissionName: 'CUSTOMER' },
-  { label: 'Cars', link: '/parties/customer/cars', permissionName: 'CUSTOMER' },
 ];
 const SalesData: NavData['links'] = [
   { label: 'Sales', link: '/sales', permissionName: 'SALES' },
@@ -137,12 +136,12 @@ const ReportDate: NavData['links'] = [
 ];
 
 const mockdata: NavData[] = [
-  {
-    links: '/dashboard',
-    label: 'DashBoard',
-    icon: IconFileAnalytics,
-    permissionName: 'DASHBOARD',
-  },
+  // {
+  //   links: '/dashboard',
+  //   label: 'DashBoard',
+  //   icon: IconFileAnalytics,
+  //   permissionName: 'DASHBOARD',
+  // },
   {
     links: CompanyData,
     label: 'Companies',
@@ -159,18 +158,18 @@ const mockdata: NavData[] = [
     label: 'Product Manager',
     icon: IconReceipt2,
   },
-  {
-    links: '/workflow',
-    label: 'WorkFlow',
-    icon: IconFileAnalytics,
-    permissionName: 'WORKFLOW',
-  },
-  {
-    links: '/tickets',
-    label: 'Tickets',
-    icon: IconReceipt2,
-    permissionName: 'TICKET',
-  },
+  // {
+  //   links: '/workflow',
+  //   label: 'WorkFlow',
+  //   icon: IconFileAnalytics,
+  //   permissionName: 'WORKFLOW',
+  // },
+  // {
+  //   links: '/tickets',
+  //   label: 'Tickets',
+  //   icon: IconReceipt2,
+  //   permissionName: 'TICKET',
+  // },
   { links: Stockdata, label: 'Stock', icon: IconReceipt2 },
   { links: '/pos', label: 'POS', icon: IconReceipt2, permissionName: 'POS' },
   { links: PartiesData, label: 'Parties', icon: IconReceipt2 },
@@ -183,7 +182,7 @@ const mockdata: NavData[] = [
     permissionName: 'CASHANDBANK',
   },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
-  { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
+  // { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
   // {
   //   links: '/settings/paymentmodes',
   //   label: 'Settings',
