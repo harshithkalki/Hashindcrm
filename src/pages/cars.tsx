@@ -42,7 +42,7 @@ const useStyles = createStyles((theme) => ({
 const Index = () => {
   const { classes, cx } = useStyles();
   return (
-    <Layout navBar={<SettingsNav hide={false} />}>
+    <Layout>
       <Flex style={{ flexDirection: 'column' }}>
         <ScrollArea style={{ height: '80vh' }}>
           <Container>

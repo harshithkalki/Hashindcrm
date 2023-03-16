@@ -213,9 +213,14 @@ export function CustomHeader({}: HeaderTabsProps) {
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Label>Settings</Menu.Label>
-                <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>
-                  Account settings
+                <Menu.Label>Menu</Menu.Label>
+                <Menu.Item
+                  icon={<IconSettings size={14} stroke={1.5} />}
+                  onClick={() => {
+                    push('/settings/paymentmodes');
+                  }}
+                >
+                  Settings
                 </Menu.Item>
                 {/* <Menu.Item
                   icon={<IconSwitchHorizontal size={14} stroke={1.5} />}
