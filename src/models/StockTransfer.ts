@@ -46,7 +46,7 @@ const StockTransferSchema: Schema = new Schema<
     },
     note: {
       type: String,
-      required: true,
+      required: false,
     },
     total: {
       type: Number,
@@ -80,7 +80,7 @@ const StockTransferSchema: Schema = new Schema<
       type: Date,
       required: true,
     },
-    formWarehouse: {
+    fromWarehouse: {
       type: String,
       required: true,
     },
