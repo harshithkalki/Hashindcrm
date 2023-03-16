@@ -1,7 +1,9 @@
-import { RootState } from '@/store';
+import type { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
-import { RouterOutputs, trpc } from '@/utils/trpc';
+import type { RouterOutputs } from '@/utils/trpc';
+import { trpc } from '@/utils/trpc';
 import { ZSaleCreateInput } from '@/zobjs/sale';
+import { ZStockTransferCreateInput } from '@/zobjs/stockTransfer';
 import {
   Modal,
   Button,
@@ -65,7 +67,7 @@ interface modalProps {
 
 type InlineProduct = {
   _id: string;
-  name: string;
+  product: string;
   discountedPrice: number;
   taxPrice: number;
   subtotal: number;
@@ -75,7 +77,6 @@ type InlineProduct = {
 };
 
 type InitialValues = {
-  customer: string;
   products: InlineProduct[];
   notes: string;
   total: number;
@@ -83,27 +84,36 @@ type InitialValues = {
   shipping: number;
   orderTax: number;
   discount: number;
-  date: string;
-  warehouse: string;
+  openingStockDate: string;
+  formWarehouse: string;
+  toWarehouse: string;
   invoiceId?: string;
   paymentMode: string;
 };
-
-const initialValues: InitialValues = {
-  customer: '',
-  date: new Date().toISOString(),
+// type WarehouseInput = ;
+const initialValues: z.infer<typeof ZStockTransferCreateInput> = {
+  openingStockDate: new Date().toISOString(),
   products: [],
   orderTax: 0,
   status: 'approved' as 'approved' | 'pending' | 'rejected',
   discount: 0,
   shipping: 0,
-  notes: '',
+  note: '',
   total: 0,
-  warehouse: '',
-  paymentMode: '',
+  formWarehouse: '',
+  toWarehouse: '',
+  //   paymentMode: '',
 };
 
-function WarehouseSelect() {
+function WarehouseSelect({
+  name,
+  label,
+  placeholder,
+}: {
+  name: string;
+  label: string;
+  placeholder: string;
+}) {
   const [searchValue, onSearchChange] = useState('');
   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
     {
@@ -122,9 +132,9 @@ function WarehouseSelect() {
 
   return (
     <FormikInfiniteSelect
-      name='warehouse'
-      placeholder='Pick one warehouse'
-      label='Warehouse'
+      name={name}
+      placeholder={placeholder}
+      label={label}
       data={
         warehouses.data?.pages
           .flatMap((page) => page.docs)
@@ -155,7 +165,7 @@ function WarehouseSelect() {
   );
 }
 
-const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
+const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const { classes, cx } = useStyles();
   // const products = trpc.productRouter.getAllProducts.useQuery();
   const [search, setSearch] = useState<string>('');
@@ -176,8 +186,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
     RouterOutputs['productRouter']['getProducts']['docs']
   >([]);
 
-  const salesSubmit = trpc.saleRouter.create.useMutation();
-
+  const transferSubmit = trpc.stockTransferRouter.create.useMutation();
   const invoice = trpc.saleRouter.getInvoice.useQuery(
     {
       _id: invoiceId,
@@ -208,7 +217,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
       >
         <Formik
           initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(ZSaleCreateInput)}
+          //  validationSchema={toFormikValidationSchema(ZStockTransferCreateInput)}
           onSubmit={(values, { setSubmitting, resetForm }) => {
             console.log(inlineProducts);
             values.products = Array.from(inlineProducts.values());
@@ -226,7 +235,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 0
               ) + values.shipping || 0;
 
-            salesSubmit.mutateAsync(values).then((res) => {
+            transferSubmit.mutateAsync(values).then((res) => {
               showNotification({
                 title: 'New Sale',
                 message: 'Sale created successfully',
@@ -234,10 +243,6 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
               setSubmitting(false);
               console.log(res._id);
               setInvoiceId(res._id as unknown as string);
-
-              // const invoice = trpc.saleRouter.getInvoice.useQuery({
-              //   _id: res._id as string,
-              // });
             });
 
             resetForm();
@@ -245,7 +250,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
             console.log(values);
           }}
         >
-          {({ values, handleSubmit, isSubmitting }) => (
+          {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
               {invoice.data && (
                 <div style={{ display: 'none' }}>
@@ -269,16 +274,22 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   placeholder='Invoice Number'
                   description='Leave blank to auto generate'
                 />
-                <WarehouseSelect />
-                <FormInput
-                  label='Customer Name'
-                  name='customer'
-                  placeholder='Customer Name'
+                <WarehouseSelect
+                  label='From Warehouse'
+                  name='fromWarehouse'
+                  placeholder='From Warehouse'
                 />
+
+                <WarehouseSelect
+                  label='To Warehouse'
+                  name='toWarehouse'
+                  placeholder='To Warehouse'
+                />
+
                 <FormDate
-                  label='Date'
-                  placeholder='Date'
-                  name='date'
+                  label='openingStockDate'
+                  placeholder='openingStockDate'
+                  name='openingStockDate'
                   withAsterisk
                 />
               </SimpleGrid>
@@ -329,7 +340,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   if (product) {
                     setSelectProduct({
                       _id: product._id.toString(),
-                      name: product.name,
+                      product: product.name,
                       quantity: 1,
                       subtotal: product.salePrice,
                       // discountedPrice:
@@ -449,7 +460,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                                 textAlign: 'center',
                               }}
                             >
-                              {item.name}
+                              {item.product}
                             </td>
                             <td
                               style={{
@@ -654,4 +665,4 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
   );
 };
 
-export default SalesForm;
+export default TransferForm;
