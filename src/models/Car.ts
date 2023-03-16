@@ -43,8 +43,7 @@ const CarSchema: Schema = new Schema<ICar, CarModel>(
 
 CarSchema.plugin(mongoosePaginate);
 
-CarSchema.index({ name: 1, companyId: 1 }, { unique: true });
-CarSchema.index({ slug: 1, companyId: 1 }, { unique: true });
+CarSchema.index({ registrationNumber: 1 }, { unique: true });
 
 export default (mongoose.models.Car as ReturnType<
   typeof mongoose.model<ICar, mongoose.PaginateModel<ICar>>
