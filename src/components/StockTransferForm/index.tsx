@@ -67,6 +67,7 @@ interface modalProps {
 
 type InlineProduct = {
   _id: string;
+  name: string;
   product: string;
   discountedPrice: number;
   taxPrice: number;
@@ -217,7 +218,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
       >
         <Formik
           initialValues={initialValues}
-          //  validationSchema={toFormikValidationSchema(ZStockTransferCreateInput)}
+          validationSchema={toFormikValidationSchema(ZStockTransferCreateInput)}
           onSubmit={(values, { setSubmitting, resetForm }) => {
             console.log(inlineProducts);
             values.products = Array.from(inlineProducts.values());
@@ -249,6 +250,10 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
             setInlineProducts(new Map());
             console.log(values);
           }}
+          //  onSubmit={(values, { setSubmitting, resetForm }) => {
+          //    console.log(values);
+          //    setSubmitting(false);
+          //  }}
         >
           {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
@@ -276,7 +281,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 />
                 <WarehouseSelect
                   label='From Warehouse'
-                  name='fromWarehouse'
+                  name='formWarehouse'
                   placeholder='From Warehouse'
                 />
 
@@ -340,7 +345,8 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   if (product) {
                     setSelectProduct({
                       _id: product._id.toString(),
-                      product: product.name,
+                      name: product.name,
+                      product: product._id.toString(),
                       quantity: 1,
                       subtotal: product.salePrice,
                       // discountedPrice:
@@ -460,7 +466,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                                 textAlign: 'center',
                               }}
                             >
-                              {item.product}
+                              {item.name}
                             </td>
                             <td
                               style={{
