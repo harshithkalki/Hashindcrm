@@ -256,4 +256,106 @@ export const saleRouter = router({
         };
       }
     ),
+
+  getCashSales: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'SALES',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const { cursor: page, limit = 10 } = input || {};
+
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+      };
+
+      const query = {
+        company: client.company,
+        paymentMethod: 'cash',
+      };
+
+      const sales = await Sale.paginate(query, options);
+
+      return sales;
+    }),
+
+  getCardSales: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'SALES',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const { cursor: page, limit = 10 } = input || {};
+
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+      };
+
+      const query = {
+        company: client.company,
+        paymentMethod: 'card',
+      };
+
+      const sales = await Sale.paginate(query, options);
+
+      return sales;
+    }),
+
+  getUPISales: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'SALES',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const { cursor: page, limit = 10 } = input || {};
+
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+      };
+
+      const query = {
+        company: client.company,
+        paymentMethod: 'upi',
+      };
+
+      const sales = await Sale.paginate(query, options);
+
+      return sales;
+    }),
 });
