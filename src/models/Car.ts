@@ -33,6 +33,8 @@ const CarSchema: Schema = new Schema<ICar, CarModel>(
     wheelDriveType: { type: String },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
     customer: { type: Schema.Types.ObjectId, ref: 'Customer' },
+    insuranceDate: { type: String },
+    insurancePeriod: { type: String },
   },
   {
     versionKey: false,
