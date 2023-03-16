@@ -23,7 +23,7 @@ import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import { trpc } from '@/utils/trpc';
 import { ZCarCreateInput } from '@/zobjs/car';
 import TableSelection from '@/components/Tables';
-import { z } from 'zod';
+import type { z } from 'zod';
 import FormikColor from '@/components/FormikCompo/FormikColor';
 
 const useStyles = createStyles((theme) => ({
@@ -98,7 +98,7 @@ const CarsForm = ({
   onClose,
 }: {
   onSubmit: (values: carsInput) => Promise<void>;
-  values?: carsInput | null;
+  values?: carsInput;
   onClose: () => void;
 }) => {
   const { classes, cx } = useStyles();
@@ -285,14 +285,16 @@ const Editcar = ({ _id, onClose }: { _id: string; onClose: () => void }) => {
   const car = trpc.carRouter.get.useQuery({ _id });
   const updateCar = trpc.carRouter.update.useMutation();
 
-  console.log(car.data);
   return (
     <Modal opened={true} title={'EDIT CAR DATA'} onClose={onClose} size={'50'}>
-      {car.isLoading ? (
+      {car.isLoading || !car.data ? (
         <Loader />
       ) : (
         <CarsForm
-          values={car.data}
+          values={{
+            ...car.data,
+            customer: car.data.customer.toString(),
+          }}
           onClose={onClose}
           onSubmit={async (values) => {
             await updateCar.mutateAsync({ _id, ...values });

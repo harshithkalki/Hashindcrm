@@ -107,8 +107,16 @@ export const carRouter = router({
         'You are not permitted to read car'
       );
 
-      const car = await CarModel.findById(input._id);
+      const car = await CarModel.findOne({
+        _id: input._id,
+      }).lean();
 
-      return car;
+      if (!car) {
+        throw new Error('Car not found');
+      }
+
+      return {
+        ...car,
+      };
     }),
 });
