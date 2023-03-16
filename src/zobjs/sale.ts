@@ -18,6 +18,7 @@ export const ZSaleCreateInput = z.object({
   notes: z.string().optional(),
   warehouse: z.string().optional(),
   paymentMode: z.enum(['cash', 'card', 'upi']),
+  staffMem: z.string().optional(),
 });
 
 export const ZSaleUpdateInput = ZSaleCreateInput.partial().extend({

@@ -39,6 +39,7 @@ const SaleSchema: Schema = new Schema<ISale, SaleModel>(
       required: true,
     },
     paymentMode: { type: String, required: true },
+    staffMem: { type: Schema.Types.ObjectId, ref: 'StaffMem', required: false },
   },
   { versionKey: false }
 );

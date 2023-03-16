@@ -4,15 +4,15 @@ export const ZSupplierCreateInput = z.object({
   name: z.string(),
   email: z.string(),
   phone: z.string(),
-  billingAddress: z.string(),
-  shippingAddress: z.string(),
+  billingAddress: z.string().optional(),
+  shippingAddress: z.string().optional(),
   warehouse: z.string(),
   status: z.enum(['active', 'inactive']),
-  taxNumber: z.string(),
-  profile: z.string(),
-  openingBalance: z.number(),
-  creditLimit: z.number(),
-  creditPeriod: z.number(),
+  taxNumber: z.string().optional(),
+  profile: z.string().optional(),
+  openingBalance: z.number().optional(),
+  creditLimit: z.number().optional(),
+  creditPeriod: z.number().optional(),
 });
 
 export type SupplierCreateInput = z.infer<typeof ZSupplierCreateInput>;

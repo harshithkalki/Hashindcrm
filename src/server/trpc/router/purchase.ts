@@ -57,7 +57,7 @@ export const purchaseRouter = router({
         ...input,
         company: client.company,
         invoiceId,
-        customer: !input.customer ? 'Walk in Customer' : input.customer,
+        supplier: input.supplier,
       });
 
       return purchase;
