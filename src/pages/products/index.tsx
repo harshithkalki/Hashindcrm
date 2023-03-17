@@ -5,6 +5,7 @@ import {
   Group,
   Pagination,
   Title,
+  Image,
 } from '@mantine/core';
 import React from 'react';
 import { useRouter } from 'next/router';
@@ -44,6 +45,7 @@ const Index = () => {
       getNextPageParam: () => page,
     }
   );
+
   const deleteProduct = trpc.productRouter.delete.useMutation();
   if (products.isLoading) return <div>Loading...</div>;
 

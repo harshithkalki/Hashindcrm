@@ -18,6 +18,7 @@ import {
   IconSettings,
   IconChevronDown,
   IconChevronsRight,
+  IconMenu2,
 } from '@tabler/icons';
 import InfiniteSelect from '../Custom/InfiniteSelect';
 import { trpc } from '@/utils/trpc';
@@ -177,7 +178,7 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
         <Group position='apart'>
           <Group>
             <ActionIcon onClick={() => setNavOpen(!navopen)} size='lg'>
-              {!navopen && <IconChevronsRight size='1.7rem' />}
+              {!navopen && <IconMenu2 size='1.7rem' />}
             </ActionIcon>
 
             <Image
