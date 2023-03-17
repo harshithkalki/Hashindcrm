@@ -11,6 +11,8 @@ import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import { Permissions } from '@/constants';
 import { ZRoleCreateInput } from '@/zobjs/role';
 import { useRouter } from 'next/router';
+import FormikSelect from '../FormikCompo/FormikSelect';
+import { navData } from '../Navbar';
 
 // const permissionsDemo: Permission = [
 //   {
@@ -34,6 +36,19 @@ import { useRouter } from 'next/router';
 // ];
 
 //remove the type error from the array
+
+// export interface NavData {
+//   links:
+//     | string
+//     | {
+//         label: string;
+//         link: string;
+//         permissionName?: typeof Permissions[number];
+//       }[];
+//   label: string;
+//   permissionName?: typeof Permissions[number];
+//   icon: TablerIcon;
+// }
 
 type CreateRole = z.infer<typeof ZRoleCreateInput>;
 
@@ -104,13 +119,34 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                 withAsterisk
                 mb={'sm'}
               />
+              <FormikSelect
+                label='Go directly on'
+                placeholder='Go directly on'
+                name='defaultRedirect'
+                withAsterisk
+                mb={'sm'}
+                data={navData.flatMap((nav) => {
+                  if (typeof nav.links === 'string') {
+                    return {
+                      label: nav.label,
+                      value: nav.links,
+                    };
+                  }
+
+                  return nav.links.map((link) => ({
+                    label: link.label,
+                    value: link.link,
+                  }));
+                })}
+              />
               <Formiktextarea
                 label='Description'
                 placeholder='Description'
                 name='description'
-                withAsterisk
                 mb={'sm'}
               />
+
+              <Text>Permissions</Text>
               {formInputs.permissions.map((permission, index) => {
                 // const permissionv: Permission = PermissonsValues[
                 //   index
@@ -120,6 +156,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                     <Text
                       mt={'xs'}
                       mb={'sm'}
+                      transform='capitalize'
                     >{`${permission.permissionName}`}</Text>
                     <Group>
                       <FormikCheck
@@ -167,7 +204,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                     router.back();
                   }}
                 >
-                  cancel
+                  Cancel
                 </Button>
               </Group>
             </Form>

@@ -132,7 +132,7 @@ const ReportDate: NavData['links'] = [
   },
 ];
 
-const mockdata: NavData[] = [
+export const navData: NavData[] = [
   {
     label: 'Roles',
     links: '/roles',
@@ -258,11 +258,11 @@ export default function NavbarNested({ hide, setNavOpen }: Props) {
 
   const links = useMemo(() => {
     if (client && !client.isSuperAdmin) {
-      return filterNavLinks(mockdata, client.role.permissions);
+      return filterNavLinks(navData, client.role.permissions);
     }
 
     if (client && client.isSuperAdmin) {
-      return mockdata.filter((value) => {
+      return navData.filter((value) => {
         if (typeof value.links === 'string') {
           if (value.links === allLinks[28] || value.links === allLinks[29]) {
             return true;

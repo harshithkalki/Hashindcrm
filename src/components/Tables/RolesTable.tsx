@@ -97,7 +97,9 @@ export default function RolesTable<T>({
           <Table verticalSpacing='sm'>
             <thead>
               <tr>
-                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>#</th>
+                <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                  S.NO
+                </th>
                 <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
                   Name
                 </th>

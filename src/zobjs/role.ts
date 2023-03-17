@@ -15,7 +15,7 @@ export const ZRoleCreateInput = z.object({
     })
   ),
   displayName: z.string(),
-  defaultRedirect: z.string().optional(),
+  defaultRedirect: z.string(),
   description: z.string().optional(),
 });
 

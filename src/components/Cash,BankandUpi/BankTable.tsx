@@ -1,5 +1,12 @@
 import { trpc } from '@/utils/trpc';
-import { Center, Flex, Loader, Pagination, ScrollArea } from '@mantine/core';
+import {
+  Center,
+  Flex,
+  Loader,
+  Pagination,
+  ScrollArea,
+  Text,
+} from '@mantine/core';
 import React, { useEffect } from 'react';
 import TableSelection from '../Tables';
 

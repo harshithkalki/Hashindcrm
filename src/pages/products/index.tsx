@@ -7,7 +7,7 @@ import {
   Title,
   Image,
 } from '@mantine/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { trpc } from '@/utils/trpc';
 import Layout from '@/components/Layout';
@@ -47,6 +47,13 @@ const Index = () => {
   );
 
   const deleteProduct = trpc.productRouter.delete.useMutation();
+
+  useEffect(() => {
+    if (!products.data?.pages.find((pageData) => pageData.page === page)) {
+      products.fetchNextPage();
+    }
+  }, [products, page]);
+
   if (products.isLoading) return <div>Loading...</div>;
 
   return (
@@ -79,6 +86,20 @@ const Index = () => {
           }
           onEdit={(id) => console.log(id)}
           colProps={{
+            logo: {
+              label: 'Logo',
+              Component: ({ logo }) => (
+                <Group spacing='xs'>
+                  <Image
+                    src={logo}
+                    alt={'logo'}
+                    radius='lg'
+                    style={{ width: 32, height: 32 }}
+                    withPlaceholder
+                  />
+                </Group>
+              ),
+            },
             name: {
               label: 'Name',
             },
@@ -113,6 +134,12 @@ const Index = () => {
             await deleteProduct.mutateAsync({
               id,
             });
+            // need to fix this logic
+            console.log(products.data?.pages[page]?.docs.length);
+            if (page > 1 && products.data?.pages[page]?.docs.length === 1)
+              setPage((page) => page - 1);
+
+            await products.refetch();
           }}
         />
         <Center>

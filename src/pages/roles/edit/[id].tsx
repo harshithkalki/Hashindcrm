@@ -51,6 +51,7 @@ const App = () => {
                 displayName: role.displayName,
                 description: role.description,
                 permissions: role.permissions,
+                defaultRedirect: role.defaultRedirect,
               }}
               onSubmit={(inputs) => {
                 return UpdateRole.mutateAsync({

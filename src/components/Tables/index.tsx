@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { GroupProps } from '@mantine/core';
+import { Center } from '@mantine/core';
 import { Button, Text } from '@mantine/core';
 import { Modal } from '@mantine/core';
 import { Container } from '@mantine/core';
@@ -126,11 +127,11 @@ export default function TableSelection<T>({
 
     return (
       <tr key={item._id} className={cx({ [classes.rowSelected]: selected })}>
-        {keys(colProps).map((key) => {
+        {keys(colProps).map((key, index) => {
           const Component = colProps[key]?.Component;
           return (
             <td
-              key={`${item[key]}`}
+              key={`${item._id}-${index}`}
               style={{
                 whiteSpace: 'nowrap',
                 textAlign: 'center',
@@ -145,28 +146,30 @@ export default function TableSelection<T>({
           );
         })}
         <td>
-          <Group spacing={0} {...groupProps}>
-            {isEditColumn && (
-              <ActionIcon
-                onClick={() => {
-                  onEdit && onEdit(item._id);
-                }}
-              >
-                <IconPencil size={16} stroke={1.5} />
-              </ActionIcon>
-            )}
-            {isDeleteColumn && (
-              <ActionIcon
-                color='red'
-                onClick={() => {
-                  setDeleteId(item._id);
-                  setSelection([item._id]);
-                }}
-              >
-                <IconTrash size={16} stroke={1.5} />
-              </ActionIcon>
-            )}
-          </Group>
+          <Center>
+            <Group spacing={0} {...groupProps}>
+              {isEditColumn && (
+                <ActionIcon
+                  onClick={() => {
+                    onEdit && onEdit(item._id);
+                  }}
+                >
+                  <IconPencil size={16} stroke={1.5} />
+                </ActionIcon>
+              )}
+              {isDeleteColumn && (
+                <ActionIcon
+                  color='red'
+                  onClick={() => {
+                    setDeleteId(item._id);
+                    setSelection([item._id]);
+                  }}
+                >
+                  <IconTrash size={16} stroke={1.5} />
+                </ActionIcon>
+              )}
+            </Group>
+          </Center>
         </td>
       </tr>
     );
@@ -197,7 +200,11 @@ export default function TableSelection<T>({
 
       <ScrollArea>
         <Container>
-          <Table sx={{ minWidth: '100%' }} verticalSpacing='sm'>
+          <Table
+            sx={{ minWidth: '100%' }}
+            verticalSpacing='sm'
+            hidden={filteredData.length === 0}
+          >
             <thead>
               <tr>
                 {keys(colProps)?.map((item) => (
@@ -208,13 +215,26 @@ export default function TableSelection<T>({
                     {colProps[item]?.label}
                   </th>
                 ))}
-                {(isDeleteColumn || isEditColumn) && <th>Actions</th>}
+                {(isDeleteColumn || isEditColumn) && (
+                  <th
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>{rows}</tbody>
           </Table>
         </Container>
       </ScrollArea>
+      {filteredData.length === 0 && (
+        <Center>
+          <Text>No Results</Text>
+        </Center>
+      )}
     </>
   );
 }

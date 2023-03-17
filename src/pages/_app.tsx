@@ -27,6 +27,10 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (me.data && !store.getState().clientState.client) {
       dispatch(setClient(me.data.data));
+
+      if (!me.data.data.isSuperAdmin) {
+        router.push(me.data.data.role.defaultRedirect);
+      }
     }
   }, [dispatch, me.data, me.error?.data?.code, router]);
 

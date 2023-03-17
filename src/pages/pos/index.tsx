@@ -335,7 +335,10 @@ const CustomerSelect = () => {
   return (
     <FormikSelect
       label='Customer'
-      data={[{ label: 'walkin', value: 'walkin' }, ...(customerData || [])]}
+      data={[
+        { label: 'Walk In Customer', value: 'walkInCustomer' },
+        ...(customerData || []),
+      ]}
       searchable
       searchValue={search}
       onSearchChange={setSearch}
@@ -359,7 +362,7 @@ const Index = () => {
   const categories = trpc.categoryRouter.getAllCategories.useQuery(undefined, {
     enabled: !!warehouse,
   });
-
+  //todo:  double caching should be removed
   const productsQuery = trpc.productRouter.getProducts.useQuery(
     {
       ...query,

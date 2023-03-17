@@ -46,7 +46,7 @@ const RoleSchema: Schema = new Schema<IRole, RoleModel>(
         ref: 'StaffMem',
       },
     ],
-    defaultRedirect: { type: String, required: false },
+    defaultRedirect: { type: String, required: true },
     description: { type: String, required: false },
   },
   {
