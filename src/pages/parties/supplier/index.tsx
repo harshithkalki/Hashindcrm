@@ -284,7 +284,7 @@ const AddSupplier = ({ modal, setModal, onClose }: modalProps) => {
       <Modal
         opened={modal}
         onClose={() => setModal(false)}
-        title='Add New Customer'
+        title='Add New Supplier'
         size={'60%'}
       >
         <Supplierform
