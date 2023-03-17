@@ -208,7 +208,7 @@ export default function TableSelection<T>({
                     {colProps[item]?.label}
                   </th>
                 ))}
-                {(isDeleteColumn || isEditColumn) && <th />}
+                {(isDeleteColumn || isEditColumn) && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>{rows}</tbody>

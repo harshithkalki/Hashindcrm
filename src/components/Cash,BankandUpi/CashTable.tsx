@@ -1,5 +1,5 @@
 import { trpc } from '@/utils/trpc';
-import { Flex, Pagination, ScrollArea } from '@mantine/core';
+import { Center, Flex, Pagination, ScrollArea } from '@mantine/core';
 import React, { useEffect } from 'react';
 import TableSelection from '../Tables';
 
@@ -50,15 +50,21 @@ const CashTable = () => {
               },
             }}
           />
-          <Pagination
-            total={
-              cashData.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages || 0
-            }
-            initialPage={1}
-            page={page}
-            onChange={setPage}
-          />
+          <Center>
+            {(cashData.data?.pages.find((pageData) => pageData.page === page)
+              ?.totalPages ?? 0) > 1 && (
+              <Pagination
+                total={
+                  cashData.data?.pages.find(
+                    (pageData) => pageData.page === page
+                  )?.totalPages ?? 0
+                }
+                initialPage={1}
+                page={page}
+                onChange={setPage}
+              />
+            )}
+          </Center>
         </ScrollArea>
       </div>
     </>

@@ -55,15 +55,21 @@ const CardTable = () => {
                 },
               }}
             />
-            <Pagination
-              total={
-                CardData.data?.pages.find((pageData) => pageData.page === page)
-                  ?.totalPages || 0
-              }
-              initialPage={1}
-              page={page}
-              onChange={setPage}
-            />
+            <Center>
+              {(CardData.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  total={
+                    CardData.data?.pages.find(
+                      (pageData) => pageData.page === page
+                    )?.totalPages ?? 0
+                  }
+                  initialPage={1}
+                  page={page}
+                  onChange={setPage}
+                />
+              )}
+            </Center>
           </ScrollArea>
         </div>
       )}

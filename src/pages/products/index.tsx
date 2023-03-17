@@ -1,19 +1,16 @@
-// import ProductTable from '@/components/Tables/ProductsTable';
-import { Button, Divider, Group, Title } from '@mantine/core';
+import {
+  Button,
+  Center,
+  Divider,
+  Group,
+  Pagination,
+  Title,
+} from '@mantine/core';
 import React from 'react';
-// import { useRouter } from "next/router";
-
 import { useRouter } from 'next/router';
-
 import { trpc } from '@/utils/trpc';
 import Layout from '@/components/Layout';
-import ProductTable from '@/components/Tables/ProductsTable';
-
-const onSubmit = async (values: any, actions: any) => {
-  console.log(values);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  actions.resetForm();
-};
+import TableSelection from '@/components/Tables';
 
 export interface ProductFormType {
   name: string;
@@ -38,11 +35,15 @@ export interface ProductFormType {
 
 const Index = () => {
   const router = useRouter();
-
-  const products = trpc.productRouter.getAllProducts.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    cacheTime: 0,
-  });
+  const [page, setPage] = React.useState(1);
+  const products = trpc.productRouter.getProducts.useInfiniteQuery(
+    {},
+    {
+      refetchOnWindowFocus: false,
+      cacheTime: 0,
+      getNextPageParam: () => page,
+    }
+  );
   const deleteProduct = trpc.productRouter.delete.useMutation();
   if (products.isLoading) return <div>Loading...</div>;
 
@@ -61,18 +62,71 @@ const Index = () => {
           </Button>
         </Group>
         <Divider mt={'xl'} />
-        <ProductTable
+        <TableSelection
           data={
-            products.data?.map((val) => ({
-              ...val,
-              id: val._id.toString(),
-              warehouse: val.warehouse as unknown as string,
-              category: val.category as unknown as string,
-              brand: val.brand as unknown as string,
-            })) || []
+            products.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((val) => ({
+                ...val,
+                _id: val._id.toString(),
+                warehouse: (val.warehouse as unknown as { name: string }).name,
+                category: (val.category as unknown as { name: string }).name,
+                brand: (val.brand as unknown as { name: string })
+                  .name as unknown as string,
+              })) ?? []
           }
           onEdit={(id) => console.log(id)}
+          colProps={{
+            name: {
+              label: 'Name',
+            },
+            warehouse: {
+              label: 'Warehouse',
+            },
+            category: {
+              label: 'Category',
+            },
+            brand: {
+              label: 'Brand',
+            },
+            mrp: {
+              label: 'MRP',
+            },
+            purchasePrice: {
+              label: 'Purchase Price',
+            },
+            salePrice: {
+              label: 'Sale Price',
+            },
+            quantity: {
+              label: 'Quantity',
+            },
+            quantityAlert: {
+              label: 'Quantity Alert',
+            },
+          }}
+          deletable
+          editable
+          onDelete={async (id) => {
+            await deleteProduct.mutateAsync({
+              id,
+            });
+          }}
         />
+        <Center>
+          {(products.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                products.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages ?? 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
       </div>
       {/* </Container> */}
     </Layout>

@@ -189,17 +189,22 @@ const Index = () => {
             },
           }}
         />
-        <Pagination
-          total={
-            stockadjustments.data?.pages.find(
-              (pageData) => pageData.page === page
-            )?.totalPages || 0
-          }
-          initialPage={1}
-          // {...pagination}
-          page={page}
-          onChange={setPage}
-        />
+        <Center>
+          {(stockadjustments.data?.pages.find(
+            (pageData) => pageData.page === page
+          )?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                stockadjustments.data?.pages.find(
+                  (pageData) => pageData.page === page
+                )?.totalPages || 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
       </Container>
     </Layout>
   );

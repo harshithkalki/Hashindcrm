@@ -211,7 +211,7 @@ export const productRouter = router({
       const { cursor: page, limit } = input || {};
 
       const options = {
-        page: page ?? undefined,
+        page: page ?? 1,
         limit: limit || 10,
         sort: {
           name: 1,

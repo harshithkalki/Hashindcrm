@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TableSelection from '@/components/Tables';
 import {
   Button,
@@ -60,7 +60,7 @@ interface modalProps {
 
 const ExpenseCategorySelect = () => {
   const [search, setSearch] = useState('');
-  const categorys = trpc.expenseCategoryRouter.expenseCategorys.useQuery(
+  const categorys = trpc.expenseCategoryRouter.expenseCategories.useQuery(
     { search: search },
     { refetchOnWindowFocus: false }
   );
@@ -256,10 +256,19 @@ const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const CreateExpense = trpc.expenseRouter.create.useMutation();
-  const Expenses = trpc.expenseRouter.expenses.useQuery({ page: page });
+  const Expenses = trpc.expenseRouter.expenses.useInfiniteQuery(
+    { limit: 10 },
+    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+  );
   const deleteExpense = trpc.expenseRouter.delete.useMutation();
   const [editId, setEditId] = useState<string>('');
   const router = useRouter();
+
+  useEffect(() => {
+    if (!Expenses.data?.pages.find((pageData) => pageData.page === page)) {
+      Expenses.fetchNextPage();
+    }
+  }, [Expenses, page]);
 
   // console.log(Data);
 
@@ -315,12 +324,15 @@ const Index = () => {
           <>
             <TableSelection
               data={
-                Expenses.data?.docs.map((val) => ({
-                  ...val,
-                  _id: val._id.toString(),
-                  category: (val.category as unknown as { name: string }).name,
-                  date: dayjs(val.date).format('DD/MM/YYYY'),
-                })) || []
+                Expenses.data?.pages
+                  .find((pageData) => pageData.page === page)
+                  ?.docs.map((val) => ({
+                    ...val,
+                    _id: val._id.toString(),
+                    category: (val.category as unknown as { name: string })
+                      .name,
+                    date: dayjs(val.date).format('DD/MM/YYYY'),
+                  })) || []
               }
               colProps={{
                 // category: 'Expense Category',
@@ -349,13 +361,21 @@ const Index = () => {
               }}
               onEdit={(id) => setEditId(id)}
             />
-            <Pagination
-              total={Expenses.data?.totalPages || 0}
-              initialPage={1}
-              // {...pagination}
-              page={page}
-              onChange={setPage}
-            />
+            <Center>
+              {(Expenses.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  total={
+                    Expenses.data?.pages.find(
+                      (pageData) => pageData.page === page
+                    )?.totalPages ?? 0
+                  }
+                  initialPage={1}
+                  page={page}
+                  onChange={setPage}
+                />
+              )}
+            </Center>
           </>
         )}
       </Container>

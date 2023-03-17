@@ -9,6 +9,7 @@ import {
   ActionIcon,
   Pagination,
   ScrollArea,
+  Center,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
@@ -59,7 +60,7 @@ const Index = () => {
             <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
               <Title fw={400}>Stock Transfer</Title>
               <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-                Add New
+                Add Transfer
               </Button>
             </Group>
             <TableSelection
@@ -105,15 +106,21 @@ const Index = () => {
                 },
               }}
             />
-            <Pagination
-              total={
-                transfers.data?.pages.find((pageData) => pageData.page === page)
-                  ?.totalPages || 0
-              }
-              initialPage={1}
-              page={page}
-              onChange={setPage}
-            />
+            <Center>
+              {(transfers.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  total={
+                    transfers.data?.pages.find(
+                      (pageData) => pageData.page === page
+                    )?.totalPages || 0
+                  }
+                  initialPage={1}
+                  page={page}
+                  onChange={setPage}
+                />
+              )}
+            </Center>
           </ScrollArea>
         </div>
       </Layout>

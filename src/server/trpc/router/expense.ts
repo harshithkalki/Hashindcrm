@@ -88,7 +88,16 @@ export const expenseRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const expenses = await ExpenseModel.paginate(query, options);
+      const expenses = await ExpenseModel.paginate(query, {
+        ...options,
+        populate: [
+          {
+            path: 'category',
+            model: 'ExpenseCategory',
+            select: 'name',
+          },
+        ],
+      });
 
       return expenses;
     }),

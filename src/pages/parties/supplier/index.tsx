@@ -14,13 +14,14 @@ import {
   Group,
   Image,
   Modal,
+  Pagination,
   SimpleGrid,
   Title,
 } from '@mantine/core';
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { z } from 'zod';
 
 interface modalProps {
@@ -315,6 +316,10 @@ const UpdateSupplier = ({
     },
     { refetchOnWindowFocus: false, enabled: Boolean(id) }
   );
+
+  if (supplier.status === 'loading' || !supplier.data)
+    return <div>Loading...</div>;
+
   // console.log(supplier.data);
   return (
     <Modal
@@ -337,10 +342,20 @@ const UpdateSupplier = ({
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [id, setId] = React.useState<string | null>(null);
-  const suppliers = trpc.supplierRouter.suppliers.useQuery({
-    limit: 10,
-  });
-  console.log(suppliers.data);
+  const [page, setPage] = React.useState(1);
+  const suppliers = trpc.supplierRouter.suppliers.useInfiniteQuery(
+    {
+      limit: 10,
+    },
+    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+  );
+
+  useEffect(() => {
+    if (!suppliers.data?.pages.find((pageData) => pageData.page === page)) {
+      suppliers.fetchNextPage();
+    }
+  }, [suppliers, page]);
+
   const onClose = () => {
     setId(null);
     suppliers.refetch();
@@ -357,10 +372,12 @@ const Index = () => {
       </Group>
       <TableSelection
         data={
-          suppliers.data?.docs.map((val) => ({
-            ...val,
-            _id: val._id.toString(),
-          })) ?? []
+          suppliers.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.map((val) => ({
+              ...val,
+              _id: val._id.toString(),
+            })) ?? []
         }
         colProps={{
           // name: 'Name',
@@ -381,6 +398,20 @@ const Index = () => {
         }}
         editable
       />
+      <Center>
+        {(suppliers.data?.pages.find((pageData) => pageData.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              suppliers.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        )}
+      </Center>
     </Layout>
   );
 };

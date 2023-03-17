@@ -533,7 +533,7 @@ export default function Warehouse() {
                 ?.docs.map((doc) => ({
                   ...doc,
                   _id: doc._id.toString(),
-                })) || []
+                })) ?? []
             }
             colProps={{
               name: {
@@ -548,15 +548,21 @@ export default function Warehouse() {
             editable
             deletable
           />
-          <Pagination
-            total={
-              warehouses.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages || 0
-            }
-            initialPage={1}
-            page={page}
-            onChange={setPage}
-          />
+          <Center>
+            {(warehouses.data?.pages.find((pageData) => pageData.page === page)
+              ?.totalPages ?? 0) > 1 && (
+              <Pagination
+                total={
+                  warehouses.data?.pages.find(
+                    (pageData) => pageData.page === page
+                  )?.totalPages ?? 0
+                }
+                initialPage={1}
+                page={page}
+                onChange={setPage}
+              />
+            )}
+          </Center>
         </Container>
       </Layout>
     </>

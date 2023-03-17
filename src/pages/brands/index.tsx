@@ -230,16 +230,21 @@ const Brand = () => {
           editable
           deletable
         />
-        <Pagination
-          total={
-            brands.data?.pages.find((pageData) => pageData.page === page)
-              ?.totalPages || 0
-          }
-          initialPage={1}
-          // {...pagination}
-          page={page}
-          onChange={setPage}
-        />
+        <Center>
+          {(brands.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                brands.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages || 0
+              }
+              initialPage={1}
+              // {...pagination}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
       </Container>
     </>
   );

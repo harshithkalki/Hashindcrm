@@ -300,7 +300,14 @@ export const staffRouter = router({
         company: client.company,
       });
 
-      const { password, ...rest } = staff?.toObject() ?? {};
+      if (!staff) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Staff not found',
+        });
+      }
+
+      const { password, ...rest } = staff?.toObject();
 
       return rest;
     }),

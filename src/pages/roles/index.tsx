@@ -5,9 +5,15 @@ import { trpc } from '@/utils/trpc';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
-import { Group, Pagination, ScrollArea, Title } from '@mantine/core';
+import {
+  Button,
+  Center,
+  Group,
+  Pagination,
+  ScrollArea,
+  Title,
+} from '@mantine/core';
 import RolesTable from '@/components/Tables/RolesTable';
-import { usePagination } from '@mantine/hooks';
 
 type Roles = RouterOutputs['roleRouter']['roles']['docs'];
 
@@ -26,8 +32,17 @@ const Index = () => {
 
   return (
     <Layout>
-      <Group mb={'lg'}>
+      <Group mb={'lg'} position='apart'>
         <Title fw={400}>Roles</Title>
+
+        <Button
+          size='xs'
+          onClick={() => {
+            router.push('/roles/add');
+          }}
+        >
+          Add Role
+        </Button>
       </Group>
       {Data && (
         <ScrollArea style={{ height: '100%' }}>
@@ -37,13 +52,17 @@ const Index = () => {
             ) : (
               <>
                 <RolesTable data={Data.docs} />
-                <Pagination
-                  total={getAllRoles.data?.totalPages}
-                  initialPage={1}
-                  // {...pagination}
-                  page={page}
-                  onChange={setPage}
-                />
+                <Center>
+                  {getAllRoles.data.totalPages > 1 && (
+                    <Pagination
+                      total={getAllRoles.data?.totalPages}
+                      initialPage={1}
+                      // {...pagination}
+                      page={page}
+                      onChange={setPage}
+                    />
+                  )}
+                </Center>
               </>
             )}
           </div>
@@ -54,15 +73,3 @@ const Index = () => {
 };
 
 export default Index;
-
-// export const getServerSideProps: GetServerSideProps<
-//   { data: Roles },
-//   { id: string }
-// > = async (ctx) => {
-//   const Data = getAllRoles.data;
-//   return {
-//     props: {
-//       data: Data,
-//     },
-//   };
-// };

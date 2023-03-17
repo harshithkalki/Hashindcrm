@@ -10,6 +10,7 @@ import {
   ActionIcon,
   Pagination,
   ScrollArea,
+  Center,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
@@ -26,9 +27,12 @@ const Index = () => {
   //   cursor: page,
   // });
 
-  const purchases = trpc.purchaseRouter.purchases.useQuery({
-    cursor: page,
-  });
+  const purchases = trpc.purchaseRouter.purchases.useInfiniteQuery(
+    {
+      limit: 10,
+    },
+    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+  );
 
   const invoice = trpc.purchaseRouter.getInvoice.useQuery(
     {
@@ -47,7 +51,11 @@ const Index = () => {
       setInvoiceId('');
     }
   }, [handlePrint, invoice.data]);
-  console.log(purchases);
+  useEffect(() => {
+    if (!purchases.data?.pages.find((pageData) => pageData.page === page)) {
+      purchases.fetchNextPage();
+    }
+  }, [purchases, page]);
 
   return (
     <>
@@ -75,11 +83,13 @@ const Index = () => {
             </Group>
             <TableSelection
               data={
-                purchases.data?.docs.map((val) => ({
-                  ...val,
-                  _id: val._id.toString(),
-                  date: dayjs(val.date).format('DD/MM/YYYY'),
-                })) || []
+                purchases.data?.pages
+                  .find((pageData) => pageData.page === page)
+                  ?.docs.map((val) => ({
+                    ...val,
+                    _id: val._id.toString(),
+                    date: dayjs(val.date).format('DD/MM/YYYY'),
+                  })) || []
               }
               colProps={{
                 invoiceId: {
@@ -115,12 +125,21 @@ const Index = () => {
                 },
               }}
             />
-            <Pagination
-              total={purchases.data?.totalPages as number}
-              initialPage={1}
-              page={page}
-              onChange={setPage}
-            />
+            <Center>
+              {(purchases.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  total={
+                    purchases.data?.pages.find(
+                      (pageData) => pageData.page === page
+                    )?.totalPages ?? 0
+                  }
+                  initialPage={1}
+                  page={page}
+                  onChange={setPage}
+                />
+              )}
+            </Center>
           </ScrollArea>
         </div>
       </Layout>

@@ -12,7 +12,7 @@ const Index = () => {
     <Layout>
       <Flex style={{ flexDirection: 'column' }}>
         <Group mb={'md'}>
-          <Title fw={400}>Cash , Bank & Upi</Title>
+          <Title fw={400}>Cash, Bank & Upi</Title>
         </Group>
         <Tabs defaultValue='cash'>
           <Tabs.List>

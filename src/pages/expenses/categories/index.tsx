@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TableSelection from '@/components/Tables';
 import {
   Button,
@@ -162,17 +162,26 @@ const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const AddExpenseCategory = trpc.expenseCategoryRouter.create.useMutation();
-  const allExpenseCategory =
-    trpc.expenseCategoryRouter.expenseCategorys.useQuery({
-      page: page,
-    });
+  const expenseCategories =
+    trpc.expenseCategoryRouter.expenseCategories.useInfiniteQuery(
+      {
+        limit: 10,
+      },
+      { getNextPageParam: () => page, refetchOnWindowFocus: false }
+    );
   const deleteCategory = trpc.expenseCategoryRouter.delete.useMutation();
-  // console.log(allExpenseCategory.data);
-  const tabData = allExpenseCategory.data;
+
   const [editId, setEditId] = useState<string>('');
   const router = useRouter();
-  const Data = tabData;
-  if (allExpenseCategory.isLoading)
+
+  useEffect(() => {
+    if (
+      !expenseCategories.data?.pages.find((pageData) => pageData.page === page)
+    ) {
+      expenseCategories.fetchNextPage();
+    }
+  }, [expenseCategories, page]);
+  if (expenseCategories.isLoading)
     return (
       <Center h='100%'>
         <Loader />
@@ -191,7 +200,7 @@ const Index = () => {
         }}
         onClose={() => {
           setModal(false);
-          allExpenseCategory.refetch();
+          expenseCategories.refetch();
         }}
       />
 
@@ -200,7 +209,7 @@ const Index = () => {
           _id={editId}
           onClose={() => {
             setEditId('');
-            allExpenseCategory.refetch();
+            expenseCategories.refetch();
           }}
         />
       )}
@@ -217,12 +226,19 @@ const Index = () => {
             Add new
           </Button>
         </Group>
-        {allExpenseCategory.isLoading ? (
+        {expenseCategories.isLoading ? (
           <Loader />
         ) : (
           <>
             <TableSelection
-              data={Data?.docs ?? []}
+              data={
+                expenseCategories?.data?.pages
+                  .find((pageData) => pageData.page === page)
+                  ?.docs.map((val) => ({
+                    ...val,
+                    _id: val._id.toString(),
+                  })) ?? []
+              }
               colProps={{
                 // name: 'Expense Category Name',
                 // description: 'Description',
@@ -244,13 +260,22 @@ const Index = () => {
               // onEdit={(id) => console.log(id)}
               onEdit={(id) => setEditId(id)}
             />
-            <Pagination
-              total={allExpenseCategory.data?.totalPages || 0}
-              initialPage={1}
-              // {...pagination}
-              page={page}
-              onChange={setPage}
-            />
+            <Center>
+              {(expenseCategories.data?.pages.find(
+                (pageData) => pageData.page === page
+              )?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  total={
+                    expenseCategories.data?.pages.find(
+                      (pageData) => pageData.page === page
+                    )?.totalPages ?? 0
+                  }
+                  initialPage={1}
+                  page={page}
+                  onChange={setPage}
+                />
+              )}
+            </Center>
           </>
         )}
       </Container>

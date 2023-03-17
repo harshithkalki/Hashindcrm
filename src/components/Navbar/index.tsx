@@ -53,10 +53,6 @@ const CompanyData: NavData['links'] = [
   { label: 'Create company', link: '/company/new' },
 ];
 
-const RolesData: NavData['links'] = [
-  { label: 'All Roles', link: '/roles', permissionName: 'ROLE' },
-  { label: 'Create Role', link: '/roles/new', permissionName: 'ROLE' },
-];
 const ProductManagerData: NavData['links'] = [
   { label: 'Products', link: '/products', permissionName: 'PRODUCT' },
   { label: 'Brands', link: '/brands', permissionName: 'BRAND' },
@@ -86,15 +82,15 @@ const PartiesData: NavData['links'] = [
 ];
 const SalesData: NavData['links'] = [
   { label: 'Sales', link: '/sales', permissionName: 'SALES' },
-  { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
+  // { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
 ];
 const PurchaseData: NavData['links'] = [
   { label: 'Purchase', link: '/purchases', permissionName: 'PURCHASE' },
-  {
-    label: 'Purchase Returns',
-    link: '/purchases/return',
-    permissionName: 'PURCHASE',
-  },
+  // {
+  //   label: 'Purchase Returns',
+  //   link: '/purchases/return',
+  //   permissionName: 'PURCHASE',
+  // },
 ];
 const ExpensesData: NavData['links'] = [
   { label: 'Expenses', link: '/expenses', permissionName: 'EXPENSE' },
@@ -137,6 +133,12 @@ const ReportDate: NavData['links'] = [
 ];
 
 const mockdata: NavData[] = [
+  {
+    label: 'Roles',
+    links: '/roles',
+    permissionName: 'ROLE',
+    icon: IconReceipt2,
+  },
   // {
   //   links: '/dashboard',
   //   label: 'DashBoard',
@@ -148,12 +150,7 @@ const mockdata: NavData[] = [
     label: 'Companies',
     icon: IconBuildingStore,
   },
-  {
-    links: RolesData,
-    label: 'Roles',
-    icon: IconReceipt2,
-    permissionName: 'ROLE',
-  },
+
   {
     links: ProductManagerData,
     label: 'Product Manager',
@@ -178,7 +175,7 @@ const mockdata: NavData[] = [
   { links: PurchaseData, label: 'Purchase', icon: IconReceipt2 },
   {
     links: '/cashandbank',
-    label: 'Cash , Bank and UPI',
+    label: 'Cash, Bank and UPI',
     icon: IconReceipt2,
     permissionName: 'CASHANDBANK',
   },
