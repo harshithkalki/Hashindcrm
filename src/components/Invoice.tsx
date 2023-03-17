@@ -391,7 +391,7 @@ export default function Invoice({
                 (netPrice * (data.discount / 100)) / data.products.length;
               return (
                 <tr key={index}>
-                  <Td>{}</Td>
+                  <Td>{product.itemCode}</Td>
                   <Td>{totalPrice}</Td>
                   <Td>{product.tax / 2}</Td>
                   <Td>{(totalPrice * (product.tax / 2)) / 100}</Td>
