@@ -10,9 +10,15 @@ import {
   Burger,
   Image,
   Loader,
+  ActionIcon,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconLogout, IconSettings, IconChevronDown } from '@tabler/icons';
+import {
+  IconLogout,
+  IconSettings,
+  IconChevronDown,
+  IconChevronsRight,
+} from '@tabler/icons';
 import InfiniteSelect from '../Custom/InfiniteSelect';
 import { trpc } from '@/utils/trpc';
 import { setWarehouse } from '@/store/clientSlice';
@@ -170,7 +176,9 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
       <Container className={classes.mainSection}>
         <Group position='apart'>
           <Group>
-            <Burger opened={navopen} onClick={() => setNavOpen(!navopen)} />
+            <ActionIcon onClick={() => setNavOpen(!navopen)} size='lg'>
+              {!navopen && <IconChevronsRight size='1.7rem' />}
+            </ActionIcon>
 
             <Image
               src={client?.company?.logo}
@@ -180,13 +188,6 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
               withPlaceholder
             />
           </Group>
-
-          <Burger
-            opened={opened}
-            onClick={toggle}
-            className={classes.burger}
-            size='sm'
-          />
 
           <Group>
             {!client?.isSuperAdmin && <WarehouseSelect />}

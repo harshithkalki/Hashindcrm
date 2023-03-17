@@ -1,6 +1,7 @@
-import { Navbar, ScrollArea, createStyles } from '@mantine/core';
+import { Navbar, ScrollArea, createStyles, ActionIcon } from '@mantine/core';
 import {
   IconBuildingStore,
+  IconChevronsLeft,
   IconFileAnalytics,
   IconReceipt2,
 } from '@tabler/icons';
@@ -205,6 +206,7 @@ const useStyles = createStyles((theme) => ({
       theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
     paddingBottom: 0,
     maxHeight: '100%',
+    position: 'relative',
   },
 
   header: {
@@ -235,13 +237,20 @@ const useStyles = createStyles((theme) => ({
       theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
     }`,
   },
+
+  chevron: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
 }));
 
 interface Props {
   hide: boolean;
+  setNavOpen: (value: boolean) => void;
 }
 
-export default function NavbarNested({ hide }: Props) {
+export default function NavbarNested({ hide, setNavOpen }: Props) {
   const { classes } = useStyles();
 
   const client = useSelector<RootState, RootState['clientState']['client']>(
@@ -286,7 +295,13 @@ export default function NavbarNested({ hide }: Props) {
       className={classes.navbar}
       hiddenBreakpoint='sm'
       hidden={hide}
+      py={'2.5rem'}
     >
+      <div className={classes.chevron}>
+        <ActionIcon size='lg' onClick={() => setNavOpen(false)}>
+          <IconChevronsLeft size='1.7rem' />
+        </ActionIcon>
+      </div>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
         <div className={classes.linksInner}>
           {links.map((item) => {

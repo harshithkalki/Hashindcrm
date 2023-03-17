@@ -99,7 +99,7 @@ export default function Layout({
         <CustomHeader navopen={opened} setNavOpen={setOpened} />
         {opened && (
           <div className={classes.nav}>
-            {navBar ?? <NavbarNested hide={!opened} />}
+            {navBar ?? <NavbarNested setNavOpen={setOpened} hide={!opened} />}
           </div>
         )}
         <main
