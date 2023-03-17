@@ -519,7 +519,7 @@ export default function Warehouse() {
         )}
         <Container mt={'xs'}>
           <Group style={{ justifyContent: 'space-between' }}>
-            <Title fw={400}>Warehouse</Title>
+            <Title fw={400}>Warehouses</Title>
             <Button size='xs' onClick={() => setOpen(true)}>
               Add Warehouse
             </Button>

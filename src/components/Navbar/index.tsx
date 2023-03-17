@@ -204,6 +204,7 @@ const useStyles = createStyles((theme) => ({
     paddingBottom: 0,
     maxHeight: '100%',
     position: 'relative',
+    zIndex: 1,
   },
 
   header: {

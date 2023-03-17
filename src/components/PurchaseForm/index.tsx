@@ -20,7 +20,12 @@ import {
   Loader,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { IconPlus, IconTrash } from '@tabler/icons';
+import {
+  IconCurrencyRupee,
+  IconPercentage,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons';
 import { Formik, Form, FieldArray } from 'formik';
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
@@ -622,6 +627,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       label={'Discount'}
                       placeholder={'Discount'}
                       name={'discount'}
+                      rightSection={<IconPercentage />}
                     />
                   </Group>
                   <Group w={'100%'} mt={'sm'}>
@@ -651,6 +657,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                         ) + (values.shipping ? values.shipping : 0) ?? 0
                       ).toFixed(2)}
                       type={'number'}
+                      icon={<IconCurrencyRupee />}
                     />
                   </Group>
                 </div>
