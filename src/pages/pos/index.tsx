@@ -38,6 +38,7 @@ import { useReactToPrint } from 'react-to-print';
 import type { IProduct } from '@/models/Product';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { ZSaleCreateInput } from '@/zobjs/sale';
+import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -369,6 +370,7 @@ const Index = () => {
   const searchProducts = trpc.productRouter.searchProducts.useQuery({
     search: search,
   });
+  const router = useRouter();
 
   const [inlineProducts, setInlineProducts] = useState<
     Map<string, InlineProduct>
@@ -547,25 +549,26 @@ const Index = () => {
                       rightSection={
                         <ActionIcon
                           onClick={() => {
-                            if (selectProduct) {
-                              const inlineProduct = inlineProducts.get(
-                                selectProduct._id.toString()
-                              );
-                              if (!inlineProduct) {
-                                inlineProducts.set(
-                                  selectProduct._id.toString(),
-                                  selectProduct
-                                );
-                              } else {
-                                return;
-                              }
-                              inlineProducts.set(
-                                selectProduct._id.toString(),
-                                selectProduct
-                              );
-                              setInlineProducts(new Map(inlineProducts));
-                              setSelectProduct(undefined);
-                            }
+                            // if (selectProduct) {
+                            //   const inlineProduct = inlineProducts.get(
+                            //     selectProduct._id.toString()
+                            //   );
+                            //   if (!inlineProduct) {
+                            //     inlineProducts.set(
+                            //       selectProduct._id.toString(),
+                            //       selectProduct
+                            //     );
+                            //   } else {
+                            //     return;
+                            //   }
+                            //   inlineProducts.set(
+                            //     selectProduct._id.toString(),
+                            //     selectProduct
+                            //   );
+                            //   setInlineProducts(new Map(inlineProducts));
+                            //   setSelectProduct(undefined);
+                            // }
+                            router.push('/products/add');
                           }}
                         >
                           <IconPlus />
@@ -589,6 +592,28 @@ const Index = () => {
                             price: product.salePrice,
                             tax: product.tax,
                           });
+                          const pushItem: InlineProduct = {
+                            _id: product._id.toString(),
+                            name: product.name,
+                            quantity: 1,
+                            subtotal: product.salePrice,
+                            price: product.salePrice,
+                            tax: product.tax,
+                          };
+                          const inlineProduct = inlineProducts.get(
+                            pushItem._id.toString()
+                          );
+                          if (!inlineProduct) {
+                            inlineProducts.set(
+                              pushItem._id.toString(),
+                              pushItem
+                            );
+                          } else {
+                            return;
+                          }
+                          inlineProducts.set(pushItem._id.toString(), pushItem);
+                          setInlineProducts(new Map(inlineProducts));
+                          setSelectProduct(undefined);
                         }
                       }}
                       searchValue={search}

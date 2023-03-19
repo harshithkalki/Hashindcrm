@@ -331,7 +331,7 @@ export default function Invoice({
                     {index + 1}
                   </Td>
                   <Td>{product.name}</Td>
-                  <Td>{}</Td>
+                  <Td>{product.itemCode}</Td>
                   <Td>{product.quantity}</Td>
                   <Td>{data.discount}</Td>
                   <Td>
