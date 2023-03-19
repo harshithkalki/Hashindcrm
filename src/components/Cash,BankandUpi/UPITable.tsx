@@ -1,5 +1,6 @@
 import { trpc } from '@/utils/trpc';
 import { Center, Flex, Pagination, ScrollArea } from '@mantine/core';
+import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import TableSelection from '../Tables';
 
@@ -27,6 +28,7 @@ const UPITable = () => {
                 ?.docs.map((doc) => ({
                   ...doc,
                   _id: doc._id.toString(),
+                  date: dayjs(doc.date).format('DD MMMM YYYY'),
                 })) || []
             }
             colProps={{

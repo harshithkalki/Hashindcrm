@@ -50,15 +50,6 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const customerOptions = [
-  { label: 'walk-in', value: 'walk-in' },
-  { label: 'Customer 1', value: 'Customer 1' },
-  { label: 'Customer 2', value: 'Customer 2' },
-  { label: 'Customer 3', value: 'Customer 3' },
-  { label: 'Customer 4', value: 'Customer 4' },
-  { label: 'Customer 5', value: 'Customer 5' },
-];
-
 type InlineProduct = {
   _id: string;
   name: string;

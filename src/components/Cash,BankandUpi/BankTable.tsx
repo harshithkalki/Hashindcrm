@@ -7,6 +7,7 @@ import {
   ScrollArea,
   Text,
 } from '@mantine/core';
+import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import TableSelection from '../Tables';
 
@@ -39,6 +40,7 @@ const CardTable = () => {
                   ?.docs.map((doc) => ({
                     ...doc,
                     _id: doc._id.toString(),
+                    date: dayjs(doc.date).format('DD MMMM YYYY'),
                   })) || []
               }
               colProps={{

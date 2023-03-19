@@ -390,11 +390,11 @@ const Index = () => {
               router.push('customer/cars');
             }}
           >
-            To Cars
+            Show Customer Cars
           </Button>
 
           <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-            Add New
+            Add Customer
           </Button>
         </Group>
       </Group>

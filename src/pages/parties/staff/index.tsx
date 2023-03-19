@@ -373,7 +373,7 @@ const Index = () => {
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Staff Members</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-          Add New
+          Add Staff Member
         </Button>
       </Group>
       <TableSelection

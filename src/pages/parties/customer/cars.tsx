@@ -77,7 +77,7 @@ const CustomerSelect = () => {
 type carsInput = z.infer<typeof ZCarCreateInput>;
 
 const initialValues = {
-  maker: '',
+  make: '',
   model: '',
   purchaseDate: '',
   registrationNumber: '',
@@ -127,17 +127,31 @@ const CarsForm = ({
                   ]}
                   style={{ alignItems: 'end' }}
                 >
-                  <FormInput
-                    name='maker'
-                    label='Maker'
-                    placeholder='Maker'
-                    type='text'
+                  <FormikSelect
+                    name='make'
+                    label='Make'
+                    placeholder='Make'
+                    data={[
+                      { label: 'Audi', value: 'Audi' },
+                      { label: 'BMW', value: 'BMW' },
+                      { label: 'Mahindra', value: 'Mahindra' },
+                      { label: 'Tata', value: 'Tata' },
+                      { label: 'Maruti', value: 'Maruti' },
+                      { label: 'Toyota', value: 'Toyota' },
+                      { label: 'Others', value: 'Others' },
+                    ]}
+                    searchable
                   />
-                  <FormInput
+                  <FormikSelect
                     name='model'
                     label='Model'
                     placeholder='Model'
-                    type='text'
+                    data={[
+                      { label: 'Lxi', value: 'Lxi' },
+                      { label: 'Vxi', value: 'Vxi' },
+                      { label: 'Zxi', value: 'Zxi' },
+                      { label: 'Others', value: 'Others' },
+                    ]}
                   />
                   <CustomerSelect />
                   <FormInput
@@ -152,11 +166,20 @@ const CarsForm = ({
                     placeholder='Purchase Date'
                     type='text'
                   />
-                  <FormInput
+                  <FormikSelect
                     name='vehicleType'
                     label='Vehicle Type'
                     placeholder='Vehicle Type'
-                    type='text'
+                    data={[
+                      { label: 'Hatchback', value: 'hatchback' },
+                      { label: 'Sedan', value: 'sedan' },
+                      { label: 'SUV', value: 'suv' },
+                      { label: 'MUV', value: 'muv' },
+                      { label: 'Coupe', value: 'coupe' },
+                      { label: 'Convertibles', value: 'convertible' },
+                      { label: 'Pickup Trucks', value: 'pickup_truck' },
+                      { label: 'Other', value: 'other' },
+                    ]}
                   />
                   <FormInput
                     name='meterReading'
@@ -201,35 +224,38 @@ const CarsForm = ({
                     <Title order={3}>Specifications</Title>
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput
+                    <FormikSelect
                       name='wheelDriveType'
                       label='Wheel Drive Type'
                       placeholder='Wheel Drive Type'
-                      type='text'
+                      data={[
+                        { label: '2WD', value: '2WD' },
+                        { label: '4WD', value: '4WD' },
+                      ]}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput
+                    <FormikSelect
                       name='fuelType'
                       label='Fuel Type'
                       placeholder='Fuel Type'
-                      type='text'
+                      data={['petrol', 'Diesel', 'CNG']}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput
+                    <FormikSelect
                       name='transmissionType'
                       label='Transmission Type'
                       placeholder='Transmission Type'
-                      type='text'
+                      data={['Automatic', 'Manual']}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput
+                    <FormikSelect
                       name='emissionType'
                       label='Emission Type'
                       placeholder='Emission Type'
-                      type='text'
+                      data={['BSV', 'BSVI', 'Other']}
                     />
                   </Grid.Col>
 
@@ -369,8 +395,8 @@ const Index = () => {
             customer: {
               label: 'Customer',
             },
-            maker: {
-              label: 'Maker',
+            make: {
+              label: 'Make',
             },
             model: {
               label: 'Model',

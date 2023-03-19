@@ -71,7 +71,7 @@ const Index = () => {
                     ...doc,
                     _id: doc._id.toString(),
                     openingStockDate: dayjs(doc.openingStockDate).format(
-                      'DD/MM/YYYY'
+                      'DD MMMM YYYY'
                     ),
                   })) || []
               }

@@ -223,7 +223,7 @@ const Index = () => {
               setModal(true);
             }}
           >
-            Add new
+            Add Category
           </Button>
         </Group>
         {expenseCategories.isLoading ? (

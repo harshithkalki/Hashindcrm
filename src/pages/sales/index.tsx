@@ -73,7 +73,7 @@ const Index = () => {
             <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
               <Title fw={400}>Sales</Title>
               <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-                Add New
+                Add Sales
               </Button>
             </Group>
             <TableSelection
@@ -83,7 +83,7 @@ const Index = () => {
                   ?.docs.map((val) => ({
                     ...val,
                     _id: val._id.toString(),
-                    date: dayjs(val.date).format('DD/MM/YYYY'),
+                    date: dayjs(val.date).format('DD MMMM YYYY'),
                   })) || []
               }
               colProps={{

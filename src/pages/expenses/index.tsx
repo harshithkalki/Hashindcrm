@@ -315,7 +315,7 @@ const Index = () => {
               setModal(true);
             }}
           >
-            Add new
+            Add Expense
           </Button>
         </Group>
         {Expenses.isLoading ? (
@@ -331,7 +331,7 @@ const Index = () => {
                     _id: val._id.toString(),
                     category: (val.category as unknown as { name: string })
                       .name,
-                    date: dayjs(val.date).format('DD/MM/YYYY'),
+                    date: dayjs(val.date).format('DD MMMM YYYY'),
                   })) || []
               }
               colProps={{

@@ -1,22 +1,22 @@
 import { z } from 'zod';
 
 export const ZCarCreateInput = z.object({
-  maker: z.string(),
-  model: z.string(),
-  purchaseDate: z.string(),
+  make: z.string(),
   registrationNumber: z.string(),
-  vehicleType: z.string(),
-  meterReading: z.string(),
-  wheelDriveType: z.string(),
-  fuelType: z.string(),
-  transmissionType: z.string(),
-  emissionType: z.string(),
-  insuranceDate: z.string(),
-  insurancePeriod: z.string(),
-  renewalDate: z.string(),
-  interiorColor: z.string(),
-  exteriorColor: z.string(),
   customer: z.string(),
+  model: z.string().optional(),
+  purchaseDate: z.string().optional(),
+  vehicleType: z.string().optional(),
+  meterReading: z.string().optional(),
+  wheelDriveType: z.string().optional(),
+  fuelType: z.string().optional(),
+  transmissionType: z.string().optional(),
+  emissionType: z.string().optional(),
+  insuranceDate: z.string().optional(),
+  insurancePeriod: z.string().optional(),
+  renewalDate: z.string().optional(),
+  interiorColor: z.string().optional(),
+  exteriorColor: z.string().optional(),
 });
 
 export type CarCreateInput = z.infer<typeof ZCarCreateInput>;
