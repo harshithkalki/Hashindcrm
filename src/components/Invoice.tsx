@@ -364,7 +364,7 @@ export default function Invoice({
         <Table withBorder withColumnBorders>
           <thead>
             <tr>
-              <Th rowSpan={2}>HSN/SAC</Th>
+              <Th rowSpan={2}>HSN / Item Code</Th>
               <Th rowSpan={2}>Taxable</Th>
 
               <Th colSpan={2} align='center'>

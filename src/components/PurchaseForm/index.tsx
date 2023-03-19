@@ -549,7 +549,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 </ScrollArea>
               </div>
               <Divider mt={'lg'} />
-              <Group style={{ justifyContent: 'end' }} w={'95%'}>
+              {/* <Group style={{ justifyContent: 'end' }} w={'95%'}>
                 <TextInput
                   label={'Total'}
                   value={
@@ -560,7 +560,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   }
                   readOnly
                 />
-              </Group>
+              </Group> */}
               <SimpleGrid
                 m={'md'}
                 cols={2}
@@ -620,6 +620,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       label={'Shipping'}
                       placeholder={'Shipping'}
                       name={'shipping'}
+                      icon={<IconCurrencyRupee />}
                     />
                     <FormInput
                       w={'46%'}
@@ -641,6 +642,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                         0
                       )}
                       type={'number'}
+                      icon={<IconCurrencyRupee />}
                     />
                     <TextInput
                       w={'46%'}

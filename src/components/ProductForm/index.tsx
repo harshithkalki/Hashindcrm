@@ -222,8 +222,8 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
                 name='barcodeSymbology'
               />
               <FormInput
-                label='Item Code'
-                placeholder='Item Code'
+                label='HSN Code / Item Code'
+                placeholder='HSN Code / Item Code'
                 name='itemCode'
               />
               <FormInput

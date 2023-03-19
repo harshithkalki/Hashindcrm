@@ -29,6 +29,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useReactToPrint } from 'react-to-print';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+import InfiniteSelect from '../Custom/InfiniteSelect';
 import FormDate from '../FormikCompo/FormikDate';
 import FormInput from '../FormikCompo/FormikInput';
 import FormikSelect from '../FormikCompo/FormikSelect';
@@ -105,6 +106,56 @@ const initialValues: z.infer<typeof ZStockTransferCreateInput> = {
   toWarehouse: '',
   //   paymentMode: '',
 };
+
+function FromWarehouseSelect() {
+  const [searchValue, onSearchChange] = useState('');
+  const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
+    {
+      search: searchValue,
+    },
+    {
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    }
+  );
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+  const dispatch = useDispatch();
+
+  return (
+    <InfiniteSelect
+      label='From Warehouse'
+      placeholder='Select warehouse'
+      data={
+        warehouses.data?.pages
+          .flatMap((page) => page.docs)
+          .map((warehouse, index) => ({
+            label: warehouse.name,
+            value: warehouse._id.toString(),
+            index,
+          })) ?? []
+      }
+      onChange={(value) => {
+        if (value) dispatch(setWarehouse(value));
+      }}
+      value={warehouse}
+      nothingFound='No warehouses found'
+      onWaypointEnter={() => {
+        if (
+          warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
+        ) {
+          warehouses.fetchNextPage();
+        }
+      }}
+      rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
+      onSearchChange={onSearchChange}
+      searchValue={searchValue}
+      searchable
+    />
+  );
+}
 
 const WarehouseSelect = () => {
   const [search, setSearch] = useState('');
@@ -245,6 +296,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     placeholder='Invoice Number'
                     description='Leave blank to auto generate'
                   />
+                  <FromWarehouseSelect />
 
                   <WarehouseSelect />
 
