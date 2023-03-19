@@ -78,7 +78,7 @@ export const saleRouter = router({
 
       const sale = await Sale.findOneAndUpdate(
         {
-          invoiceId: input.id,
+          _id: input.id,
           company: client.company,
         },
         input,
