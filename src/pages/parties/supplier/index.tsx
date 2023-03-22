@@ -329,11 +329,15 @@ const UpdateSupplier = ({
       size={'60%'}
     >
       <Supplierform
-        formvalues={supplier.data}
+        formvalues={{
+          ...supplier.data,
+          warehouse: supplier.data.warehouse.toString(),
+        }}
         onSubmit={async (values) => {
           await update.mutateAsync({ ...values, _id: id as string });
           onClose();
         }}
+        setModal={() => setId(null)}
       />
     </Modal>
   );

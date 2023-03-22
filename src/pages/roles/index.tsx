@@ -13,7 +13,6 @@ import {
   ScrollArea,
   Title,
 } from '@mantine/core';
-import RolesTable from '@/components/Tables/RolesTable';
 
 type Roles = RouterOutputs['roleRouter']['roles']['docs'];
 
@@ -51,13 +50,32 @@ const Index = () => {
               <div>Loading...</div>
             ) : (
               <>
-                <RolesTable data={Data.docs} />
+                <TableSelection
+                  data={Data.docs.map((val) => ({
+                    ...val,
+                    _id: val._id.toString(),
+                  }))}
+                  colProps={{
+                    _id: {
+                      label: 'S.NO',
+                      Component: ({ index }) => {
+                        return <>{index + 1}</>;
+                      },
+                    },
+                    name: {
+                      label: 'Name',
+                    },
+                  }}
+                  editable
+                  onEdit={(id) => {
+                    router.push(`/roles/edit/${id}`);
+                  }}
+                />
                 <Center>
                   {getAllRoles.data.totalPages > 1 && (
                     <Pagination
                       total={getAllRoles.data?.totalPages}
                       initialPage={1}
-                      // {...pagination}
                       page={page}
                       onChange={setPage}
                     />

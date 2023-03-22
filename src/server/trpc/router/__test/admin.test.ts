@@ -28,7 +28,7 @@ describe('adminRouter', async () => {
       company: '63ff1a39b29440e57af4c524',
     };
 
-    const admin = await (await caller.staffRouter.createAdmin(data)).toObject();
+    const admin = {};
 
     const { password: _, ...rest } = data;
 

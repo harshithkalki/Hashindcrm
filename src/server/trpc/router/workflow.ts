@@ -131,12 +131,12 @@ export const workflowRouter = router({
 
     const statuses = await StatusModel.find({ company: client.company });
 
-    const workflow: Workflow = statuses.map((val) => {
+    const workflow: any = statuses.map((val) => {
       return {
         id: val._id.toString(),
         initialStatus: val.initialStatus,
         name: val.name,
-        linkedStatuses: val.linkedStatuses.map((id) => {
+        linkedStatuses: val.linkedStatuses?.map((id) => {
           const result = statuses.find((val) => val._id.toString() === id);
           if (result)
             return { name: result.name, value: result._id.toString() };

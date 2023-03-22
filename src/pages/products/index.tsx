@@ -90,7 +90,7 @@ const Index = () => {
           colProps={{
             logo: {
               label: 'Logo',
-              Component: ({ logo }) => (
+              Component: ({ data: { logo } }) => (
                 <Group spacing='xs'>
                   <Image
                     src={logo}

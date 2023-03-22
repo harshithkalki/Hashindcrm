@@ -104,7 +104,6 @@ const initialValues: z.infer<typeof ZStockTransferCreateInput> = {
   total: 0,
   fromWarehouse: '',
   toWarehouse: '',
-  //   paymentMode: '',
 };
 
 function FromWarehouseSelect() {

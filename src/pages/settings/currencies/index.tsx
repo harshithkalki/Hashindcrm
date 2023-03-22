@@ -122,7 +122,10 @@ const Index = () => {
           </Button>
         </Group>
         <TableSelection
-          data={data}
+          data={data.map((item) => ({
+            ...item,
+            _id: item._id.toString(),
+          }))}
           colProps={{
             currencyname: {
               label: 'Currency Name',

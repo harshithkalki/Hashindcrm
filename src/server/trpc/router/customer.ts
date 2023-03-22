@@ -76,6 +76,10 @@ export const customerRouter = router({
 
       const customer = await Customer.findOne({ _id: input._id });
 
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
+
       return customer;
     }),
 

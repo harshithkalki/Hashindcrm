@@ -72,14 +72,14 @@ describe('get brands', async () => {
   );
 
   it('should get brands', async () => {
-    const brands = await caller.brandRouter.brands();
+    const brands = await caller.brandRouter.brands({});
 
     expect(brands.docs).toHaveLength(10);
     expect(brands.totalPages).toBe(2);
   });
 
   it('should get brands with pagination', async () => {
-    const brands = await caller.brandRouter.brands({ page: 2, limit: 5 });
+    const brands = await caller.brandRouter.brands({ cursor: 2, limit: 5 });
 
     expect(brands.docs).toHaveLength(5);
     expect(brands.totalPages).toBe(4);
@@ -97,7 +97,7 @@ describe('get brands', async () => {
   it('should get brands with search and pagination', async () => {
     const brands = await caller.brandRouter.brands({
       search: 'Test Brand 1',
-      page: 1,
+      cursor: 1,
       limit: 5,
     });
 

@@ -89,7 +89,12 @@ const Index = () => {
           </Button>
         </Group>
         <TableSelection
-          data={data}
+          data={data.map((item) => {
+            return {
+              ...item,
+              _id: item._id.toString(),
+            };
+          })}
           colProps={{
             taxname: {
               label: 'Tax Name',

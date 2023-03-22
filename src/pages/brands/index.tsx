@@ -9,6 +9,7 @@ import {
   Modal,
   Pagination,
   Title,
+  Image,
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import FormInput from '@/components/FormikCompo/FormikInput';
@@ -22,7 +23,6 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import type { BrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
 import { ZBrandCreateInput } from '@/zobjs/brand';
 import type { z } from 'zod';
-import BrandsTableSelection from '@/components/Tables/BrandsTable';
 
 const initialValues: BrandCreateInput = {
   name: '',
@@ -217,7 +217,7 @@ const Brand = () => {
           editable
           deletable
         /> */}
-        <BrandsTableSelection
+        <TableSelection
           data={
             brands.data?.pages
               .find((pageData) => pageData.page === page)
@@ -227,6 +227,25 @@ const Brand = () => {
               })) || []
           }
           onEdit={(id) => setEditId(id)}
+          colProps={{
+            logo: {
+              label: 'Logo',
+              Component: ({ data: { logo } }) => (
+                <Group spacing='xs' position='center'>
+                  <Image
+                    src={logo}
+                    alt={'logo'}
+                    radius='lg'
+                    style={{ width: 32, height: 32 }}
+                    withPlaceholder
+                  />
+                </Group>
+              ),
+            },
+            name: {
+              label: 'Name',
+            },
+          }}
           editable
           deletable
         />

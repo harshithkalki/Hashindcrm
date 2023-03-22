@@ -44,7 +44,7 @@ interface TableSelectionProps<T> {
 type ColProps<T> = {
   [K in keyof T]?: {
     label: string;
-    Component?: React.FC<T>;
+    Component?: React.FC<{ data: T; index: number }>;
   };
 };
 
@@ -122,7 +122,7 @@ export default function TableSelection<T>({
     setFilteredData(data);
   }, [data]);
 
-  const rows = filteredData.map((item) => {
+  const rows = filteredData.map((item, index) => {
     const selected = selection.includes(item._id);
 
     return (
@@ -138,7 +138,7 @@ export default function TableSelection<T>({
               }}
             >
               {Component ? (
-                <Component {...item} />
+                <Component data={item} index={index} />
               ) : (
                 <Text size='sm'>{item[key] as string}</Text>
               )}

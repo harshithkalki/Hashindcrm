@@ -109,13 +109,13 @@ const Index = () => {
                 },
                 _id: {
                   label: 'Show Invoice',
-                  Component: ({ ...value }) => (
+                  Component: ({ data: { _id } }) => (
                     <Group position='center'>
                       <ActionIcon
                         color={'blue'}
                         variant='filled'
                         onClick={() => {
-                          setInvoiceId(value._id);
+                          setInvoiceId(_id);
                         }}
                       >
                         <IconEye size='1.125rem' />

@@ -8,7 +8,8 @@
     "lint": "next lint",
     "start": "next start",
     "seed": "ts-node --project tsconfig.seeder.json seeder.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "type-check": "tsc"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

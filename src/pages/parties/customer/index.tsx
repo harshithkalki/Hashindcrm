@@ -356,7 +356,12 @@ const UpdateCustomer = ({
           await update.mutateAsync({ _id: id as string, ...values });
           onClose();
         }}
-        values={customer.data}
+        values={
+          customer.data && {
+            ...customer.data,
+            warehouse: customer.data.warehouse.toString(),
+          }
+        }
       />
     </Modal>
   );

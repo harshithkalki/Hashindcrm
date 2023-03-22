@@ -104,7 +104,10 @@ const Index = () => {
           </Button>
         </Group>
         <TableSelection
-          data={data}
+          data={data.map((item) => ({
+            ...item,
+            _id: item._id.toString(),
+          }))}
           colProps={{
             modename: {
               label: 'Mode Name',
