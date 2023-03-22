@@ -37,6 +37,7 @@ import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import type { IProduct } from '@/models/Product';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+import type { SaleCreateInput } from '@/zobjs/sale';
 import { ZSaleCreateInput } from '@/zobjs/sale';
 import { useRouter } from 'next/router';
 
@@ -54,8 +55,8 @@ const useStyles = createStyles((theme) => ({
 type InlineProduct = {
   _id: string;
   name: string;
-  discountedPrice?: number;
-  taxPrice?: number;
+  discountedPrice: number;
+  taxPrice: number;
   subtotal: number;
   quantity: number;
   price: number;
@@ -66,6 +67,21 @@ type Query = {
   page: number;
   limit: number;
   category?: string;
+};
+
+const initialValues: SaleCreateInput = {
+  customer: 'walkin',
+  date: new Date().toISOString(),
+  products: [],
+  orderTax: 0,
+  status: 'approved' as 'approved' | 'pending' | 'rejected',
+  discount: 0,
+  shipping: 0,
+  notes: '',
+  total: 0,
+  warehouse: '',
+  paymentMode: 'cash',
+  staffMem: '',
 };
 
 function ProductsSelect({
@@ -429,20 +445,7 @@ const Index = () => {
         </div>
       )}
       <Formik
-        initialValues={{
-          customer: 'walkin',
-          date: new Date().toISOString(),
-          products: [],
-          orderTax: 0,
-          status: 'approved' as 'approved' | 'pending' | 'rejected',
-          discount: 0,
-          shipping: 0,
-          notes: '',
-          total: 0,
-          warehouse: '',
-          paymentMode: 'cash',
-          staffMem: '',
-        }}
+        initialValues={initialValues}
         validationSchema={toFormikValidationSchema(ZSaleCreateInput)}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           values.products = Array.from(inlineProducts.values());
@@ -516,6 +519,8 @@ const Index = () => {
                     subtotal: product.salePrice,
                     price: product.salePrice,
                     tax: product.tax,
+                    discountedPrice: 0,
+                    taxPrice: 0,
                   };
                   const inlineProduct = inlineProducts.get(
                     pushItem._id.toString()
@@ -599,6 +604,8 @@ const Index = () => {
                             //     (inlineProducts.size + 1),
                             price: product.salePrice,
                             tax: product.tax,
+                            discountedPrice: 0,
+                            taxPrice: 0,
                           });
                           const pushItem: InlineProduct = {
                             _id: product._id.toString(),
@@ -607,6 +614,8 @@ const Index = () => {
                             subtotal: product.salePrice,
                             price: product.salePrice,
                             tax: product.tax,
+                            discountedPrice: 0,
+                            taxPrice: 0,
                           };
                           const inlineProduct = inlineProducts.get(
                             pushItem._id.toString()

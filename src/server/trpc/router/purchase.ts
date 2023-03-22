@@ -180,6 +180,9 @@ export const purchaseRouter = router({
       const options = {
         page: page ?? 1,
         limit: limit,
+        sort: {
+          createdAt: -1,
+        },
       };
 
       const query = {

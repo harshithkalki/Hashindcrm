@@ -216,6 +216,9 @@ export const saleRouter = router({
       const options = {
         page: page ?? 1,
         limit: limit,
+        sort: {
+          createdAt: -1,
+        },
       };
 
       const query = {
@@ -439,7 +442,7 @@ export const saleRouter = router({
         company: client.company,
         warehouse: input.warehouse,
       }).populate<{
-        category: Category;
+        category: Category & { _id: string };
       }>('category');
 
       const categories = products
