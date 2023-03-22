@@ -75,7 +75,7 @@ type InitialValues = {
   date: string;
   warehouse: string;
   invoiceId?: string;
-  paymentMode: string;
+  paymentMode: 'cash' | 'card' | 'upi';
 };
 
 interface modalProps {
@@ -214,17 +214,6 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
       product.salePrice -
       (totalProductsCost * (Data.discount / 100)) / Data.products.length;
     const tax = Discount * (product.tax / 100);
-    // inlineProducts.set(product._id, {
-    //   _id: product._id,
-    //   name: product.name,
-    //   discountedPrice: Discount,
-    //   taxPrice: tax,
-    //   subtotal: product.salePrice,
-    //   quantity: product.quantity,
-    //   price: product.salePrice,
-    //   tax: product.tax,
-    // });
-    // setInlineProducts(inlineProducts);
     return {
       _id: product._id,
       name: product.name,
@@ -306,8 +295,8 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                 });
                 console.log(res);
                 setSubmitting(false);
-                console.log(res._id);
-                setInvoiceId(res._id as unknown as string);
+                // console.log(res._id);
+                // setInvoiceId(res._id as unknown as string);
 
                 //  const invoice = trpc.saleRouter.getInvoice.useQuery({
                 //    _id: res._id as string,
