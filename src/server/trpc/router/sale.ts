@@ -9,9 +9,10 @@ import type CompanyModel from '@/models/Company';
 import WarehouseModel from '@/models/Warehouse';
 import type { Warehouse } from '@/zobjs/warehouse';
 import type { Company } from '@/zobjs/company';
-import console from 'console';
 import type { Product } from '@/zobjs/product';
 import ProductModel from '@/models/Product';
+import CategoryModel from '@/models/Category';
+import type { Category } from '@/zobjs/category';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -382,5 +383,36 @@ export const saleRouter = router({
       const sales = await Sale.paginate(query, options);
 
       return sales;
+    }),
+
+  getCategoriesForPos: protectedProcedure
+    .input(
+      z.object({
+        warehouse: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'POS',
+        {
+          create: true,
+          update: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read categories"
+      );
+
+      const products = await ProductModel.find({
+        company: client.company,
+        warehouse: input.warehouse,
+      }).populate<{
+        category: Category;
+      }>('category');
+
+      const categories = products
+        .map((product) => product.category)
+        .filter((category) => category !== null);
+
+      return [...new Set(categories)];
     }),
 });
