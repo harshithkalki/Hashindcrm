@@ -85,7 +85,7 @@ export default function BrandsTableSelection<T>({
             <Group spacing={0} {...groupProps}>
               <ActionIcon
                 onClick={() => {
-                  onEdit && onEdit(item._id);
+                  onEdit && onEdit(item.id);
                 }}
               >
                 <IconPencil size={16} stroke={1.5} />

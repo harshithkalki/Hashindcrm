@@ -77,9 +77,9 @@ export default function SettingsNav({ hide }: Props) {
     <LinksGroup
       {...item}
       key={item.label}
-      onClick={() => {
-        setActive(item.label);
-      }}
+      // onClick={() => {
+      //   setActive(item.label);
+      // }}
       active={item.label === active}
     />
   ));

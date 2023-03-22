@@ -546,18 +546,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   </ScrollArea>
                 </div>
                 <Divider mt={'lg'} />
-                <Group style={{ justifyContent: 'end' }} w={'95%'}>
-                  <TextInput
-                    label={'Total'}
-                    value={
-                      values.products.reduce(
-                        (acc, item) => acc + item.subtotal,
-                        0
-                      ) || 0
-                    }
-                    readOnly
-                  />
-                </Group>
+
                 <SimpleGrid
                   m={'md'}
                   cols={2}
@@ -671,7 +660,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     Cancel
                   </Button>
                 </Group>
-                {<pre>{JSON.stringify(props, null, 2)}</pre>}
+                {/* {<pre>{JSON.stringify(props, null, 2)}</pre>} */}
               </Form>
             );
           }}
