@@ -1,6 +1,8 @@
-import { RootState } from '@/store';
+import type { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
-import { RouterOutputs, trpc } from '@/utils/trpc';
+import type { RouterOutputs } from '@/utils/trpc';
+import { trpc } from '@/utils/trpc';
+import type { PurchaseCreateInput } from '@/zobjs/purchase';
 import { ZPurchaseCreateInput } from '@/zobjs/purchase';
 import { ZSaleCreateInput } from '@/zobjs/sale';
 import {
@@ -26,7 +28,7 @@ import {
   IconPlus,
   IconTrash,
 } from '@tabler/icons';
-import { Formik, Form, FieldArray } from 'formik';
+import { Formik, Form } from 'formik';
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -81,22 +83,7 @@ type InlineProduct = {
   tax: number;
 };
 
-type InitialValues = {
-  supplier: string;
-  products: InlineProduct[];
-  notes: string;
-  total: number;
-  status: 'approved' | 'pending' | 'rejected';
-  shipping: number;
-  orderTax: number;
-  discount: number;
-  date: string;
-  warehouse: string;
-  invoiceId?: string;
-  paymentMode: string;
-};
-
-const initialValues: InitialValues = {
+const initialValues: PurchaseCreateInput = {
   supplier: '',
   date: new Date().toISOString(),
   products: [],
@@ -107,7 +94,7 @@ const initialValues: InitialValues = {
   notes: '',
   total: 0,
   warehouse: '',
-  paymentMode: '',
+  paymentMode: 'cash',
 };
 
 function WarehouseSelect() {
