@@ -9,7 +9,7 @@ export const ZStaffMemCreateInput = z.object({
   email: z.string(),
   password: z.string(),
   profile: z.string().optional(),
-  warehouse: z.string(),
+  warehouse: z.string().optional(),
   status: z.string(),
 });
 
