@@ -120,18 +120,13 @@ const Index = () => {
                       >
                         <IconEye size='1.125rem' />
                       </ActionIcon>
-                      <ActionIcon
-                        color={'blue'}
-                        variant='filled'
-                        onClick={() => {
-                          setEditId(value._id);
-                        }}
-                      >
-                        <IconEdit size='1.125rem' />
-                      </ActionIcon>
                     </Group>
                   ),
                 },
+              }}
+              editable
+              onEdit={(id) => {
+                setEditId(id);
               }}
             />
             <Center>

@@ -184,11 +184,14 @@ export const saleRouter = router({
         company: client.company,
       });
 
-      const customer = await Customer.findOne({
-        _id: sale?.customer,
-      }).lean();
-
-      return { ...sale, customer: customer ?? 'Walk in Customer' };
+      return {
+        ...sale,
+        customer: mongoose.isValidObjectId(sale?.customer)
+          ? await Customer.findOne({
+              _id: sale?.customer,
+            }).lean()
+          : 'Walk in Customer',
+      };
     }),
 
   sales: protectedProcedure
@@ -296,10 +299,6 @@ export const saleRouter = router({
         const warehouse =
           (await WarehouseModel.findById(sale.warehouse).lean()) ?? undefined;
 
-        const customer = await Customer.findOne({
-          _id: sale?.customer,
-        }).lean();
-
         return {
           ...sale,
           warehouse,
@@ -308,7 +307,11 @@ export const saleRouter = router({
             ...product._id,
             quantity: product.quantity,
           })),
-          customer: customer ?? 'Walk in Customer',
+          customer: mongoose.isValidObjectId(sale?.customer)
+            ? await Customer.findOne({
+                _id: sale?.customer,
+              }).lean()
+            : 'Walk in Customer',
         };
       }
     ),
