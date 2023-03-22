@@ -145,9 +145,21 @@ export default function TableSelection<T>({
             </td>
           );
         })}
-        <td>
+        <td
+          style={
+            {
+              // width: ',
+            }
+          }
+        >
           <Center>
-            <Group spacing={0} {...groupProps}>
+            <Group
+              spacing={0}
+              {...groupProps}
+              style={{
+                whiteSpace: 'nowrap',
+              }}
+            >
               {isEditColumn && (
                 <ActionIcon
                   onClick={() => {
@@ -199,7 +211,7 @@ export default function TableSelection<T>({
       />
 
       <ScrollArea>
-        <Container>
+        <Container w={'100%'} p={'sm'}>
           <Table
             sx={{ minWidth: '100%' }}
             verticalSpacing='sm'
@@ -219,6 +231,7 @@ export default function TableSelection<T>({
                   <th
                     style={{
                       textAlign: 'center',
+                      // whiteSpace: 'nowrap',
                     }}
                   >
                     Actions

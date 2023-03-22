@@ -17,6 +17,8 @@ import type { z } from 'zod';
 import type { Company } from '@/zobjs/company';
 import type { Warehouse } from '@/zobjs/warehouse';
 import type { RouterOutputs } from '@/utils/trpc';
+import _ from 'lodash';
+// import {  _ } from 'vitest/dist/types-7cd96283';
 
 const useStyles = createStyles((theme) => ({
   invoice: {
@@ -287,9 +289,11 @@ export default function Invoice({
             <div>
               <Text weight={500}>Buyer Info</Text>
               <Text weight={700} size='xl'>
-                Name
+                {_.get(data, 'customer.name', "Customer's Name")}
               </Text>
-              <Text weight={500}>Address</Text>
+              <Text weight={500}>
+                {_.get(data, 'customer.shippingAddress', 'Customer Address')}
+              </Text>
             </div>
           </div>
           <div>
