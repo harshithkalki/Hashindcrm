@@ -13,9 +13,10 @@ import {
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { IconEye } from '@tabler/icons';
+import { IconEdit, IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
+import EditSales from '@/components/EditSales';
 
 const Index = () => {
   const [modal, setModal] = useState(false);
@@ -34,6 +35,7 @@ const Index = () => {
     },
     { enabled: Boolean(invoiceId) }
   );
+  const [editId, setEditId] = useState<string | null>(null);
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -60,6 +62,7 @@ const Index = () => {
         </div>
       )}
       <Layout>
+        {editId && <EditSales _id={editId} onClose={() => setEditId(null)} />}
         <div
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
@@ -114,6 +117,15 @@ const Index = () => {
                         }}
                       >
                         <IconEye size='1.125rem' />
+                      </ActionIcon>
+                      <ActionIcon
+                        color={'blue'}
+                        variant='filled'
+                        onClick={() => {
+                          setEditId(value._id);
+                        }}
+                      >
+                        <IconEdit size='1.125rem' />
                       </ActionIcon>
                     </Group>
                   ),
