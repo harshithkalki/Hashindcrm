@@ -11,6 +11,7 @@ import type { Warehouse } from '@/zobjs/warehouse';
 import type { Company } from '@/zobjs/company';
 import console from 'console';
 import type { Product } from '@/zobjs/product';
+import ProductModel from '@/models/Product';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -53,6 +54,30 @@ export const saleRouter = router({
 
         invoiceId = `${newCount.count}`;
       }
+
+      const products = await Promise.all(
+        input.products.map(async (element) => {
+          const product = await ProductModel.findById(element._id);
+          if (product) {
+            if (product.quantity < element.quantity) {
+              throw new Error('Not enough quantity');
+            }
+          }
+          return product;
+        })
+      );
+
+      await Promise.all(
+        input.products.map(async (element) => {
+          const product = products.find(
+            (product) => product?._id.toString() == element._id
+          );
+
+          product?.quantity && (product.quantity -= element.quantity);
+
+          await product?.save();
+        })
+      );
 
       const sale = await Sale.create({
         ...input,

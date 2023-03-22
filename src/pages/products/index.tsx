@@ -84,7 +84,9 @@ const Index = () => {
                   .name as unknown as string,
               })) ?? []
           }
-          onEdit={(id) => console.log(id)}
+          onEdit={(id) => {
+            router.push(`/products/edit/${id}`);
+          }}
           colProps={{
             logo: {
               label: 'Logo',
