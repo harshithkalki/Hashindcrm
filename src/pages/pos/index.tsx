@@ -82,7 +82,14 @@ function ProductsSelect({
     RootState,
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
-  const categories = trpc.categoryRouter.allLeafNodes.useQuery();
+  const categories = trpc.saleRouter.getCategoriesForPos.useQuery(
+    {
+      warehouse: warehouse ?? '',
+    },
+    {
+      enabled: !!warehouse,
+    }
+  );
   const [category, setCategory] = useState<string | undefined>(undefined);
   const products = trpc.productRouter.getProducts.useInfiniteQuery(
     {

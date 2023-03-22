@@ -9,8 +9,11 @@ import type CompanyModel from '@/models/Company';
 import WarehouseModel from '@/models/Warehouse';
 import type { Warehouse } from '@/zobjs/warehouse';
 import type { Company } from '@/zobjs/company';
-import console from 'console';
 import type { Product } from '@/zobjs/product';
+import ProductModel from '@/models/Product';
+import CategoryModel from '@/models/Category';
+import type { Category } from '@/zobjs/category';
+import Customer from '@/models/Customer';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -53,6 +56,30 @@ export const saleRouter = router({
 
         invoiceId = `${newCount.count}`;
       }
+
+      const products = await Promise.all(
+        input.products.map(async (element) => {
+          const product = await ProductModel.findById(element._id);
+          if (product) {
+            if (product.quantity < element.quantity) {
+              throw new Error('Not enough quantity');
+            }
+          }
+          return product;
+        })
+      );
+
+      await Promise.all(
+        input.products.map(async (element) => {
+          const product = products.find(
+            (product) => product?._id.toString() == element._id
+          );
+
+          product?.quantity && (product.quantity -= element.quantity);
+
+          await product?.save();
+        })
+      );
 
       const sale = await Sale.create({
         ...input,
@@ -156,7 +183,11 @@ export const saleRouter = router({
         company: client.company,
       });
 
-      return sale;
+      const customer = await Customer.findOne({
+        _id: sale?.customer,
+      }).lean();
+
+      return { ...sale, customer: customer ?? 'Walk in Customer' };
     }),
 
   sales: protectedProcedure
@@ -245,6 +276,10 @@ export const saleRouter = router({
         const warehouse =
           (await WarehouseModel.findById(sale.warehouse).lean()) ?? undefined;
 
+        const customer = await Customer.findOne({
+          _id: sale?.customer,
+        }).lean();
+
         return {
           ...sale,
           warehouse,
@@ -253,6 +288,7 @@ export const saleRouter = router({
             ...product._id,
             quantity: product.quantity,
           })),
+          customer: customer ?? 'Walk in Customer',
         };
       }
     ),
@@ -357,5 +393,36 @@ export const saleRouter = router({
       const sales = await Sale.paginate(query, options);
 
       return sales;
+    }),
+
+  getCategoriesForPos: protectedProcedure
+    .input(
+      z.object({
+        warehouse: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'POS',
+        {
+          create: true,
+          update: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read categories"
+      );
+
+      const products = await ProductModel.find({
+        company: client.company,
+        warehouse: input.warehouse,
+      }).populate<{
+        category: Category;
+      }>('category');
+
+      const categories = products
+        .map((product) => product.category)
+        .filter((category) => category !== null);
+
+      return [...new Set(categories)];
     }),
 });
