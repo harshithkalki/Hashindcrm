@@ -196,7 +196,7 @@ const Supplierform = ({
               label='Email'
               placeholder='Email'
               name='email'
-              withAsterisk
+              // withAsterisk
             />
             <FormikInput
               label='Phone'
@@ -220,28 +220,28 @@ const Supplierform = ({
               label='Tax Number'
               placeholder='Tax Number'
               name='taxNumber'
-              withAsterisk
+              // withAsterisk
             />
             <FormikInput
               type={'number'}
               label='Opening Balance'
               placeholder='Opening Balance'
               name='openingBalance'
-              withAsterisk
+              // withAsterisk
             />
             <FormikInput
               type={'number'}
               label='Credit Limit'
               placeholder='Credit Limit'
               name='creditLimit'
-              withAsterisk
+              // withAsterisk
             />
             <FormikInput
               type={'number'}
               label='Credit Period'
               placeholder='Credit Period'
               name='creditPeriod'
-              withAsterisk
+              // withAsterisk
             />
           </SimpleGrid>
           <Formiktextarea

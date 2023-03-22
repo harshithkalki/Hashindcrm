@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 export const ZSupplierCreateInput = z.object({
   name: z.string(),
-  email: z.string(),
   phone: z.string(),
-  billingAddress: z.string().optional(),
-  shippingAddress: z.string().optional(),
+  billingAddress: z.string(),
+  shippingAddress: z.string(),
   warehouse: z.string(),
   status: z.enum(['active', 'inactive']),
+  email: z.string().optional(),
   taxNumber: z.string().optional(),
   profile: z.string().optional(),
   openingBalance: z.number().optional(),

@@ -91,7 +91,7 @@ type InitialValues = {
   date: string;
   warehouse: string;
   invoiceId?: string;
-  paymentMode: string;
+  paymentMode: 'cash' | 'card' | 'upi';
 };
 
 const initialValues: InitialValues = {
@@ -105,7 +105,7 @@ const initialValues: InitialValues = {
   notes: '',
   total: 0,
   warehouse: '',
-  paymentMode: '',
+  paymentMode: 'cash',
 };
 
 function WarehouseSelect() {

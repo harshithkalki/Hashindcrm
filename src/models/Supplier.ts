@@ -18,10 +18,10 @@ const SupplierSchema = new Schema<ISupplier, SupplierModel>(
   {
     name: { type: String, required: true },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
-    email: { type: String, required: true },
+    email: { type: String, required: false },
     phone: { type: String, required: true },
-    billingAddress: { type: String, required: false },
-    shippingAddress: { type: String, required: false },
+    billingAddress: { type: String, required: true },
+    shippingAddress: { type: String, required: true },
     warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse' },
     status: { type: String, required: true },
     taxNumber: { type: String, required: false },

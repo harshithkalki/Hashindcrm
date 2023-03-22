@@ -284,7 +284,10 @@ const CarsForm = ({
                     />
                   </Grid.Col>
                 </Grid>
-                <Button type='submit'>Submit</Button>
+                <Group>
+                  <Button type='submit'>Submit</Button>
+                  <Button onClick={() => onClose()}>Cancel</Button>
+                </Group>
               </Form>
             )}
           </Formik>

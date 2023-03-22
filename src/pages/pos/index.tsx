@@ -262,6 +262,7 @@ function ProductsSelect({
                     alt={item.name}
                     height={160}
                     // width={0}
+                    withPlaceholder
                   />
                 </Card.Section>
                 <Card.Section pl={'md'} mt={'sm'}>
