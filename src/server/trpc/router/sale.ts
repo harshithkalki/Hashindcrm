@@ -14,6 +14,7 @@ import ProductModel from '@/models/Product';
 import CategoryModel from '@/models/Category';
 import type { Category } from '@/zobjs/category';
 import Customer from '@/models/Customer';
+import mongoose from 'mongoose';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -218,9 +219,28 @@ export const saleRouter = router({
         company: client.company,
       };
 
-      const brands = await Sale.paginate(query, options);
+      const brands = await Sale.paginate(query, {
+        ...options,
+        lean: true,
+      });
 
-      return brands;
+      const brandsWithCustomer = await Promise.all(
+        brands.docs.map(async (brand) => {
+          if (mongoose.isValidObjectId(brand.customer)) {
+            const customer = await Customer.findOne({
+              _id: brand.customer,
+            }).lean();
+            return { ...brand, customer: customer ?? 'Walk in Customer' };
+          }
+
+          return { ...brand, customer: 'Walk in Customer' };
+        })
+      );
+
+      return {
+        ...brands,
+        docs: brandsWithCustomer,
+      };
     }),
 
   getInvoice: protectedProcedure
