@@ -13,6 +13,7 @@ import type { Product } from '@/zobjs/product';
 import ProductModel from '@/models/Product';
 import CategoryModel from '@/models/Category';
 import type { Category } from '@/zobjs/category';
+import Customer from '@/models/Customer';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -182,7 +183,11 @@ export const saleRouter = router({
         company: client.company,
       });
 
-      return sale;
+      const customer = await Customer.findOne({
+        _id: sale?.customer,
+      }).lean();
+
+      return { ...sale, customer: customer ?? 'Walk in Customer' };
     }),
 
   sales: protectedProcedure
