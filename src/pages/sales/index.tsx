@@ -17,6 +17,7 @@ import { IconEdit, IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
+import _ from 'lodash';
 
 const Index = () => {
   const [modal, setModal] = useState(false);
@@ -87,7 +88,8 @@ const Index = () => {
                     ...val,
                     _id: val._id.toString(),
                     date: dayjs(val.date).format('DD MMMM YYYY'),
-                  })) || []
+                    customer: _.get(val, 'customer.name', 'Walk-in Customer'),
+                  })) ?? []
               }
               colProps={{
                 invoiceId: {
