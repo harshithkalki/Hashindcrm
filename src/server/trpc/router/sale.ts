@@ -276,6 +276,10 @@ export const saleRouter = router({
         const warehouse =
           (await WarehouseModel.findById(sale.warehouse).lean()) ?? undefined;
 
+        const customer = await Customer.findOne({
+          _id: sale?.customer,
+        }).lean();
+
         return {
           ...sale,
           warehouse,
@@ -284,6 +288,7 @@ export const saleRouter = router({
             ...product._id,
             quantity: product.quantity,
           })),
+          customer: customer ?? 'Walk in Customer',
         };
       }
     ),
