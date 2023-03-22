@@ -124,6 +124,7 @@ function WarehouseSelect() {
       searchValue={searchValue}
       w={'100%'}
       searchable
+      withAsterisk
     />
   );
 }
@@ -221,7 +222,7 @@ function CustomerForm({
                 label='Email'
                 placeholder='Email'
                 name='email'
-                withAsterisk
+                // withAsterisk
               />
               <FieldArray
                 name='numbers'
@@ -249,42 +250,42 @@ function CustomerForm({
                 label='Tax Number'
                 placeholder='Tax Number'
                 name='taxNumber'
-                withAsterisk
+                // withAsterisk
               />
               <FormikInput
                 type={'number'}
                 label='Opening Balance'
                 placeholder='Opening Balance'
                 name='openingBalance'
-                withAsterisk
+                // withAsterisk
               />
               <FormikInput
                 type={'number'}
                 label='Credit Limit'
                 placeholder='Credit Limit'
                 name='creditLimit'
-                withAsterisk
+                // withAsterisk
               />
               <FormikInput
                 type={'number'}
                 label='Credit Period'
                 placeholder='Credit Period'
                 name='creditPeriod'
-                withAsterisk
+                // withAsterisk
               />
             </SimpleGrid>
             <Formiktextarea
               label='Billing Address'
               placeholder='Billing Address'
               name='billingAddress'
-              withAsterisk
+              // withAsterisk
               mb={'md'}
             />
             <Formiktextarea
               label='Shipping Address'
               placeholder='Shipping Address'
               name='shippingAddress'
-              withAsterisk
+              // withAsterisk
             />
             <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
               <Button type='submit' size='xs' loading={props.isSubmitting}>

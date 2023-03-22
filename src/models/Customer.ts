@@ -18,7 +18,7 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>(
   {
     name: { type: String, required: true },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
-    email: { type: String, required: true },
+    email: { type: String, required: false },
     numbers: [
       {
         type: String,

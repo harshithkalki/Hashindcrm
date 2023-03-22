@@ -3,13 +3,13 @@ import { z } from 'zod';
 export const ZStaffMemCreateInput = z.object({
   name: z.string(),
   phoneNumber: z.string(),
-  address: z.string(),
+  address: z.string().optional(),
   role: z.string(),
   linkedTo: z.string().optional(),
   email: z.string(),
   password: z.string(),
   profile: z.string().optional(),
-  warehouse: z.string().optional(),
+  warehouse: z.string(),
   status: z.string(),
 });
 

@@ -37,7 +37,7 @@ const StaffMemSchema: Schema = new Schema<
   {
     name: { type: String, required: true },
     phoneNumber: { type: String, required: true, unique: true },
-    address: { type: String, required: true },
+    address: { type: String, required: false },
     role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
