@@ -243,13 +243,11 @@ export const staffRouter = router({
 
   getAdmins: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().optional(),
-          limit: z.number().optional(),
-          search: z.string().optional(),
-        })
-        .optional()
+      z.object({
+        cursor: z.number().nullish(),
+        limit: z.number().optional(),
+        search: z.string().optional(),
+      })
     )
     .query(async ({ input, ctx }) => {
       if (ctx.clientId !== env.SUPER_ADMIN_EMAIL) {
@@ -259,10 +257,10 @@ export const staffRouter = router({
         });
       }
 
-      const { page = 1, limit = 10, search } = input || {};
+      const { cursor = 1, limit = 10, search } = input || {};
 
       const options = {
-        page: page,
+        page: cursor ?? undefined,
         limit: limit,
       };
 

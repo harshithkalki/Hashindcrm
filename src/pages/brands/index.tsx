@@ -255,7 +255,7 @@ const Brand = () => {
             <Pagination
               total={
                 brands.data?.pages.find((pageData) => pageData.page === page)
-                  ?.totalPages || 0
+                  ?.totalPages ?? 0
               }
               initialPage={1}
               // {...pagination}

@@ -12,6 +12,7 @@ import {
   Group,
   Image,
   Modal,
+  Pagination,
   SimpleGrid,
   Title,
 } from '@mantine/core';
@@ -238,16 +239,27 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
-  const admin = trpc.staffRouter.getAdmins.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
+  const [page, setPage] = React.useState(1);
+  const admins = trpc.staffRouter.getAdmins.useInfiniteQuery(
+    {},
+    {
+      getNextPageParam: () => page,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  React.useEffect(() => {
+    if (!admins.data?.pages.find((pageData) => pageData.page === page)) {
+      admins.fetchNextPage();
+    }
+  }, [admins, page]);
 
   return (
     <Layout>
       <AddCustomer
         modal={modal}
         setModal={setModal}
-        onCreated={() => admin.refetch()}
+        onCreated={() => admins.refetch()}
       />
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Admins</Title>
@@ -256,10 +268,11 @@ const Index = () => {
         </Button>
       </Group>
       <Tables
-        data={admin.data?.docs || []}
+        data={
+          admins.data?.pages.find((pageData) => pageData.page === page)?.docs ??
+          []
+        }
         colProps={{
-          // name: 'Name',
-          // email: 'Email',
           name: {
             label: 'Name',
           },
@@ -268,6 +281,21 @@ const Index = () => {
           },
         }}
       />
+      <Center>
+        {(admins.data?.pages.find((pageData) => pageData.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              admins.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0
+            }
+            initialPage={1}
+            // {...pagination}
+            page={page}
+            onChange={setPage}
+          />
+        )}
+      </Center>
     </Layout>
   );
 };

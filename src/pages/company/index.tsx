@@ -80,16 +80,22 @@ const Index = () => {
               router.push(`/company/${_id}`);
             }}
           />
-          <Pagination
-            total={
-              companies.data.pages.find((pageData) => pageData.page === page)
-                ?.totalPages || 0
-            }
-            initialPage={1}
-            // {...pagination}
-            page={page}
-            onChange={setPage}
-          />
+          <Center>
+            {(companies.data?.pages.find((pageData) => pageData.page === page)
+              ?.totalPages ?? 0) > 1 && (
+              <Pagination
+                total={
+                  companies.data?.pages.find(
+                    (pageData) => pageData.page === page
+                  )?.totalPages ?? 0
+                }
+                initialPage={1}
+                // {...pagination}
+                page={page}
+                onChange={setPage}
+              />
+            )}
+          </Center>
         </>
       )}
       {companies.isLoading && (
