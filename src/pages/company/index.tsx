@@ -23,7 +23,7 @@ const Index = () => {
   const { classes } = useStyle();
   const [page, setPage] = React.useState(1);
   const companies = trpc.companyRouter.companies.useInfiniteQuery(
-    { limit: 1 },
+    {},
     {
       getNextPageParam: () => page,
       refetchOnWindowFocus: false,
