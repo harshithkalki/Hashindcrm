@@ -9,9 +9,10 @@ import {
 } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { trpc } from '@/utils/trpc';
+import { client, trpc } from '@/utils/trpc';
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
+import { exportCSVFile } from '@/utils/jsonTocsv';
 
 export interface ProductFormType {
   name: string;
@@ -61,14 +62,52 @@ const Index = () => {
       <div style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
         <Group style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Products</Title>
-          <Button
-            size='xs'
-            onClick={() => {
-              router.push('/products/add');
-            }}
-          >
-            Add Product
-          </Button>
+          <Group>
+            <Button
+              size='xs'
+              onClick={() => {
+                router.push('/products/add');
+              }}
+            >
+              Add Product
+            </Button>
+            <Button
+              size='xs'
+              onClick={async () => {
+                const data = await client.productRouter.getCsv.query();
+                const headers: Record<keyof typeof data[number], string> = {
+                  name: 'Name',
+                  warehouse: 'Warehouse',
+                  _id: 'ID',
+                  company: 'Company',
+                  createdAt: 'Created At',
+                  description: 'Description',
+                  slug: 'Slug',
+                  logo: 'Logo',
+                  quantity: 'Quantity',
+                  quantityAlert: 'Quantity Alert',
+                  category: 'Category',
+                  brand: 'Brand',
+                  barcodeSymbology: 'Barcode Symbology',
+                  itemCode: 'Item Code',
+                  openingStock: 'Opening Stock',
+                  openingStockDate: 'Opening Stock Date',
+                  purchasePrice: 'Purchase Price',
+                  salePrice: 'Sale Price',
+                  tax: 'Tax',
+                  mrp: 'MRP',
+                  expiryDate: 'Expiry Date',
+                  warehouseId: 'Warehouse ID',
+                  categoryId: 'Category ID',
+                  brandId: 'Brand ID',
+                };
+
+                exportCSVFile(headers, data, 'products');
+              }}
+            >
+              Download CSV
+            </Button>
+          </Group>
         </Group>
         <Divider mt={'xl'} />
         <TableSelection

@@ -1,15 +1,28 @@
+import _ from 'lodash';
+
 export function convertToCSV(
-  objArray: Record<string | number, string>[] | string
+  objArray: Record<string | number, string | undefined | number>[] | string,
+  headers: Record<string | number, string>
 ) {
   const array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
   let str = '';
 
-  for (let i = 0; i < array.length; i++) {
+  let line = '';
+
+  for (const index in array[0]) {
+    if (line != '') line += ',';
+
+    line += _.get(headers, index, '');
+  }
+
+  str += line + '\r\n';
+
+  for (let i = 1; i < array.length; i++) {
     let line = '';
     for (const index in array[i]) {
       if (line != '') line += ',';
 
-      line += array[i][index];
+      line += _.get(array[i], index, '');
     }
 
     str += line + '\r\n';
@@ -20,16 +33,12 @@ export function convertToCSV(
 
 export function exportCSVFile(
   headers: Record<string | number, string>,
-  items: Record<string | number, string>[],
+  items: Record<string | number, string | undefined | number>[],
   fileTitle: string
 ) {
-  if (headers) {
-    items.unshift(headers);
-  }
-
   const jsonObject = JSON.stringify(items);
 
-  const csv = convertToCSV(jsonObject);
+  const csv = convertToCSV(jsonObject, headers);
 
   const exportedFilenmae = fileTitle + '.csv' || 'export.csv';
 

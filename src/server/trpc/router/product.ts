@@ -199,7 +199,6 @@ export const productRouter = router({
         warehouse: z.string().optional(),
       })
     )
-
     .query(async ({ input, ctx }) => {
       const client = await checkPermission(
         'PRODUCT',
@@ -329,4 +328,50 @@ export const productRouter = router({
         warehouse: { ...val.warehouse, _id: val.warehouse._id.toString() },
       }));
     }),
+
+  getCsv: protectedProcedure.query(async ({ ctx }) => {
+    const client = await checkPermission(
+      'PRODUCT',
+      { read: true },
+      ctx.clientId,
+      'You are not permitted to read products'
+    );
+
+    const products = await ProductModel.find({
+      company: client.company,
+    })
+      .populate<{
+        warehouse: {
+          _id: string;
+          name: string;
+        };
+        category: {
+          _id: string;
+          name: string;
+        };
+        brand: {
+          _id: string;
+          name: string;
+        };
+      }>(['warehouse', 'category', 'brand'])
+      .lean();
+
+    const csv = products.map((product) => {
+      return {
+        ...product,
+        warehouse: product.warehouse.name,
+        warehouseId: product.warehouse._id,
+        category: product.category.name,
+        categoryId: product.category._id,
+        _id: product._id.toString(),
+        company: product.company.toString(),
+        createdAt: product.createdAt.toISOString(),
+        brand: product.brand.name,
+        brandId: product.brand._id,
+        openingStockDate: product.openingStockDate?.toISOString(),
+      };
+    });
+
+    return csv;
+  }),
 });
