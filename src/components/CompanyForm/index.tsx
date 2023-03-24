@@ -29,8 +29,6 @@ const useStyles = createStyles((theme) => ({
   wrapper: {
     background: 'dark',
     padding: '15px 20px',
-    borderRadius: '5px',
-    boxShadow: theme.shadows.xs,
   },
   profile: {
     cursor: 'pointer',
@@ -53,9 +51,10 @@ interface Props {
   title: string;
   onSubmit: (inputs: CreateCompanyInput) => Promise<void>;
   formInputs: CreateCompanyInput;
+  onCancel?: () => void;
 }
 
-const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
+const CompanyForm = ({ title, formInputs, onSubmit, onCancel }: Props) => {
   const { classes, cx } = useStyles();
   const [logo, setLogo] = useState<File | null>(null);
   const logoref = useRef<HTMLInputElement>(null);
@@ -78,10 +77,14 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
             onSubmit(values).then(() => setSubmitting(false));
           }}
         >
-          {({ values, isSubmitting, setFieldValue, errors, touched }) => {
-            console.log(errors);
-            console.log(touched, 'touched');
-
+          {({
+            values,
+            isSubmitting,
+            setFieldValue,
+            errors,
+            touched,
+            resetForm,
+          }) => {
             return (
               <Form>
                 <SimpleGrid
@@ -358,9 +361,19 @@ const CompanyForm = ({ title, formInputs, onSubmit }: Props) => {
                   columns={2}
                 >
                   <Grid.Col>
-                    <Button type='submit' loading={isSubmitting}>
-                      Save
-                    </Button>
+                    <Group>
+                      <Button type='submit' loading={isSubmitting}>
+                        Save
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          resetForm();
+                          onCancel && onCancel();
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </Group>
                   </Grid.Col>
                 </Grid>
               </Form>

@@ -55,8 +55,9 @@ const Index = () => {
         <>
           <Tables
             data={
-              companies.data.pages.find((pageData) => pageData.page === page)
-                ?.docs || []
+              companies.data.pages
+                .find((pageData) => pageData.page === page)
+                ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ?? []
             }
             colProps={{
               // name: 'Company Name',

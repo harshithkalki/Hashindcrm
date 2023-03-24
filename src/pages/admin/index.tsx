@@ -99,7 +99,7 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
       <Modal
         opened={modal}
         onClose={() => setModal(false)}
-        title='Add New Customer'
+        title='Add New Admin'
         size={'60%'}
       >
         <Formik
@@ -458,7 +458,10 @@ const Index = () => {
       </Group>
       <Tables
         data={
-          admins.data?.pages.find((pageData) => pageData.page === page)?.docs ??
+          admins.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ??
+          [] ??
           []
         }
         colProps={{

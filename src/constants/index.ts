@@ -22,3 +22,28 @@ export const Permissions = [
 ] as const;
 
 export const Roles = ['ADMIN'] as const;
+
+type PermissionsUnion = typeof Permissions[number];
+
+export const PermissionsLabels: Record<PermissionsUnion, string> = {
+  STAFFMEM: 'Staff Members',
+  ROLE: 'Roles',
+  WORKFLOW: 'Workflows',
+  TICKET: 'Tickets',
+  BRAND: 'Brands',
+  CATEGORY: 'Categories',
+  PRODUCT: 'Products',
+  DASHBOARD: 'Dashboard',
+  STOCKADJUST: 'Stock Adjustment',
+  WAREHOUSE: 'Warehouse',
+  SUPPLIER: 'Suppliers',
+  CUSTOMER: 'Customers',
+  EXPENSECATEGORY: 'Expense Category',
+  EXPENSE: 'Expenses',
+  POS: 'POS',
+  CASHANDBANK: 'Cash, Bank and Account',
+  SALES: 'Sales',
+  STOCKTRANSFER: 'Stock Transfer',
+  PURCHASE: 'Purchase',
+  REPORT: 'Reports',
+};

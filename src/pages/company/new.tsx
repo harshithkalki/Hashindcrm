@@ -46,6 +46,7 @@ const Index = () => {
             });
         }}
         title='Add Company'
+        onCancel={() => push('/company')}
       />
     </Layout>
   );

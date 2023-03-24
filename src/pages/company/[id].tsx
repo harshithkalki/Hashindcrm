@@ -35,6 +35,7 @@ function EditCompany() {
             console.error(err);
           });
       }}
+      onCancel={() => push('/company')}
       title='Add Company'
     />
   );
