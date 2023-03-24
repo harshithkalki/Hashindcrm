@@ -14,11 +14,12 @@ import FormInput from '@/components/FormikCompo/FormikInput';
 import { Formik, Form } from 'formik';
 import { IconUpload } from '@tabler/icons';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
-import { trpc } from '@/utils/trpc';
+import { client, trpc } from '@/utils/trpc';
 import convertToCategory from '@/utils/convertToCategory';
 import axios from 'axios';
 import Layout from '@/components/Layout';
 import type { CategoryCreateInput } from '@/zobjs/category';
+import { exportCSVFile } from '@/utils/jsonTocsv';
 
 const initialValues: CategoryCreateInput = {
   logo: '',
@@ -163,7 +164,6 @@ const EditCategory = ({
       refetchOnWindowFocus: false,
     }
   );
-
   const updateCategory = trpc.categoryRouter.update.useMutation();
 
   return (
@@ -244,9 +244,27 @@ const Index = () => {
       <Container mt={'xs'}>
         <Group style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Categories</Title>
-          <Button size='xs' onClick={() => setModal(true)}>
-            Add Categories
-          </Button>
+          <Group>
+            <Button size='xs' onClick={() => setModal(true)}>
+              Add Categories
+            </Button>
+            <Button
+              size='xs'
+              onClick={async () => {
+                const data = await client.categoryRouter.getCsv.query();
+                const headers: Record<keyof typeof data[number], string> = {
+                  _id: 'ID',
+                  name: 'Name',
+                  parentCategory: 'Parent Category',
+                  parentCategory_id: 'Parent Category ID',
+                };
+
+                exportCSVFile(headers, data, 'categories');
+              }}
+            >
+              Download CSV
+            </Button>
+          </Group>
         </Group>
         <Divider mt={'xl'} />
         <CategoriesTable data={parsedData} onEdit={setEditId} />
