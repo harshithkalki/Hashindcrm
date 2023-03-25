@@ -28,6 +28,8 @@ import type { z } from 'zod';
 import FormikColor from '@/components/FormikCompo/FormikColor';
 import { IconArrowLeft } from '@tabler/icons';
 import { useRouter } from 'next/router';
+import { DatePicker } from '@mantine/dates';
+import dayjs from 'dayjs';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -87,8 +89,8 @@ const initialValues = {
   fuelType: '',
   transmissionType: '',
   emissionType: '',
-  insuranceDate: '',
-  insurancePeriod: '',
+  insuranceDate: new Date().toISOString(),
+  insurancePeriod: 0,
   renewalDate: '',
   interiorColor: '',
   exteriorColor: '',
@@ -105,6 +107,7 @@ const CarsForm = ({
   onClose: () => void;
 }) => {
   const { classes, cx } = useStyles();
+  const [renewalDate, setRenewalDate] = useState(new Date());
   return (
     <Flex style={{ flexDirection: 'column' }}>
       <ScrollArea style={{ height: '80vh' }}>
@@ -114,7 +117,7 @@ const CarsForm = ({
             onSubmit={onSubmit}
             validationSchema={toFormikValidationSchema(ZCarCreateInput)}
           >
-            {({ handleSubmit }) => (
+            {({ handleSubmit, values, setFieldValue }) => (
               <Form>
                 <SimpleGrid
                   m={'md'}
@@ -265,6 +268,14 @@ const CarsForm = ({
                       label='Insurance Date'
                       placeholder='Insurance Date'
                       type='text'
+                      onChange={() => {
+                        const date = new Date(values.insuranceDate as string);
+                        const renewalYear = (date.getFullYear() +
+                          values?.insurancePeriod ?? 0) as number;
+                        const newDate = new Date(date.setFullYear(renewalYear));
+                        // setFieldValue('renewalDate', newDate);
+                        setRenewalDate(newDate);
+                      }}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
@@ -272,16 +283,42 @@ const CarsForm = ({
                       name='insurancePeriod'
                       label='Insurance Period'
                       placeholder='Insurance Period'
-                      type='text'
+                      type='number'
+                      onChange={() => {
+                        const date = new Date(values.insuranceDate as string);
+                        const renewalYear = (date.getFullYear() +
+                          values?.insurancePeriod ?? 0) as number;
+                        const newDate = new Date(date.setFullYear(renewalYear));
+                        // setFieldValue('renewalDate', newDate);
+                        setRenewalDate(newDate);
+                      }}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormDate
+                    {/* <FormDate
                       name='renewalDate'
                       label='Renewal Date'
                       placeholder='Renewal Date'
                       type='text'
+                      value={new Date(values.renewalDate as string)}
+                    /> */}
+                    <FormInput
+                      name='renewalDate'
+                      label='Renewal Date'
+                      placeholder='Renewal Date'
+                      type='text'
+                      value={dayjs(renewalDate.toISOString()).format(
+                        'DD MMMM YYYY'
+                      )}
+                      readOnly
                     />
+                    {/* <DatePicker
+                      name='renewalDate'
+                      label='Renewal Date'
+                      placeholder='Renewal Date'
+                      type='text'
+                      value={}
+                    /> */}
                   </Grid.Col>
                 </Grid>
                 <Group>

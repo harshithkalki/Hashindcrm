@@ -13,7 +13,7 @@ export const ZCarCreateInput = z.object({
   transmissionType: z.string().optional(),
   emissionType: z.string().optional(),
   insuranceDate: z.string().optional(),
-  insurancePeriod: z.string().optional(),
+  insurancePeriod: z.number().optional(),
   renewalDate: z.string().optional(),
   interiorColor: z.string().optional(),
   exteriorColor: z.string().optional(),
