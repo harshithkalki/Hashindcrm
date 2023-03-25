@@ -8,47 +8,11 @@ import FormikCheck from '@/components/FormikCompo/FormikCheckBox';
 import { useMediaQuery } from '@mantine/hooks';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 // import { trpc } from "@/utils/trpc";
-import { Permissions } from '@/constants';
+import { Permissions, PermissionsLabels } from '@/constants';
 import { ZRoleCreateInput } from '@/zobjs/role';
 import { useRouter } from 'next/router';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import { navData } from '../Navbar';
-
-// const permissionsDemo: Permission = [
-//   {
-//     permissionName: "COMPANY",
-//     crud: {
-//       read: false,
-//       update: false,
-//       delete: false,
-//       create: false,
-//     },
-//   },
-//   {
-//     permissionName: "USER",
-//     crud: {
-//       read: false,
-//       update: false,
-//       delete: false,
-//       create: false,
-//     },
-//   },
-// ];
-
-//remove the type error from the array
-
-// export interface NavData {
-//   links:
-//     | string
-//     | {
-//         label: string;
-//         link: string;
-//         permissionName?: typeof Permissions[number];
-//       }[];
-//   label: string;
-//   permissionName?: typeof Permissions[number];
-//   icon: TablerIcon;
-// }
 
 type CreateRole = z.infer<typeof ZRoleCreateInput>;
 
@@ -148,16 +112,11 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
 
               <Text>Permissions</Text>
               {formInputs.permissions.map((permission, index) => {
-                // const permissionv: Permission = PermissonsValues[
-                //   index
-                // ] as unknown as Permission;
                 return (
                   <div key={permission.permissionName}>
-                    <Text
-                      mt={'xs'}
-                      mb={'sm'}
-                      transform='capitalize'
-                    >{`${permission.permissionName}`}</Text>
+                    <Text mt={'xs'} mb={'sm'} transform='capitalize'>{`${
+                      PermissionsLabels[permission.permissionName]
+                    }`}</Text>
                     <Group>
                       <FormikCheck
                         label={'view'}

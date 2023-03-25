@@ -99,7 +99,7 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
       <Modal
         opened={modal}
         onClose={() => setModal(false)}
-        title='Add New Customer'
+        title='Add New Admin'
         size={'60%'}
       >
         <Formik
@@ -237,6 +237,192 @@ const AddCustomer = ({ modal, setModal, onCreated }: modalProps) => {
   );
 };
 
+const AdminForm = ({
+  onSubmit,
+  onCancel,
+  values = initialValues,
+  disable,
+}: {
+  onSubmit: (values: typeof initialValues) => Promise<void>;
+  onCancel: () => void;
+  values?: typeof initialValues;
+  disable?: Partial<Record<keyof typeof initialValues, boolean>>;
+}) => {
+  const { classes, cx } = useStyles();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <Formik
+      onSubmit={async (values, { setSubmitting }) => {
+        await onSubmit(values);
+        setSubmitting(false);
+      }}
+      initialValues={values}
+      validationSchema={toFormikValidationSchema(ZAdminCreateInput)}
+    >
+      {({ handleSubmit, values, setFieldValue, isSubmitting }) => (
+        <Form onSubmit={handleSubmit}>
+          <SimpleGrid
+            m={'md'}
+            cols={3}
+            className={classes.wrapper}
+            breakpoints={[
+              { maxWidth: 'md', cols: 3, spacing: 'md' },
+              { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+              { maxWidth: 'xs', cols: 1, spacing: 'sm' },
+            ]}
+          >
+            <Container className={classes.containerStyles}>
+              <Center>
+                <Image
+                  height={150}
+                  width={150}
+                  src={values.profile}
+                  alt=''
+                  withPlaceholder
+                />
+                <input
+                  hidden
+                  ref={fileRef}
+                  type='file'
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    if (e.target.files) {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setFieldValue('logo', URL.createObjectURL(file));
+                      }
+                    }
+                  }}
+                />
+              </Center>
+              <Center>
+                <Button
+                  size='xs'
+                  leftIcon={values.profile === '' && <IconUpload size={17} />}
+                  onClick={() => {
+                    fileRef.current?.click();
+                  }}
+                  styles={{
+                    root: {
+                      margin: 2,
+                    },
+                  }}
+                >
+                  {values.profile === '' ? `Upload` : `Change`}
+                </Button>
+              </Center>
+            </Container>
+
+            <FormikInput
+              label='Name'
+              placeholder='Name'
+              name='name'
+              withAsterisk
+            />
+            <FormikInput
+              label='Email'
+              placeholder='Email'
+              name='email'
+              withAsterisk
+            />
+            <FormikInput
+              label='Phone'
+              placeholder='Phone'
+              name='phoneNumber'
+              withAsterisk
+            />
+
+            <Company />
+
+            <FormikSelect
+              label='Status'
+              data={[
+                { label: 'Active', value: 'Active' },
+                { label: 'Inactive', value: 'Inactive' },
+              ]}
+              placeholder='Pick one status'
+              name='status'
+              searchable
+              w={'100%'}
+              withAsterisk
+            />
+            <FormInput
+              label='Password'
+              placeholder='Password'
+              name='password'
+              withAsterisk
+              disabled={disable?.password}
+            />
+          </SimpleGrid>
+          <Formiktextarea
+            label='Address'
+            placeholder='Address'
+            name='address'
+            withAsterisk
+            mb={'md'}
+          />
+
+          <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
+            <Button type='submit' size='xs' loading={isSubmitting}>
+              Create
+            </Button>
+            <Button size='xs' onClick={onCancel}>
+              Cancel
+            </Button>
+          </Group>
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
+const EditAdmin: React.FC<{
+  id: string;
+  setModal: (modal: string) => void;
+}> = ({ id, setModal }) => {
+  const { data: admin } = trpc.staffRouter.getAdmin.useQuery(
+    { _id: id },
+    {
+      enabled: !!id,
+    }
+  );
+  const updateAdmin = trpc.staffRouter.updateAdmin.useMutation();
+
+  if (!admin) {
+    return <></>;
+  }
+
+  return (
+    <Modal
+      title='Edit Admin'
+      onClose={() => {
+        setModal('');
+      }}
+      opened={!!id}
+      size={'60%'}
+    >
+      <AdminForm
+        values={{
+          ...admin,
+          linkedTo: admin.linkedTo?.toString(),
+          company: admin.company?.toString(),
+          password: '',
+        }}
+        onSubmit={async (values) => {
+          await updateAdmin.mutateAsync({ _id: id, ...values });
+          setModal('');
+        }}
+        onCancel={() => {
+          setModal('');
+        }}
+        disable={{
+          password: true,
+        }}
+      />
+    </Modal>
+  );
+};
+
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -247,6 +433,8 @@ const Index = () => {
       refetchOnWindowFocus: false,
     }
   );
+  const [adminId, setAdminId] = React.useState('');
+  const deleteAdmin = trpc.staffRouter.deleteAdmin.useMutation();
 
   React.useEffect(() => {
     if (!admins.data?.pages.find((pageData) => pageData.page === page)) {
@@ -261,6 +449,7 @@ const Index = () => {
         setModal={setModal}
         onCreated={() => admins.refetch()}
       />
+      <EditAdmin id={adminId} setModal={setAdminId} />
       <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
         <Title fw={400}>Admins</Title>
         <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
@@ -269,7 +458,10 @@ const Index = () => {
       </Group>
       <Tables
         data={
-          admins.data?.pages.find((pageData) => pageData.page === page)?.docs ??
+          admins.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ??
+          [] ??
           []
         }
         colProps={{
@@ -279,6 +471,15 @@ const Index = () => {
           email: {
             label: 'Email',
           },
+        }}
+        editable
+        deletable
+        onEdit={(id) => {
+          setAdminId(id);
+        }}
+        onDelete={async (id) => {
+          await deleteAdmin.mutateAsync({ _id: id });
+          admins.refetch();
         }}
       />
       <Center>

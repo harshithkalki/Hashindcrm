@@ -57,6 +57,7 @@ function ConfirmDelete({
   onConfirm: () => void;
   isOpen: boolean;
 }) {
+  const [loading, setLoading] = useState(false);
   return (
     <Modal onClose={onClose} opened={isOpen} title='Delete'>
       <Text size='lg' weight={500}>
@@ -66,7 +67,16 @@ function ConfirmDelete({
         <Button onClick={onClose} variant='outline'>
           Cancel
         </Button>
-        <Button onClick={onConfirm} variant='outline' color='red'>
+        <Button
+          onClick={async () => {
+            setLoading(true);
+            await onConfirm();
+            setLoading(false);
+          }}
+          variant='outline'
+          color='red'
+          loading={loading}
+        >
           Delete
         </Button>
       </Group>
@@ -193,10 +203,10 @@ export default function TableSelection<T>({
         <ConfirmDelete
           isOpen={Boolean(deleteId)}
           onClose={() => setDeleteId('')}
-          onConfirm={() => {
+          onConfirm={async () => {
             const selected = selection[0];
             if (selected) {
-              onDelete && onDelete(selected);
+              await (onDelete && onDelete(selected));
             }
             setDeleteId('');
           }}

@@ -12,6 +12,7 @@ import {
 import { env } from '@/env/server.mjs';
 import { TRPCError } from '@trpc/server';
 import { Permissions, Roles } from '@/constants';
+import _ from 'lodash';
 
 interface StatusType {
   id: string;
@@ -326,9 +327,16 @@ export const staffRouter = router({
 
       const admin = await StaffModel.findOne({
         _id: input._id,
-      });
+      }).lean();
 
-      return admin;
+      if (!admin) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Admin not found',
+        });
+      }
+
+      return _.omit(admin, ['password']);
     }),
 
   delete: protectedProcedure

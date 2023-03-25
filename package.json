@@ -46,6 +46,7 @@
     "react-to-print": "^2.14.12",
     "react-waypoint": "^10.3.0",
     "redux": "^4.2.0",
+    "sharp": "^0.31.3",
     "superjson": "1.9.1",
     "trpc-playground": "^1.0.4",
     "zod": "^3.18.0",
