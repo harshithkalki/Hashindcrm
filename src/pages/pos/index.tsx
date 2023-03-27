@@ -70,7 +70,7 @@ type Query = {
 };
 
 const initialValues: SaleCreateInput = {
-  customer: 'walkin',
+  customer: 'walkInCustomer',
   date: new Date().toISOString(),
   products: [],
   orderTax: 0,
@@ -320,15 +320,17 @@ const StaffMemSelect = () => {
     { search: search },
     { refetchOnWindowFocus: false }
   );
+  // const firstStaff =
+  //  ;
+  const data =
+    staffMem.data?.docs?.map((staff) => ({
+      label: staff.name,
+      value: staff._id.toString(),
+    })) || [];
   return (
     <FormikSelect
       label='Staff Member'
-      data={
-        staffMem.data?.docs?.map((staff) => ({
-          label: staff.name,
-          value: staff._id.toString(),
-        })) || []
-      }
+      data={data}
       searchable
       searchValue={search}
       onSearchChange={setSearch}
