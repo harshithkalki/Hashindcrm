@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ActionIcon,
   Button,
+  Center,
   Container,
   createStyles,
   Divider,
@@ -28,7 +29,6 @@ import type { z } from 'zod';
 import FormikColor from '@/components/FormikCompo/FormikColor';
 import { IconArrowLeft } from '@tabler/icons';
 import { useRouter } from 'next/router';
-import { DatePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
 
 const useStyles = createStyles((theme) => ({
@@ -99,25 +99,24 @@ const initialValues = {
 
 const CarsForm = ({
   onSubmit,
-  values = initialValues,
+  inputs = initialValues,
   onClose,
 }: {
   onSubmit: (values: carsInput) => Promise<void>;
-  values?: carsInput;
+  inputs?: carsInput;
   onClose: () => void;
 }) => {
   const { classes, cx } = useStyles();
-  const [renewalDate, setRenewalDate] = useState(new Date());
   return (
     <Flex style={{ flexDirection: 'column' }}>
       <ScrollArea style={{ height: '80vh' }}>
         <Container>
           <Formik
-            initialValues={values}
+            initialValues={inputs}
             onSubmit={onSubmit}
             validationSchema={toFormikValidationSchema(ZCarCreateInput)}
           >
-            {({ handleSubmit, values, setFieldValue }) => (
+            {({ values }) => (
               <Form>
                 <SimpleGrid
                   m={'md'}
@@ -268,14 +267,6 @@ const CarsForm = ({
                       label='Insurance Date'
                       placeholder='Insurance Date'
                       type='text'
-                      onChange={() => {
-                        const date = new Date(values.insuranceDate as string);
-                        const renewalYear = (date.getFullYear() +
-                          values?.insurancePeriod ?? 0) as number;
-                        const newDate = new Date(date.setFullYear(renewalYear));
-                        // setFieldValue('renewalDate', newDate);
-                        setRenewalDate(newDate);
-                      }}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
@@ -284,14 +275,6 @@ const CarsForm = ({
                       label='Insurance Period'
                       placeholder='Insurance Period'
                       type='number'
-                      onChange={() => {
-                        const date = new Date(values.insuranceDate as string);
-                        const renewalYear = (date.getFullYear() +
-                          values?.insurancePeriod ?? 0) as number;
-                        const newDate = new Date(date.setFullYear(renewalYear));
-                        // setFieldValue('renewalDate', newDate);
-                        setRenewalDate(newDate);
-                      }}
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
@@ -307,18 +290,14 @@ const CarsForm = ({
                       label='Renewal Date'
                       placeholder='Renewal Date'
                       type='text'
-                      value={dayjs(renewalDate.toISOString()).format(
-                        'DD MMMM YYYY'
-                      )}
+                      value={dayjs(
+                        dayjs(values.insuranceDate).add(
+                          values.insurancePeriod as number,
+                          'year'
+                        )
+                      ).format('DD MMMM YYYY')}
                       readOnly
                     />
-                    {/* <DatePicker
-                      name='renewalDate'
-                      label='Renewal Date'
-                      placeholder='Renewal Date'
-                      type='text'
-                      value={}
-                    /> */}
                   </Grid.Col>
                 </Grid>
                 <Group>
@@ -360,7 +339,7 @@ const Editcar = ({ _id, onClose }: { _id: string; onClose: () => void }) => {
         <Loader />
       ) : (
         <CarsForm
-          values={{
+          inputs={{
             ...car.data,
             customer: car.data.customer.toString(),
           }}
@@ -456,15 +435,17 @@ const Index = () => {
           editable
           deletable
         />
-        <Pagination
-          total={
-            CarsData.data?.pages.find((pageData) => pageData.page === page)
-              ?.totalPages || 0
-          }
-          initialPage={1}
-          page={page}
-          onChange={setPage}
-        />
+        <Center>
+          <Pagination
+            total={
+              CarsData.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages || 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        </Center>
       </Container>
     </Layout>
   );
