@@ -89,6 +89,7 @@ const Index = () => {
                     _id: val._id.toString(),
                     date: dayjs(val.date).format('DD MMMM YYYY'),
                     customer: _.get(val, 'customer.name', 'Walk-in Customer'),
+                    total: val.total.toFixed(),
                   })) ?? []
               }
               colProps={{

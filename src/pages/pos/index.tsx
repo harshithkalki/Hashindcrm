@@ -459,11 +459,16 @@ const Index = () => {
               values.discount +
               values.shipping || 0;
           values.total =
-            [...inlineProducts.values()].reduce(
-              (acc, item) =>
-                acc + (item.discountedPrice + item.taxPrice) * item.quantity,
-              0
-            ) + values.shipping || 0;
+            Number(
+              (
+                [...inlineProducts.values()].reduce(
+                  (acc, item) =>
+                    acc +
+                    (item.discountedPrice + item.taxPrice) * item.quantity,
+                  0
+                ) + values.shipping
+              ).toFixed()
+            ) || 0;
           values.warehouse = warehouse as string;
 
           salesSubmit.mutateAsync(values).then((res) => {
