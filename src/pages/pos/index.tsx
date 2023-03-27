@@ -490,7 +490,7 @@ const Index = () => {
           console.log(values);
         }}
       >
-        {({ handleSubmit, values, isSubmitting, resetForm }) => (
+        {({ handleSubmit, values, isSubmitting, resetForm, errors }) => (
           <Form
             onSubmit={handleSubmit}
             style={{
@@ -855,6 +855,9 @@ const Index = () => {
                       size='sm'
                       loading={isSubmitting}
                       type='submit'
+                      disabled={
+                        !(Boolean(values.staffMem) && inlineProducts.size !== 0)
+                      }
                     >
                       Save & Print
                     </Button>
