@@ -1,96 +1,24 @@
 import Layout from '@/components/Layout';
-import {
-  ActionIcon,
-  Group,
-  Title,
-  Image,
-  TextInput,
-  Table,
-  Center,
-} from '@mantine/core';
-import { IconPencil, IconSearch, IconTrash } from '@tabler/icons';
-import React, { useState } from 'react';
-
-const data = [
-  {
-    id: '1',
-    name: 'Product 1',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    currentStock: 100,
-    quantityAlert: 50,
-  },
-  {
-    id: '2',
-    name: 'Phone',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    currentStock: 100,
-    quantityAlert: 50,
-  },
-  {
-    id: '3',
-    name: 'oven',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    currentStock: 100,
-    quantityAlert: 50,
-  },
-  {
-    id: '4',
-    name: 'lighter',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    currentStock: 100,
-    quantityAlert: 50,
-  },
-];
+import TableSelection from '@/components/Tables';
+import { trpc } from '@/utils/trpc';
+import { Group, Title, Center, Image, Pagination } from '@mantine/core';
+import React from 'react';
 
 const Index = () => {
-  const [filteredData, setFilteredData] = useState(data);
-  const [search, setSearch] = useState('');
+  const [page, setPage] = React.useState(1);
+  const stockalerts = trpc.reports.stockAlerts.useInfiniteQuery(
+    { limit: 10 },
+    {
+      getNextPageParam: () => page,
+      refetchOnWindowFocus: false,
+    }
+  );
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setSearch(value);
-    setFilteredData(
-      data.filter((item) =>
-        Object.values(item).some((field) =>
-          String(field)
-            .toLowerCase()
-            .trim()
-            .includes(value.toLowerCase().trim())
-        )
-      )
-    );
-  };
-
-  const rows = filteredData.map((item) => {
-    return (
-      <tr key={item.id}>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          <Group spacing='xs'>
-            <Image
-              src={item.logo}
-              alt={item.name}
-              radius='lg'
-              style={{ width: 25, height: 25 }}
-            />
-            {item.name}
-          </Group>
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.itemCode}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.currentStock}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.quantityAlert}
-        </td>
-      </tr>
-    );
-  });
+  React.useEffect(() => {
+    if (!stockalerts.data?.pages.find((pageData) => pageData.page === page)) {
+      stockalerts.fetchNextPage();
+    }
+  }, [stockalerts, page]);
 
   return (
     <Layout>
@@ -98,31 +26,59 @@ const Index = () => {
         <Title fw={400}>Stock Alert</Title>
       </Group>
 
-      <TextInput
-        placeholder='Search by any field'
-        mb='md'
-        icon={<IconSearch size={14} stroke={1.5} />}
-        value={search}
-        onChange={handleSearchChange}
+      <TableSelection
+        data={
+          stockalerts.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.map((doc) => ({
+              ...doc,
+              _id: doc._id.toString(),
+            })) || []
+        }
+        colProps={{
+          logo: {
+            label: 'Logo',
+            Component: ({ data: { logo } }) => (
+              <Group spacing='xs' position='center'>
+                <Image
+                  src={logo}
+                  alt={'logo'}
+                  radius='lg'
+                  style={{ width: 32, height: 32 }}
+                  withPlaceholder
+                />
+              </Group>
+            ),
+          },
+          name: {
+            label: 'Name',
+          },
+          itemCode: {
+            label: 'Item Code',
+          },
+          quantity: {
+            label: 'Current Stock',
+          },
+          quantityAlert: {
+            label: 'Quantity Alert',
+          },
+        }}
       />
       <Center>
-        <Table w={'90%'} verticalSpacing='sm'>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Item Code
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Current Stock
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Quantity Alert
-              </th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
+        {(stockalerts.data?.pages.find((pageData) => pageData?.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              stockalerts.data?.pages.find(
+                (pageData) => pageData?.page === page
+              )?.totalPages ?? 0
+            }
+            initialPage={1}
+            // {...pagination}
+            page={page}
+            onChange={setPage}
+          />
+        )}
       </Center>
     </Layout>
   );
