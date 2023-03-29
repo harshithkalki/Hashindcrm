@@ -115,6 +115,10 @@ interface HeaderTabsProps {
 
 function WarehouseSelect() {
   const [searchValue, onSearchChange] = useState('');
+  const { warehouse, client } = useSelector<
+    RootState,
+    RootState['clientState']
+  >((state) => state.clientState);
   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
     {
       search: searchValue,
@@ -122,12 +126,10 @@ function WarehouseSelect() {
     {
       refetchOnWindowFocus: false,
       getNextPageParam: (lastPage) => lastPage.nextPage,
+      enabled: !client?.isSuperAdmin && !!client,
     }
   );
-  const warehouse = useSelector<
-    RootState,
-    RootState['clientState']['warehouse']
-  >((state) => state.clientState.warehouse);
+
   const dispatch = useDispatch();
 
   return (
