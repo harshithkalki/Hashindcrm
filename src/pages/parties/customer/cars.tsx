@@ -408,6 +408,7 @@ const Index = () => {
               ?.docs.map((doc) => ({
                 ...doc,
                 _id: doc._id.toString(),
+                customer: (doc.customer as unknown as { name: string }).name,
               })) || []
           }
           colProps={{

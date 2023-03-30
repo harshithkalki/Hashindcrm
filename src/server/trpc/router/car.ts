@@ -88,7 +88,15 @@ export const carRouter = router({
         ...(search && { name: { $regex: search, $options: 'i' } }),
       };
 
-      const cars = await CarModel.paginate(query, options);
+      const cars = await CarModel.paginate(query, {
+        ...options,
+        populate: [
+          {
+            path: 'customer',
+            select: 'name',
+          },
+        ],
+      });
 
       return cars;
     }),
