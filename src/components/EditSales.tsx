@@ -39,6 +39,7 @@ import FormikSelect from './FormikCompo/FormikSelect';
 import Formiktextarea from './FormikCompo/FormikTextarea';
 import FormikInfiniteSelect from './FormikCompo/InfiniteSelect';
 import Invoice from './Invoice';
+// import { useQueryClient } from 'react-query';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -192,7 +193,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
   const initialValues: InitialValues = {
     id: Data?._id as unknown as string,
     customer: Data?.customer as string,
-    date: Data?.date as unknown as string,
+    date: Data?.date.toISOString() as unknown as string,
     products: Data?.products as unknown as InlineProduct[],
     orderTax: Data?.orderTax as number,
     status: Data?.status as 'approved' | 'pending' | 'rejected',
@@ -234,30 +235,38 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
     Map<string, InlineProduct>
   >(new Map(List?.map((product) => [product._id, product]) || []));
 
-  const [invoiceId, setInvoiceId] = useState<string>('');
-  const [products, setProducts] = useState<
-    RouterOutputs['productRouter']['getProducts']['docs']
-  >([]);
+  // const [invoiceId, setInvoiceId] = useState<string>('');
+  // const [products, setProducts] = useState<
+  //   RouterOutputs['productRouter']['getProducts']['docs']
+  // >([]);
 
   const salesSubmit = trpc.saleRouter.update.useMutation();
 
-  const invoice = trpc.saleRouter.getInvoice.useQuery(
-    {
-      _id: invoiceId,
-    },
-    { enabled: Boolean(invoiceId) }
-  );
+  // const invoice = trpc.saleRouter.getInvoice.useQuery(
+  //   {
+  //     _id: invoiceId,
+  //   },
+  //   { enabled: Boolean(invoiceId) }
+  // );
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
+  // useEffect(() => {
+  //   if (invoice.data) {
+  //     handlePrint();
+  //     setInvoiceId('');
+  //   }
+  // }, [handlePrint, invoice.data]);
+
   useEffect(() => {
-    if (invoice.data) {
-      handlePrint();
-      setInvoiceId('');
+    if (List && inlineProducts.size === 0) {
+      setInlineProducts(
+        new Map(List?.map((product) => [product._id, product]) || [])
+      );
     }
-  }, [handlePrint, invoice.data]);
+  }, [List]);
 
   return (
     <>
@@ -272,6 +281,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
             validationSchema={toFormikValidationSchema(ZSaleCreateInput)}
             onSubmit={(values, { setSubmitting, resetForm }) => {
               console.log(inlineProducts);
+              setSubmitting(true);
               values.products = Array.from(inlineProducts.values());
               values.orderTax =
                 [...inlineProducts.values()].reduce(
@@ -289,18 +299,15 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                 ) + values.shipping || 0;
 
               salesSubmit.mutateAsync(values).then((res) => {
+                ProductData.refetch();
                 showNotification({
                   title: 'New Sale',
                   message: 'Sale created successfully',
                 });
                 console.log(res);
                 setSubmitting(false);
-                // console.log(res._id);
-                // setInvoiceId(res._id as unknown as string);
 
-                //  const invoice = trpc.saleRouter.getInvoice.useQuery({
-                //    _id: res._id as string,
-                //  });
+                onClose();
               });
 
               resetForm();
@@ -310,11 +317,11 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
           >
             {({ values, handleSubmit, isSubmitting }) => (
               <Form onSubmit={handleSubmit}>
-                {invoice.data && (
+                {/* {invoice.data && (
                   <div style={{ display: 'none' }}>
                     <Invoice invoiceRef={componentRef} data={invoice.data} />
                   </div>
-                )}
+                )} */}
                 <SimpleGrid
                   m={'md'}
                   cols={3}

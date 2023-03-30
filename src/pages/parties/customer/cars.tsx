@@ -436,15 +436,18 @@ const Index = () => {
           deletable
         />
         <Center>
-          <Pagination
-            total={
-              CarsData.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages || 0
-            }
-            initialPage={1}
-            page={page}
-            onChange={setPage}
-          />
+          {(CarsData.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                CarsData.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages || 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
         </Center>
       </Container>
     </Layout>

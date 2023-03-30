@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { IconEdit, IconEye } from '@tabler/icons';
+import { IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
@@ -34,7 +34,7 @@ const Index = () => {
     {
       _id: invoiceId,
     },
-    { enabled: Boolean(invoiceId) }
+    { enabled: Boolean(invoiceId), cacheTime: 0 }
   );
   const [editId, setEditId] = useState<string | null>(null);
   const componentRef = useRef<HTMLDivElement>(null);
@@ -55,6 +55,9 @@ const Index = () => {
     }
   }, [sales, page]);
 
+  console.log('aaaaaaaaa');
+  console.log(invoice.data);
+
   return (
     <>
       {invoice.data && (
@@ -63,7 +66,15 @@ const Index = () => {
         </div>
       )}
       <Layout>
-        {editId && <EditSales _id={editId} onClose={() => setEditId(null)} />}
+        {editId && (
+          <EditSales
+            _id={editId}
+            onClose={() => {
+              setEditId(null);
+              sales.refetch();
+            }}
+          />
+        )}
         <div
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
