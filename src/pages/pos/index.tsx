@@ -865,7 +865,13 @@ const Index = () => {
                       loading={isSubmitting}
                       type='submit'
                       disabled={
-                        !(Boolean(values.staffMem) && inlineProducts.size !== 0)
+                        !(
+                          (
+                            Boolean(values.staffMem) &&
+                            inlineProducts.size !== 0
+                          )
+                          // && Boolean(values.warehouse)
+                        )
                       }
                     >
                       Save & Print
