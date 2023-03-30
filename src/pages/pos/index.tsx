@@ -28,7 +28,7 @@ import {
   IconPlus,
   IconTrash,
 } from '@tabler/icons';
-import { Form, Formik } from 'formik';
+import { Form, Formik, useFormikContext } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Waypoint } from 'react-waypoint';
@@ -320,19 +320,28 @@ const StaffMemSelect = () => {
     { search: search },
     { refetchOnWindowFocus: false }
   );
-  // const firstStaff =
-  //  ;
+
   const data =
     staffMem.data?.docs?.map((staff) => ({
       label: staff.name,
       value: staff._id.toString(),
     })) || [];
+
+  const { values, setFieldValue } = useFormikContext<typeof initialValues>();
+
+  useEffect(() => {
+    if (data.length > 0 && !values.staffMem) {
+      setFieldValue('staffMem', data[0]?.value || '');
+    }
+  }, [data]);
+
   return (
     <FormikSelect
       label='Staff Member'
       data={data}
       searchable
       searchValue={search}
+      defaultValue={data[0]?.value}
       onSearchChange={setSearch}
       placeholder='Pick one'
       name='staffMem'
