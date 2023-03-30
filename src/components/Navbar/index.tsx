@@ -82,15 +82,15 @@ const PartiesData: NavData['links'] = [
 ];
 const SalesData: NavData['links'] = [
   { label: 'Sales', link: '/sales', permissionName: 'SALES' },
-  // { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
+  { label: 'Sales Returns', link: '/sales/return', permissionName: 'SALES' },
 ];
 const PurchaseData: NavData['links'] = [
   { label: 'Purchase', link: '/purchases', permissionName: 'PURCHASE' },
-  // {
-  //   label: 'Purchase Returns',
-  //   link: '/purchases/return',
-  //   permissionName: 'PURCHASE',
-  // },
+  {
+    label: 'Purchase Returns',
+    link: '/purchases/return',
+    permissionName: 'PURCHASE',
+  },
 ];
 const ExpensesData: NavData['links'] = [
   { label: 'Expenses', link: '/expenses', permissionName: 'EXPENSE' },
@@ -180,13 +180,7 @@ export const navData: NavData[] = [
     permissionName: 'CASHANDBANK',
   },
   { links: ExpensesData, label: 'Expenses', icon: IconReceipt2 },
-  // { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
-  // {
-  //   links: '/settings/paymentmodes',
-  //   label: 'Settings',
-  //   icon: IconReceipt2,
-  //   permissionName: 'SETTINGS',
-  // },
+  { links: ReportDate, label: 'Reports', icon: IconReceipt2 },
   { label: 'Admin', icon: IconReceipt2, links: '/admin' },
   {
     label: 'Warehouse',

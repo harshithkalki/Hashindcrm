@@ -39,9 +39,15 @@ export const outSchemaForMe = z.object({
         backgroundColor: true,
         secondaryColor: true,
         primaryColor: true,
-      }).extend({
-        _id: z.string(),
-      }),
+      })
+        .partial({
+          primaryColor: true,
+          secondaryColor: true,
+          backgroundColor: true,
+        })
+        .extend({
+          _id: z.string(),
+        }),
     }).omit({ password: true }),
   ]),
 });

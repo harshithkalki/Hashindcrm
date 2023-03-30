@@ -74,6 +74,7 @@ const CompanyForm = ({ title, formInputs, onSubmit, onCancel }: Props) => {
               const { data } = await axios.post('/api/upload-file', form);
               values.logo = data.url;
             }
+            setSubmitting(true);
             onSubmit(values).then(() => setSubmitting(false));
           }}
         >
@@ -238,20 +239,10 @@ const CompanyForm = ({ title, formInputs, onSubmit, onCancel }: Props) => {
                       columns={2}
                     >
                       <Grid.Col lg={1} sm={3}>
-                        <FormInput
-                          label='cin'
-                          placeholder='cin'
-                          name='cinNo'
-                          withAsterisk
-                        />
+                        <FormInput label='cin' placeholder='cin' name='cinNo' />
                       </Grid.Col>
                       <Grid.Col lg={1} sm={3}>
-                        <FormInput
-                          label='gst'
-                          placeholder='gst'
-                          name='gstNo'
-                          withAsterisk
-                        />
+                        <FormInput label='gst' placeholder='gst' name='gstNo' />
                       </Grid.Col>
                       <Grid.Col lg={1} sm={3}>
                         <FormInput label='pan' placeholder='pan' name='pan' />
@@ -285,10 +276,10 @@ const CompanyForm = ({ title, formInputs, onSubmit, onCancel }: Props) => {
                       name='natureOfBusiness'
                       placeholder='Nature of Business'
                       data={[
-                        { label: 'Manufacturing', value: 'Manufacturing' },
-                        { label: 'Trading', value: 'Trading' },
-                        { label: 'Service', value: 'Service' },
+                        { label: 'Automobiles', value: 'automobiles' },
+                        { label: 'Other', value: 'other' },
                       ]}
+                      withAsterisk
                     />
                   </Grid.Col>
                 </Grid>
