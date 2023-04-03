@@ -1,118 +1,105 @@
 import Layout from '@/components/Layout';
-import {
-  ActionIcon,
-  Group,
-  Title,
-  Image,
-  TextInput,
-  Table,
-  Center,
-} from '@mantine/core';
-import { IconPencil, IconSearch, IconTrash } from '@tabler/icons';
-import React, { useState } from 'react';
-
-const data = [
-  {
-    id: '1',
-    name: 'Product 1',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    unitsSold: 100,
-  },
-  {
-    id: '2',
-    name: 'Phone',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    unitsSold: 100,
-  },
-  {
-    id: '3',
-    name: 'oven',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    unitsSold: 100,
-  },
-  {
-    id: '4',
-    name: 'lighter',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    unitsSold: 100,
-  },
-];
+import TableSelection from '@/components/Tables';
+import { trpc } from '@/utils/trpc';
+import { Group, Title, Center, Pagination } from '@mantine/core';
+import React from 'react';
 
 const Index = () => {
-  const [filteredData, setFilteredData] = useState(data);
-  const [search, setSearch] = useState('');
+  const [page, setPage] = React.useState(1);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setSearch(value);
-    setFilteredData(
-      data.filter((item) =>
-        Object.values(item).some((field) =>
-          String(field)
-            .toLowerCase()
-            .trim()
-            .includes(value.toLowerCase().trim())
-        )
-      )
-    );
-  };
+  const stockReport = trpc.reports.stockReport.useInfiniteQuery(
+    { limit: 10 },
+    {
+      getNextPageParam: () => page,
+      refetchOnWindowFocus: false,
+    }
+  );
 
-  const rows = filteredData.map((item) => {
-    return (
-      <tr key={item.id}>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          <Group spacing='xs'>
-            <Image
-              src={item.logo}
-              alt={item.name}
-              radius='lg'
-              style={{ width: 25, height: 25 }}
-            />
-            {item.name}
-          </Group>
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.itemCode}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.unitsSold}
-        </td>
-      </tr>
+  React.useEffect(() => {
+    if (!stockReport.data?.pages.find((pageData) => pageData?.page === page)) {
+      stockReport.fetchNextPage();
+    }
+  }, [stockReport, page]);
+
+  const data = React.useMemo(() => {
+    const pageData = stockReport.data?.pages.find(
+      (pageData) => pageData?.page === page
     );
-  });
+
+    const products: {
+      name: string;
+      itemCode: string;
+      unitsSold: number;
+      _id: string;
+    }[] = [];
+
+    pageData?.docs.forEach((doc) => {
+      doc.products.forEach((product) => {
+        const currentProduct = products.find(
+          (productData) =>
+            productData._id === (product._id as unknown as { _id: string })?._id
+        );
+
+        if (currentProduct) {
+          currentProduct.unitsSold += product.quantity;
+        } else {
+          if (product._id === null) {
+            return;
+          }
+
+          products.push({
+            name: (product._id as unknown as { name: string }).name,
+            itemCode: (product._id as unknown as { itemCode: string }).itemCode,
+            unitsSold: product.quantity,
+            _id: (product._id as unknown as { _id: string })._id,
+          });
+        }
+      });
+    });
+
+    return products;
+  }, [stockReport.data, page]);
 
   return (
     <Layout>
       <Group mb={'xl'}>
         <Title fw={400}>Product Sales Summary</Title>
       </Group>
-
-      <TextInput
-        placeholder='Search by any field'
-        mb='md'
-        icon={<IconSearch size={14} stroke={1.5} />}
-        value={search}
-        onChange={handleSearchChange}
-      />
+      <Center
+        style={{
+          flexDirection: 'column',
+          width: '100%',
+        }}
+      >
+        <TableSelection
+          data={data}
+          colProps={{
+            name: {
+              label: 'Name',
+            },
+            itemCode: {
+              label: 'Item Code',
+            },
+            unitsSold: {
+              label: 'Units Sold',
+            },
+          }}
+        />
+      </Center>
       <Center>
-        <Table w={'90%'} verticalSpacing='sm'>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Item Code
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Units Sold
-              </th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
+        {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              stockReport.data?.pages.find(
+                (pageData) => pageData?.page === page
+              )?.totalPages ?? 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        )}
       </Center>
     </Layout>
   );

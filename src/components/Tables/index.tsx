@@ -218,9 +218,12 @@ export default function TableSelection<T>({
         icon={<IconSearch size={14} stroke={1.5} />}
         value={search}
         onChange={handleSearchChange}
+        style={{
+          width: '100%',
+        }}
       />
 
-      <ScrollArea>
+      <ScrollArea w='100%'>
         <Container w={'100%'} p={'sm'}>
           <Table
             sx={{ minWidth: '100%' }}

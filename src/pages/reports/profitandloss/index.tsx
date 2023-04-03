@@ -1,16 +1,10 @@
 import Layout from '@/components/Layout';
+import { trpc } from '@/utils/trpc';
 import { Group, Table, Title } from '@mantine/core';
 import React from 'react';
 
 const index = () => {
-  const data = {
-    sales: 0,
-    purchases: 0,
-    expenses: 0,
-    profit: 0,
-    purchaseReturn: 0,
-    salesReturn: 0,
-  };
+  const { data } = trpc.reports.profitAndLoss.useQuery();
 
   return (
     <Layout>
@@ -39,27 +33,27 @@ const index = () => {
         <tbody>
           <tr>
             <td>Sales</td>
-            <td>{data.sales}</td>
+            <td>{data?.salesTotal.toFixed(2)}</td>
           </tr>
           <tr>
             <td>Purchases</td>
-            <td>{data.purchases}</td>
+            <td>{data?.purchasesTotal.toFixed(2)}</td>
           </tr>
           <tr>
             <td>Expenses</td>
-            <td>{data.expenses}</td>
+            <td>{data?.expensesTotal.toFixed(2)}</td>
           </tr>
           <tr>
             <td>Profit</td>
-            <td>{data.profit}</td>
+            <td>{data?.profit.toFixed(2)}</td>
           </tr>
           <tr>
             <td>Purchase Return</td>
-            <td>{data.purchaseReturn}</td>
+            <td>{0}</td>
           </tr>
           <tr>
             <td>Sales Return</td>
-            <td>{data.salesReturn}</td>
+            <td>{0}</td>
           </tr>
         </tbody>
       </Table>

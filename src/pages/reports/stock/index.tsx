@@ -1,77 +1,107 @@
 import Layout from '@/components/Layout';
-import { Group, Title, Image, TextInput, Table, Center } from '@mantine/core';
+import { trpc } from '@/utils/trpc';
+import {
+  Group,
+  Title,
+  Image,
+  TextInput,
+  Table,
+  Center,
+  Pagination,
+} from '@mantine/core';
 import { IconSearch } from '@tabler/icons';
 import React, { useState } from 'react';
 
-const data = [
-  {
-    id: '1',
-    name: 'Product 1',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    category: 'Category 1',
-    brand: 'Brand 1',
-    purchasePrice: 100,
-    salesPrice: 200,
-    currentStock: 100,
-    stockvaluebypurchase: 10000,
-    stockvaluebysales: 20000,
-  },
-  {
-    id: '2',
-    name: 'Product 2',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    category: 'Category 1',
-    brand: 'Brand 1',
-    purchasePrice: 100,
-    salesPrice: 200,
-    currentStock: 100,
-    stockvaluebypurchase: 10000,
-    stockvaluebysales: 20000,
-  },
-  {
-    id: '3',
-    name: 'Product 3',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    category: 'Category 1',
-    brand: 'Brand 1',
-    purchasePrice: 100,
-    salesPrice: 200,
-    currentStock: 100,
-    stockvaluebypurchase: 10000,
-    stockvaluebysales: 20000,
-  },
-  {
-    id: '4',
-    name: 'Product 4',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    category: 'Category 1',
-    brand: 'Brand 1',
-    purchasePrice: 100,
-    salesPrice: 200,
-    currentStock: 100,
-    stockvaluebypurchase: 10000,
-    stockvaluebysales: 20000,
-  },
-  {
-    id: '5',
-    name: 'Product 5',
-    logo: 'https://picsum.photos/seed/picsum/200/300',
-    itemCode: '123456',
-    category: 'Category 1',
-    brand: 'Brand 1',
-    purchasePrice: 100,
-    salesPrice: 200,
-    currentStock: 100,
-    stockvaluebypurchase: 10000,
-    stockvaluebysales: 20000,
-  },
-];
+type StockReport = {
+  id: string;
+  name: string;
+  logo: string;
+  itemCode: string;
+  category: string;
+  brand: string;
+  purchasePrice: number;
+  salesPrice: number;
+  currentStock: number;
+  stockvaluebypurchase: number;
+  stockvaluebysales: number;
+};
 
 const Index = () => {
+  const [page, setPage] = React.useState(1);
+
+  const stockReport = trpc.reports.stockReport.useInfiniteQuery(
+    { limit: 10 },
+    {
+      getNextPageParam: () => page,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  React.useEffect(() => {
+    if (!stockReport.data?.pages.find((pageData) => pageData?.page === page)) {
+      stockReport.fetchNextPage();
+    }
+  }, [stockReport, page]);
+
+  const data = React.useMemo(() => {
+    const pageData = stockReport.data?.pages.find(
+      (pageData) => pageData?.page === page
+    );
+
+    if (!pageData) {
+      return [];
+    }
+
+    const product = new Map<string, StockReport>();
+
+    pageData.docs.forEach((doc) => {
+      doc.products.forEach((productDoc) => {
+        const id = (
+          productDoc._id as unknown as { _id: string }
+        )?._id.toString();
+
+        if (!id) return;
+
+        const existingProduct = product.get(id);
+        const isSale = 'customer' in doc;
+        if (existingProduct) {
+          product.set(id, {
+            ...existingProduct,
+            stockvaluebypurchase: !isSale
+              ? existingProduct.stockvaluebypurchase
+              : existingProduct.stockvaluebypurchase + productDoc.price,
+            stockvaluebysales: isSale
+              ? existingProduct.stockvaluebysales
+              : existingProduct.stockvaluebysales + productDoc.price,
+          });
+        } else {
+          product.set(id, {
+            id,
+            name: (productDoc._id as unknown as { name: string }).name,
+            logo: (productDoc._id as unknown as { logo: string }).logo,
+            itemCode: (productDoc._id as unknown as { itemCode: string })
+              .itemCode,
+            category: (productDoc._id as unknown as { category: string })
+              .category,
+            brand: (productDoc._id as unknown as { brand: string }).brand,
+            purchasePrice: (
+              productDoc._id as unknown as { purchasePrice: number }
+            ).purchasePrice,
+            salesPrice: (productDoc._id as unknown as { salePrice: number })
+              .salePrice,
+            currentStock: productDoc.quantity,
+            stockvaluebypurchase: !isSale ? productDoc.price : 0,
+            stockvaluebysales: isSale ? productDoc.price : 0,
+          });
+        }
+      });
+    });
+
+    const data = Array.from(product.values());
+
+    return data;
+  }, [stockReport.data, page]);
+
   const [filteredData, setFilteredData] = useState(data);
   const [search, setSearch] = useState('');
 
@@ -89,6 +119,10 @@ const Index = () => {
       )
     );
   };
+
+  React.useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
 
   const rows = filteredData.map((item) => {
     return (
@@ -190,6 +224,21 @@ const Index = () => {
           </thead>
           <tbody>{rows}</tbody>
         </Table>
+      </Center>
+      <Center>
+        {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              stockReport.data?.pages.find(
+                (pageData) => pageData?.page === page
+              )?.totalPages ?? 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        )}
       </Center>
     </Layout>
   );
