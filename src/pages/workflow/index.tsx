@@ -1,26 +1,26 @@
-// import type { ModalProps } from '@mantine/core';
-// import { ScrollArea } from '@mantine/core';
-// import {
-//   ActionIcon,
-//   Button,
-//   Container,
-//   Divider,
-//   Group,
-//   Modal,
-//   MultiSelect,
-//   Table,
-//   Title,
-// } from '@mantine/core';
-// import React, { useState } from 'react';
-// import { IconPencil } from '@tabler/icons';
-// import { z } from 'zod';
-// import { Form, Formik } from 'formik';
-// import { toFormikValidationSchema } from 'zod-formik-adapter';
-// import FormInput from '@/components/FormikCompo/FormikInput';
-// import FormikSwitch from '@/components/FormikCompo/FormikSwitch';
-// import type { RouterOutputs } from '@/utils/trpc';
-// import { trpc } from '@/utils/trpc';
-// import FormikSelect from '@/components/FormikCompo/FormikSelect';
+import type { ModalProps } from '@mantine/core';
+import { ScrollArea } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  Container,
+  Divider,
+  Group,
+  Modal,
+  MultiSelect,
+  Table,
+  Title,
+} from '@mantine/core';
+import React, { useState } from 'react';
+import { IconPencil } from '@tabler/icons';
+import { z } from 'zod';
+import { Form, Formik } from 'formik';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import FormInput from '@/components/FormikCompo/FormikInput';
+import FormikSwitch from '@/components/FormikCompo/FormikSwitch';
+import type { RouterOutputs } from '@/utils/trpc';
+import { trpc } from '@/utils/trpc';
+import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Layout from '@/components/Layout';
 
 // const LinkStatus = ({
@@ -45,7 +45,10 @@ import Layout from '@/components/Layout';
 //               linkedStatus: values.linkedStatus,
 //               target: values.target,
 //             })
-//             .then(() => setSubmitting(false));
+//             .then(() => {
+//               setSubmitting(false);
+//               modalProps.onClose();
+//             });
 //         }}
 //         validationSchema={toFormikValidationSchema(
 //           z.object({
@@ -103,7 +106,10 @@ import Layout from '@/components/Layout';
 //               linkedStatus: values.linkedStatus,
 //               target: values.target,
 //             })
-//             .then(() => setSubmitting(false));
+//             .then(() => {
+//               setSubmitting(false);
+//               modalProps.onClose();
+//             });
 //         }}
 //         validationSchema={toFormikValidationSchema(
 //           z.object({
@@ -301,14 +307,26 @@ import Layout from '@/components/Layout';
 //           </Table>
 //         </ScrollArea>
 //         <LinkStatus
-//           modalProps={{ opened: link, onClose: () => setLink(false) }}
+//           modalProps={{
+//             opened: link,
+//             onClose: () => {
+//               workflow.refetch();
+//               setLink(false);
+//             },
+//           }}
 //           data={workflow.data?.map((val) => ({
 //             value: val.id,
 //             label: val.name,
 //           }))}
 //         />
 //         <RemoveLink
-//           modalProps={{ opened: remove, onClose: () => setRemove(false) }}
+//           modalProps={{
+//             opened: remove,
+//             onClose: () => {
+//               workflow.refetch();
+//               setRemove(false);
+//             },
+//           }}
 //           data={workflow.data}
 //         />
 //       </Container>
