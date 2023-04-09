@@ -19,6 +19,7 @@ export const Permissions = [
   'STOCKTRANSFER',
   'PURCHASE',
   'REPORT',
+  'SALE_RETURN',
 ] as const;
 
 export const Roles = ['ADMIN'] as const;
@@ -46,4 +47,5 @@ export const PermissionsLabels: Record<PermissionsUnion, string> = {
   STOCKTRANSFER: 'Stock Transfer',
   PURCHASE: 'Purchase',
   REPORT: 'Reports',
+  SALE_RETURN: 'Sale Return',
 };
