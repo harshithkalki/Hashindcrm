@@ -6,86 +6,80 @@ import { ZPurchaseReturnCreateInput } from '@/zobjs/purchaseReturn';
 import { z } from 'zod';
 
 export const purchaseReturnRouter = router({
-    create: protectedProcedure.input(
-        ZPurchaseReturnCreateInput
-    ).mutation(async ({ input, ctx }) => {
-        const client = await checkPermission(
-            'PURCHASE_RETURN',
-            {
-                create: true,
+  create: protectedProcedure
+    .input(ZPurchaseReturnCreateInput)
+    .mutation(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'PURCHASE',
+        {
+          create: true,
+        },
+        ctx.clientId,
+        "You don't have permission to create purchase returns"
+      );
+
+      const purchaseReturn = await PurchaseReturn.create({
+        ...input,
+        company: client.company,
+      });
+
+      await Promise.all(
+        input.products.map(async (product) => {
+          const productModel = await Product.findOne({
+            _id: product._id,
+          });
+
+          if (!productModel) {
+            throw new Error('Product not found');
+          }
+
+          await productModel.updateOne({
+            $inc: {
+              quantity: -product.quantity,
             },
-            ctx.clientId,
-            "You don't have permission to create purchase returns"
-        );
+          });
+        })
+      );
 
-        const purchaseReturn = await PurchaseReturn.create({
-            ...input,
-            company: client.company,
-        });
-
-        await Promise.all(
-            input.products.map(async (product) => {
-                const productModel = await Product.findOne({
-                    _id: product._id,
-                });
-
-                if (!productModel) {
-                    throw new Error('Product not found');
-                }
-
-                await productModel.updateOne({
-                    $inc: {
-                        quantity: -product.quantity,
-                    },
-                });
-            })
-        );
-
-        return purchaseReturn;
+      return purchaseReturn;
     }),
 
-    purchaseReturns: protectedProcedure
-        .input(z.object({
-            cursor: z.number().optional(),
-            limit: z.number().optional(),
-        }))
-        .query(async ({ input, ctx }) => {
-            const client = await checkPermission(
-                'PURCHASE_RETURN',
-                {
-                    read: true,
-                },
-                ctx.clientId,
-                "You don't have permission to read purchase returns"
-            );
+  purchaseReturns: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'PURCHASE',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read purchase returns"
+      );
 
-            const { cursor: page, limit = 10 } = input || {};
+      const { cursor: page, limit = 10 } = input || {};
 
-            const options = {
-                page: page ?? 1,
-                limit: limit,
-                sort: {
-                    createdAt: -1,
-                },
-            };
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+        sort: {
+          createdAt: -1,
+        },
+      };
 
-            const query = {
-                company: client.company,
-            };
+      const query = {
+        company: client.company,
+      };
 
+      const purchaseReturns = await PurchaseReturn.paginate(query, {
+        ...options,
+        lean: true,
+      });
 
-            const purchaseReturns = await PurchaseReturn.paginate(query, {
-                ...options,
-                lean: true,
-            });
-
-
-            return purchaseReturns;
-
-        }),
-
-
+      return purchaseReturns;
+    }),
 });
-
-
-

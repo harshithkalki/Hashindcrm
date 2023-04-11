@@ -105,9 +105,9 @@ const Index = () => {
                   })) ?? []
               }
               colProps={{
-                invoiceId: {
-                  label: 'Invoice ID',
-                },
+                // invoiceId: {
+                //   label: 'Invoice ID',
+                // },
                 date: {
                   label: 'Date',
                 },
@@ -120,27 +120,27 @@ const Index = () => {
                 total: {
                   label: 'Total Amount',
                 },
-                _id: {
-                  label: 'Show Invoice',
-                  Component: ({ data }) => (
-                    <Group position='center'>
-                      <ActionIcon
-                        color={'blue'}
-                        variant='filled'
-                        onClick={() => {
-                          setInvoiceId(data._id);
-                        }}
-                      >
-                        <IconEye size='1.125rem' />
-                      </ActionIcon>
-                    </Group>
-                  ),
-                },
+                // _id: {
+                //   label: 'Show Invoice',
+                //   Component: ({ data }) => (
+                //     <Group position='center'>
+                //       <ActionIcon
+                //         color={'blue'}
+                //         variant='filled'
+                //         onClick={() => {
+                //           setInvoiceId(data._id);
+                //         }}
+                //       >
+                //         <IconEye size='1.125rem' />
+                //       </ActionIcon>
+                //     </Group>
+                //   ),
+                // },
               }}
-              editable
-              onEdit={(id) => {
-                setEditId(id);
-              }}
+              // editable
+              // onEdit={(id) => {
+              //   setEditId(id);
+              // }}
             />
             <Center>
               {(sales.data?.pages.find((pageData) => pageData.page === page)
