@@ -55,8 +55,8 @@ const Index = () => {
     }
   }, [sales, page]);
 
-  console.log('aaaaaaaaa');
-  console.log(invoice.data);
+  // console.log('aaaaaaaaa');
+  // console.log(invoice.data);
 
   return (
     <>

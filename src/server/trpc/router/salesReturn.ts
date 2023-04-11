@@ -3,13 +3,16 @@ import { ZSaleReturnCreateInput } from '@/zobjs/saleReturn';
 import { protectedProcedure, router } from '../trpc';
 import checkPermission from '@/utils/checkPermission';
 import Product from '@/models/Product';
+import { z } from 'zod';
+import mongoose from 'mongoose';
+import Customer from '@/models/Customer';
 
 export const saleReturnRouter = router({
   create: protectedProcedure
     .input(ZSaleReturnCreateInput)
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
-        'SALE_RETURN',
+        'SALES',
         {
           create: true,
         },
@@ -19,7 +22,7 @@ export const saleReturnRouter = router({
 
       const saleReturn = await SaleReturn.create({
         ...input,
-        clientId: client.id,
+        company: client.company,
       });
 
       await Promise.all(
@@ -41,5 +44,60 @@ export const saleReturnRouter = router({
       );
 
       return saleReturn;
+    }),
+
+  returns: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.number().optional(),
+        limit: z.number().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'SALES',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const { cursor: page, limit = 10 } = input || {};
+
+      const options = {
+        page: page ?? 1,
+        limit: limit,
+        sort: {
+          createdAt: -1,
+        },
+      };
+
+      const query = {
+        company: client.company,
+      };
+
+      const brands = await SaleReturn.paginate(query, {
+        ...options,
+        lean: true,
+      });
+
+      const brandsWithCustomer = await Promise.all(
+        brands.docs.map(async (brand) => {
+          if (mongoose.isValidObjectId(brand.customer)) {
+            const customer = await Customer.findOne({
+              _id: brand.customer,
+            }).lean();
+            return { ...brand, customer: customer ?? 'Walk in Customer' };
+          }
+
+          return { ...brand, customer: 'Walk in Customer' };
+        })
+      );
+
+      return {
+        ...brands,
+        docs: brandsWithCustomer,
+      };
     }),
 });

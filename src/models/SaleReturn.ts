@@ -45,14 +45,6 @@ const SaleReturnSchema: Schema = new Schema<ISaleReturn, SaleReturnModel>(
 
 SaleReturnSchema.plugin(mongoosePaginate);
 
-SaleReturnSchema.index(
-  {
-    invoiceId: 1,
-    company: 1,
-  },
-  { unique: true }
-);
-
 export default (mongoose.models.SaleReturn as ReturnType<
   typeof mongoose.model<ISaleReturn, mongoose.PaginateModel<ISaleReturn>>
 >) ||
