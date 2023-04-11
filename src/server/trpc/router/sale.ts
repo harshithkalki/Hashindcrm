@@ -188,8 +188,8 @@ export const saleRouter = router({
         ...sale,
         customer: mongoose.isValidObjectId(sale?.customer)
           ? await Customer.findOne({
-              _id: sale?.customer,
-            }).lean()
+            _id: sale?.customer,
+          }).lean()
           : 'Walk in Customer',
       };
     }),
@@ -225,13 +225,13 @@ export const saleRouter = router({
         company: client.company,
       };
 
-      const brands = await Sale.paginate(query, {
+      const sales = await Sale.paginate(query, {
         ...options,
         lean: true,
       });
 
-      const brandsWithCustomer = await Promise.all(
-        brands.docs.map(async (brand) => {
+      const salesWithCustomer = await Promise.all(
+        sales.docs.map(async (brand) => {
           if (mongoose.isValidObjectId(brand.customer)) {
             const customer = await Customer.findOne({
               _id: brand.customer,
@@ -244,8 +244,8 @@ export const saleRouter = router({
       );
 
       return {
-        ...brands,
-        docs: brandsWithCustomer,
+        ...sales,
+        docs: salesWithCustomer,
       };
     }),
 
@@ -312,8 +312,8 @@ export const saleRouter = router({
           })),
           customer: mongoose.isValidObjectId(sale?.customer)
             ? await Customer.findOne({
-                _id: sale?.customer,
-              }).lean()
+              _id: sale?.customer,
+            }).lean()
             : 'Walk in Customer',
         };
       }

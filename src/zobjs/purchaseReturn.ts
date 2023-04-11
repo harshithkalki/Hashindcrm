@@ -20,18 +20,13 @@ export const ZPurchaseReturnCreateInput = z.object({
   paymentMode: z.enum(['cash', 'card', 'upi']),
 });
 
-export const ZPurchaseReturnUpdateInput =
-  ZPurchaseReturnCreateInput.partial().extend({
-    id: z.string(),
-  });
+export const ZPurchaseReturnUpdateInput = ZPurchaseReturnCreateInput.partial().extend({
+  id: z.string(),
+});
 
-export type PurchaseReturnCreateInput = z.infer<
-  typeof ZPurchaseReturnCreateInput
->;
+export type PurchaseReturnCreateInput = z.infer<typeof ZPurchaseReturnCreateInput>;
 
-export type PurchaseReturnUpdateInput = z.infer<
-  typeof ZPurchaseReturnUpdateInput
->;
+export type PurchaseReturnUpdateInput = z.infer<typeof ZPurchaseReturnUpdateInput>;
 
 export const ZPurchaseReturn = ZPurchaseReturnCreateInput.extend({
   createdAt: z.string(),
