@@ -162,12 +162,12 @@ export const navData: NavData[] = [
   //   icon: IconFileAnalytics,
   //   permissionName: 'WORKFLOW',
   // },
-  // {
-  //   links: '/tickets',
-  //   label: 'Tickets',
-  //   icon: IconReceipt2,
-  //   permissionName: 'TICKET',
-  // },
+  {
+    links: '/tickets',
+    label: 'Tickets',
+    icon: IconReceipt2,
+    permissionName: 'TICKET',
+  },
   { links: Stockdata, label: 'Stock', icon: IconReceipt2 },
   { links: '/pos', label: 'POS', icon: IconReceipt2, permissionName: 'POS' },
   { links: PartiesData, label: 'Parties', icon: IconReceipt2 },

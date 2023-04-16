@@ -21,6 +21,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import DropzoneComp from '@/components/DropZone';
+import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 // import Superscript from '@tiptap/extension-superscript';
 // import SubScript from '@tiptap/extension-subscript';
 
@@ -104,7 +105,7 @@ const AddnewTicket = ({
                 }))}
               />
             </SimpleGrid>
-            <RichTextEditor editor={editor}>
+            {/* <RichTextEditor editor={editor}>
               <RichTextEditor.Toolbar>
                 <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Bold />
@@ -121,7 +122,14 @@ const AddnewTicket = ({
                 </RichTextEditor.ControlsGroup>
               </RichTextEditor.Toolbar>
               <RichTextEditor.Content />
-            </RichTextEditor>
+            </RichTextEditor> */}
+            <Formiktextarea
+              name='description'
+              label='Description'
+              placeholder='Enter Description'
+              withAsterisk
+              mb={'md'}
+            />
 
             <DropzoneComp />
 

@@ -10,12 +10,13 @@ export default function DropzoneComp(props: Partial<DropzoneProps>) {
       onDrop={(files) => console.log('accepted files', files)}
       onReject={(files) => console.log('rejected files', files)}
       maxSize={3 * 1024 ** 2}
+      h={220}
       accept={IMAGE_MIME_TYPE}
       {...props}
     >
       <Group
         position='center'
-        spacing='xl'
+        spacing='lg'
         style={{ minHeight: 220, pointerEvents: 'none' }}
       >
         <Dropzone.Accept>
