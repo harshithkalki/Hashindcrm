@@ -93,7 +93,7 @@ export default function TableSelection<T>({
   editDeleteColumnProps: { groupProps } = {},
   colProps,
 }: TableSelectionProps<T>) {
-  const { classes, cx } = useStyles();
+  const { classes, cx, theme } = useStyles();
   const [filteredData, setFilteredData] = useState(data);
   const [search, setSearch] = useState('');
   const [selection, setSelection] = useState<string[]>([]);
@@ -223,14 +223,24 @@ export default function TableSelection<T>({
         }}
       />
 
-      <ScrollArea w='100%'>
-        <Container w={'100%'} p={'sm'}>
+      <ScrollArea style={{ flex: 1 }} w='100%'>
+        <Container w={'100%'}>
           <Table
             sx={{ minWidth: '100%' }}
             verticalSpacing='sm'
             hidden={filteredData.length === 0}
+            style={{
+              position: 'relative',
+            }}
           >
-            <thead>
+            <thead
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+                backgroundColor: theme.colors.dark[8],
+              }}
+            >
               <tr>
                 {keys(colProps)?.map((item) => (
                   <th

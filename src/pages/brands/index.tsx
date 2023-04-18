@@ -10,6 +10,7 @@ import {
   Pagination,
   Title,
   Image,
+  Flex,
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import FormInput from '@/components/FormikCompo/FormikInput';
@@ -191,7 +192,7 @@ const Brand = () => {
       {Boolean(editId) && (
         <EditBrand _id={editId} onClose={() => setEditId('')} />
       )}
-      <Container mt={'xs'}>
+      <Flex mt={'xs'} h='100%' direction={'column'}>
         <Group style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Brands</Title>
           <Button size='xs' onClick={() => setModal(true)}>
@@ -249,7 +250,7 @@ const Brand = () => {
           editable
           deletable
         />
-        <Center>
+        <Center mb='lg'>
           {(brands.data?.pages.find((pageData) => pageData.page === page)
             ?.totalPages ?? 0) > 1 && (
             <Pagination
@@ -264,7 +265,7 @@ const Brand = () => {
             />
           )}
         </Center>
-      </Container>
+      </Flex>
     </>
   );
 };
