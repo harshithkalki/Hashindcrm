@@ -99,7 +99,8 @@ export const categoryRouter = router({
       return category;
     }),
 
-  getAllCategories: protectedProcedure.query(async ({ ctx }) => {
+  getAllCategories: protectedProcedure.query(async ({ ctx, }) => {
+
     const client = await checkPermission(
       'CATEGORY',
       {
@@ -170,4 +171,62 @@ export const categoryRouter = router({
 
     return csv;
   }),
+
+  getChildCategories: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'CATEGORY',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        'You are not permitted to read categorys'
+      );
+
+      const categories = await CategoryModel.find({
+        company: client.company,
+        parentCategory: input._id,
+      });
+
+      return categories;
+    }),
+
+  getrootCategories: protectedProcedure.input(z.object({
+    cursor: z.number().nullish(),
+    limit: z.number().optional(),
+    search: z.string().optional(),
+  })).query(async ({ ctx, input }) => {
+    const client = await checkPermission(
+      'CATEGORY',
+      {
+        read: true,
+      },
+      ctx.clientId,
+      'You are not permitted to read categorys'
+    );
+
+
+    const { cursor: page, limit = 10, search } = input || {};
+
+    const options = {
+      page: page ?? 1,
+      limit: limit,
+    };
+
+    const query = {
+      company: client.company,
+      parentCategory: null,
+      ...(search && { name: { $regex: search, $options: 'i' } }),
+    };
+
+    const categories = await CategoryModel.paginate(query, options);
+
+    return categories;
+  }
+  ),
 });

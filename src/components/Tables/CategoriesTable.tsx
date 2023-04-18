@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   createStyles,
   Table,
@@ -73,14 +73,26 @@ export function TableSort({ data, onEdit }: TableSortProps) {
     );
   };
 
-  function RowMap({ data }: { data: Category }) {
-    const childrenRows = data.children ? rowdatamap(data.children) : null;
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
+
+  function RowMap({ data: parent }: { data: Category }) {
+    const children = trpc.categoryRouter.getChildCategories.useQuery({
+      _id: parent._id,
+    });
+    const childrenRows = children.data
+      ? rowdatamap(
+          children.data.map((val) => ({ ...val, _id: val._id.toString() }))
+        )
+      : null;
     const [hide, setHide] = useState(true);
+
     return (
       <>
         <tr>
           <td>
-            {data.children && data.children.length > 0 && (
+            {children && (children.data?.length ?? 0) > 0 && (
               <ActionIcon onClick={() => setHide(!hide)}>
                 {hide ? (
                   <IconPlus size={16} stroke={1.5} />
@@ -92,38 +104,36 @@ export function TableSort({ data, onEdit }: TableSortProps) {
           </td>
           <td>
             <Image
-              src={data.logo}
+              src={parent.logo}
               alt={'brand'}
               radius='lg'
               style={{ width: 32, height: 32 }}
               withPlaceholder
             />
           </td>
-          <td>{data.name}</td>
+          <td>{parent.name}</td>
           <td>
             <Group spacing={0}>
-              <ActionIcon onClick={() => onEdit(data._id)}>
+              <ActionIcon onClick={() => onEdit(parent._id)}>
                 <IconPencil size={16} stroke={1.5} />
               </ActionIcon>
 
               <ActionIcon
                 color='red'
-                onClick={() => deleteCategory.mutateAsync({ id: data._id })}
+                onClick={() => deleteCategory.mutateAsync({ id: parent._id })}
               >
                 <IconTrash size={16} stroke={1.5} />
               </ActionIcon>
             </Group>
           </td>
         </tr>
-        {data.children && data.children.length > 0 && !hide && childrenRows}
+        {children && (children.data?.length ?? 0) > 0 && !hide && childrenRows}
       </>
     );
   }
 
   function rowdatamap(data: Category[]): JSX.Element[] {
     const rows = data.map((row, index) => {
-      // const returndata = RowMap(row);
-      // return returndata;
       return <RowMap data={row} key={index} />;
     });
 

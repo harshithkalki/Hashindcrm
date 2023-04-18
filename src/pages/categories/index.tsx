@@ -1,12 +1,15 @@
 import CategoriesTable from '@/components/Tables/CategoriesTable';
 import {
   Button,
+  Center,
   Container,
   Divider,
   FileInput,
+  Flex,
   Group,
   Loader,
   Modal,
+  Pagination,
   Title,
 } from '@mantine/core';
 import React, { useMemo } from 'react';
@@ -197,37 +200,33 @@ const EditCategory = ({
 
 const Index = () => {
   const [modal, setModal] = React.useState(false);
-  const allCategories = trpc.categoryRouter.getAllCategories.useQuery(
-    undefined,
+  const [page, setPage] = React.useState(1);
+  const rootCategories = trpc.categoryRouter.getrootCategories.useInfiniteQuery(
+    { limit: 10 },
     {
+      getNextPageParam: () => page,
       refetchOnWindowFocus: false,
     }
   );
+
+  React.useEffect(() => {
+    if (
+      !rootCategories.data?.pages.find((pageData) => pageData.page === page)
+    ) {
+      rootCategories.fetchNextPage();
+    }
+  }, [rootCategories, page]);
+
   const [editId, setEditId] = React.useState<string | null>(null);
 
-  const parsedData = useMemo(
-    () =>
-      convertToCategory(
-        allCategories.data?.map((val) => ({
-          _id: val._id.toString(),
-          name: val.name,
-          slug: val.slug,
-          logo: val.logo,
-          parentCategory: val.parentCategory?.toString(),
-          company: val.company.toString(),
-        })) || []
-      ),
-    [allCategories.data]
-  );
-
-  if (allCategories.isLoading) return <div>Loading...</div>;
+  if (rootCategories.isLoading) return <div>Loading...</div>;
 
   return (
     <Layout>
       <AddCategory
         onClose={() => {
           setModal(false);
-          allCategories.refetch();
+          rootCategories.refetch();
         }}
         opened={modal}
       />
@@ -236,12 +235,12 @@ const Index = () => {
         <EditCategory
           onClose={() => {
             setEditId(null);
-            allCategories.refetch();
+            rootCategories.refetch();
           }}
           _id={editId}
         />
       )}
-      <Container mt={'xs'}>
+      <Flex mt={'xs'} direction={'column'} h='100%'>
         <Group style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Categories</Title>
           <Group>
@@ -267,8 +266,35 @@ const Index = () => {
           </Group>
         </Group>
         <Divider mt={'xl'} />
-        <CategoriesTable data={parsedData} onEdit={setEditId} />
-      </Container>
+        <CategoriesTable
+          data={
+            rootCategories.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((doc) => ({
+                ...doc,
+                _id: doc._id.toString(),
+              })) || []
+          }
+          onEdit={setEditId}
+        />
+        <Center mb='lg'>
+          {(rootCategories.data?.pages.find(
+            (pageData) => pageData.page === page
+          )?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                rootCategories.data?.pages.find(
+                  (pageData) => pageData.page === page
+                )?.totalPages ?? 0
+              }
+              initialPage={1}
+              // {...pagination}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Flex>
     </Layout>
   );
 };

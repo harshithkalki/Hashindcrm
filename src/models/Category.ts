@@ -1,6 +1,7 @@
 import type { ZCategory } from '@/zobjs/category';
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import type { z } from 'zod';
 
 export type ICategory = ModifyDeep<
@@ -31,8 +32,10 @@ const CategorySchema: Schema = new Schema<ICategory, CategoryModel>(
   }
 );
 
+CategorySchema.plugin(mongoosePaginate);
+
 CategorySchema.index({ name: 1, companyId: 1 }, { unique: true });
 
 export default (mongoose.models.Category as ReturnType<
-  typeof mongoose.model<ICategory, CategoryModel>
->) || mongoose.model<ICategory, CategoryModel>('Category', CategorySchema);
+  typeof mongoose.model<ICategory, mongoose.PaginateModel<ICategory>>
+>) || mongoose.model<ICategory, mongoose.PaginateModel<ICategory>>('Category', CategorySchema);
