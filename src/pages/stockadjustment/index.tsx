@@ -3,7 +3,6 @@ import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
-import StockadjustmentTable from '@/components/Tables/StockAdjustTable';
 import { trpc } from '@/utils/trpc';
 import { ZStockAdjustCreateInput } from '@/zobjs/stockAdjust';
 import {
