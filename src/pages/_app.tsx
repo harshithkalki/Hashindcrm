@@ -9,6 +9,30 @@ import { useRouter } from 'next/router';
 import { setClient } from '@/store/clientSlice';
 import { NotificationsProvider } from '@mantine/notifications';
 
+const HASHIND_COLORPALETTE: [
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string
+] = [
+  '#FDE4B7',
+  '#FDD897',
+  '#FCCD7A',
+  '#FCC25F',
+  '#FBB946',
+  '#FAB02F',
+  '#FAA819',
+  '#F89F05',
+  '#E49305',
+  '#D28705',
+];
+
 function UserContextProvider({ children }: { children: React.ReactNode }) {
   const me = trpc.auth.me.useQuery(undefined, {
     onError: (err) => {
@@ -43,6 +67,10 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
         withNormalizeCSS
         theme={{
           colorScheme: 'dark',
+          colors: {
+            company: HASHIND_COLORPALETTE,
+          },
+          primaryColor: 'company',
         }}
       >
         <div style={{ height: '100vh' }}>
@@ -66,20 +94,21 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
       withNormalizeCSS
       theme={{
         colorScheme: 'dark',
-
         colors: {
-          company: [
-            '',
-            me.data?.data.company?.primaryColor || '#faa819',
-            me.data?.data.company?.primaryColor || '#faa819',
-            me.data?.data.company?.primaryColor || '#faa819',
-            me.data?.data.company?.primaryColor || '#faa819',
-            me.data?.data.company?.secondaryColor || '#faa819',
-            '',
-            '',
-            me.data?.data.company?.primaryColor || '#faa819',
-            '',
-          ],
+          company: me.data?.data.company?.primaryColor
+            ? [
+                '',
+                me.data?.data.company?.primaryColor || '#faa819',
+                me.data?.data.company?.primaryColor || '#faa819',
+                me.data?.data.company?.primaryColor || '#faa819',
+                me.data?.data.company?.primaryColor || '#faa819',
+                me.data?.data.company?.secondaryColor || '#faa819',
+                '',
+                '',
+                me.data?.data.company?.primaryColor || '#faa819',
+                '',
+              ]
+            : HASHIND_COLORPALETTE,
         },
         primaryColor: 'company',
       }}
