@@ -4,7 +4,6 @@ import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
-import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
 import { ZStaffMemCreateInput } from '@/zobjs/staffMem';
 import {
@@ -370,51 +369,53 @@ const Index = () => {
     <Layout>
       <AddCustomer modal={modal} setModal={setModal} />
       {id && <UpdateCustomer id={id} setId={setId} />}
-      <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
-        <Title fw={400}>Staff Members</Title>
-        <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-          Add Staff Member
-        </Button>
-      </Group>
-      <TableSelection
-        data={
-          staffs.data?.pages
-            .find((pageData) => pageData.page === page)
-            ?.docs.map((val) => ({ ...val, _id: val._id.toString() })) ?? []
-        }
-        colProps={{
-          // name: 'Name',
-          // email: 'Email',
-          // status: 'Status',
-          name: {
-            label: 'Name',
-          },
-          email: {
-            label: 'Email',
-          },
-          status: {
-            label: 'Status',
-          },
-        }}
-        onEdit={(id) => {
-          setId(id);
-        }}
-        editable
-      />
-      <Center>
-        {(staffs.data?.pages.find((pageData) => pageData.page === page)
-          ?.totalPages ?? 0) > 1 && (
-          <Pagination
-            total={
-              staffs.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages ?? 0
-            }
-            initialPage={1}
-            page={page}
-            onChange={setPage}
-          />
-        )}
-      </Center>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my={'lg'} style={{ justifyContent: 'space-between' }}>
+          <Title fw={400}>Staff Members</Title>
+          <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+            Add Staff Member
+          </Button>
+        </Group>
+        <TableSelection
+          data={
+            staffs.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((val) => ({ ...val, _id: val._id.toString() })) ?? []
+          }
+          colProps={{
+            // name: 'Name',
+            // email: 'Email',
+            // status: 'Status',
+            name: {
+              label: 'Name',
+            },
+            email: {
+              label: 'Email',
+            },
+            status: {
+              label: 'Status',
+            },
+          }}
+          onEdit={(id) => {
+            setId(id);
+          }}
+          editable
+        />
+        <Center>
+          {(staffs.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                staffs.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages ?? 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Container>
     </Layout>
   );
 };

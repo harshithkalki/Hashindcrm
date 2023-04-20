@@ -320,7 +320,6 @@ const UpdateSupplier = ({
   if (supplier.status === 'loading' || !supplier.data)
     return <div>Loading...</div>;
 
-  // console.log(supplier.data);
   return (
     <Modal
       opened={Boolean(id)}
@@ -368,54 +367,56 @@ const Index = () => {
     <Layout>
       <AddSupplier modal={modal} setModal={setModal} onClose={onClose} />
       {id && <UpdateSupplier id={id} setId={setId} onClose={onClose} />}
-      <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
-        <Title fw={400}>Suppliers</Title>
-        <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-          Add Supplier
-        </Button>
-      </Group>
-      <TableSelection
-        data={
-          suppliers.data?.pages
-            .find((pageData) => pageData.page === page)
-            ?.docs.map((val) => ({
-              ...val,
-              _id: val._id.toString(),
-            })) ?? []
-        }
-        colProps={{
-          // name: 'Name',
-          // email: 'Email',
-          // status: 'Status',
-          name: {
-            label: 'Name',
-          },
-          email: {
-            label: 'Email',
-          },
-          status: {
-            label: 'Status',
-          },
-        }}
-        onEdit={(id) => {
-          setId(id);
-        }}
-        editable
-      />
-      <Center>
-        {(suppliers.data?.pages.find((pageData) => pageData.page === page)
-          ?.totalPages ?? 0) > 1 && (
-          <Pagination
-            total={
-              suppliers.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages ?? 0
-            }
-            initialPage={1}
-            page={page}
-            onChange={setPage}
-          />
-        )}
-      </Center>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my='lg' style={{ justifyContent: 'space-between' }}>
+          <Title fw={400}>Suppliers</Title>
+          <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+            Add Supplier
+          </Button>
+        </Group>
+        <TableSelection
+          data={
+            suppliers.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((val) => ({
+                ...val,
+                _id: val._id.toString(),
+              })) ?? []
+          }
+          colProps={{
+            // name: 'Name',
+            // email: 'Email',
+            // status: 'Status',
+            name: {
+              label: 'Name',
+            },
+            email: {
+              label: 'Email',
+            },
+            status: {
+              label: 'Status',
+            },
+          }}
+          onEdit={(id) => {
+            setId(id);
+          }}
+          editable
+        />
+        <Center>
+          {(suppliers.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                suppliers.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages ?? 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Container>
     </Layout>
   );
 };

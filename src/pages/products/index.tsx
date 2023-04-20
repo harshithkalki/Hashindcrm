@@ -1,18 +1,12 @@
-import {
-  Button,
-  Center,
-  Divider,
-  Group,
-  Pagination,
-  Title,
-  Image,
-} from '@mantine/core';
+import { Button, Center, Group, Pagination, Title, Image } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { client, trpc } from '@/utils/trpc';
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
 import { exportCSVFile } from '@/utils/jsonTocsv';
+import { Container } from '@mantine/core';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 export interface ProductFormType {
   name: string;
@@ -55,12 +49,18 @@ const Index = () => {
     }
   }, [products, page]);
 
-  if (products.isLoading) return <div>Loading...</div>;
+  if (products.isLoading) return <LoadingScreen />;
 
   return (
     <Layout>
-      <div style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
-        <Group style={{ justifyContent: 'space-between' }}>
+      <Container
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+        }}
+      >
+        <Group my='lg' style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Products</Title>
           <Group>
             <Button
@@ -109,7 +109,6 @@ const Index = () => {
             </Button>
           </Group>
         </Group>
-        <Divider mt={'xl'} />
         <TableSelection
           data={
             products.data?.pages
@@ -197,8 +196,7 @@ const Index = () => {
             />
           )}
         </Center>
-      </div>
-      {/* </Container> */}
+      </Container>
     </Layout>
   );
 };

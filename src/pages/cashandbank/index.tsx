@@ -3,17 +3,18 @@ import CashTable from '@/components/Cash,BankandUpi/CashTable';
 import UPITable from '@/components/Cash,BankandUpi/UPITable';
 import Layout from '@/components/Layout';
 
-import { Flex, Group, ScrollArea, Tabs, Title } from '@mantine/core';
+import { Container, Flex, Group, ScrollArea, Tabs, Title } from '@mantine/core';
 import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
 import React from 'react';
 
 const Index = () => {
   return (
     <Layout>
-      <Flex style={{ flexDirection: 'column' }}>
-        <Group mb={'md'}>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my='lg'>
           <Title fw={400}>Cash, Bank & UPI</Title>
         </Group>
+
         <Tabs defaultValue='cash'>
           <Tabs.List>
             <Tabs.Tab value='cash' icon={<IconBrandCashapp size={14} />}>
@@ -36,7 +37,7 @@ const Index = () => {
             <UPITable />
           </Tabs.Panel>
         </Tabs>
-      </Flex>
+      </Container>
     </Layout>
   );
 };

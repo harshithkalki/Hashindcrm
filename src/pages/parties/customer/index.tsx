@@ -2,7 +2,6 @@ import FormikInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
-import PartiesTable from '@/components/Tables/PartiesTable';
 import { trpc } from '@/utils/trpc';
 import {
   Button,
@@ -13,6 +12,7 @@ import {
   Image,
   Loader,
   Modal,
+  Pagination,
   SimpleGrid,
   Title,
 } from '@mantine/core';
@@ -323,7 +323,7 @@ const AddCustomer = ({ modal, setModal, onClose }: ModalProps) => {
 
 const UpdateCustomer = ({
   id,
-  setId,
+
   onClose,
 }: {
   id: string | null;
@@ -370,10 +370,14 @@ const UpdateCustomer = ({
 const Index = () => {
   const [modal, setModal] = React.useState(false);
   const [id, setId] = React.useState<string | null>(null);
-  const customers = trpc.customerRouter.customers.useQuery({
-    limit: 10,
-  });
-  console.log(customers.data);
+  const [page, setPage] = React.useState(1);
+  const customers = trpc.customerRouter.customers.useInfiniteQuery(
+    {
+      limit: 10,
+    },
+    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+  );
+
   const onClose = () => {
     setId(null);
     setModal(false);
@@ -386,50 +390,65 @@ const Index = () => {
       <AddCustomer modal={modal} setModal={setModal} onClose={onClose} />
 
       {id && <UpdateCustomer id={id} setId={setId} onClose={onClose} />}
-      <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
-        <Title fw={400}>Customers</Title>
-        <Group>
-          <Button
-            size='xs'
-            mr={'md'}
-            onClick={() => {
-              router.push('customer/cars');
-            }}
-          >
-            Show Customer Cars
-          </Button>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my={'lg'} style={{ justifyContent: 'space-between' }}>
+          <Title fw={400}>Customers</Title>
+          <Group>
+            <Button
+              size='xs'
+              mr={'md'}
+              onClick={() => {
+                router.push('customer/cars');
+              }}
+            >
+              Show Customer Cars
+            </Button>
 
-          <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-            Add Customer
-          </Button>
+            <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+              Add Customer
+            </Button>
+          </Group>
         </Group>
-      </Group>
-      <TableSelection
-        data={
-          customers.data?.docs.map((val) => ({
-            ...val,
-            _id: val._id.toString(),
-          })) ?? []
-        }
-        colProps={{
-          // name: 'Name',
-          // email: 'Email',
-          // status: 'Status',
-          name: {
-            label: 'Name',
-          },
-          email: {
-            label: 'Email',
-          },
-          status: {
-            label: 'Status',
-          },
-        }}
-        onEdit={(id) => {
-          setId(id);
-        }}
-        editable
-      />
+        <TableSelection
+          data={
+            customers.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((val) => ({
+                ...val,
+                _id: val._id.toString(),
+              })) ?? []
+          }
+          colProps={{
+            name: {
+              label: 'Name',
+            },
+            email: {
+              label: 'Email',
+            },
+            status: {
+              label: 'Status',
+            },
+          }}
+          onEdit={(id) => {
+            setId(id);
+          }}
+          editable
+        />
+        <Center>
+          {(customers.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                customers.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages ?? 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Container>
     </Layout>
   );
 };

@@ -1,7 +1,6 @@
 import Layout from '@/components/Layout';
-import CashandBankTable from '@/components/Tables/CashAndBankTable';
 import UserReportTable from '@/components/Tables/UserReportsTable.';
-import { Group, Tabs, Title } from '@mantine/core';
+import { Container, Group, Tabs, Title } from '@mantine/core';
 import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
 import React from 'react';
 
@@ -59,25 +58,27 @@ const userReportDate = [
 const Index = () => {
   return (
     <Layout>
-      <Group mb={'lg'}>
-        <Title fw={400}>User Report</Title>
-      </Group>
-      <Tabs defaultValue='customers'>
-        <Tabs.List>
-          <Tabs.Tab value='customers' icon={<IconBrandCashapp size={14} />}>
-            Customers
-          </Tabs.Tab>
-          <Tabs.Tab value='suppliers' icon={<IconBuildingBank size={14} />}>
-            Suppliers
-          </Tabs.Tab>
-        </Tabs.List>
-        <Tabs.Panel value='customers'>
-          <UserReportTable data={userReportDate} isCustomer={true} />
-        </Tabs.Panel>
-        <Tabs.Panel value='suppliers'>
-          <UserReportTable data={userReportDate} isCustomer={false} />
-        </Tabs.Panel>
-      </Tabs>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my={'lg'}>
+          <Title fw={400}>User Report</Title>
+        </Group>
+        <Tabs defaultValue='customers'>
+          <Tabs.List>
+            <Tabs.Tab value='customers' icon={<IconBrandCashapp size={14} />}>
+              Customers
+            </Tabs.Tab>
+            <Tabs.Tab value='suppliers' icon={<IconBuildingBank size={14} />}>
+              Suppliers
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='customers'>
+            <UserReportTable data={userReportDate} isCustomer={true} />
+          </Tabs.Panel>
+          <Tabs.Panel value='suppliers'>
+            <UserReportTable data={userReportDate} isCustomer={false} />
+          </Tabs.Panel>
+        </Tabs>
+      </Container>
     </Layout>
   );
 };

@@ -9,22 +9,30 @@ import {
   Container,
   Group,
   Pagination,
-  ScrollArea,
   Title,
 } from '@mantine/core';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
-  const getAllRoles = trpc.roleRouter.roles.useQuery({ page: page, limit: 10 });
+  const roles = trpc.roleRouter.roles.useQuery({ page: page, limit: 10 });
 
-  const tabData = getAllRoles.data;
-  const Data = tabData;
   const router = useRouter();
+
+  if (roles.isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Layout>
-      <Container h='100%'>
-        <Group mb={'lg'} position='apart'>
+      <Container
+        h='100%'
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Group mb={'lg'} mt='lg' position='apart'>
           <Title fw={400}>Roles</Title>
           <Button
             size='xs'
@@ -35,49 +43,39 @@ const Index = () => {
             Add Role
           </Button>
         </Group>
-        {Data && (
-          <ScrollArea style={{ height: '100%' }}>
-            <div>
-              {getAllRoles.isLoading ? (
-                <div>Loading...</div>
-              ) : (
-                <>
-                  <TableSelection
-                    data={Data.docs.map((val) => ({
-                      ...val,
-                      _id: val._id.toString(),
-                    }))}
-                    colProps={{
-                      _id: {
-                        label: 'S.NO',
-                        Component: ({ index }) => {
-                          return <>{index + 1}</>;
-                        },
-                      },
-                      name: {
-                        label: 'Name',
-                      },
-                    }}
-                    editable
-                    onEdit={(id) => {
-                      router.push(`/roles/edit/${id}`);
-                    }}
-                  />
-                  <Center>
-                    {getAllRoles.data.totalPages > 1 && (
-                      <Pagination
-                        total={getAllRoles.data?.totalPages}
-                        initialPage={1}
-                        page={page}
-                        onChange={setPage}
-                      />
-                    )}
-                  </Center>
-                </>
-              )}
-            </div>
-          </ScrollArea>
-        )}
+        <TableSelection
+          data={
+            roles.data?.docs.map((val) => ({
+              ...val,
+              _id: val._id.toString(),
+            })) ?? []
+          }
+          colProps={{
+            _id: {
+              label: 'S.NO',
+              Component: ({ index }) => {
+                return <>{index + 1}</>;
+              },
+            },
+            name: {
+              label: 'Name',
+            },
+          }}
+          editable
+          onEdit={(id) => {
+            router.push(`/roles/edit/${id}`);
+          }}
+        />
+        <Center>
+          {(roles.data?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={roles.data?.totalPages ?? 0}
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
       </Container>
     </Layout>
   );

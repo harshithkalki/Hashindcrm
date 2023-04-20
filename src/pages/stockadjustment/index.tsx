@@ -2,6 +2,7 @@ import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 import { ZStockAdjustCreateInput } from '@/zobjs/stockAdjust';
@@ -128,16 +129,7 @@ const Index = () => {
 
   const createAdjustment = trpc.stockAdjustRouter.create.useMutation();
 
-  if (stockadjustments.isLoading)
-    return (
-      <Layout>
-        <Center h='100%'>
-          <Loader />
-        </Center>
-      </Layout>
-    );
-
-  console.log(stockadjustments.data);
+  if (stockadjustments.isLoading) return <LoadingScreen />;
 
   return (
     <Layout>
@@ -154,8 +146,8 @@ const Index = () => {
           }}
         />
       </Modal>
-      <Container h='100%'>
-        <Group mb={'lg'} mt={'lg'} style={{ justifyContent: 'space-between' }}>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my='lg' style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Stock Adjustment</Title>
           <Button
             size='xs'

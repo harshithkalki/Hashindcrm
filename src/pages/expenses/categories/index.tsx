@@ -10,17 +10,15 @@ import {
   Pagination,
   Title,
 } from '@mantine/core';
-
 import { Form, Formik } from 'formik';
 import FormInput from '@/components/FormikCompo/FormikInput';
-
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
-// import { ZExpenseCreateInput } from '@/zobjs/expense';
 import type { z } from 'zod';
 import { trpc } from '@/utils/trpc';
 import type { ZExpenseCategoryCreateInput } from '@/zobjs/expenseCategory';
 import { useRouter } from 'next/router';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 type CreateExpenseCategory = z.infer<typeof ZExpenseCategoryCreateInput>;
 
@@ -181,12 +179,7 @@ const Index = () => {
       expenseCategories.fetchNextPage();
     }
   }, [expenseCategories, page]);
-  if (expenseCategories.isLoading)
-    return (
-      <Center h='100%'>
-        <Loader />
-      </Center>
-    );
+  if (expenseCategories.isLoading) return <LoadingScreen />;
 
   return (
     <Layout>
@@ -214,7 +207,7 @@ const Index = () => {
         />
       )}
       <Container>
-        <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
+        <Group my={'lg'} style={{ justifyContent: 'space-between' }}>
           <Title fw={300}>Expenses Category</Title>
           <Button
             size='xs'
@@ -226,58 +219,50 @@ const Index = () => {
             Add Category
           </Button>
         </Group>
-        {expenseCategories.isLoading ? (
-          <Loader />
-        ) : (
-          <>
-            <TableSelection
-              data={
-                expenseCategories?.data?.pages
-                  .find((pageData) => pageData.page === page)
-                  ?.docs.map((val) => ({
-                    ...val,
-                    _id: val._id.toString(),
-                  })) ?? []
+
+        <TableSelection
+          data={
+            expenseCategories?.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((val) => ({
+                ...val,
+                _id: val._id.toString(),
+              })) ?? []
+          }
+          colProps={{
+            name: {
+              label: 'Expense Category Name',
+            },
+            description: {
+              label: 'Description',
+            },
+          }}
+          key='_id'
+          deletable={true}
+          editable={true}
+          onDelete={(id) => {
+            deleteCategory.mutateAsync({ _id: id }).then(() => {
+              router.reload();
+            });
+          }}
+          onEdit={(id) => setEditId(id)}
+        />
+        <Center>
+          {(expenseCategories.data?.pages.find(
+            (pageData) => pageData.page === page
+          )?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                expenseCategories.data?.pages.find(
+                  (pageData) => pageData.page === page
+                )?.totalPages ?? 0
               }
-              colProps={{
-                // name: 'Expense Category Name',
-                // description: 'Description',
-                name: {
-                  label: 'Expense Category Name',
-                },
-                description: {
-                  label: 'Description',
-                },
-              }}
-              key='_id'
-              deletable={true}
-              editable={true}
-              onDelete={(id) => {
-                deleteCategory.mutateAsync({ _id: id }).then(() => {
-                  router.reload();
-                });
-              }}
-              // onEdit={(id) => console.log(id)}
-              onEdit={(id) => setEditId(id)}
+              initialPage={1}
+              page={page}
+              onChange={setPage}
             />
-            <Center>
-              {(expenseCategories.data?.pages.find(
-                (pageData) => pageData.page === page
-              )?.totalPages ?? 0) > 1 && (
-                <Pagination
-                  total={
-                    expenseCategories.data?.pages.find(
-                      (pageData) => pageData.page === page
-                    )?.totalPages ?? 0
-                  }
-                  initialPage={1}
-                  page={page}
-                  onChange={setPage}
-                />
-              )}
-            </Center>
-          </>
-        )}
+          )}
+        </Center>
       </Container>
     </Layout>
   );

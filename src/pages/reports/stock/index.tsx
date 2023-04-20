@@ -171,7 +171,6 @@ const Index = () => {
       <Group mb={'xl'}>
         <Title fw={400}>Stock Summary</Title>
       </Group>
-
       <TextInput
         placeholder='Search by any field'
         mb='md'

@@ -2,7 +2,6 @@ import {
   Button,
   Center,
   Container,
-  Divider,
   FileInput,
   Group,
   Loader,
@@ -10,7 +9,6 @@ import {
   Pagination,
   Title,
   Image,
-  Flex,
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import FormInput from '@/components/FormikCompo/FormikInput';
@@ -24,6 +22,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import type { BrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
 import { ZBrandCreateInput } from '@/zobjs/brand';
 import type { z } from 'zod';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const initialValues: BrandCreateInput = {
   name: '',
@@ -173,15 +172,10 @@ const Brand = () => {
     }
   }, [brands, page]);
 
-  if (brands.isLoading)
-    return (
-      <Center h='100%'>
-        <Loader />
-      </Center>
-    );
+  if (brands.isLoading) return <LoadingScreen />;
 
   return (
-    <>
+    <Layout>
       <AddBrand
         opened={modal}
         onClose={() => {
@@ -192,32 +186,13 @@ const Brand = () => {
       {Boolean(editId) && (
         <EditBrand _id={editId} onClose={() => setEditId('')} />
       )}
-      <Flex mt={'xs'} h='100%' direction={'column'}>
-        <Group style={{ justifyContent: 'space-between' }}>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my='lg' style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Brands</Title>
           <Button size='xs' onClick={() => setModal(true)}>
             Add Brand
           </Button>
         </Group>
-        <Divider mt={'xl'} />
-
-        {/* <TableSelection
-          data={
-            brands.data?.pages
-              .find((pageData) => pageData.page === page)
-              ?.docs.map((doc) => ({
-                ...doc,
-                _id: doc._id.toString(),
-              })) || []
-          }
-          keysandlabels={{
-            logo: 'Logo',
-            name: 'Name',
-          }}
-          onEdit={(id) => setEditId(id)}
-          editable
-          deletable
-        /> */}
         <TableSelection
           data={
             brands.data?.pages
@@ -265,15 +240,9 @@ const Brand = () => {
             />
           )}
         </Center>
-      </Flex>
-    </>
+      </Container>
+    </Layout>
   );
 };
 
-export default function Wrapper() {
-  return (
-    <Layout>
-      <Brand />
-    </Layout>
-  );
-}
+export default Brand;

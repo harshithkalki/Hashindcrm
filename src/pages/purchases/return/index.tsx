@@ -1,24 +1,21 @@
 import Layout from '@/components/Layout';
-import SalesForm from '@/components/SandCForm';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 import {
   Group,
   Title,
   Button,
-  ActionIcon,
   Pagination,
   ScrollArea,
   Center,
+  Container,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
 import _ from 'lodash';
-import SaleReturnForm from '@/components/SReturnFrom';
 import PurchaseReturnForm from '@/components/PReturnForm';
 
 const Index = () => {
@@ -57,9 +54,6 @@ const Index = () => {
     }
   }, [sales, page]);
 
-  // console.log('aaaaaaaaa');
-  // console.log(invoice.data);
-
   return (
     <>
       {invoice.data && (
@@ -77,85 +71,63 @@ const Index = () => {
             }}
           />
         )}
-        <div
+        <Container
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
-          <ScrollArea style={{ height: '100vh' }}>
-            <PurchaseReturnForm
-              modal={modal}
-              setModal={setModal}
-              isCustomer={true}
-              title={'Sales'}
-            />
-            <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
-              <Title fw={400}>Purchase Return</Title>
-              <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-                Add Return
-              </Button>
-            </Group>
-            <TableSelection
-              data={
-                sales.data?.pages
-                  .find((pageData) => pageData.page === page)
-                  ?.docs.map((val) => ({
-                    ...val,
-                    _id: val._id.toString(),
-                    date: dayjs(val.date).format('DD MMMM YYYY'),
-                    customer: _.get(val, 'customer.name', 'Walk-in Customer'),
-                    total: val.total.toFixed(),
-                  })) ?? []
-              }
-              colProps={{
-                date: {
-                  label: 'Date',
-                },
-                supplier: {
-                  label: 'Supplier',
-                },
-                status: {
-                  label: 'Payment Status',
-                },
-                total: {
-                  label: 'Total Amount',
-                },
-                // _id: {
-                //   label: 'Show Invoice',
-                //   Component: ({ data }) => (
-                //     <Group position='center'>
-                //       <ActionIcon
-                //         color={'blue'}
-                //         variant='filled'
-                //         onClick={() => {
-                //           setInvoiceId(data._id);
-                //         }}
-                //       >
-                //         <IconEye size='1.125rem' />
-                //       </ActionIcon>
-                //     </Group>
-                //   ),
-                // },
-              }}
-              // editable
-              // onEdit={(id) => {
-              //   setEditId(id);
-              // }}
-            />
-            <Center>
-              {(sales.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages ?? 0) > 1 && (
-                <Pagination
-                  total={
-                    sales.data?.pages.find((pageData) => pageData.page === page)
-                      ?.totalPages ?? 0
-                  }
-                  initialPage={1}
-                  page={page}
-                  onChange={setPage}
-                />
-              )}
-            </Center>
-          </ScrollArea>
-        </div>
+          <PurchaseReturnForm
+            modal={modal}
+            setModal={setModal}
+            isCustomer={true}
+            title={'Sales'}
+          />
+          <Group my='lg' style={{ justifyContent: 'space-between' }}>
+            <Title fw={400}>Purchase Return</Title>
+            <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+              Add Return
+            </Button>
+          </Group>
+          <TableSelection
+            data={
+              sales.data?.pages
+                .find((pageData) => pageData.page === page)
+                ?.docs.map((val) => ({
+                  ...val,
+                  _id: val._id.toString(),
+                  date: dayjs(val.date).format('DD MMMM YYYY'),
+                  customer: _.get(val, 'customer.name', 'Walk-in Customer'),
+                  total: val.total.toFixed(),
+                })) ?? []
+            }
+            colProps={{
+              date: {
+                label: 'Date',
+              },
+              supplier: {
+                label: 'Supplier',
+              },
+              status: {
+                label: 'Payment Status',
+              },
+              total: {
+                label: 'Total Amount',
+              },
+            }}
+          />
+          <Center>
+            {(sales.data?.pages.find((pageData) => pageData.page === page)
+              ?.totalPages ?? 0) > 1 && (
+              <Pagination
+                total={
+                  sales.data?.pages.find((pageData) => pageData.page === page)
+                    ?.totalPages ?? 0
+                }
+                initialPage={1}
+                page={page}
+                onChange={setPage}
+              />
+            )}
+          </Center>
+        </Container>
       </Layout>
     </>
   );

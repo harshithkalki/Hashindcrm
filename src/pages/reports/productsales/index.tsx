@@ -1,7 +1,7 @@
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
-import { Group, Title, Center, Pagination } from '@mantine/core';
+import { Group, Title, Center, Pagination, Container } from '@mantine/core';
 import React from 'react';
 
 const Index = () => {
@@ -62,45 +62,47 @@ const Index = () => {
 
   return (
     <Layout>
-      <Group mb={'xl'}>
-        <Title fw={400}>Product Sales Summary</Title>
-      </Group>
-      <Center
-        style={{
-          flexDirection: 'column',
-          width: '100%',
-        }}
-      >
-        <TableSelection
-          data={data}
-          colProps={{
-            name: {
-              label: 'Name',
-            },
-            itemCode: {
-              label: 'Item Code',
-            },
-            unitsSold: {
-              label: 'Units Sold',
-            },
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group my={'lg'}>
+          <Title fw={400}>Product Sales Summary</Title>
+        </Group>
+        <Center
+          style={{
+            flexDirection: 'column',
+            width: '100%',
           }}
-        />
-      </Center>
-      <Center>
-        {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
-          ?.totalPages ?? 0) > 1 && (
-          <Pagination
-            total={
-              stockReport.data?.pages.find(
-                (pageData) => pageData?.page === page
-              )?.totalPages ?? 0
-            }
-            initialPage={1}
-            page={page}
-            onChange={setPage}
+        >
+          <TableSelection
+            data={data}
+            colProps={{
+              name: {
+                label: 'Name',
+              },
+              itemCode: {
+                label: 'Item Code',
+              },
+              unitsSold: {
+                label: 'Units Sold',
+              },
+            }}
           />
-        )}
-      </Center>
+        </Center>
+        <Center>
+          {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                stockReport.data?.pages.find(
+                  (pageData) => pageData?.page === page
+                )?.totalPages ?? 0
+              }
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Container>
     </Layout>
   );
 };

@@ -5,7 +5,6 @@ import {
   Center,
   Container,
   createStyles,
-  FileInput,
   Group,
   Loader,
   Modal,
@@ -17,15 +16,15 @@ import { Form, Formik } from 'formik';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import FormDate from '@/components/FormikCompo/FormikDate';
-import { IconUpload } from '@tabler/icons';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import Layout from '@/components/Layout';
 import { ZExpenseCreateInput } from '@/zobjs/expense';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { trpc } from '@/utils/trpc';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -273,11 +272,7 @@ const Index = () => {
   // console.log(Data);
 
   if (Expenses.isLoading) {
-    return (
-      <Center h='100%'>
-        <Loader />
-      </Center>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -306,7 +301,7 @@ const Index = () => {
         />
       )}
       <Container>
-        <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
+        <Group my='lg' style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Expenses</Title>
           <Button
             size='xs'
@@ -318,66 +313,55 @@ const Index = () => {
             Add Expense
           </Button>
         </Group>
-        {Expenses.isLoading ? (
-          <Loader />
-        ) : (
-          <>
-            <TableSelection
-              data={
-                Expenses.data?.pages
-                  .find((pageData) => pageData.page === page)
-                  ?.docs.map((val) => ({
-                    ...val,
-                    _id: val._id.toString(),
-                    category: (val.category as unknown as { name: string })
-                      .name,
-                    date: dayjs(val.date).format('DD MMMM YYYY'),
-                  })) || []
+
+        <TableSelection
+          data={
+            Expenses.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.map((val) => ({
+                ...val,
+                _id: val._id.toString(),
+                category: (val.category as unknown as { name: string }).name,
+                date: dayjs(val.date).format('DD MMMM YYYY'),
+              })) || []
+          }
+          colProps={{
+            category: {
+              label: 'Expense Category',
+            },
+            amount: {
+              label: 'Amount',
+            },
+            date: {
+              label: 'Date',
+            },
+            notes: {
+              label: 'Notes',
+            },
+          }}
+          deletable={true}
+          editable={true}
+          onDelete={(id) => {
+            deleteExpense.mutateAsync({ _id: id }).then(() => {
+              router.reload();
+            });
+          }}
+          onEdit={(id) => setEditId(id)}
+        />
+        <Center>
+          {(Expenses.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                Expenses.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages ?? 0
               }
-              colProps={{
-                // category: 'Expense Category',
-                // amount: 'Amount',
-                // date: 'Date',
-                // notes: 'Notes',
-                category: {
-                  label: 'Expense Category',
-                },
-                amount: {
-                  label: 'Amount',
-                },
-                date: {
-                  label: 'Date',
-                },
-                notes: {
-                  label: 'Notes',
-                },
-              }}
-              deletable={true}
-              editable={true}
-              onDelete={(id) => {
-                deleteExpense.mutateAsync({ _id: id }).then(() => {
-                  router.reload();
-                });
-              }}
-              onEdit={(id) => setEditId(id)}
+              initialPage={1}
+              page={page}
+              onChange={setPage}
             />
-            <Center>
-              {(Expenses.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages ?? 0) > 1 && (
-                <Pagination
-                  total={
-                    Expenses.data?.pages.find(
-                      (pageData) => pageData.page === page
-                    )?.totalPages ?? 0
-                  }
-                  initialPage={1}
-                  page={page}
-                  onChange={setPage}
-                />
-              )}
-            </Center>
-          </>
-        )}
+          )}
+        </Center>
       </Container>
     </Layout>
   );

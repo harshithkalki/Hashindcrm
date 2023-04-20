@@ -3,26 +3,24 @@ import {
   Button,
   Center,
   Container,
-  Divider,
   FileInput,
-  Flex,
   Group,
   Loader,
   Modal,
   Pagination,
   Title,
 } from '@mantine/core';
-import React, { useMemo } from 'react';
+import React from 'react';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { Formik, Form } from 'formik';
 import { IconUpload } from '@tabler/icons';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import { client, trpc } from '@/utils/trpc';
-import convertToCategory from '@/utils/convertToCategory';
 import axios from 'axios';
 import Layout from '@/components/Layout';
 import type { CategoryCreateInput } from '@/zobjs/category';
 import { exportCSVFile } from '@/utils/jsonTocsv';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const initialValues: CategoryCreateInput = {
   logo: '',
@@ -219,7 +217,7 @@ const Index = () => {
 
   const [editId, setEditId] = React.useState<string | null>(null);
 
-  if (rootCategories.isLoading) return <div>Loading...</div>;
+  if (rootCategories.isLoading) return <LoadingScreen />;
 
   return (
     <Layout>
@@ -240,8 +238,8 @@ const Index = () => {
           _id={editId}
         />
       )}
-      <Flex mt={'xs'} direction={'column'} h='100%'>
-        <Group style={{ justifyContent: 'space-between' }}>
+      <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <Group style={{ justifyContent: 'space-between' }} my='lg'>
           <Title fw={400}>Categories</Title>
           <Group>
             <Button size='xs' onClick={() => setModal(true)}>
@@ -265,7 +263,6 @@ const Index = () => {
             </Button>
           </Group>
         </Group>
-        <Divider mt={'xl'} />
         <CategoriesTable
           data={
             rootCategories.data?.pages
@@ -288,13 +285,12 @@ const Index = () => {
                 )?.totalPages ?? 0
               }
               initialPage={1}
-              // {...pagination}
               page={page}
               onChange={setPage}
             />
           )}
         </Center>
-      </Flex>
+      </Container>
     </Layout>
   );
 };

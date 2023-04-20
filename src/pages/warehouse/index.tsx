@@ -517,8 +517,8 @@ export default function Warehouse() {
         {editId && (
           <EditWarehouse _id={editId} onClose={() => setEditId(null)} />
         )}
-        <Container mt={'xs'}>
-          <Group style={{ justifyContent: 'space-between' }}>
+        <Container>
+          <Group my='lg' style={{ justifyContent: 'space-between' }}>
             <Title fw={400}>Warehouses</Title>
             <Button size='xs' onClick={() => setOpen(true)}>
               Add Warehouse

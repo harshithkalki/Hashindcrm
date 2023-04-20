@@ -155,13 +155,7 @@ export default function TableSelection<T>({
             </td>
           );
         })}
-        <td
-          style={
-            {
-              // width: ',
-            }
-          }
-        >
+        <td style={{}}>
           <Center>
             <Group
               spacing={0}
@@ -222,7 +216,6 @@ export default function TableSelection<T>({
           width: '100%',
         }}
       />
-
       <ScrollArea style={{ flex: 1 }} w='100%'>
         <Container w={'100%'}>
           <Table
