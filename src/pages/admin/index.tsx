@@ -450,53 +450,57 @@ const Index = () => {
         onCreated={() => admins.refetch()}
       />
       <EditAdmin id={adminId} setModal={setAdminId} />
-      <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
-        <Title fw={400}>Admins</Title>
-        <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-          Add New
-        </Button>
-      </Group>
-      <Tables
-        data={
-          admins.data?.pages
-            .find((pageData) => pageData.page === page)
-            ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ??
-          [] ??
-          []
-        }
-        colProps={{
-          name: {
-            label: 'Name',
-          },
-          email: {
-            label: 'Email',
-          },
-        }}
-        editable
-        deletable
-        onEdit={(id) => {
-          setAdminId(id);
-        }}
-        onDelete={async (id) => {
-          await deleteAdmin.mutateAsync({ _id: id });
-          admins.refetch();
-        }}
-      />
-      <Center>
-        {(admins.data?.pages.find((pageData) => pageData.page === page)
-          ?.totalPages ?? 0) > 1 && (
-          <Pagination
-            total={
-              admins.data?.pages.find((pageData) => pageData.page === page)
-                ?.totalPages ?? 0
-            }
-            initialPage={1}
-            // {...pagination}
-            page={page}
-            onChange={setPage}
-          />
-        )}
-      </Center>
+      <Container
+        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+      >
+        <Group mb={'md'} style={{ justifyContent: 'space-between' }}>
+          <Title fw={400}>Admins</Title>
+          <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+            Add New
+          </Button>
+        </Group>
+        <Tables
+          data={
+            admins.data?.pages
+              .find((pageData) => pageData.page === page)
+              ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ??
+            [] ??
+            []
+          }
+          colProps={{
+            name: {
+              label: 'Name',
+            },
+            email: {
+              label: 'Email',
+            },
+          }}
+          editable
+          deletable
+          onEdit={(id) => {
+            setAdminId(id);
+          }}
+          onDelete={async (id) => {
+            await deleteAdmin.mutateAsync({ _id: id });
+            admins.refetch();
+          }}
+        />
+        <Center>
+          {(admins.data?.pages.find((pageData) => pageData.page === page)
+            ?.totalPages ?? 0) > 1 && (
+            <Pagination
+              total={
+                admins.data?.pages.find((pageData) => pageData.page === page)
+                  ?.totalPages ?? 0
+              }
+              initialPage={1}
+              // {...pagination}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Container>
     </Layout>
   );
 };

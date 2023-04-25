@@ -1,6 +1,7 @@
 import Layout from '@/components/Layout';
 import {
   Center,
+  Container,
   createStyles,
   Group,
   Loader,
@@ -11,6 +12,7 @@ import React, { useEffect } from 'react';
 import Tables from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 import { useRouter } from 'next/router';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const useStyle = createStyles(() => ({
   contianer: {
@@ -23,7 +25,7 @@ const Index = () => {
   const { classes } = useStyle();
   const [page, setPage] = React.useState(1);
   const companies = trpc.companyRouter.companies.useInfiniteQuery(
-    {},
+    { limit: 10 },
     {
       getNextPageParam: () => page,
       refetchOnWindowFocus: false,
@@ -39,72 +41,57 @@ const Index = () => {
     }
   }, [companies, page]);
 
-  if (companies.isLoading)
-    return (
-      <Center h='100%'>
-        <Loader />
-      </Center>
-    );
+  if (companies.isLoading) return <LoadingScreen />;
 
   return (
-    <div className={classes.contianer}>
-      <Group mb={'md'}>
+    <Container
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
+      <Group my={'lg'}>
         <Title fw={400}>Companies</Title>
       </Group>
-      {companies.data && (
-        <>
-          <Tables
-            data={
-              companies.data.pages
-                .find((pageData) => pageData.page === page)
-                ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ?? []
+
+      <Tables
+        data={
+          companies.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ?? []
+        }
+        colProps={{
+          name: {
+            label: 'Company Name',
+          },
+          email: {
+            label: 'Email',
+          },
+        }}
+        editable={true}
+        deletable={true}
+        onDelete={async (_id) => {
+          await deleteCompany.mutateAsync({
+            _id,
+          });
+          companies.refetch();
+        }}
+        onEdit={async (_id) => {
+          router.push(`/company/${_id}`);
+        }}
+      />
+      <Center>
+        {(companies.data?.pages.find((pageData) => pageData.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              companies.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0
             }
-            colProps={{
-              // name: 'Company Name',
-              // email: 'Email',
-              name: {
-                label: 'Company Name',
-              },
-              email: {
-                label: 'Email',
-              },
-            }}
-            editable={true}
-            deletable={true}
-            onDelete={async (_id) => {
-              await deleteCompany.mutateAsync({
-                _id,
-              });
-              companies.refetch();
-            }}
-            onEdit={async (_id) => {
-              router.push(`/company/${_id}`);
-            }}
+            initialPage={1}
+            page={page}
+            onChange={setPage}
           />
-          <Center>
-            {(companies.data?.pages.find((pageData) => pageData.page === page)
-              ?.totalPages ?? 0) > 1 && (
-              <Pagination
-                total={
-                  companies.data?.pages.find(
-                    (pageData) => pageData.page === page
-                  )?.totalPages ?? 0
-                }
-                initialPage={1}
-                // {...pagination}
-                page={page}
-                onChange={setPage}
-              />
-            )}
-          </Center>
-        </>
-      )}
-      {companies.isLoading && (
-        <Center h='100%'>
-          <Loader />
-        </Center>
-      )}
-    </div>
+        )}
+      </Center>
+    </Container>
   );
 };
 

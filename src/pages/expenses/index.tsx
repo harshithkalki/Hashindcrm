@@ -300,7 +300,9 @@ const Index = () => {
           }}
         />
       )}
-      <Container>
+      <Container
+        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+      >
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>Expenses</Title>
           <Button
