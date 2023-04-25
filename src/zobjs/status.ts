@@ -10,7 +10,10 @@ export const ZStatusUpdateInput = ZStatusCreateInput.partial().extend({
   _id: z.string(),
 });
 
+
 export const ZStatus = ZStatusCreateInput.extend({
   createdAt: z.date(),
   company: z.string(),
 });
+
+export type IStatus = z.infer<typeof ZStatus>;

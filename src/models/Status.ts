@@ -35,6 +35,7 @@ const StatusSchema = new Schema<IStatus, StatusModel>(
       {
         type: String,
         required: false,
+        ref: 'Status',
         default: [],
       },
     ],

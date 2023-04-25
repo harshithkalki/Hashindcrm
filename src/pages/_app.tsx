@@ -52,10 +52,12 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
     if (me.data && !store.getState().clientState.client) {
       dispatch(setClient(me.data.data));
 
-      if (!me.data.data.isSuperAdmin) {
-        router.push(me.data.data.role.defaultRedirect);
-      } else {
-        router.push('/company');
+      if (router.pathname === '/') {
+        if (!me.data.data.isSuperAdmin) {
+          router.push(me.data.data.role.defaultRedirect);
+        } else {
+          router.push('/company');
+        }
       }
     }
   }, [dispatch, me.data, me.error?.data?.code, router]);

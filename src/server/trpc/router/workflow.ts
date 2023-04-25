@@ -121,7 +121,7 @@ export const workflowRouter = router({
     );
 
     type Status = {
-      id: string;
+      _id: string;
       name: string;
       linkedStatuses: { name: string; value: string }[];
       initialStatus: boolean;
@@ -131,9 +131,10 @@ export const workflowRouter = router({
 
     const statuses = await StatusModel.find({ company: client.company });
 
-    const workflow: any = statuses.map((val) => {
+
+    const workflow = statuses.map((val) => {
       return {
-        id: val._id.toString(),
+        _id: val._id.toString(),
         initialStatus: val.initialStatus,
         name: val.name,
         linkedStatuses: val.linkedStatuses?.map((id) => {
@@ -145,7 +146,7 @@ export const workflowRouter = router({
       };
     });
 
-    return workflow;
+    return workflow as Workflow;
   }),
 
   removeLink: protectedProcedure
@@ -211,7 +212,7 @@ export const workflowRouter = router({
   getLinkedStatuses: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const client = await checkPermission(
+      await checkPermission(
         'WORKFLOW',
         {
           read: true,
