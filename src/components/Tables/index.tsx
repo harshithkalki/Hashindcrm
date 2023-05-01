@@ -39,6 +39,7 @@ interface TableSelectionProps<T> {
     groupProps?: GroupProps;
   };
   colProps: ColProps<T>;
+  searchable?: boolean;
 }
 
 type ColProps<T> = {
@@ -92,6 +93,7 @@ export default function TableSelection<T>({
   onEdit,
   editDeleteColumnProps: { groupProps } = {},
   colProps,
+  searchable = true,
 }: TableSelectionProps<T>) {
   const { classes, cx, theme } = useStyles();
   const [filteredData, setFilteredData] = useState(data);
@@ -206,16 +208,18 @@ export default function TableSelection<T>({
           }}
         />
       )}
-      <TextInput
-        placeholder='Search by any field'
-        mb='md'
-        icon={<IconSearch size={14} stroke={1.5} />}
-        value={search}
-        onChange={handleSearchChange}
-        style={{
-          width: '100%',
-        }}
-      />
+      {searchable && (
+        <TextInput
+          placeholder='Search by any field'
+          mb='md'
+          icon={<IconSearch size={14} stroke={1.5} />}
+          value={search}
+          onChange={handleSearchChange}
+          style={{
+            width: '100%',
+          }}
+        />
+      )}
       <ScrollArea style={{ flex: 1 }} w='100%'>
         <Container w={'100%'}>
           <Table

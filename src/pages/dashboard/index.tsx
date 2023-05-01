@@ -1,10 +1,12 @@
 import Graph from '@/components/Graph';
 import Layout from '@/components/Layout';
+import SaleandPurchasesDashboard from '@/components/SaleandPurchasesDashboard';
 import { StatsGrid } from '@/components/StatsGrid';
 import { StatsHistroy } from '@/components/StatsGrid/StatsHistroy';
 import { StatsGroup } from '@/components/StatsGroup';
 import { StatsSegments } from '@/components/StatsSegment';
-import { Flex, Grid, ScrollArea, SimpleGrid } from '@mantine/core';
+import StockAlertDashboard from '@/components/StockAlertDashboard';
+import { Flex, Grid, ScrollArea, SimpleGrid, Tabs } from '@mantine/core';
 import React from 'react';
 
 const index = () => {
@@ -124,7 +126,7 @@ const index = () => {
                 ]}
               />
             </Grid.Col>
-            <Grid.Col span={1}>
+            <Grid.Col span={1} mt={'md'}>
               <StatsHistroy
                 data={[
                   {
@@ -145,6 +147,12 @@ const index = () => {
                   },
                 ]}
               />
+            </Grid.Col>
+            <Grid.Col span={3} mt={'md'}>
+              <SaleandPurchasesDashboard />
+            </Grid.Col>
+            <Grid.Col span={3} h={300}>
+              <StockAlertDashboard />
             </Grid.Col>
           </Grid>
         </ScrollArea>
