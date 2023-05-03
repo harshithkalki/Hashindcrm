@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 export const ZTicketCreateInput = z.object({
   name: z.string(),
+  issueType: z.string(),
+  description: z.string().optional(),
+  files: z.array(z.string()),
   assignedTo: z.string().optional(),
   status: z.string(),
 });
@@ -12,5 +15,8 @@ export const ZTicketUpdateInput = ZTicketCreateInput.partial().extend({
 
 export const ZTicket = ZTicketCreateInput.extend({
   createdAt: z.date(),
-  company: z.string(),
+  companyId: z.string(),
 });
+
+export type ITicket = z.infer<typeof ZTicket>;
+export type ITicketCreateInput = z.infer<typeof ZTicketCreateInput>;

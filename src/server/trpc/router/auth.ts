@@ -28,11 +28,13 @@ export const outSchemaForMe = z.object({
         role: z.literal('super-admin'),
         email: z.string(),
         isSuperAdmin: z.literal(true),
+        _id: z.string(),
       })
       .omit({ password: true }),
     ZStaffMem.extend({
       role: ZRole.omit({ staffMem: true, createdAt: true }),
       isSuperAdmin: z.literal(false),
+      _id: z.string(),
       company: ZCompany.pick({
         logo: true,
         name: true,
@@ -130,6 +132,7 @@ export const auth = router({
           isSuperAdmin: true,
           email: env.SUPER_ADMIN_EMAIL,
           role: 'super-admin',
+          _id: env.SUPER_ADMIN_EMAIL,
         },
       };
     }
@@ -167,6 +170,7 @@ export const auth = router({
         isSuperAdmin: false,
         ...staff,
         linkedTo: staff.linkedTo?.toString(),
+        reportTo: staff.reportTo?.toString(),
         ticket: staff.ticket?.toString(),
         role: {
           ...staff.role,
@@ -174,6 +178,7 @@ export const auth = router({
         },
         createdAt: staff.createdAt.toISOString(),
         warehouse: staff.warehouse?.toString(),
+        _id: staff._id.toString(),
       },
     };
   }),

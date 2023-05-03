@@ -5,21 +5,12 @@ import TicketModel from '@/models/Ticket';
 import StatusModel from '@/models/Status';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
+import { ZTicketCreateInput } from '@/zobjs/ticket';
 
 export const ticketRouter = router({
   createTicket: protectedProcedure
     .input(
-      z.object({
-        name: z.string(),
-        status: z.string().refine(async (val) => {
-          if (val)
-            return Boolean(
-              StatusModel.findOne({ _id: val, initialStatus: true })
-            );
-
-          return true;
-        }),
-      })
+      ZTicketCreateInput
     )
     .mutation(async ({ input, ctx }) => {
       const client = await checkPermission(
@@ -31,13 +22,29 @@ export const ticketRouter = router({
         'You are not permitted to create a ticket'
       );
 
+      const isValidStatus = await StatusModel.exists({
+        _id: input.status,
+        companyId: client.company,
+        initialStatus: true,
+      });
+
+      if (!isValidStatus) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid status',
+        });
+      }
+
       const ticket = await TicketModel.create({
         name: input.name,
         status: input.status,
         companyId: client.company,
+        description: input.description,
+        issueType: input.issueType,
+        files: input.files,
       });
 
-      return ticket;
+      return ticket.toObject();
     }),
 
   updateTicket: protectedProcedure
@@ -76,25 +83,7 @@ export const ticketRouter = router({
       'You are not permitted to read products'
     );
 
-    const tickets = TicketModel.find({ companyId: client.company }).populate<{
-      assignedTo: {
-        firstName: string;
-        lastName: string;
-        middlename: string;
-        role: {
-          name: string;
-          _id: string;
-        };
-        _id: string;
-      } | null;
-    }>({
-      path: 'assignedTo',
-      select: 'firstName lastName middlename',
-      populate: {
-        path: 'role',
-        select: 'name',
-      },
-    });
+    const tickets = TicketModel.find({ companyId: client.company }).lean()
 
     return tickets;
   }),
@@ -124,12 +113,7 @@ export const ticketRouter = router({
     }),
 
   getAssignableUsers: protectedProcedure
-    .input(
-      z.object({
-        ticketId: z.string(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       const client = await checkPermission(
         'TICKET',
         {
@@ -139,42 +123,28 @@ export const ticketRouter = router({
         'You are not permitted to read tickets'
       );
 
-      const ticket = await TicketModel.findOne({
-        _id: input.ticketId,
+      const parent = await UserModel.findById(client.reportTo);
+
+      const user = await UserModel.find({
         companyId: client.company,
-        assignedTo: client._id,
-      });
-
-      if (!ticket) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You are not permitted to assign a ticket',
-        });
-      }
-
-      const childUsers = await UserModel.find({
-        linkedTo: client._id,
-        company: client.company,
+        $or: [
+          {
+            role: parent?.role,
+          }, {
+            reportTo: client.id
+          }
+        ]
+      }).populate<{
+        role: {
+          name: string;
+          _id: string;
+        };
+      }>({
+        path: 'role',
+        select: 'name _id',
       })
-        .select('firstName lastName middleName')
-        .populate<{ role: { name: string } }>('role', 'name')
         .lean();
 
-      const parentUser = await UserModel.findById(client.linkedTo)
-        .select('firstName lastName middleName')
-        .populate<{ role: { name: string } }>('role', 'name')
-        .lean();
-
-      const allparentUsers = await UserModel.find({
-        role: parentUser?.role,
-        company: client.company,
-      })
-        .select('firstName lastName middleName')
-        .populate<{ role: { name: string } }>('role', 'name')
-        .lean();
-
-      const allUsers = [...childUsers, ...allparentUsers];
-
-      return allUsers;
+      return user;
     }),
 });

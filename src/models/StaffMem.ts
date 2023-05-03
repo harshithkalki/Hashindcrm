@@ -48,6 +48,7 @@ const StaffMemSchema: Schema = new Schema<
     profile: { type: String, required: false },
     status: { type: String, required: true },
     warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse' },
+    reportTo: { type: Schema.Types.ObjectId, ref: 'StaffMem' },
   },
   {
     versionKey: false,

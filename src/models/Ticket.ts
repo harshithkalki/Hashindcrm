@@ -1,14 +1,14 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
-import type { IStaffMem } from '@/models/StaffMem';
+import type { ITicket as IZTicket } from '@/zobjs/ticket';
 
-export interface ITicket {
-  name: string;
-  createdAt: Date;
-  companyId: Types.ObjectId;
-  assignedTo?: Types.ObjectId | (IStaffMem & { _id: string });
-  status: Types.ObjectId;
-}
+
+type ITicket = Omit<IZTicket, "assignedTo" | "companyId" | "status"> & {
+  _id: Types.ObjectId;
+  assignedTo?: mongoose.Types.ObjectId;
+  companyId: mongoose.Types.ObjectId;
+  status: mongoose.Types.ObjectId;
+};
 
 type TicketModel = Model<ITicket, Record<string, never>>;
 
@@ -32,13 +32,27 @@ const TicketSchema = new Schema<ITicket, TicketModel>(
     status: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'Ticket',
+      ref: 'Status',
     },
     assignedTo: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: false,
     },
+    issueType: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    files: [
+      {
+        type: String,
+        required: false,
+        default: [],
+      },
+    ],
   },
   { versionKey: false }
 );

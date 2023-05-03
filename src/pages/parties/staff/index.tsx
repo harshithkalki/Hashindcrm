@@ -22,7 +22,7 @@ import {
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
@@ -145,12 +145,27 @@ const StaffForm = ({
   onSubmit,
   setModal,
 }: {
-  formvalues?: z.infer<typeof ZStaffMemCreateInput>;
+  formvalues?: z.infer<typeof ZStaffMemCreateInput> & { _id?: string };
   onSubmit: (values: z.infer<typeof ZStaffMemCreateInput>) => void;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes } = useStyles();
+  const allStaffs = trpc.staffRouter.all.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  const staffOptions = useMemo(
+    () =>
+      allStaffs.data
+        ?.map((staff) => ({
+          label: staff.name,
+          value: staff._id.toString(),
+        }))
+        .filter((value) => value.value !== formvalues._id) ?? [],
+    [allStaffs.data, formvalues._id]
+  );
+
   return (
     <Formik
       onSubmit={(values, { resetForm }) => {
@@ -250,6 +265,13 @@ const StaffForm = ({
               name='password'
               withAsterisk
             />
+            <FormikSelect
+              label='Report To'
+              placeholder='Report To'
+              name='reportTo'
+              withAsterisk
+              data={staffOptions}
+            />
           </SimpleGrid>
           <Formiktextarea
             label='Address'
@@ -332,6 +354,7 @@ const UpdateCustomer = ({
           role: staff.data.role?.toString(),
           warehouse: staff.data.warehouse?.toString(),
           password: '',
+          _id: staff.data._id.toString(),
         }}
         onSubmit={(values) => {
           updateStaff.mutateAsync({

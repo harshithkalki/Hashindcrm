@@ -11,6 +11,7 @@ export const ZStaffMemCreateInput = z.object({
   profile: z.string().optional(),
   warehouse: z.string().optional(),
   status: z.string(),
+  reportTo: z.string().optional(),
 });
 
 export const ZAdminCreateInput = ZStaffMemCreateInput.omit({

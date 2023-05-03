@@ -96,6 +96,8 @@ export const staffRouter = router({
         'You are not permitted to update a staff'
       );
 
+      delete input.password;
+
       const staff = await StaffModel.findOneAndUpdate(
         { _id: input._id },
         { ...input },
@@ -359,4 +361,18 @@ export const staffRouter = router({
 
       return staff;
     }),
+
+  all: protectedProcedure.query(async ({ ctx }) => {
+    const client = await checkPermission(
+      'STAFFMEM',
+      { read: true },
+      ctx.clientId,
+      'You are not permitted to read staff'
+    );
+
+    const staffs = await StaffModel.find({ company: client.company }).lean();
+
+    return staffs;
+  }
+  ),
 });

@@ -6,24 +6,28 @@ import type { RootState } from '@/store';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import type { ModalProps } from '@mantine/core';
+import { Select } from '@mantine/core';
 import { SimpleGrid } from '@mantine/core';
 import { ScrollArea } from '@mantine/core';
-import { Select } from '@mantine/core';
 import { Button, Container, Group, Modal, Table, Title } from '@mantine/core';
-import { Link, RichTextEditor } from '@mantine/tiptap';
 import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-
-import { useEditor } from '@tiptap/react';
-import Highlight from '@tiptap/extension-highlight';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
 import DropzoneComp from '@/components/DropZone';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
-// import Superscript from '@tiptap/extension-superscript';
-// import SubScript from '@tiptap/extension-subscript';
+import type { ITicketCreateInput } from '@/zobjs/ticket';
+import _ from 'lodash';
+import SelectUserItem from '@/components/SelectUserItem';
+import dayjs from 'dayjs';
+
+const initialValues: ITicketCreateInput = {
+  name: '',
+  assignedTo: undefined,
+  description: undefined,
+  files: [],
+  issueType: '',
+  status: '',
+};
 
 const AddnewTicket = ({
   modalProps,
@@ -34,34 +38,14 @@ const AddnewTicket = ({
 }) => {
   const createTicket = trpc.ticketRouter.createTicket.useMutation();
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
-      // Superscript,
-      // SubScript,
-      Highlight,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    ],
-    content: '<p>hello</p>',
-  });
-
-  // console.log(editor.getJSON());
-
   return (
     <Modal title='Add Ticket' {...modalProps} size={'xl'}>
       <Formik
-        initialValues={{
-          issueType: '',
-          name: '',
-          initialstatus: '',
-        }}
+        initialValues={initialValues}
         onSubmit={(values, { setSubmitting }) => {
           createTicket
             .mutateAsync({
-              status: values.initialstatus,
-              name: values.name,
+              ...values,
             })
             .then(() => setSubmitting(false));
         }}
@@ -71,7 +55,6 @@ const AddnewTicket = ({
             <SimpleGrid
               m={'md'}
               cols={3}
-              // className={classes.wrapper}
               breakpoints={[
                 { maxWidth: 'md', cols: 3, spacing: 'md' },
                 { maxWidth: 'sm', cols: 2, spacing: 'sm' },
@@ -96,7 +79,7 @@ const AddnewTicket = ({
               />
               <FormikSelect
                 mt={'xs'}
-                name='initialstatus'
+                name='status'
                 label='Initial Status'
                 placeholder='Select Status'
                 data={data.map((val) => ({
@@ -105,24 +88,6 @@ const AddnewTicket = ({
                 }))}
               />
             </SimpleGrid>
-            {/* <RichTextEditor editor={editor}>
-              <RichTextEditor.Toolbar>
-                <RichTextEditor.ControlsGroup>
-                  <RichTextEditor.Bold />
-                  <RichTextEditor.Italic />
-                  <RichTextEditor.Underline />
-                  <RichTextEditor.Strikethrough />
-                  <RichTextEditor.ClearFormatting />
-                  <RichTextEditor.Highlight />
-                  <RichTextEditor.Code />
-                  <RichTextEditor.Blockquote />
-                  <RichTextEditor.Hr />
-                  <RichTextEditor.BulletList />
-                  <RichTextEditor.OrderedList />
-                </RichTextEditor.ControlsGroup>
-              </RichTextEditor.Toolbar>
-              <RichTextEditor.Content />
-            </RichTextEditor> */}
             <Formiktextarea
               name='description'
               label='Description'
@@ -130,9 +95,7 @@ const AddnewTicket = ({
               withAsterisk
               mb={'md'}
             />
-
             <DropzoneComp />
-
             <Button type='submit' mt={'md'} loading={isSubmitting}>
               submit
             </Button>
@@ -140,6 +103,128 @@ const AddnewTicket = ({
         )}
       </Formik>
     </Modal>
+  );
+};
+
+const StatusSelect = ({
+  ticketId,
+  statusId,
+  assignedTo,
+}: {
+  ticketId: string;
+  statusId: string;
+  assignedTo?: string;
+}) => {
+  const updateTicket = trpc.ticketRouter.updateTicket.useMutation();
+  const { data } = trpc.workflowRouter.getLinkedStatuses.useQuery(statusId);
+  const deboune = useCallback(
+    _.debounce((fn) => fn(), 1000),
+    []
+  );
+  const user = useSelector((state: RootState) => state.clientState.client);
+
+  return (
+    <Formik
+      initialValues={{
+        ticketStatus: statusId,
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        updateTicket
+          .mutateAsync({
+            nextStatusId: values.ticketStatus,
+            ticketId,
+          })
+          .then(() => setSubmitting(false));
+      }}
+    >
+      {({ submitForm }) => {
+        return (
+          <Form>
+            <Group w={'100%'} p={0} m={0}>
+              <TicketSelect
+                data={
+                  data?.map((val) => ({
+                    value: val._id,
+                    label: val.name,
+                  })) ?? []
+                }
+                name='ticketStatus'
+                variant='unstyled'
+                placeholder='Select Status'
+                onChange={() => {
+                  deboune(submitForm);
+                }}
+                disabled={assignedTo !== user?._id}
+              />
+            </Group>
+          </Form>
+        );
+      }}
+    </Formik>
+  );
+};
+
+const AssignableSelect = ({
+  ticketId,
+  assigned,
+}: {
+  ticketId: string;
+  assigned: string;
+}) => {
+  const { data } = trpc.ticketRouter.getAssignableUsers.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+  const assignTicket = trpc.ticketRouter.assignTicket.useMutation();
+  const deboune = useCallback(
+    _.debounce((fn) => fn(), 1000),
+    []
+  );
+  const user = useSelector((state: RootState) => state.clientState.client);
+
+  const userOptions = useMemo(() => {
+    return data?.map((val) => ({
+      value: val._id.toString(),
+      label: val.name,
+      role: val.role.name,
+    }));
+  }, [data]);
+
+  return (
+    <Formik
+      initialValues={{
+        assignTo: assigned,
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        assignTicket
+          .mutateAsync({
+            ticketId,
+            userId: values.assignTo,
+          })
+          .then(() => setSubmitting(false));
+      }}
+    >
+      {({ submitForm, setFieldValue, values }) => {
+        return (
+          <Form>
+            <Group w={'100%'} p={0} m={0}>
+              <Select
+                itemComponent={SelectUserItem}
+                data={userOptions ?? []}
+                name='reportTo'
+                variant='unstyled'
+                placeholder='Select Assignee'
+                onChange={(val) => {
+                  setFieldValue('assignTo', val);
+                  deboune(submitForm);
+                }}
+                value={values.assignTo}
+                disabled={assigned !== user?._id}
+              />
+            </Group>
+          </Form>
+        );
+      }}
+    </Formik>
   );
 };
 
@@ -184,7 +269,6 @@ const Index = () => {
                   <th>Todo</th>
                   <th>Created</th>
                   <th>Status</th>
-                  <th></th>
                   <th>Assigned</th>
                 </tr>
               </thead>
@@ -193,101 +277,20 @@ const Index = () => {
                   <tr key={item._id.toString()}>
                     <td>{item._id.toString()}</td>
                     <td>{item.name}</td>
-                    <td>{item.createdAt.toString()}</td>
+                    <td>{dayjs(item.createdAt).format('DD/MM/YYYY')}</td>
                     <td>
-                      <Formik
-                        initialValues={{
-                          ticketStatus: item.status as unknown as string,
-                        }}
-                        onSubmit={(values, { setSubmitting }) => {
-                          updateTicket
-                            .mutateAsync({
-                              nextStatusId: values.ticketStatus,
-                              ticketId: item._id.toString(),
-                            })
-                            .then(() => setSubmitting(false));
-                        }}
-                      >
-                        {({ isSubmitting }) => {
-                          const { data } =
-                            trpc.workflowRouter.getLinkedStatuses.useQuery(
-                              item.status as unknown as string
-                            );
-
-                          return (
-                            <Form>
-                              <Group w={'100%'} p={0} m={0}>
-                                <TicketSelect
-                                  data={
-                                    data?.map((val) => ({
-                                      value: val._id,
-                                      label: val.name,
-                                    })) || []
-                                  }
-                                  name='ticketStatus'
-                                />
-                                <Button type='submit' loading={isSubmitting}>
-                                  ok
-                                </Button>
-                              </Group>
-                            </Form>
-                          );
-                        }}
-                      </Formik>
-                    </td>
-                    <td></td>
-                    {/* <td>
-                      <Select
-                        placeholder='Select User'
-                        data={
-                          item.assignedTo
-                            ? assignableUsers.data?.map((val) => ({
-                                value: val._id.toString(),
-                                label: val.name.toString(),
-                                ),
-                                group: val.role.name,
-                              })) || [
-                                {
-                                  value: item.assignedTo._id,
-                                  label: item.assignedTo.firstName.concat(
-                                    ' ',
-                                    item.assignedTo.middlename,
-                                    ' ',
-                                    item.assignedTo.lastName
-                                  ),
-                                  group: item.assignedTo.role.name,
-                                },
-                              ]
-                            : [
-                                {
-                                  value: user._id,
-                                  label: user.firstName.concat(
-                                    ' ',
-                                    user.middleName,
-                                    ' ',
-                                    user.lastName
-                                  ),
-                                  group: user.role.name,
-                                },
-                              ]
-                        }
-                        disabled={
-                          item.assignedTo
-                            ? item.assignedTo._id !== user?._id
-                            : false
-                        }
-                        onChange={async (val) => {
-                          if (!val) return;
-                          await assignTicket.mutateAsync({
-                            ticketId: item._id.toString(),
-                            userId: val,
-                          });
-                        }}
-                        onFocus={() => setActiveTicket(item._id.toString())}
-                        onBlur={() => setActiveTicket(null)}
-                        value={item.assignedTo?._id}
+                      <StatusSelect
+                        statusId={item.status.toString()}
+                        ticketId={item._id.toString()}
+                        assignedTo={item.assignedTo?.toString()}
                       />
-                    </td> */}
+                    </td>
+                    <td>
+                      <AssignableSelect
+                        assigned={item.assignedTo?.toString() ?? ''}
+                        ticketId={item._id.toString()}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
