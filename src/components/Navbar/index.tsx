@@ -139,12 +139,12 @@ export const navData: NavData[] = [
     permissionName: 'ROLE',
     icon: IconReceipt2,
   },
-  // {
-  //   links: '/dashboard',
-  //   label: 'DashBoard',
-  //   icon: IconFileAnalytics,
-  //   permissionName: 'DASHBOARD',
-  // },
+  {
+    links: '/dashboard',
+    label: 'DashBoard',
+    icon: IconFileAnalytics,
+    permissionName: 'DASHBOARD',
+  },
   {
     links: CompanyData,
     label: 'Companies',
@@ -156,12 +156,12 @@ export const navData: NavData[] = [
     label: 'Product Manager',
     icon: IconReceipt2,
   },
-  // {
-  //   links: '/workflow',
-  //   label: 'WorkFlow',
-  //   icon: IconFileAnalytics,
-  //   permissionName: 'WORKFLOW',
-  // },
+  {
+    links: '/workflow',
+    label: 'WorkFlow',
+    icon: IconFileAnalytics,
+    permissionName: 'WORKFLOW',
+  },
   {
     links: '/tickets',
     label: 'Tickets',
