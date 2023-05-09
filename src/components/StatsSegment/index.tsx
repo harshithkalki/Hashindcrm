@@ -60,13 +60,22 @@ export function StatsSegments({ data }: StatsSegmentsProps) {
     label: segment.part > 10 ? `${segment.part}%` : undefined,
   }));
 
-  const descriptions = data.map((stat) => (
+  const descriptions = data.map((stat, index) => (
     <Box
-      key={stat.label}
+      key={index}
       sx={{ borderBottomColor: stat.color }}
       className={classes.stat}
     >
-      <Text transform='uppercase' size='xs' color='dimmed' weight={700}>
+      <Text
+        transform='uppercase'
+        size='xs'
+        color='dimmed'
+        weight={700}
+        style={{
+          wordBreak: 'break-word',
+          overflowWrap: 'break-word',
+        }}
+      >
         {stat.label}
       </Text>
 
@@ -86,23 +95,6 @@ export function StatsSegments({ data }: StatsSegmentsProps) {
 
   return (
     <Paper withBorder p='md' radius='md'>
-      {/* <Group position='apart'>
-        <Group align='flex-end' spacing='xs'>
-          <Text size='xl' weight={700}>
-            {total}
-          </Text>
-          <Text color='teal' className={classes.diff} size='sm' weight={700}>
-            <span>{diff}%</span>
-            <IconArrowUpRight
-              size={16}
-              style={{ marginBottom: 4 }}
-              stroke={1.5}
-            />
-          </Text>
-        </Group>
-        <IconDeviceAnalytics size={20} className={classes.icon} stroke={1.5} />
-      </Group> */}
-
       <Text color='dimmed' size='sm'>
         Total selling products
       </Text>

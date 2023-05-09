@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Bar,
   BarChart,
-  CartesianGrid,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -12,8 +11,8 @@ import {
 
 type data = {
   name: string;
-  purchase: number;
-  sale: number;
+  purchase: string;
+  sale: string;
 }[];
 
 const index = ({ data }: { data: data }) => {
@@ -30,7 +29,6 @@ const index = ({ data }: { data: data }) => {
           bottom: 5,
         }}
       >
-        {/* <CartesianGrid /> */}
         <XAxis dataKey='name' />
         <YAxis />
         <Tooltip />

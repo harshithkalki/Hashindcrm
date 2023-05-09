@@ -28,7 +28,7 @@ import {
   IconPlus,
   IconTrash,
 } from '@tabler/icons';
-import { Form, Formik, useFormikContext } from 'formik';
+import { Form, Formik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Waypoint } from 'react-waypoint';
@@ -46,9 +46,6 @@ const useStyles = createStyles((theme) => ({
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
     gridGap: theme.spacing.lg,
-    // [theme.breakpoints.down("xs")]: {
-    //     gridTemplateColumns: "repeat(2, 1fr)",
-    // },
   },
 }));
 
@@ -316,24 +313,15 @@ function ProductsSelect({
 
 const StaffMemSelect = () => {
   const [search, setSearch] = useState('');
-  const staffMem = trpc.staffRouter.staffs.useQuery(
-    { search: search },
-    { refetchOnWindowFocus: false }
-  );
+  const staffMem = trpc.staffRouter.all.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const data =
-    staffMem.data?.docs?.map((staff) => ({
+    staffMem.data?.map((staff) => ({
       label: staff.name,
       value: staff._id.toString(),
-    })) || [];
-
-  const { values, setFieldValue } = useFormikContext<typeof initialValues>();
-
-  useEffect(() => {
-    if (data.length > 0 && !values.staffMem) {
-      setFieldValue('staffMem', data[0]?.value || '');
-    }
-  }, [data]);
+    })) ?? [];
 
   return (
     <FormikSelect
@@ -359,6 +347,7 @@ const CustomerSelect = () => {
     label: customer.name,
     value: customer._id.toString(),
   }));
+
   return (
     <FormikSelect
       label='Customer'
@@ -385,6 +374,10 @@ const Index = () => {
     RootState,
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
+  const client = useSelector<RootState, RootState['clientState']['client']>(
+    (state) => state.clientState.client
+  );
+  initialValues.staffMem = client?._id.toString();
 
   const categories = trpc.categoryRouter.getAllCategories.useQuery(undefined, {
     enabled: !!warehouse,
@@ -447,7 +440,6 @@ const Index = () => {
     }
   }, [handlePrint, invoice.data]);
 
-  const { classes, theme } = useStyles();
   return (
     <Layout>
       {invoice.data && (
@@ -486,22 +478,15 @@ const Index = () => {
               message: 'Sale created successfully',
             });
             setSubmitting(false);
-            console.log(res._id);
-            setInvoiceId(res._id as unknown as string);
 
-            // const invoice = trpc.saleRouter.getInvoice.useQuery({
-            //   _id: res._id as string,
-            // });
+            setInvoiceId(res._id as unknown as string);
           });
 
-          resetForm();
           setInlineProducts(new Map());
-          console.log(values);
         }}
       >
-        {({ handleSubmit, values, isSubmitting, resetForm, errors }) => (
+        {({ values, isSubmitting }) => (
           <Form
-            onSubmit={handleSubmit}
             style={{
               height: '100%',
               display: 'flex',
@@ -578,25 +563,6 @@ const Index = () => {
                       rightSection={
                         <ActionIcon
                           onClick={() => {
-                            // if (selectProduct) {
-                            //   const inlineProduct = inlineProducts.get(
-                            //     selectProduct._id.toString()
-                            //   );
-                            //   if (!inlineProduct) {
-                            //     inlineProducts.set(
-                            //       selectProduct._id.toString(),
-                            //       selectProduct
-                            //     );
-                            //   } else {
-                            //     return;
-                            //   }
-                            //   inlineProducts.set(
-                            //     selectProduct._id.toString(),
-                            //     selectProduct
-                            //   );
-                            //   setInlineProducts(new Map(inlineProducts));
-                            //   setSelectProduct(undefined);
-                            // }
                             router.push('/products/add');
                           }}
                         >
@@ -865,13 +831,7 @@ const Index = () => {
                       loading={isSubmitting}
                       type='submit'
                       disabled={
-                        !(
-                          (
-                            Boolean(values.staffMem) &&
-                            inlineProducts.size !== 0
-                          )
-                          // && Boolean(values.warehouse)
-                        )
+                        !(Boolean(values.staffMem) && inlineProducts.size !== 0)
                       }
                     >
                       Save & Print
@@ -881,8 +841,8 @@ const Index = () => {
                       size='sm'
                       onClick={() => {
                         setInlineProducts(new Map());
-                        resetForm();
                       }}
+                      type='reset'
                     >
                       Reset
                     </Button>

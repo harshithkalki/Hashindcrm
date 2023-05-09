@@ -52,3 +52,6 @@ export const PermissionsLabels: Record<PermissionsUnion, string> = {
   SALE_RETURN: 'Sale Return',
   PURCHASE_RETURN: 'Purchase Return',
 };
+
+
+export const Rupee = "\u20B9"

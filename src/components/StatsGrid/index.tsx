@@ -54,12 +54,12 @@ interface StatsGridProps {
 
 export function StatsGrid({ data }: StatsGridProps) {
   const { classes } = useStyles();
-  const stats = data.map((stat) => {
+  const stats = data.map((stat, index) => {
     const Icon = icons[stat.icon];
     //  const DiffIcon = stat.diff > 0 ? IconArrowUpRight : IconArrowDownRight;
 
     return (
-      <Paper withBorder p='md' radius='md' key={stat.title}>
+      <Paper withBorder p='md' radius='md' key={index}>
         <Group position='apart'>
           <Text size='xs' color='dimmed' className={classes.title}>
             {stat.title}
@@ -69,27 +69,14 @@ export function StatsGrid({ data }: StatsGridProps) {
 
         <Group align='flex-end' spacing='xs' mt={25}>
           <Text className={classes.value}>{stat.value}</Text>
-          {/* <Text
-            color={stat.diff > 0 ? 'teal' : 'red'}
-            size='sm'
-            weight={500}
-            className={classes.diff}
-          >
-            <span>{stat.diff}%</span>
-            <DiffIcon size={16} stroke={1.5} />
-          </Text> */}
         </Group>
-
-        {/* <Text size='xs' color='dimmed' mt={7}>
-          Compared to previous month
-        </Text> */}
       </Paper>
     );
   });
   return (
     <div className={classes.root}>
       <SimpleGrid
-        cols={4}
+        cols={3}
         breakpoints={[
           { maxWidth: 'md', cols: 2 },
           { maxWidth: 'xs', cols: 1 },

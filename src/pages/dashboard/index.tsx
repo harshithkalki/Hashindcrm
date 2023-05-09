@@ -1,15 +1,73 @@
 import Graph from '@/components/Graph';
 import Layout from '@/components/Layout';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import SaleandPurchasesDashboard from '@/components/SaleandPurchasesDashboard';
 import { StatsGrid } from '@/components/StatsGrid';
 import { StatsHistroy } from '@/components/StatsGrid/StatsHistroy';
 import { StatsGroup } from '@/components/StatsGroup';
 import { StatsSegments } from '@/components/StatsSegment';
 import StockAlertDashboard from '@/components/StockAlertDashboard';
-import { Flex, Grid, ScrollArea, SimpleGrid, Tabs } from '@mantine/core';
+import { Rupee } from '@/constants';
+import { trpc } from '@/utils/trpc';
+import type { DefaultMantineColor } from '@mantine/core';
+import { Flex, Grid, ScrollArea, useMantineTheme } from '@mantine/core';
 import React from 'react';
+import dayjs from 'dayjs';
 
-const index = () => {
+const colorsNames: DefaultMantineColor[] = [
+  'blue',
+  'red',
+  'yellow',
+  'violet',
+  'teal',
+  'gray',
+];
+
+const Index = () => {
+  const { data, isLoading } = trpc.daashboardRouter.dashboard.useQuery(
+    {},
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const { colors } = useMantineTheme();
+
+  const top5SellingProducts = React.useMemo(() => {
+    if (!data) return null;
+
+    let remaining = data.totalSaleItems;
+
+    const values = data.top5SellingProducts.map((item, index) => {
+      remaining = remaining - item.totalQuantity;
+
+      return {
+        label: item.name,
+        count: item.totalQuantity.toFixed(0),
+        part: parseInt(
+          ((item.totalQuantity / data.totalSaleItems) * 100).toFixed(0)
+        ),
+        color: colors[colorsNames[index]!]![6],
+      };
+    });
+
+    if (remaining <= 0) return values;
+
+    values.push({
+      label: 'Others',
+      count: remaining.toFixed(0),
+      part: parseInt(((remaining / data.totalSaleItems) * 100).toFixed(0)),
+      color: colors[colorsNames[5]!]![6],
+    });
+
+    return values;
+  }, [data]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (!data) return null;
+
   return (
     <Layout>
       <Flex
@@ -23,17 +81,17 @@ const index = () => {
             data={[
               {
                 title: 'UPI',
-                stats: '100',
+                stats: data.salesByPaymentMode.totalSalesUpi.toFixed(0),
                 description: 'Upi Monthly turnover',
               },
               {
                 title: 'Bank',
-                stats: '100',
+                stats: data.salesByPaymentMode.totalSalesCash.toFixed(0),
                 description: 'Bank Monthly turnover',
               },
               {
                 title: 'Cash',
-                stats: '100',
+                stats: data.salesByPaymentMode.totalSalesBank.toFixed(0),
                 description: 'Cash Monthly turnover',
               },
             ]}
@@ -44,86 +102,32 @@ const index = () => {
               {
                 title: 'Total Sales',
                 icon: 'sales',
-                value: '$ 25,000',
+                value: Rupee + ' ' + data.totalSales.toFixed(0),
               },
               {
                 title: 'Total Expenses',
                 icon: 'expenses',
-                value: '$ 5,000',
+                value: Rupee + ' ' + data.totalExpense.toFixed(0),
               },
               {
                 title: 'Payments Sent',
                 icon: 'payments',
-                value: '$ 20,000',
-              },
-              {
-                title: 'Payments Received',
-                icon: 'paymentsRecived',
-                value: '$ 10,000',
+                value: Rupee + ' ' + data.totalPurchase.toFixed(0),
               },
             ]}
           />
 
           <Grid columns={4} mr={'sm'} ml={'sm'}>
             <Grid.Col span={1}>
-              <StatsSegments
-                data={[
-                  {
-                    label: 'sunroof',
-                    count: '1000',
-                    part: 40,
-                    color: '#47d6ab',
-                  },
-                  {
-                    label: 'Doors',
-                    count: '500',
-                    part: 20,
-                    color: '#fca130',
-                  },
-                  {
-                    label: 'Wheels',
-                    count: '500',
-                    part: 20,
-                    color: '#f93e3e',
-                  },
-                  {
-                    label: 'Engine',
-                    count: '500',
-                    part: 20,
-                    color: '#a3a0fb',
-                  },
-                ]}
-              />
+              <StatsSegments data={top5SellingProducts ?? []} />
             </Grid.Col>
             <Grid.Col span={3}>
               <Graph
-                data={[
-                  {
-                    name: 'Jan',
-                    purchase: 4000,
-                    sale: 2400,
-                  },
-                  {
-                    name: 'Feb',
-                    purchase: 3000,
-                    sale: 1398,
-                  },
-                  {
-                    name: 'Mar',
-                    purchase: 2000,
-                    sale: 9800,
-                  },
-                  {
-                    name: 'Apr',
-                    purchase: 2780,
-                    sale: 3908,
-                  },
-                  {
-                    name: 'May',
-                    purchase: 1890,
-                    sale: 4800,
-                  },
-                ]}
+                data={data.salesPerMonth.map((quantity, index) => ({
+                  name: dayjs().month(index).format('MMM'),
+                  purchase: data.purchasesPerMonth[index]?.toFixed(0) ?? '0',
+                  sale: quantity.toFixed(0),
+                }))}
               />
             </Grid.Col>
             <Grid.Col span={1} mt={'md'}>
@@ -131,19 +135,19 @@ const index = () => {
                 data={[
                   {
                     title: 'Total sale items',
-                    value: '1000',
+                    value: data.totalSaleItems.toFixed(0),
                   },
                   {
                     title: 'Total sale return items',
-                    value: '1000',
+                    value: data.totalSaleReturnItems.toFixed(0),
                   },
                   {
                     title: 'Total purchase items',
-                    value: '1000',
+                    value: data.totalPurchaseItems.toFixed(0),
                   },
                   {
                     title: 'Total purchase return items',
-                    value: '1000',
+                    value: data.totalPurchaseReturnItems.toFixed(0),
                   },
                 ]}
               />
@@ -161,4 +165,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

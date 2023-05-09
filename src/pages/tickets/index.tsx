@@ -6,6 +6,7 @@ import type { RootState } from '@/store';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import type { ModalProps } from '@mantine/core';
+import { Tabs } from '@mantine/core';
 import { Select } from '@mantine/core';
 import { SimpleGrid } from '@mantine/core';
 import { ScrollArea } from '@mantine/core';
@@ -19,6 +20,7 @@ import type { ITicketCreateInput } from '@/zobjs/ticket';
 import _ from 'lodash';
 import SelectUserItem from '@/components/SelectUserItem';
 import dayjs from 'dayjs';
+import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
 
 const initialValues: ITicketCreateInput = {
   name: '',
@@ -235,10 +237,6 @@ const Index = () => {
   const updateTicket = trpc.ticketRouter.updateTicket.useMutation();
   const user = useSelector((state: RootState) => state.clientState.client);
   const [activeTicket, setActiveTicket] = React.useState<string | null>(null);
-  // const assignableUsers = trpc.ticketRouter.getAssignableUsers.useQuery({
-  //   ticketId: activeTicket || '',
-  // });
-  // const assignTicket = trpc.ticketRouter.assignTicket.useMutation();
 
   if (!user) return null;
 
