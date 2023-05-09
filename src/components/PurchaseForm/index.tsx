@@ -1,10 +1,8 @@
 import type { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
-import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import type { PurchaseCreateInput } from '@/zobjs/purchase';
 import { ZPurchaseCreateInput } from '@/zobjs/purchase';
-import { ZSaleCreateInput } from '@/zobjs/sale';
 import {
   Modal,
   Button,
@@ -173,17 +171,24 @@ const SupplierSelect = () => {
     />
   );
 };
+const terms =
+  '1.Goods once sold will not be takenback or exchanged\n2.All disputes are subject to Mumbai Jurisdiction';
 
 const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const { classes, cx } = useStyles();
   // const products = trpc.productRouter.getAllProducts.useQuery();
   const [search, setSearch] = useState<string>('');
   const [selectProduct, setSelectProduct] = useState<InlineProduct>();
-  const terms =
-    '1.Goods once sold will not be takenback or exchanged\n2.All disputes are subject to Mumbai Jurisdiction';
+  const warehouse = useSelector<
+    RootState,
+    RootState['clientState']['warehouse']
+  >((state) => state.clientState.warehouse);
+
+  console.log(warehouse);
 
   const searchProducts = trpc.productRouter.searchProducts.useQuery({
     search: search,
+    warehouse: warehouse,
   });
 
   const [inlineProducts, setInlineProducts] = useState<
@@ -191,9 +196,6 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
   >(new Map());
 
   const [invoiceId, setInvoiceId] = useState<string>('');
-  const [products, setProducts] = useState<
-    RouterOutputs['productRouter']['getProducts']['docs']
-  >([]);
 
   const PurchasesSubmit = trpc.purchaseRouter.create.useMutation();
 
@@ -253,15 +255,10 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
               setSubmitting(false);
               console.log(res._id);
               setInvoiceId(res._id as unknown as string);
-
-              // const invoice = trpc.saleRouter.getInvoice.useQuery({
-              //   _id: res._id as string,
-              // });
             });
 
             resetForm();
             setInlineProducts(new Map());
-            console.log(values);
           }}
         >
           {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
@@ -536,18 +533,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 </ScrollArea>
               </div>
               <Divider mt={'lg'} />
-              {/* <Group style={{ justifyContent: 'end' }} w={'95%'}>
-                <TextInput
-                  label={'Total'}
-                  value={
-                    values.products.reduce(
-                      (acc, item) => acc + item.subtotal,
-                      0
-                    ) || 0
-                  }
-                  readOnly
-                />
-              </Group> */}
+
               <SimpleGrid
                 m={'md'}
                 cols={2}
@@ -557,7 +543,6 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   { maxWidth: 'sm', cols: 2, spacing: 'sm' },
                   { maxWidth: 'xs', cols: 1, spacing: 'sm' },
                 ]}
-                // style={{ alignItems: 'end' }}
               >
                 <div>
                   <Textarea

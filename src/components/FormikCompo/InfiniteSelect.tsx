@@ -17,7 +17,10 @@ const FormikInfiniteSelect: React.FC<Props> = ({ name, label, ...props }) => {
       error={isError ? meta.error : undefined}
       {...field}
       {...props}
-      onChange={(e) => helper.setValue(e, true)}
+      onChange={(e) => {
+        helper.setValue(e, true);
+        props.onChange && props.onChange(e);
+      }}
     />
   );
 };

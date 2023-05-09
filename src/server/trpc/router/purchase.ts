@@ -10,6 +10,7 @@ import WarehouseModel from '@/models/Warehouse';
 import type { Warehouse } from '@/zobjs/warehouse';
 import type { Company } from '@/zobjs/company';
 import type { Product } from '@/zobjs/product';
+import ProductModel from '@/models/Product';
 
 export const purchaseRouter = router({
   create: protectedProcedure
@@ -59,6 +60,23 @@ export const purchaseRouter = router({
         invoiceId,
         supplier: input.supplier,
       });
+
+
+      await Promise.all(
+        input.products.map(async (product) => {
+          await ProductModel.findOneAndUpdate(
+            {
+              _id: product._id,
+              company: client.company,
+            },
+            {
+              $inc: {
+                quantity: product.quantity,
+              },
+            }
+          );
+        })
+      );
 
       return purchase;
     }),
@@ -183,13 +201,18 @@ export const purchaseRouter = router({
         sort: {
           createdAt: -1,
         },
+
+
       };
 
       const query = {
         company: client.company,
       };
 
-      const brands = await Purchase.paginate(query, options);
+      const brands = await Purchase.paginate(query, {
+        ...options,
+        populate: ["supplier"]
+      });
 
       return brands;
     }),

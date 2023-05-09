@@ -1,5 +1,4 @@
 import Layout from '@/components/Layout';
-// import SalesForm from '@/components/SandCForm';
 import PurchaseForm from '@/components/PurchaseForm';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
@@ -9,7 +8,6 @@ import {
   Button,
   ActionIcon,
   Pagination,
-  ScrollArea,
   Center,
   Container,
 } from '@mantine/core';
@@ -85,6 +83,7 @@ const Index = () => {
                   ...val,
                   _id: val._id.toString(),
                   date: dayjs(val.date).format('DD MMMM YYYY'),
+                  supplier: (val.supplier as unknown as { name: string }).name,
                 })) || []
             }
             colProps={{
