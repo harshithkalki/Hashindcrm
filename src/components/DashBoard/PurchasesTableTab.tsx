@@ -33,6 +33,7 @@ const Index = () => {
                 ...val,
                 _id: val._id.toString(),
                 date: dayjs(val.date).format('DD MMMM YYYY'),
+                supplier: (val.supplier as unknown as { name: string }).name,
               })) || []
           }
           colProps={{

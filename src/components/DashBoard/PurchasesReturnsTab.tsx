@@ -36,6 +36,7 @@ const Index = () => {
                 date: dayjs(val.date).format('DD MMMM YYYY'),
                 customer: _.get(val, 'customer.name', 'Walk-in Customer'),
                 total: val.total.toFixed(),
+                supplier: (val.supplier as unknown as { name: string }).name,
               })) ?? []
           }
           colProps={{
