@@ -71,7 +71,10 @@ export const ticketRouter = router({
       return ticket;
     }),
 
-  getAllTicket: protectedProcedure.query(async ({ ctx }) => {
+  tickets: protectedProcedure.input(z.object({
+    cursor: z.number().optional(),
+    limit: z.number().optional(),
+  })).query(async ({ ctx, input }) => {
     const client = await checkPermission(
       'TICKET',
       {
@@ -83,7 +86,30 @@ export const ticketRouter = router({
       'You are not permitted to read products'
     );
 
-    const tickets = TicketModel.find({ companyId: client.company }).lean()
+    const { cursor: page, limit = 10 } = input || {};
+
+    const options = {
+      page: page ?? 1,
+      limit: limit,
+      sort: {
+        createdAt: -1,
+      },
+    };
+
+    const query = {
+      company: client.company,
+    };
+
+    const tickets = await TicketModel.paginate(query, {
+      ...options,
+      lean: true,
+      populate: [{
+        path: 'status',
+        select: 'name _id',
+      }]
+    });
+
+
 
     return tickets;
   }),

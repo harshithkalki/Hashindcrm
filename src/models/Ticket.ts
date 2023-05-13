@@ -1,6 +1,7 @@
 import type { Model, Types } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 import type { ITicket as IZTicket } from '@/zobjs/ticket';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 
 type ITicket = Omit<IZTicket, "assignedTo" | "companyId" | "status"> & {
@@ -48,8 +49,14 @@ const TicketSchema = new Schema<ITicket, TicketModel>(
     },
     files: [
       {
-        type: String,
-        required: false,
+        url: {
+          type: String,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
         default: [],
       },
     ],
@@ -57,8 +64,13 @@ const TicketSchema = new Schema<ITicket, TicketModel>(
   { versionKey: false }
 );
 
-TicketSchema.index({ name: 1, companyId: 1 }, { unique: true });
+
+TicketSchema.plugin(mongoosePaginate);
 
 export default (mongoose.models.Ticket as ReturnType<
-  typeof mongoose.model<ITicket, TicketModel>
->) || mongoose.model<ITicket, TicketModel>('Ticket', TicketSchema);
+  typeof mongoose.model<ITicket, mongoose.PaginateModel<ITicket>>
+>) ||
+  mongoose.model<ITicket, mongoose.PaginateModel<ITicket>>(
+    'Ticket',
+    TicketSchema
+  );

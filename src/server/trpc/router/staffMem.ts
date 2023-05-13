@@ -299,7 +299,7 @@ export const staffRouter = router({
       const staff = await StaffModel.findOne({
         _id: input._id,
         company: client.company,
-      });
+      }).populate<{ role: { _id: string, name: string, displayName: string } }>('role', 'name displayName').lean();
 
       if (!staff) {
         throw new TRPCError({
@@ -308,7 +308,7 @@ export const staffRouter = router({
         });
       }
 
-      const { password, ...rest } = staff?.toObject();
+      const { password, ...rest } = staff;
 
       return rest;
     }),

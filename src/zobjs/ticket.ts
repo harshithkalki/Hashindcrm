@@ -4,7 +4,10 @@ export const ZTicketCreateInput = z.object({
   name: z.string(),
   issueType: z.string(),
   description: z.string().optional(),
-  files: z.array(z.string()),
+  files: z.array(z.object({
+    url: z.string(),
+    name: z.string(),
+  })),
   assignedTo: z.string().optional(),
   status: z.string(),
 });

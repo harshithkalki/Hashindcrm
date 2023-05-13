@@ -4,8 +4,8 @@ const useStyles = createStyles((theme) => ({
   root: {
     display: 'flex',
     backgroundImage: `linear-gradient(-60deg, ${
-      theme.colors[theme.primaryColor][4]
-    } 0%, ${theme.colors[theme.primaryColor][7]} 100%)`,
+      theme.colors[theme.primaryColor]![4]
+    } 0%, ${theme.colors[theme.primaryColor]![7]} 100%)`,
     padding: theme.spacing.xl * 1.5,
     borderRadius: theme.radius.md,
 
@@ -31,7 +31,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   description: {
-    color: theme.colors[theme.primaryColor][0],
+    color: theme.colors[theme.primaryColor]![0],
     fontSize: theme.fontSizes.sm,
     marginTop: 5,
   },
@@ -42,7 +42,7 @@ const useStyles = createStyles((theme) => ({
     '& + &': {
       paddingLeft: theme.spacing.xl,
       marginLeft: theme.spacing.xl,
-      borderLeft: `1px solid ${theme.colors[theme.primaryColor][3]}`,
+      borderLeft: `1px solid ${theme.colors[theme.primaryColor]![3]}`,
 
       [theme.fn.smallerThan('sm')]: {
         paddingLeft: 0,
@@ -50,7 +50,7 @@ const useStyles = createStyles((theme) => ({
         borderLeft: 0,
         paddingTop: theme.spacing.xl,
         marginTop: theme.spacing.xl,
-        borderTop: `1px solid ${theme?.colors[theme?.primaryColor][3]}`,
+        borderTop: `1px solid ${theme?.colors[theme?.primaryColor]![3]}`,
       },
     },
   },
