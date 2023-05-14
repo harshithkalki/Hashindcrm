@@ -6,10 +6,13 @@ import checkPermission from '@/utils/checkPermission';
 import type { CategoryDocument } from '@/models/Category';
 import CategoryModel from '@/models/Category';
 import type { BrandDocument } from '@/models/Brand';
+import type {
+  Product
+} from '@/zobjs/product';
 import {
   ZProduct,
   ZProductCreateInput,
-  ZProductUpdateInput,
+  ZProductUpdateInput
 } from '@/zobjs/product';
 import { objectkeys } from '@/utils/helpers';
 import mongoose from 'mongoose';
@@ -73,6 +76,31 @@ export const productRouter = router({
 
       return product;
     }),
+
+  createMany: protectedProcedure
+    .input(
+      z.array(
+        ZProductCreateInput
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'PRODUCT',
+        { create: true },
+        ctx.clientId,
+        'You are not permitted to create product'
+      );
+
+      const products = await ProductModel.insertMany(
+        input.map((product) => ({
+          ...product,
+          company: client.company,
+        }))
+      );
+
+      return products;
+    }),
+
 
   getProductsByCategory: protectedProcedure
     .input(
@@ -340,38 +368,9 @@ export const productRouter = router({
     const products = await ProductModel.find({
       company: client.company,
     })
-      .populate<{
-        warehouse: {
-          _id: string;
-          name: string;
-        };
-        category: {
-          _id: string;
-          name: string;
-        };
-        brand: {
-          _id: string;
-          name: string;
-        };
-      }>(['warehouse', 'category', 'brand'])
       .lean();
 
-    const csv = products.map((product) => {
-      return {
-        ...product,
-        warehouse: product.warehouse.name,
-        warehouseId: product.warehouse._id,
-        category: product.category.name,
-        categoryId: product.category._id,
-        _id: product._id.toString(),
-        company: product.company.toString(),
-        createdAt: product.createdAt.toISOString(),
-        brand: product.brand.name,
-        brandId: product.brand._id,
-        openingStockDate: product.openingStockDate?.toISOString(),
-      };
-    });
 
-    return csv;
+    return products as unknown as Omit<Product, "createdAt">[]
   }),
 });

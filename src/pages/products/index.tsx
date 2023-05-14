@@ -1,4 +1,12 @@
-import { Button, Center, Group, Pagination, Title, Image } from '@mantine/core';
+import {
+  Button,
+  Center,
+  Group,
+  Pagination,
+  Title,
+  Image,
+  FileButton,
+} from '@mantine/core';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { client, trpc } from '@/utils/trpc';
@@ -7,6 +15,8 @@ import TableSelection from '@/components/Tables';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { Container } from '@mantine/core';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { MIME_TYPES } from '@mantine/dropzone';
+import csvtojson from 'csvtojson';
 
 export interface ProductFormType {
   name: string;
@@ -42,6 +52,8 @@ const Index = () => {
   );
 
   const deleteProduct = trpc.productRouter.delete.useMutation();
+  const createManyProducts = trpc.productRouter.createMany.useMutation();
+  const [file, setFile] = React.useState<File | null>(null);
 
   useEffect(() => {
     if (!products.data?.pages.find((pageData) => pageData.page === page)) {
@@ -75,38 +87,50 @@ const Index = () => {
               size='xs'
               onClick={async () => {
                 const data = await client.productRouter.getCsv.query();
-                const headers: Record<keyof typeof data[number], string> = {
-                  name: 'Name',
-                  warehouse: 'Warehouse',
-                  _id: 'ID',
-                  company: 'Company',
-                  createdAt: 'Created At',
-                  description: 'Description',
-                  slug: 'Slug',
-                  logo: 'Logo',
-                  quantity: 'Quantity',
-                  quantityAlert: 'Quantity Alert',
-                  category: 'Category',
-                  brand: 'Brand',
-                  barcodeSymbology: 'Barcode Symbology',
-                  itemCode: 'Item Code',
-                  openingStock: 'Opening Stock',
-                  openingStockDate: 'Opening Stock Date',
-                  purchasePrice: 'Purchase Price',
-                  salePrice: 'Sale Price',
-                  tax: 'Tax',
-                  mrp: 'MRP',
-                  expiryDate: 'Expiry Date',
-                  warehouseId: 'Warehouse ID',
-                  categoryId: 'Category ID',
-                  brandId: 'Brand ID',
-                };
-
+                const headers: Record<string, string> = {};
+                if (data.length === 0) return;
+                Object.keys(data[0]!).forEach((key) => {
+                  headers[key as keyof (typeof data)[number]] = key;
+                });
                 exportCSVFile(headers, data, 'products');
               }}
             >
               Download CSV
             </Button>
+            <FileButton
+              onChange={(file) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                  const csv = e.target?.result;
+                  if (!csv) return;
+                  const data = await csvtojson({
+                    colParser: {
+                      quantity: 'number',
+                      quantityAlert: 'number',
+                      openingStock: 'number',
+                      purchasePrice: 'number',
+                      salePrice: 'number',
+                      mrp: 'number',
+                      tax: 'number',
+                    },
+                  }).fromString(csv as string);
+                  createManyProducts.mutateAsync(data);
+                };
+                reader.readAsText(file);
+              }}
+              accept={MIME_TYPES.csv}
+            >
+              {(props) => (
+                <Button
+                  {...props}
+                  size='xs'
+                  loading={createManyProducts.isLoading}
+                >
+                  Upload CSV
+                </Button>
+              )}
+            </FileButton>
           </Group>
         </Group>
         <TableSelection

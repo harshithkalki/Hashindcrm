@@ -16,7 +16,7 @@ export const ZProductCreateInput = z.object({
   salePrice: z.number(),
   tax: z.number(),
   mrp: z.number(),
-  expiryDate: z.string().optional(),
+  expiryDate: z.string().optional().transform((val) => val || undefined),
   description: z.string().optional(),
   warehouse: z.string(),
 });
@@ -31,5 +31,7 @@ export const ZProduct = ZProductCreateInput.extend({
   createdAt: z.date(),
   company: z.string(),
 });
+
+
 
 export type Product = z.infer<typeof ZProduct>;
