@@ -5,7 +5,7 @@ import TicketSelect from '@/components/TicketStatus';
 import type { RootState } from '@/store';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
-import { ModalProps, ScrollArea } from '@mantine/core';
+import { ModalProps, ScrollArea, useMantineTheme } from '@mantine/core';
 import { ActionIcon } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { Badge } from '@mantine/core';
@@ -879,6 +879,7 @@ const Index = () => {
   const initialStatuses = trpc.workflowRouter.getInitialStatuses.useQuery();
   const user = useSelector((state: RootState) => state.clientState.client);
   const [ticket, setTicket] = React.useState<TicketCustom | null>(null);
+  const theme = useMantineTheme();
 
   if (!user) return null;
 
@@ -893,10 +894,21 @@ const Index = () => {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
+          position: 'relative',
         }}
       >
         <ScrollArea offsetScrollbars>
-          <Group my='lg' style={{ justifyContent: 'space-between' }}>
+          <Group
+            style={{
+              justifyContent: 'space-between',
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+              backgroundColor: theme.colors.dark[9],
+              paddingTop: theme.spacing.lg,
+              paddingBottom: theme.spacing.lg,
+            }}
+          >
             <Title fw={400}>Tickets</Title>
             <Button onClick={() => setModal(true)}>Add</Button>
           </Group>
