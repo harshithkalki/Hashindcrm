@@ -5,7 +5,7 @@ import TicketModel from '@/models/Ticket';
 import StatusModel from '@/models/Status';
 import { TRPCError } from '@trpc/server';
 import checkPermission from '@/utils/checkPermission';
-import { ZTicketCreateInput } from '@/zobjs/ticket';
+import { ZTicketCreateInput, ZTicketUpdateInput } from '@/zobjs/ticket';
 
 export const ticketRouter = router({
   createTicket: protectedProcedure
@@ -49,10 +49,7 @@ export const ticketRouter = router({
 
   updateTicket: protectedProcedure
     .input(
-      z.object({
-        ticketId: z.string(),
-        nextStatusId: z.string(),
-      })
+      ZTicketUpdateInput
     )
     .mutation(async ({ input, ctx }) => {
       await checkPermission(
@@ -64,9 +61,7 @@ export const ticketRouter = router({
         'You are not permitted to update a ticket'
       );
 
-      const ticket = await TicketModel.findByIdAndUpdate(input.ticketId, {
-        status: input.nextStatusId,
-      });
+      const ticket = await TicketModel.findByIdAndUpdate(input._id, input);
 
       return ticket;
     }),

@@ -9,18 +9,17 @@ import type { ModalProps } from '@mantine/core';
 import { ActionIcon } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { Badge } from '@mantine/core';
-import { Textarea } from '@mantine/core';
 import { Avatar, LoadingOverlay, Text } from '@mantine/core';
 import { Center, Divider, Pagination } from '@mantine/core';
 import { Select } from '@mantine/core';
 import { SimpleGrid } from '@mantine/core';
 import { Button, Container, Group, Modal, Title } from '@mantine/core';
-import { Form, Formik } from 'formik';
+import { FieldArray, Form, Formik } from 'formik';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DropzoneComp from '@/components/DropZone';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
-import type { ITicketCreateInput, ITicket } from '@/zobjs/ticket';
+import type { ITicketCreateInput } from '@/zobjs/ticket';
 import _ from 'lodash';
 import SelectUserItem from '@/components/SelectUserItem';
 import dayjs from 'dayjs';
@@ -223,8 +222,8 @@ const StatusSelect = ({
       onSubmit={(values, { setSubmitting }) => {
         updateTicket
           .mutateAsync({
-            nextStatusId: values.ticketStatus,
-            ticketId,
+            _id: ticketId,
+            status: values.ticketStatus,
           })
           .then(() => setSubmitting(false));
       }}
@@ -331,6 +330,7 @@ const TicketDetails = ({
   onClose: () => void;
 }) => {
   const utils = trpc.useContext();
+  const updateTicket = trpc.ticketRouter.updateTicket.useMutation();
   const { data: staff, isLoading } = trpc.staffRouter.getStaff.useQuery(
     { _id: (data?.assignedTo as unknown as string) ?? '' },
     {
@@ -339,6 +339,8 @@ const TicketDetails = ({
     }
   );
   const { classes } = useStyles();
+  const { mutateAsync: delteFiles } =
+    trpc.filesRouter.deleteFiles.useMutation();
 
   if (isLoading && data?.assignedTo) return <LoadingOverlay visible />;
 
@@ -346,102 +348,174 @@ const TicketDetails = ({
 
   return (
     <Modal title='Ticket Details' opened={!!data} onClose={onClose} size='xl'>
-      <div
-        style={{
-          padding: '2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2rem',
+      <Formik
+        initialValues={{
+          description: data.description,
+          files: data.files,
+        }}
+        onSubmit={async (values, { setSubmitting }) => {
+          const filesToDelete = data.files.filter(
+            (file) => !values.files.includes(file)
+          );
+
+          if (filesToDelete.length) {
+            await delteFiles({ keys: filesToDelete.map((file) => file.name) });
+          }
+
+          updateTicket
+            .mutateAsync({
+              _id: data._id.toString(),
+              description: values.description,
+              files: values.files,
+            })
+            .then(() => {
+              setSubmitting(false);
+              utils.ticketRouter.tickets.invalidate();
+              onClose();
+            });
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-            }}
-          >
-            <Avatar
-              src={staff?.profile}
-              size='xl'
+        {({ values, isSubmitting }) => (
+          <Form>
+            <div
               style={{
-                borderRadius: '50%',
+                padding: '2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
               }}
-            />
-            <Text>{staff?.name ?? 'Not Assigned'}</Text>
-            <Text size='xs' fw={'bold'}>
-              {staff?.role?.displayName}
-            </Text>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              flex: 1,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <Text fw={'bold'}>Status</Text>
-              <Badge>{(data.status as unknown as { name: string }).name}</Badge>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <Text fw={'bold'}>Issue Type</Text>
-              {data.issueType?.length > 0 && <Badge>{data.issueType}</Badge>}
-            </div>
-            <Textarea
-              label='Description'
-              placeholder='Description...'
-              value={data?.description}
-              readOnly
-            />
-          </div>
-        </div>
-        <div>
-          <Text fw={'bold'}>Files</Text>
-          <div>
-            {data?.files?.map((file, index) => (
-              <div className={classes.file} key={index}>
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    flex: 1,
+                  }}
+                >
+                  <Avatar
+                    src={staff?.profile}
+                    size='xl'
+                    style={{
+                      borderRadius: '50%',
+                    }}
+                  />
+                  <Text>{staff?.name ?? 'Not Assigned'}</Text>
+                  <Text size='xs' fw={'bold'}>
+                    {staff?.role?.displayName}
+                  </Text>
+                </div>
+
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    flexDirection: 'column',
                     gap: '1rem',
+                    flex: 1,
                   }}
                 >
-                  <IconFileInvoice size={25} />
-                  <Text>{file.name}</Text>
-                </div>
-                <Group>
-                  <ActionIcon
-                    variant='filled'
-                    onClick={() => {
-                      downloadFile(file.url, file.name);
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
                     }}
                   >
-                    <IconDownload />
-                  </ActionIcon>
-
-                  <ActionIcon variant='filled' color='red'>
-                    <IconTrash />
-                  </ActionIcon>
-                </Group>
-              </div>
-            ))}
-            {data.files.length === 0 && (
-              <div className={classes.file}>
-                <div style={{ flex: 1 }}>
-                  <Text align='center'>No files attached</Text>
+                    <Text fw={'bold'}>Status</Text>
+                    <Badge>
+                      {(data.status as unknown as { name: string }).name}
+                    </Badge>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                    }}
+                  >
+                    <Text fw={'bold'}>Issue Type</Text>
+                    {data.issueType?.length > 0 && (
+                      <Badge>{data.issueType}</Badge>
+                    )}
+                  </div>
+                  <Formiktextarea
+                    label='Description'
+                    placeholder='Description...'
+                    name='description'
+                  />
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+              <div>
+                <Text fw={'bold'}>Files</Text>
+                <FieldArray
+                  name='files'
+                  render={(arrayHelpers) => (
+                    <div>
+                      {values?.files?.map((file, index) => (
+                        <div className={classes.file} key={index}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '1rem',
+                            }}
+                          >
+                            <IconFileInvoice size={25} />
+                            <Text>{file.name}</Text>
+                          </div>
+                          <Group>
+                            <ActionIcon
+                              variant='filled'
+                              onClick={() => {
+                                downloadFile(file.url, file.name);
+                              }}
+                            >
+                              <IconDownload />
+                            </ActionIcon>
+
+                            <ActionIcon
+                              variant='filled'
+                              color='red'
+                              onClick={() => {
+                                arrayHelpers.remove(index);
+                              }}
+                            >
+                              <IconTrash />
+                            </ActionIcon>
+                          </Group>
+                        </div>
+                      ))}
+                      {data.files.length === 0 && (
+                        <div className={classes.file}>
+                          <div style={{ flex: 1 }}>
+                            <Text align='center'>No files attached</Text>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+              <Group position='center'>
+                <Button
+                  variant='outline'
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type='submit' loading={isSubmitting}>
+                  Save
+                </Button>
+              </Group>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </Modal>
   );
 };
@@ -456,7 +530,6 @@ const Index = () => {
     },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
-  const updateTicket = trpc.ticketRouter.updateTicket.useMutation();
   const user = useSelector((state: RootState) => state.clientState.client);
   const [ticketId, setTicketId] = React.useState<string | null>(null);
 
