@@ -221,7 +221,7 @@ export default function TableSelection<T>({
         />
       )}
       <ScrollArea style={{ flex: 1 }} w='100%'>
-        <Container w={'100%'}>
+        <Container h='100%' w={'100%'}>
           <Table
             sx={{ minWidth: '100%' }}
             verticalSpacing='sm'
@@ -261,13 +261,15 @@ export default function TableSelection<T>({
             </thead>
             <tbody>{rows}</tbody>
           </Table>
+          {filteredData.length === 0 && (
+            <Center>
+              <Text fw={'bold'} size={'lg'}>
+                No Results
+              </Text>
+            </Center>
+          )}
         </Container>
       </ScrollArea>
-      {filteredData.length === 0 && (
-        <Center>
-          <Text>No Results</Text>
-        </Center>
-      )}
     </>
   );
 }

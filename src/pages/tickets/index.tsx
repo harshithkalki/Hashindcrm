@@ -5,7 +5,7 @@ import TicketSelect from '@/components/TicketStatus';
 import type { RootState } from '@/store';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
-import type { ModalProps } from '@mantine/core';
+import { ModalProps, ScrollArea } from '@mantine/core';
 import { ActionIcon } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { Badge } from '@mantine/core';
@@ -19,7 +19,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DropzoneComp from '@/components/DropZone';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
-import type { ITicketCreateInput } from '@/zobjs/ticket';
+import type { ITicket, ITicketCreateInput } from '@/zobjs/ticket';
 import _ from 'lodash';
 import SelectUserItem from '@/components/SelectUserItem';
 import dayjs from 'dayjs';
@@ -276,12 +276,29 @@ const AssignableSelect = ({
   const user = useSelector((state: RootState) => state.clientState.client);
 
   const userOptions = useMemo(() => {
-    return data?.map((val) => ({
+    const options = data?.map((val) => ({
       value: val._id.toString(),
       label: val.name,
       role: val.role.name,
     }));
-  }, [data]);
+
+    if (!user) return options;
+
+    if (user.role !== 'super-admin') {
+      options?.push({
+        value: user._id,
+        label: 'Me',
+        role: user.role.name,
+      });
+      options?.push({
+        value: user._id,
+        label: 'Me',
+        role: user.role.name,
+      });
+    }
+
+    return options;
+  }, [data, user]);
 
   return (
     <Formik
@@ -326,7 +343,7 @@ const TicketDetails = ({
   data,
   onClose,
 }: {
-  data?: RouterOutputs['ticketRouter']['tickets']['docs'][number];
+  data: TicketCustom | null;
   onClose: () => void;
 }) => {
   const utils = trpc.useContext();
@@ -520,24 +537,348 @@ const TicketDetails = ({
   );
 };
 
-const Index = () => {
-  const [modal, setModal] = React.useState(false);
-  const initialStatuses = trpc.workflowRouter.getInitialStatuses.useQuery();
+const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
   const [page, setPage] = useState(1);
-  const tickets = trpc.ticketRouter.tickets.useInfiniteQuery(
+  const tickets = trpc.ticketRouter.myTickets.useInfiniteQuery(
     {
       limit: 10,
     },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
-  const user = useSelector((state: RootState) => state.clientState.client);
-  const [ticketId, setTicketId] = React.useState<string | null>(null);
-
   useEffect(() => {
     if (!tickets.data?.pages.find((pageData) => pageData.page === page)) {
       tickets.fetchNextPage();
     }
   }, [tickets, page]);
+
+  return (
+    <div
+      style={{
+        paddingTop: '1rem',
+        paddingBottom: '1rem',
+        height: 'calc(100vh - 10rem)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <TableSelection
+        data={
+          tickets.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.map((doc) => ({
+              ...doc,
+              _id: doc._id.toString(),
+              showMore: '',
+            })) ?? []
+        }
+        colProps={{
+          _id: {
+            label: 'Id',
+          },
+          name: {
+            label: 'Todo',
+          },
+          createdAt: {
+            label: 'Created',
+            Component: ({ data: { createdAt } }) => (
+              <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
+            ),
+          },
+          status: {
+            label: 'Status',
+            Component: ({ data: { status, _id, assignedTo } }) => (
+              <StatusSelect
+                statusId={status._id.toString() as string}
+                ticketId={_id.toString()}
+                assignedTo={assignedTo?.toString()}
+              />
+            ),
+          },
+          assignedTo: {
+            label: 'Assigned',
+            Component: ({ data: { assignedTo, _id } }) => (
+              <AssignableSelect
+                ticketId={_id.toString()}
+                assigned={assignedTo?.toString() ?? ''}
+              />
+            ),
+          },
+          showMore: {
+            label: '',
+            Component: ({ data }) => (
+              <Button
+                variant='subtle'
+                size='xs'
+                onClick={() => {
+                  setTicketId({
+                    ...data,
+                    assignedTo: data.assignedTo?.toString(),
+                    status: data.status as unknown as {
+                      _id: string;
+                      name: string;
+                    },
+                    companyId: data.companyId?.toString(),
+                  });
+                }}
+              >
+                Show More
+              </Button>
+            ),
+          },
+        }}
+        deletable
+      />
+      <Center>
+        {(tickets.data?.pages.find((pageData) => pageData.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              tickets.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        )}
+      </Center>
+    </div>
+  );
+};
+
+const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
+  const [page, setPage] = useState(1);
+  const tickets = trpc.ticketRouter.openTickets.useInfiniteQuery(
+    {
+      limit: 10,
+    },
+    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+  );
+  useEffect(() => {
+    if (!tickets.data?.pages.find((pageData) => pageData.page === page)) {
+      tickets.fetchNextPage();
+    }
+  }, [tickets, page]);
+
+  return (
+    <div
+      style={{
+        paddingTop: '1rem',
+        paddingBottom: '1rem',
+        height: 'calc(100vh - 10rem)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <TableSelection
+        data={
+          tickets.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.map((doc) => ({
+              ...doc,
+              _id: doc._id.toString(),
+              showMore: '',
+            })) ?? []
+        }
+        colProps={{
+          _id: {
+            label: 'Id',
+          },
+          name: {
+            label: 'Todo',
+          },
+          createdAt: {
+            label: 'Created',
+            Component: ({ data: { createdAt } }) => (
+              <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
+            ),
+          },
+          status: {
+            label: 'Status',
+            Component: ({ data: { status, _id, assignedTo } }) => (
+              <StatusSelect
+                statusId={status._id.toString() as string}
+                ticketId={_id.toString()}
+                assignedTo={assignedTo?.toString()}
+              />
+            ),
+          },
+          assignedTo: {
+            label: 'Assigned',
+            Component: ({ data: { assignedTo, _id } }) => (
+              <AssignableSelect
+                ticketId={_id.toString()}
+                assigned={assignedTo?.toString() ?? ''}
+              />
+            ),
+          },
+          showMore: {
+            label: '',
+            Component: ({ data }) => (
+              <Button
+                variant='subtle'
+                size='xs'
+                onClick={() => {
+                  setTicketId({
+                    ...data,
+                    assignedTo: data.assignedTo?.toString(),
+                    status: data.status as unknown as {
+                      _id: string;
+                      name: string;
+                    },
+                    companyId: data.companyId?.toString(),
+                  });
+                }}
+              >
+                Show More
+              </Button>
+            ),
+          },
+        }}
+        deletable
+      />
+      <Center>
+        {(tickets.data?.pages.find((pageData) => pageData.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              tickets.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        )}
+      </Center>
+    </div>
+  );
+};
+
+type SetTicket = (ticket: TicketCustom) => void;
+
+type TicketCustom = Omit<ITicket, 'status'> & {
+  status: {
+    _id: string;
+    name: string;
+  };
+  _id: string;
+};
+
+const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
+  const [page, setPage] = useState(1);
+  const tickets = trpc.ticketRouter.otherTickets.useInfiniteQuery(
+    {
+      limit: 10,
+    },
+    { getNextPageParam: () => page, refetchOnWindowFocus: false }
+  );
+  useEffect(() => {
+    if (!tickets.data?.pages.find((pageData) => pageData.page === page)) {
+      tickets.fetchNextPage();
+    }
+  }, [tickets, page]);
+
+  return (
+    <div
+      style={{
+        paddingTop: '1rem',
+        paddingBottom: '1rem',
+        height: 'calc(100vh - 10rem)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <TableSelection
+        data={
+          tickets.data?.pages
+            .find((pageData) => pageData.page === page)
+            ?.docs.map((doc) => ({
+              ...doc,
+              _id: doc._id.toString(),
+              showMore: '',
+            })) ?? []
+        }
+        colProps={{
+          _id: {
+            label: 'Id',
+          },
+          name: {
+            label: 'Todo',
+          },
+          createdAt: {
+            label: 'Created',
+            Component: ({ data: { createdAt } }) => (
+              <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
+            ),
+          },
+          status: {
+            label: 'Status',
+            Component: ({ data: { status, _id, assignedTo } }) => (
+              <StatusSelect
+                statusId={status._id.toString() as string}
+                ticketId={_id.toString()}
+                assignedTo={assignedTo?.toString()}
+              />
+            ),
+          },
+          assignedTo: {
+            label: 'Assigned',
+            Component: ({ data: { assignedTo, _id } }) => (
+              <AssignableSelect
+                ticketId={_id.toString()}
+                assigned={assignedTo?.toString() ?? ''}
+              />
+            ),
+          },
+          showMore: {
+            label: '',
+            Component: ({ data }) => (
+              <Button
+                variant='subtle'
+                size='xs'
+                onClick={() => {
+                  setTicketId({
+                    ...data,
+                    assignedTo: data.assignedTo?.toString(),
+                    status: data.status as unknown as {
+                      _id: string;
+                      name: string;
+                    },
+                    companyId: data.companyId?.toString(),
+                  });
+                }}
+              >
+                Show More
+              </Button>
+            ),
+          },
+        }}
+        deletable
+      />
+      <Center>
+        {(tickets.data?.pages.find((pageData) => pageData.page === page)
+          ?.totalPages ?? 0) > 1 && (
+          <Pagination
+            total={
+              tickets.data?.pages.find((pageData) => pageData.page === page)
+                ?.totalPages ?? 0
+            }
+            initialPage={1}
+            page={page}
+            onChange={setPage}
+          />
+        )}
+      </Center>
+    </div>
+  );
+};
+
+const Index = () => {
+  const [modal, setModal] = React.useState(false);
+  const initialStatuses = trpc.workflowRouter.getInitialStatuses.useQuery();
+  const user = useSelector((state: RootState) => state.clientState.client);
+  const [ticket, setTicket] = React.useState<TicketCustom | null>(null);
 
   if (!user) return null;
 
@@ -548,95 +889,37 @@ const Index = () => {
         data={initialStatuses.data}
       />
       <Container
-        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+        }}
       >
-        <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Tickets</Title>
-          <Button onClick={() => setModal(true)}>Add</Button>
-        </Group>
-        <Divider mt={'xl'} />
+        <ScrollArea offsetScrollbars>
+          <Group my='lg' style={{ justifyContent: 'space-between' }}>
+            <Title fw={400}>Tickets</Title>
+            <Button onClick={() => setModal(true)}>Add</Button>
+          </Group>
+          <Divider mt={'xl'} />
 
-        <TableSelection
-          data={
-            tickets.data?.pages
-              .find((pageData) => pageData.page === page)
-              ?.docs.map((doc) => ({
-                ...doc,
-                _id: doc._id.toString(),
-                showMore: '',
-              })) ?? []
-          }
-          colProps={{
-            _id: {
-              label: 'Id',
-            },
-            name: {
-              label: 'Todo',
-            },
-            createdAt: {
-              label: 'Created',
-              Component: ({ data: { createdAt } }) => (
-                <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
-              ),
-            },
-            status: {
-              label: 'Status',
-              Component: ({ data: { status, _id, assignedTo } }) => (
-                <StatusSelect
-                  statusId={status._id.toString() as string}
-                  ticketId={_id.toString()}
-                  assignedTo={assignedTo?.toString()}
-                />
-              ),
-            },
-            assignedTo: {
-              label: 'Assigned',
-              Component: ({ data: { assignedTo, _id } }) => (
-                <AssignableSelect
-                  ticketId={_id.toString()}
-                  assigned={assignedTo?.toString() ?? ''}
-                />
-              ),
-            },
-            showMore: {
-              label: '',
-              Component: ({ data: { _id } }) => (
-                <Button
-                  variant='subtle'
-                  size='xs'
-                  onClick={() => {
-                    setTicketId(_id.toString());
-                  }}
-                >
-                  Show More
-                </Button>
-              ),
-            },
-          }}
-        />
-        <Center>
-          {(tickets.data?.pages.find((pageData) => pageData.page === page)
-            ?.totalPages ?? 0) > 1 && (
-            <Pagination
-              total={
-                tickets.data?.pages.find((pageData) => pageData.page === page)
-                  ?.totalPages ?? 0
-              }
-              initialPage={1}
-              page={page}
-              onChange={setPage}
-            />
-          )}
-        </Center>
+          <Title my='xl' fw={400} size='24px'>
+            Assigned to me
+          </Title>
+          <AssignedToMe setTicketId={setTicket} />
+
+          <Divider mt={'xl'} />
+          <Title my='xl' fw={400} size='24px'>
+            Open
+          </Title>
+          <OpenTickets setTicketId={setTicket} />
+          <Divider mt={'xl'} />
+          <Title my='xl' fw={400} size='24px'>
+            Other
+          </Title>
+          <OtherTickets setTicketId={setTicket} />
+        </ScrollArea>
       </Container>
-      <TicketDetails
-        data={
-          tickets.data?.pages[page - 1]?.docs.find(
-            (val) => val._id.toString() === ticketId
-          ) ?? undefined
-        }
-        onClose={() => setTicketId(null)}
-      />
+      <TicketDetails data={ticket} onClose={() => setTicket(null)} />
     </Layout>
   );
 };

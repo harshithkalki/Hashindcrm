@@ -109,6 +109,142 @@ export const ticketRouter = router({
     return tickets;
   }),
 
+  myTickets: protectedProcedure.input(z.object({
+    cursor: z.number().optional(),
+    limit: z.number().optional(),
+  })).query(async ({ ctx, input }) => {
+    const client = await checkPermission(
+      'TICKET',
+      {
+        delete: true,
+        read: true,
+        update: true,
+      },
+      ctx.clientId,
+      'You are not permitted to read products'
+    );
+
+    const { cursor: page, limit = 10 } = input || {};
+
+    const options = {
+      page: page ?? 1,
+      limit: limit,
+      sort: {
+        createdAt: -1,
+      },
+    };
+
+    const query = {
+      company: client.company,
+      assignedTo: client.id,
+    };
+
+    const tickets = await TicketModel.paginate(query, {
+      ...options,
+      lean: true,
+      populate: [{
+        path: 'status',
+        select: 'name _id',
+      }]
+    });
+
+    return tickets;
+
+  }),
+
+  openTickets: protectedProcedure.input(z.object({
+    cursor: z.number().optional(),
+    limit: z.number().optional(),
+  })).query(async ({ ctx, input }) => {
+    const client = await checkPermission(
+      'TICKET',
+      {
+        delete: true,
+        read: true,
+        update: true,
+      },
+      ctx.clientId,
+      'You are not permitted to read products'
+    );
+
+    const { cursor: page, limit = 10 } = input || {};
+
+    const options = {
+      page: page ?? 1,
+      limit: limit,
+      sort: {
+        createdAt: -1,
+      },
+    };
+
+    const query = {
+      company: client.company,
+    };
+
+
+    const tickets = await TicketModel.paginate({
+      ...query,
+      assignedTo: null
+    }, {
+      ...options,
+      lean: true,
+      populate: [{
+        path: 'status',
+        select: 'name _id',
+      }]
+    });
+
+    return tickets;
+  }),
+
+  otherTickets: protectedProcedure.input(z.object({
+    cursor: z.number().optional(),
+    limit: z.number().optional(),
+  })).query(async ({ ctx, input }) => {
+    const client = await checkPermission(
+      'TICKET',
+      {
+        delete: true,
+        read: true,
+        update: true,
+      },
+      ctx.clientId,
+      'You are not permitted to read products'
+    );
+
+    const { cursor: page, limit = 10 } = input || {};
+
+    const options = {
+      page: page ?? 1,
+      limit: limit,
+      sort: {
+        createdAt: -1,
+      },
+    };
+
+    const query = {
+      company: client.company,
+    };
+
+    const tickets = await TicketModel.paginate({
+      ...query,
+      assignedTo: {
+        $ne: client.id,
+        $exists: true,
+      }
+    }, {
+      ...options,
+      lean: true,
+      populate: [{
+        path: 'status',
+        select: 'name _id',
+      }]
+    });
+
+    return tickets;
+  }),
+
+
   assignTicket: protectedProcedure
     .input(
       z.object({
