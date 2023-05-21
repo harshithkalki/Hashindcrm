@@ -29,6 +29,7 @@ import { IconDownload, IconFileInvoice, IconTrash } from '@tabler/icons';
 import type { FileWithPath } from '@mantine/dropzone';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
+import { Accordion } from '@mantine/core';
 
 const uploadFiles = async (files: FileWithPath[]) => {
   const formData = new FormData();
@@ -898,39 +899,46 @@ const Index = () => {
           position: 'relative',
         }}
       >
-        <ScrollArea offsetScrollbars>
-          <Group
-            style={{
-              justifyContent: 'space-between',
-              position: 'sticky',
-              top: 0,
-              zIndex: 10,
-              backgroundColor: theme.colors.dark[9],
-              paddingTop: theme.spacing.lg,
-              paddingBottom: theme.spacing.lg,
-            }}
-          >
-            <Title fw={400}>Tickets</Title>
-            <Button onClick={() => setModal(true)}>Add</Button>
-          </Group>
-          <Divider mt={'xl'} />
+        <Group
+          style={{
+            justifyContent: 'space-between',
+            paddingTop: theme.spacing.lg,
+            paddingBottom: theme.spacing.lg,
+          }}
+        >
+          <Title fw={400}>Tickets</Title>
+          <Button onClick={() => setModal(true)}>Add</Button>
+        </Group>
+        <Divider mt={'xl'} />
+        <div
+          style={{
+            flex: '1',
+            overflow: 'auto',
+          }}
+        >
+          <Accordion chevronPosition='left' defaultValue='assignedToMe'>
+            <Accordion.Item value='assignedToMe'>
+              <Accordion.Control>Assigned to me</Accordion.Control>
+              <Accordion.Panel>
+                <AssignedToMe setTicketId={setTicket} />
+              </Accordion.Panel>
+            </Accordion.Item>
 
-          <Title my='xl' fw={400} size='24px'>
-            Assigned to me
-          </Title>
-          <AssignedToMe setTicketId={setTicket} />
+            <Accordion.Item value='open'>
+              <Accordion.Control>Open</Accordion.Control>
+              <Accordion.Panel>
+                <OpenTickets setTicketId={setTicket} />
+              </Accordion.Panel>
+            </Accordion.Item>
 
-          <Divider mt={'xl'} />
-          <Title my='xl' fw={400} size='24px'>
-            Open
-          </Title>
-          <OpenTickets setTicketId={setTicket} />
-          <Divider mt={'xl'} />
-          <Title my='xl' fw={400} size='24px'>
-            Other
-          </Title>
-          <OtherTickets setTicketId={setTicket} />
-        </ScrollArea>
+            <Accordion.Item value='other'>
+              <Accordion.Control>Other</Accordion.Control>
+              <Accordion.Panel>
+                <OtherTickets setTicketId={setTicket} />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </div>
       </Container>
       <TicketDetails data={ticket} onClose={() => setTicket(null)} />
     </Layout>
