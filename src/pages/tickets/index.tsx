@@ -6,7 +6,7 @@ import type { RootState } from '@/store';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
 import type { ModalProps } from '@mantine/core';
-import { ScrollArea, useMantineTheme } from '@mantine/core';
+import { useMantineTheme } from '@mantine/core';
 import { ActionIcon } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { Badge } from '@mantine/core';
@@ -136,7 +136,13 @@ const AddnewTicket = ({
                 placeholder='Select Issue Type'
                 data={[
                   { value: 'bug', label: 'Bug' },
-                  { value: 'feature', label: 'Feature' },
+                  { value: 'sub-task', label: 'Sub-Task' },
+                  { value: 'epic', label: 'Epic' },
+                  { value: 'story', label: 'Story' },
+                  { value: 'improvement', label: 'Improvement' },
+                  { value: 'newFeature', label: 'New Feature' },
+                  { value: 'story', label: 'Story' },
+                  { value: 'task', label: 'Task' },
                 ]}
               />
               <FormInput
@@ -149,7 +155,7 @@ const AddnewTicket = ({
                 mt={'xs'}
                 name='status'
                 label='Initial Status'
-                placeholder='Select Status'
+                placeholder='Status'
                 data={data.map((val) => ({
                   value: val._id.toString(),
                   label: val.name,
@@ -215,6 +221,7 @@ const StatusSelect = ({
     []
   );
   const user = useSelector((state: RootState) => state.clientState.client);
+  const utils = trpc.useContext();
 
   return (
     <Formik
@@ -227,7 +234,12 @@ const StatusSelect = ({
             _id: ticketId,
             status: values.ticketStatus,
           })
-          .then(() => setSubmitting(false));
+          .then(() => {
+            setSubmitting(false);
+            utils.ticketRouter.myTickets.invalidate();
+            utils.ticketRouter.otherTickets.invalidate();
+            utils.ticketRouter.openTickets.invalidate();
+          });
       }}
     >
       {({ submitForm }) => {
@@ -547,6 +559,7 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
     },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
+  const deleteTicket = trpc.ticketRouter.deleteTicket.useMutation();
   useEffect(() => {
     if (!tickets.data?.pages.find((pageData) => pageData.page === page)) {
       tickets.fetchNextPage();
@@ -628,6 +641,12 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
             ),
           },
         }}
+        onDelete={async (id) => {
+          await deleteTicket.mutateAsync({
+            ticketId: id,
+          });
+          tickets.refetch();
+        }}
         deletable
       />
       <Center>
@@ -656,6 +675,7 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
     },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
+  const deleteTicket = trpc.ticketRouter.deleteTicket.useMutation();
   useEffect(() => {
     if (!tickets.data?.pages.find((pageData) => pageData.page === page)) {
       tickets.fetchNextPage();
@@ -736,6 +756,12 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
               </Button>
             ),
           },
+        }}
+        onDelete={async (id) => {
+          await deleteTicket.mutateAsync({
+            ticketId: id,
+          });
+          tickets.refetch();
         }}
         deletable
       />
@@ -856,7 +882,6 @@ const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
             ),
           },
         }}
-        deletable
       />
       <Center>
         {(tickets.data?.pages.find((pageData) => pageData.page === page)

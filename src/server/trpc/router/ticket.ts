@@ -304,4 +304,26 @@ export const ticketRouter = router({
 
       return user;
     }),
+
+  deleteTicket: protectedProcedure
+    .input(
+      z.object({
+        ticketId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'TICKET',
+        {
+          delete: true,
+        },
+        ctx.clientId,
+        'You are not permitted to delete a ticket'
+      );
+
+      const ticket = await TicketModel.findByIdAndDelete(input.ticketId);
+
+      return ticket;
+    }
+    ),
 });
