@@ -91,6 +91,7 @@ const AddnewTicket = ({
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const { classes } = useStyles();
   const [fileUploadLoading, setFileUploadLoading] = useState(false);
+  const utils = trpc.useContext();
 
   return (
     <Modal title='Add Ticket' {...modalProps} size={'xl'}>
@@ -112,6 +113,8 @@ const AddnewTicket = ({
               ...values,
             });
 
+            utils.ticketRouter.openTickets.invalidate();
+            modalProps.onClose();
             setSubmitting(false);
           };
 
@@ -138,7 +141,6 @@ const AddnewTicket = ({
                   { value: 'bug', label: 'Bug' },
                   { value: 'sub-task', label: 'Sub-Task' },
                   { value: 'epic', label: 'Epic' },
-                  { value: 'story', label: 'Story' },
                   { value: 'improvement', label: 'Improvement' },
                   { value: 'newFeature', label: 'New Feature' },
                   { value: 'story', label: 'Story' },
@@ -234,11 +236,11 @@ const StatusSelect = ({
             _id: ticketId,
             status: values.ticketStatus,
           })
-          .then(() => {
+          .then(async () => {
             setSubmitting(false);
-            utils.ticketRouter.myTickets.invalidate();
-            utils.ticketRouter.otherTickets.invalidate();
-            utils.ticketRouter.openTickets.invalidate();
+            await utils.ticketRouter.myTickets.invalidate();
+            await utils.ticketRouter.otherTickets.invalidate();
+            await utils.ticketRouter.openTickets.invalidate();
           });
       }}
     >
@@ -288,22 +290,20 @@ const AssignableSelect = ({
     []
   );
   const user = useSelector((state: RootState) => state.clientState.client);
+  const utils = trpc.useContext();
 
   const userOptions = useMemo(() => {
-    const options = data?.map((val) => ({
-      value: val._id.toString(),
-      label: val.name,
-      role: val.role.name,
-    }));
+    const options = data?.map((val) => {
+      return {
+        value: val._id.toString(),
+        label: val.name,
+        role: val.role.name,
+      };
+    });
 
     if (!user) return options;
 
     if (user.role !== 'super-admin') {
-      options?.push({
-        value: user._id,
-        label: 'Me',
-        role: user.role.name,
-      });
       options?.push({
         value: user._id,
         label: 'Me',
@@ -325,7 +325,12 @@ const AssignableSelect = ({
             ticketId,
             userId: values.assignTo,
           })
-          .then(() => setSubmitting(false));
+          .then(async () => {
+            setSubmitting(false);
+            await utils.ticketRouter.myTickets.invalidate();
+            await utils.ticketRouter.otherTickets.invalidate();
+            await utils.ticketRouter.openTickets.invalidate();
+          });
       }}
     >
       {({ submitForm, setFieldValue, values }) => {
