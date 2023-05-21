@@ -160,6 +160,31 @@ function WarehouseSelect() {
   );
 }
 
+const SupplierSelect = () => {
+  const [search, setSearch] = useState('');
+  const suppliers = trpc.supplierRouter.suppliers.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  return (
+    <FormikSelect
+      label='Supplier'
+      data={
+        suppliers.data?.docs?.map((supplier) => ({
+          label: supplier.name,
+          value: supplier._id.toString(),
+        })) || []
+      }
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='supplier'
+      withAsterisk
+    />
+  );
+};
+
 const PurchaseReturnForm = ({
   modal,
   setModal,
@@ -276,11 +301,12 @@ const PurchaseReturnForm = ({
                 style={{ alignItems: 'end' }}
               >
                 <WarehouseSelect />
-                <FormInput
+                {/* <FormInput
                   label='Supplier Name'
                   name='supplier'
                   placeholder='Supplier Name'
-                />
+                /> */}
+                <SupplierSelect />
                 <FormDate
                   label='Date'
                   placeholder='Date'

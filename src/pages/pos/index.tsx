@@ -232,8 +232,16 @@ function ProductsSelect({
                     />
                     <Truncate
                       text={item.name}
-                      maxLength={8}
-                      textProps={{ size: 'xs' }}
+                      maxLength={20}
+                      textProps={{
+                        size: 'xs',
+                        style: {
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          wordBreak: 'initial',
+                        },
+                      }}
                     />
                   </Container>
                 </div>

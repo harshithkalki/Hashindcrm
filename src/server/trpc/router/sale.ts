@@ -188,8 +188,8 @@ export const saleRouter = router({
         ...sale,
         customer: mongoose.isValidObjectId(sale?.customer)
           ? await Customer.findOne({
-            _id: sale?.customer,
-          }).lean()
+              _id: sale?.customer,
+            }).lean()
           : 'Walk in Customer',
       };
     }),
@@ -312,8 +312,8 @@ export const saleRouter = router({
           })),
           customer: mongoose.isValidObjectId(sale?.customer)
             ? await Customer.findOne({
-              _id: sale?.customer,
-            }).lean()
+                _id: sale?.customer,
+              }).lean()
             : 'Walk in Customer',
         };
       }
@@ -420,6 +420,90 @@ export const saleRouter = router({
 
       return sales;
     }),
+
+  getAllUPISales: protectedProcedure.query(async ({ ctx }) => {
+    const client = await checkPermission(
+      'SALES',
+      {
+        read: true,
+      },
+      ctx.clientId,
+      "You don't have permission to read sales"
+    );
+    const query = {
+      company: client.company,
+      paymentMode: 'upi',
+    };
+
+    const data = await Sale.find(query).lean();
+    const sales = data.map((sale) => {
+      return {
+        Date: sale.date.toISOString(),
+        invoiceId: sale.invoiceId,
+        Customer: sale.customer,
+        Discount: sale.discount,
+        Shipping: sale.shipping,
+        Amount: sale.total,
+      };
+    });
+
+    return sales;
+  }),
+
+  getAllCardSales: protectedProcedure.query(async ({ ctx }) => {
+    const client = await checkPermission(
+      'SALES',
+      {
+        read: true,
+      },
+      ctx.clientId,
+      "You don't have permission to read sales"
+    );
+    const query = {
+      company: client.company,
+      paymentMode: 'card',
+    };
+    const data = await Sale.find(query).lean();
+    const sales = data.map((sale) => {
+      return {
+        Date: sale.date.toString(),
+        invoiceId: sale.invoiceId,
+        Customer: sale.customer,
+        Discount: sale.discount,
+        Shipping: sale.shipping,
+        Amount: sale.total,
+      };
+    });
+    return sales;
+  }),
+
+  getAllCashSales: protectedProcedure.query(async ({ ctx }) => {
+    const client = await checkPermission(
+      'SALES',
+      {
+        read: true,
+      },
+      ctx.clientId,
+      "You don't have permission to read sales"
+    );
+    const query = {
+      company: client.company,
+      paymentMode: 'cash',
+    };
+
+    const data = await Sale.find(query).lean();
+    const sales = data.map((sale) => {
+      return {
+        Date: sale.date.toString(),
+        invoiceId: sale.invoiceId,
+        Customer: sale.customer,
+        Discount: sale.discount,
+        Shipping: sale.shipping,
+        Amount: sale.total,
+      };
+    });
+    return sales;
+  }),
 
   getCategoriesForPos: protectedProcedure
     .input(

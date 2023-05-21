@@ -1,5 +1,5 @@
-import type { TextProps } from "@mantine/core";
-import { Text } from "@mantine/core";
+import type { TextProps } from '@mantine/core';
+import { Text } from '@mantine/core';
 
 const Truncate = ({
   text,
@@ -11,9 +11,9 @@ const Truncate = ({
   textProps?: TextProps;
 }) => {
   const truncatedText =
-    text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   return (
-    <Text {...textProps} style={{ wordBreak: "break-word" }}>
+    <Text style={{ wordBreak: 'break-word' }} {...textProps}>
       {truncatedText}
     </Text>
   );

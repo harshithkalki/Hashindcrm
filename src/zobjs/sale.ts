@@ -34,3 +34,5 @@ export const ZSale = ZSaleCreateInput.extend({
   createdAt: z.string(),
   company: z.string(),
 });
+
+export type Sale = z.infer<typeof ZSale>;

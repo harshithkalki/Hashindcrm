@@ -160,6 +160,33 @@ function WarehouseSelect() {
   );
 }
 
+const CustomerSelect = () => {
+  const [search, setSearch] = useState('');
+  const customers = trpc.customerRouter.customers.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  const customerData = customers.data?.docs?.map((customer) => ({
+    label: customer.name,
+    value: customer._id.toString(),
+  }));
+
+  return (
+    <FormikSelect
+      label='Customer'
+      data={[
+        { label: 'Walk In Customer', value: 'walkInCustomer' },
+        ...(customerData || []),
+      ]}
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='customer'
+    />
+  );
+};
+
 const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const { classes, cx } = useStyles();
   // const products = trpc.productRouter.getAllProducts.useQuery();
@@ -275,11 +302,12 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   description='Leave blank to auto generate'
                 />
                 <WarehouseSelect />
-                <FormInput
+                {/* <FormInput
                   label='Customer Name'
                   name='customer'
                   placeholder='Customer Name'
-                />
+                /> */}
+                <CustomerSelect />
                 <FormDate
                   label='Date'
                   placeholder='Date'
