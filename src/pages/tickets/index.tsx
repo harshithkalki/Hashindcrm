@@ -20,6 +20,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DropzoneComp from '@/components/DropZone';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
+import { ZTicketCreateInput } from '@/zobjs/ticket';
 import type { ITicket, ITicketCreateInput } from '@/zobjs/ticket';
 import _ from 'lodash';
 import SelectUserItem from '@/components/SelectUserItem';
@@ -30,6 +31,7 @@ import type { FileWithPath } from '@mantine/dropzone';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { Accordion } from '@mantine/core';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 const uploadFiles = async (files: FileWithPath[]) => {
   const formData = new FormData();
@@ -120,6 +122,7 @@ const AddnewTicket = ({
 
           submit();
         }}
+        validationSchema={toFormikValidationSchema(ZTicketCreateInput)}
       >
         {({ isSubmitting }) => (
           <Form>
