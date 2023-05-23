@@ -17,7 +17,7 @@ export function convertToCSV(
 
   str += line + '\r\n';
 
-  for (let i = 1; i < array.length; i++) {
+  for (let i = 0; i < array.length; i++) {
     let line = '';
     for (const index in array[i]) {
       if (line != '') line += ',';
