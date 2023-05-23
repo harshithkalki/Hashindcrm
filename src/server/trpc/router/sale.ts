@@ -188,8 +188,8 @@ export const saleRouter = router({
         ...sale,
         customer: mongoose.isValidObjectId(sale?.customer)
           ? await Customer.findOne({
-              _id: sale?.customer,
-            }).lean()
+            _id: sale?.customer,
+          }).lean()
           : 'Walk in Customer',
       };
     }),
@@ -312,8 +312,8 @@ export const saleRouter = router({
           })),
           customer: mongoose.isValidObjectId(sale?.customer)
             ? await Customer.findOne({
-                _id: sale?.customer,
-              }).lean()
+              _id: sale?.customer,
+            }).lean()
             : 'Walk in Customer',
         };
       }
@@ -535,4 +535,65 @@ export const saleRouter = router({
 
       return [...new Set(categories)];
     }),
+
+  getAllSales: protectedProcedure.input(
+    z.object({
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+    })
+  ).query(async ({ input, ctx }) => {
+    const client = await checkPermission(
+      'SALES',
+      {
+        read: true,
+      },
+      ctx.clientId,
+      "You don't have permission to read sales"
+    );
+
+    const { startDate, endDate } = input || {};
+
+    const query = {
+      company: client.company,
+      ...(
+        (startDate || endDate) && {
+          date: {
+            ...(startDate && { $gte: new Date(startDate) }),
+            ...(endDate && { $lte: new Date(endDate) }),
+          },
+        }
+      )
+    };
+
+    const func = Sale.find(query).populate<
+      {
+        customer: {
+          _id: string;
+          name: string;
+        }
+      }>({
+        path: 'customer',
+        select: 'name',
+      }).sort({ date: -1 })
+      .lean();
+
+    if (!startDate && !endDate) {
+      func.limit(10);
+    }
+
+    const sales = (await func).map((sale) => {
+      return {
+        Date: sale.date.toString(),
+        invoiceId: sale.invoiceId,
+        CustomerId: sale.customer._id,
+        Discount: sale.discount,
+        Shipping: sale.shipping,
+        Amount: sale.total,
+        CustomerName: sale.customer.name,
+      };
+    });
+
+    return sales;
+  }),
+
 });
