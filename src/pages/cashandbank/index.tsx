@@ -32,20 +32,6 @@ const Index = () => {
             <Button
               size='xs'
               onClick={async () => {
-                const data = await client.saleRouter.getAllCardSales.query();
-                const headers: Record<string, string> = {};
-                if (data.length === 0) return;
-                Object.keys(data[0]!).forEach((key) => {
-                  headers[key as keyof (typeof data)[number]] = key;
-                });
-                exportCSVFile(headers, data, 'cardSales');
-              }}
-            >
-              Card Csv
-            </Button>
-            <Button
-              size='xs'
-              onClick={async () => {
                 const data = await client.saleRouter.getAllCashSales.query();
                 const headers: Record<string, string> = {};
                 if (data.length === 0) return;
@@ -55,8 +41,23 @@ const Index = () => {
                 exportCSVFile(headers, data, 'cashSales');
               }}
             >
-              UPI Csv
+              Cash Csv
             </Button>
+            <Button
+              size='xs'
+              onClick={async () => {
+                const data = await client.saleRouter.getAllCardSales.query();
+                const headers: Record<string, string> = {};
+                if (data.length === 0) return;
+                Object.keys(data[0]!).forEach((key) => {
+                  headers[key as keyof (typeof data)[number]] = key;
+                });
+                exportCSVFile(headers, data, 'BankSales');
+              }}
+            >
+              Bank Csv
+            </Button>
+
             <Button
               size='xs'
               onClick={async () => {
@@ -69,7 +70,7 @@ const Index = () => {
                 exportCSVFile(headers, data, 'upiSales');
               }}
             >
-              Cash Csv
+              UPI Csv
             </Button>
           </Group>
         </Group>
