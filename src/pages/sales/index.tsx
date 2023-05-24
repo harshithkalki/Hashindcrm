@@ -10,19 +10,81 @@ import {
   Pagination,
   Center,
   Container,
+  Modal,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { IconEye } from '@tabler/icons';
+import { IconArrowDown, IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
 import _ from 'lodash';
+import { Form, Formik } from 'formik';
+import FormDate from '@/components/FormikCompo/FormikDate';
+
+interface DownloadModalProps {
+  modal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  return (
+    <>
+      <Modal
+        opened={modal}
+        onClose={() => setModal(false)}
+        title='Download Sales'
+      >
+        <Formik
+          initialValues={{
+            startDate: '',
+            endDate: '',
+          }}
+          onSubmit={(values) => {
+            const startDate = dayjs(values.startDate).format('YYYY-MM-DD');
+            const endDate = dayjs(values.endDate).format('YYYY-MM-DD');
+            console.log(startDate, endDate);
+          }}
+        >
+          {({ values, handleChange, handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <FormDate
+                label='Start Date'
+                placeholder='Start Date'
+                name='startDate'
+                // value={values.startDate}
+                // onChange={handleChange}
+              />
+              <Center mt={'sm'}>
+                <IconArrowDown />
+              </Center>
+
+              <FormDate
+                label='End Date'
+                placeholder='End Date'
+                name='endDate'
+                // value={values.endDate}
+                // onChange={handleChange}
+              />
+
+              <Center mt={'md'}>
+                <Button size='xs' mr={'md'} type='submit'>
+                  Download Sales
+                </Button>
+              </Center>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
+  );
+}
 
 const Index = () => {
   const [modal, setModal] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [page, setPage] = useState(1);
+  const [downloadM, setDownloadM] = useState(false);
   const sales = trpc.saleRouter.sales.useInfiniteQuery(
     {
       limit: 10,
@@ -75,6 +137,7 @@ const Index = () => {
         <Container
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
+          <DownloadModal modal={downloadM} setModal={setDownloadM} />
           <SalesForm
             modal={modal}
             setModal={setModal}
@@ -83,9 +146,14 @@ const Index = () => {
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
             <Title fw={400}>Sales</Title>
-            <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-              Add Sales
-            </Button>
+            <Group>
+              <Button size='xs' mr={'md'} onClick={() => setDownloadM(true)}>
+                Download
+              </Button>
+              <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+                Add Sales
+              </Button>
+            </Group>
           </Group>
           <TableSelection
             data={
