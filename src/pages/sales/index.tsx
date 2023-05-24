@@ -1,7 +1,7 @@
 import Layout from '@/components/Layout';
 import SalesForm from '@/components/SandCForm';
 import TableSelection from '@/components/Tables';
-import { trpc } from '@/utils/trpc';
+import { client, trpc } from '@/utils/trpc';
 import {
   Group,
   Title,
@@ -21,6 +21,7 @@ import EditSales from '@/components/EditSales';
 import _ from 'lodash';
 import { Form, Formik } from 'formik';
 import FormDate from '@/components/FormikCompo/FormikDate';
+import { exportCSVFile } from '@/utils/jsonTocsv';
 
 interface DownloadModalProps {
   modal: boolean;
@@ -28,6 +29,7 @@ interface DownloadModalProps {
 }
 
 function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  // const getAllSales = client.saleRouter.getAllSales
   return (
     <>
       <Modal
@@ -40,10 +42,20 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
             startDate: '',
             endDate: '',
           }}
-          onSubmit={(values) => {
-            const startDate = dayjs(values.startDate).format('YYYY-MM-DD');
-            const endDate = dayjs(values.endDate).format('YYYY-MM-DD');
+          onSubmit={async (values) => {
+            const startDate = values.startDate;
+            const endDate = values.endDate;
             console.log(startDate, endDate);
+            const data = await client.saleRouter.getAllSales.query({
+              startDate,
+              endDate,
+            });
+            const headers: Record<string, string> = {};
+            if (data.length === 0) return;
+            Object.keys(data[0]!).forEach((key) => {
+              headers[key as keyof (typeof data)[number]] = key;
+            });
+            exportCSVFile(headers, data, 'Sales');
           }}
         >
           {({ values, handleChange, handleSubmit }) => (

@@ -61,7 +61,6 @@ export const purchaseRouter = router({
         supplier: input.supplier,
       });
 
-
       await Promise.all(
         input.products.map(async (product) => {
           await ProductModel.findOneAndUpdate(
@@ -201,8 +200,6 @@ export const purchaseRouter = router({
         sort: {
           createdAt: -1,
         },
-
-
       };
 
       const query = {
@@ -211,7 +208,7 @@ export const purchaseRouter = router({
 
       const brands = await Purchase.paginate(query, {
         ...options,
-        populate: ["supplier"]
+        populate: ['supplier'],
       });
 
       return brands;
@@ -260,5 +257,66 @@ export const purchaseRouter = router({
           quantity: product.quantity,
         })),
       };
+    }),
+
+  getAllPurchases: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'PURCHASE',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const { startDate, endDate } = input || {};
+
+      const query = {
+        company: client.company,
+        ...((startDate || endDate) && {
+          date: {
+            ...(startDate && { $gte: new Date(startDate) }),
+            ...(endDate && { $lte: new Date(endDate) }),
+          },
+        }),
+      };
+
+      const func = Purchase.find(query)
+        .populate<{
+          supplier: {
+            _id: string;
+            name: string;
+          };
+        }>({
+          path: 'supplier',
+          select: 'name',
+        })
+        .sort({ date: -1 })
+        .lean();
+
+      if (!startDate && !endDate) {
+        func.limit(10);
+      }
+
+      const sales = (await func).map((sale) => {
+        return {
+          Date: sale.date.toString(),
+          invoiceId: sale.invoiceId,
+          CustomerId: sale.supplier._id,
+          Discount: sale.discount,
+          Shipping: sale.shipping,
+          Amount: sale.total,
+          SupplierName: sale.supplier.name,
+        };
+      });
+
+      return sales;
     }),
 });

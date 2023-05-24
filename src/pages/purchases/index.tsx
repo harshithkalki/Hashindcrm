@@ -1,7 +1,7 @@
 import Layout from '@/components/Layout';
 import PurchaseForm from '@/components/PurchaseForm';
 import TableSelection from '@/components/Tables';
-import { trpc } from '@/utils/trpc';
+import { client, trpc } from '@/utils/trpc';
 import {
   Group,
   Title,
@@ -10,16 +10,91 @@ import {
   Pagination,
   Center,
   Container,
+  Modal,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { IconEye } from '@tabler/icons';
+import { IconArrowDown, IconEye } from '@tabler/icons';
 import Invoice from '@/components/PurchaseInvoice';
 import { useReactToPrint } from 'react-to-print';
+import FormDate from '@/components/FormikCompo/FormikDate';
+import { exportCSVFile } from '@/utils/jsonTocsv';
+import { Formik, Form } from 'formik';
+
+interface DownloadModalProps {
+  modal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  // const getAllSales = client.saleRouter.getAllSales
+  return (
+    <>
+      <Modal
+        opened={modal}
+        onClose={() => setModal(false)}
+        title='Download Sales'
+      >
+        <Formik
+          initialValues={{
+            startDate: '',
+            endDate: '',
+          }}
+          onSubmit={async (values) => {
+            const startDate = values.startDate;
+            const endDate = values.endDate;
+            console.log(startDate, endDate);
+            const data = await client.purchaseRouter.getAllPurchases.query({
+              startDate,
+              endDate,
+            });
+            const headers: Record<string, string> = {};
+            if (data.length === 0) return;
+            Object.keys(data[0]!).forEach((key) => {
+              headers[key as keyof (typeof data)[number]] = key;
+            });
+            exportCSVFile(headers, data, 'Purchases');
+            // setModal(false);
+          }}
+        >
+          {({ values, handleChange, handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <FormDate
+                label='Start Date'
+                placeholder='Start Date'
+                name='startDate'
+                // value={values.startDate}
+                // onChange={handleChange}
+              />
+              <Center mt={'sm'}>
+                <IconArrowDown />
+              </Center>
+
+              <FormDate
+                label='End Date'
+                placeholder='End Date'
+                name='endDate'
+                // value={values.endDate}
+                // onChange={handleChange}
+              />
+
+              <Center mt={'md'}>
+                <Button size='xs' mr={'md'} type='submit'>
+                  Download Sales
+                </Button>
+              </Center>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
+  );
+}
 
 const Index = () => {
   const [modal, setModal] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
+  const [downloadM, setDownloadM] = useState(false);
   const [page, setPage] = useState(1);
 
   const purchases = trpc.purchaseRouter.purchases.useInfiniteQuery(
@@ -63,6 +138,7 @@ const Index = () => {
         <Container
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
+          <DownloadModal modal={downloadM} setModal={setDownloadM} />
           <PurchaseForm
             modal={modal}
             setModal={setModal}
@@ -71,9 +147,14 @@ const Index = () => {
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
             <Title fw={400}>Purchases</Title>
-            <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-              Add Purchase
-            </Button>
+            <Group>
+              <Button size='xs' mr={'md'} onClick={() => setDownloadM(true)}>
+                Download
+              </Button>
+              <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
+                Add Purchase
+              </Button>
+            </Group>
           </Group>
           <TableSelection
             data={
