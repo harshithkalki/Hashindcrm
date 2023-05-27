@@ -24,6 +24,7 @@ const Index = () => {
   }, [paymentReport, page]);
 
   if (paymentReport.isLoading) return <LoadingScreen />;
+  console.log(paymentReport.data);
 
   return (
     <Layout>
@@ -69,11 +70,7 @@ const Index = () => {
             (pageData) => pageData?.page === page
           )?.totalPages ?? 0) > 1 && (
             <Pagination
-              total={
-                paymentReport.data?.pages.find(
-                  (pageData) => pageData?.page === page
-                )?.totalPages ?? 0
-              }
+              total={paymentReport.data?.pages.length ?? 0}
               initialPage={1}
               page={page}
               onChange={setPage}

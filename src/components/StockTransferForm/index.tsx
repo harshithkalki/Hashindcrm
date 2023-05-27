@@ -152,6 +152,7 @@ function FromWarehouseSelect() {
       onSearchChange={onSearchChange}
       searchValue={searchValue}
       searchable
+      withAsterisk
     />
   );
 }
@@ -620,10 +621,12 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                         label={'Order Tax'}
                         placeholder={'Order Tax'}
                         name={'orderTax'}
-                        value={[...inlineProducts.values()].reduce(
-                          (acc, curr) => acc + curr.taxPrice * curr.quantity,
-                          0
-                        )}
+                        value={[...inlineProducts.values()]
+                          .reduce(
+                            (acc, curr) => acc + curr.taxPrice * curr.quantity,
+                            0
+                          )
+                          .toFixed(2)}
                         type={'number'}
                       />
                       <TextInput
@@ -646,7 +649,12 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   </div>
                 </SimpleGrid>
                 <Group w={'100%'} style={{ justifyContent: 'center' }}>
-                  <Button type='submit' mb={'md'} loading={isSubmitting}>
+                  <Button
+                    type='submit'
+                    mb={'md'}
+                    loading={isSubmitting}
+                    disabled={inlineProducts.size === 0}
+                  >
                     Submit
                   </Button>
                   <Button

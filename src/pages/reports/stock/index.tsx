@@ -101,6 +101,7 @@ const Index = () => {
 
     return data;
   }, [stockReport.data, page]);
+  console.log(stockReport.data);
 
   const [filteredData, setFilteredData] = useState(data);
   const [search, setSearch] = useState('');
@@ -228,11 +229,7 @@ const Index = () => {
         {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
           ?.totalPages ?? 0) > 1 && (
           <Pagination
-            total={
-              stockReport.data?.pages.find(
-                (pageData) => pageData?.page === page
-              )?.totalPages ?? 0
-            }
+            total={stockReport.data?.pages.length ?? 0}
             initialPage={1}
             page={page}
             onChange={setPage}

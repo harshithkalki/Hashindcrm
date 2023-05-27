@@ -26,6 +26,7 @@ const Index = () => {
       stockalerts.fetchNextPage();
     }
   }, [stockalerts, page]);
+  // console.log(stockalerts.data);
 
   return (
     <Layout>
@@ -75,11 +76,7 @@ const Index = () => {
           {(stockalerts.data?.pages.find((pageData) => pageData?.page === page)
             ?.totalPages ?? 0) > 1 && (
             <Pagination
-              total={
-                stockalerts.data?.pages.find(
-                  (pageData) => pageData?.page === page
-                )?.totalPages ?? 0
-              }
+              total={stockalerts.data?.pages.length ?? 0}
               initialPage={1}
               // {...pagination}
               page={page}
