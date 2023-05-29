@@ -23,6 +23,31 @@ export const categoryRouter = router({
       return category;
     }),
 
+  createMany: protectedProcedure
+    .input(
+      z.array(
+        ZCategoryCreateInput
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'CATEGORY',
+        { create: true },
+        ctx.clientId,
+        'You are not permitted to create category'
+      );
+
+      const categorys = await CategoryModel.insertMany(
+        input.map((category) => ({
+          ...category,
+          company: client.company,
+        }))
+      );
+
+      return categorys;
+    }),
+
+
   update: protectedProcedure
     .input(ZCategoryUpdateInput)
     .mutation(async ({ input, ctx }) => {
@@ -166,6 +191,7 @@ export const categoryRouter = router({
         name: category.name,
         parentCategory: category.parentCategory?.name ?? '',
         parentCategory_id: category.parentCategory?._id ?? '',
+        slug: category.slug,
       };
     });
 

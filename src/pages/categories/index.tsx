@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Container,
+  FileButton,
   FileInput,
   Group,
   Loader,
@@ -21,6 +22,8 @@ import Layout from '@/components/Layout';
 import type { CategoryCreateInput } from '@/zobjs/category';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { MIME_TYPES } from '@mantine/dropzone';
+import csvtojson from 'csvtojson';
 
 const initialValues: CategoryCreateInput = {
   logo: '',
@@ -206,6 +209,8 @@ const Index = () => {
       refetchOnWindowFocus: false,
     }
   );
+  const createManyCategories = trpc.categoryRouter.createMany.useMutation();
+  const utils = trpc.useContext();
 
   React.useEffect(() => {
     if (
@@ -249,11 +254,12 @@ const Index = () => {
               size='xs'
               onClick={async () => {
                 const data = await client.categoryRouter.getCsv.query();
-                const headers: Record<keyof typeof data[number], string> = {
+                const headers: Record<keyof (typeof data)[number], string> = {
                   _id: 'ID',
-                  name: 'Name',
-                  parentCategory: 'Parent Category',
-                  parentCategory_id: 'Parent Category ID',
+                  name: 'name',
+                  parentCategory: 'Parent Category Name',
+                  parentCategory_id: 'parentCategory',
+                  slug: 'slug',
                 };
 
                 exportCSVFile(headers, data, 'categories');
@@ -261,6 +267,36 @@ const Index = () => {
             >
               Download CSV
             </Button>
+            <FileButton
+              onChange={(file) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                  const csv = e.target?.result;
+                  if (!csv) return;
+                  const data = await csvtojson({
+                    colParser: {
+                      name: 'string',
+                      parentCategory: 'string',
+                      slug: 'string',
+                    },
+                  }).fromString(csv as string);
+                  createManyCategories.mutateAsync(data);
+                  utils.categoryRouter.getrootCategories.invalidate({
+                    limit: 10,
+                    cursor: 0,
+                  });
+                };
+                reader.readAsText(file);
+              }}
+              accept={MIME_TYPES.csv}
+            >
+              {(props) => (
+                <Button {...props} size='xs'>
+                  Upload CSV
+                </Button>
+              )}
+            </FileButton>
           </Group>
         </Group>
         <CategoriesTable
