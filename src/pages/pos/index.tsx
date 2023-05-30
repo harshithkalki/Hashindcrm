@@ -23,6 +23,7 @@ import {
   NumberInput,
 } from '@mantine/core';
 import {
+  IconAlertCircle,
   IconCurrencyRupee,
   IconPercentage,
   IconPlus,
@@ -480,14 +481,24 @@ const Index = () => {
             ) || 0;
           values.warehouse = warehouse as string;
 
-          salesSubmit.mutateAsync(values).then((res) => {
-            showNotification({
-              title: 'New Sale',
-              message: 'Sale created successfully',
-            });
-            setSubmitting(false);
+          salesSubmit.mutate(values, {
+            onSuccess(data) {
+              showNotification({
+                title: 'New Sale',
+                message: 'Sale created successfully',
+              });
+              setSubmitting(false);
 
-            setInvoiceId(res._id as unknown as string);
+              setInvoiceId(data._id as unknown as string);
+            },
+            onError(error) {
+              showNotification({
+                title: 'New Sale',
+                message: error.message,
+                color: 'red',
+              });
+              setSubmitting(false);
+            },
           });
 
           setInlineProducts(new Map());

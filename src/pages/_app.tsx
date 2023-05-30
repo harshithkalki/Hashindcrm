@@ -7,7 +7,10 @@ import { trpc } from '../utils/trpc';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { setClient } from '@/store/clientSlice';
-import { NotificationsProvider } from '@mantine/notifications';
+import {
+  NotificationsProvider,
+  showNotification,
+} from '@mantine/notifications';
 
 const HASHIND_COLORPALETTE: [
   string,
@@ -138,11 +141,36 @@ function App(props: AppProps) {
 
       <Provider store={store}>
         <UserContextProvider>
+          <NoNetworkErrorPlugin />
           <Component {...pageProps} />
         </UserContextProvider>
       </Provider>
     </>
   );
+}
+
+function NoNetworkErrorPlugin() {
+  useEffect(() => {
+    const setNetworkToast = () => {
+      showNotification({
+        title: 'No Internet Connection',
+        message: 'Please check your internet connection and try again.',
+        color: 'red',
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offline', setNetworkToast);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('offline', setNetworkToast);
+      }
+    };
+  }, []);
+
+  return null;
 }
 
 export default trpc.withTRPC(App);

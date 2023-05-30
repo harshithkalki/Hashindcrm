@@ -2,19 +2,16 @@ import Sale from '@/models/Sale';
 import Count from '@/models/Count';
 import { protectedProcedure, router } from '@/server/trpc/trpc';
 import checkPermission from '@/utils/checkPermission';
-import type { ZSale } from '@/zobjs/sale';
 import { ZSaleCreateInput, ZSaleUpdateInput } from '@/zobjs/sale';
 import { z } from 'zod';
-import type CompanyModel from '@/models/Company';
 import WarehouseModel from '@/models/Warehouse';
-import type { Warehouse } from '@/zobjs/warehouse';
 import type { Company } from '@/zobjs/company';
 import type { Product } from '@/zobjs/product';
 import ProductModel from '@/models/Product';
-import CategoryModel from '@/models/Category';
 import type { Category } from '@/zobjs/category';
 import Customer from '@/models/Customer';
 import mongoose from 'mongoose';
+import { TRPCError } from '@trpc/server';
 
 export const saleRouter = router({
   create: protectedProcedure
@@ -63,7 +60,11 @@ export const saleRouter = router({
           const product = await ProductModel.findById(element._id);
           if (product) {
             if (product.quantity < element.quantity) {
-              throw new Error('Not enough quantity');
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                cause: "Quantity not available",
+                message: "Quantity not available",
+              })
             }
           }
           return product;
