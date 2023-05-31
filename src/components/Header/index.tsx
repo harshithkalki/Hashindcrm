@@ -232,11 +232,13 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
                 >
                   Settings
                 </Menu.Item>
-                {/* <Menu.Item
-                  icon={<IconSwitchHorizontal size={14} stroke={1.5} />}
+                <Menu.Item
+                  onClick={() => {
+                    push('/settings/profile');
+                  }}
                 >
-                  Change account
-                </Menu.Item> */}
+                  Profile
+                </Menu.Item>
                 <Menu.Item
                   icon={<IconLogout size={14} stroke={1.5} />}
                   onClick={() => {
