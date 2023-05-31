@@ -22,6 +22,7 @@ import FormDate from '../FormikCompo/FormikDate';
 import axios from 'axios';
 import { ZProductCreateInput } from '@/zobjs/product';
 import { useRouter } from 'next/router';
+import { showNotification } from '@mantine/notifications';
 
 const barcodeSymbologyOptions = [
   { label: 'Code 39', value: 'code39' },
@@ -155,6 +156,10 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
           values.logo = data.url;
         }
         await onSubmit(values);
+        showNotification({
+          title: 'New Product',
+          message: 'created successfully',
+        });
         actions.resetForm();
         actions.setSubmitting(false);
       }}

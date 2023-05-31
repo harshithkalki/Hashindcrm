@@ -27,6 +27,7 @@ import Layout from '@/components/Layout';
 import ArrayInput from '@/components/FormikCompo/ArrayInput';
 import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
 import FormInput from '@/components/FormikCompo/FormikInput';
+import { showNotification } from '@mantine/notifications';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
 
@@ -443,6 +444,10 @@ const AddWarehouse = ({
         onSubmit={async (values) => {
           await createWarehouse.mutateAsync(values);
           onClose();
+          showNotification({
+            title: 'New Warehouse',
+            message: 'Created successfully',
+          });
           utils.warehouseRouter.warehouses.refetch();
         }}
         onClose={onClose}
@@ -477,6 +482,10 @@ const EditWarehouse = ({
             await updateWarehouse.mutateAsync({
               ...values,
               _id,
+            });
+            showNotification({
+              title: 'New warehouse',
+              message: 'Edited successfully',
             });
             onClose();
           }}

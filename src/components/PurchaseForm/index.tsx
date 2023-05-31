@@ -249,8 +249,8 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
 
             PurchasesSubmit.mutateAsync(values).then((res) => {
               showNotification({
-                title: 'New Sale',
-                message: 'Sale created successfully',
+                title: 'New Purchase',
+                message: 'Created successfully',
               });
               setSubmitting(false);
               console.log(res._id);

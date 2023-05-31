@@ -23,6 +23,7 @@ import type { BrandCreateInput, ZBrandUpdateInput } from '@/zobjs/brand';
 import { ZBrandCreateInput } from '@/zobjs/brand';
 import type { z } from 'zod';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { showNotification } from '@mantine/notifications';
 
 const initialValues: BrandCreateInput = {
   name: '',
@@ -55,6 +56,10 @@ const BrandForm = ({
         }
 
         await onSubmit(values);
+        showNotification({
+          title: 'New Brand',
+          message: 'Created successfully',
+        });
         actions.resetForm();
       }}
     >

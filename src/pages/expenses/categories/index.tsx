@@ -19,6 +19,7 @@ import { trpc } from '@/utils/trpc';
 import type { ZExpenseCategoryCreateInput } from '@/zobjs/expenseCategory';
 import { useRouter } from 'next/router';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { showNotification } from '@mantine/notifications';
 
 type CreateExpenseCategory = z.infer<typeof ZExpenseCategoryCreateInput>;
 
@@ -47,6 +48,10 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
           // }}
           onSubmit={async (values) => {
             await onSubmit(values);
+            showNotification({
+              title: 'New Expense Category',
+              message: 'Created successfully',
+            });
             onClose();
           }}
         >
@@ -115,6 +120,10 @@ const EditExpenseCategory = ({
             await updateExpenseCategory.mutateAsync({
               _id,
               ...values,
+            });
+            showNotification({
+              title: 'New Expense Category',
+              message: 'Edited successfully',
             });
             onClose();
           }}

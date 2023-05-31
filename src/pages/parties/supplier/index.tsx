@@ -18,6 +18,7 @@ import {
   SimpleGrid,
   Title,
 } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
@@ -129,6 +130,10 @@ const Supplierform = ({
     <Formik
       onSubmit={(values, { resetForm }) => {
         onSubmit(values);
+        showNotification({
+          title: 'New Supplier',
+          message: 'Created successfully',
+        });
         resetForm();
       }}
       initialValues={formvalues}

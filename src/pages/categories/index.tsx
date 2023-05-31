@@ -24,6 +24,7 @@ import { exportCSVFile } from '@/utils/jsonTocsv';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { MIME_TYPES } from '@mantine/dropzone';
 import csvtojson from 'csvtojson';
+import { showNotification } from '@mantine/notifications';
 
 const initialValues: CategoryCreateInput = {
   logo: '',
@@ -70,6 +71,10 @@ const CategoryForm = ({
         }
 
         await onSubmit(values);
+        showNotification({
+          title: 'New Category',
+          message: 'Created successfully',
+        });
         actions.resetForm();
         actions.setSubmitting(false);
       }}

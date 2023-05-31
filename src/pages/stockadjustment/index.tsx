@@ -17,6 +17,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import { Form, Formik } from 'formik';
 import React, { useEffect } from 'react';
 import type { z } from 'zod';
@@ -41,6 +42,10 @@ function StockAdjustmentForm({
       initialValues={initialValues}
       onSubmit={async (values, { resetForm, setSubmitting }) => {
         await onSubmit(values);
+        showNotification({
+          title: 'Adjustment Created',
+          message: 'Successfully',
+        });
         resetForm();
         setSubmitting(false);
       }}

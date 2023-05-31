@@ -30,6 +30,7 @@ import FormikColor from '@/components/FormikCompo/FormikColor';
 import { IconArrowLeft } from '@tabler/icons';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -322,6 +323,10 @@ const AddCar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
         onClose={onClose}
         onSubmit={async (values) => {
           await createCar.mutateAsync(values);
+          showNotification({
+            title: 'New Car Added',
+            message: 'Successfully',
+          });
           onClose();
         }}
       />
@@ -346,6 +351,10 @@ const Editcar = ({ _id, onClose }: { _id: string; onClose: () => void }) => {
           onClose={onClose}
           onSubmit={async (values) => {
             await updateCar.mutateAsync({ _id, ...values });
+            showNotification({
+              title: 'Car Updated',
+              message: 'Successfully',
+            });
             onClose();
           }}
         />

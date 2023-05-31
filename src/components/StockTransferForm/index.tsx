@@ -259,6 +259,10 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
 
               setModal(false);
             });
+            showNotification({
+              title: 'New Transfer',
+              message: 'Created successfully',
+            });
 
             resetForm();
             setInlineProducts(new Map());

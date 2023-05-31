@@ -31,6 +31,7 @@ import axios from 'axios';
 import FormikArray from '@/components/FormikCompo/FormikArray';
 import TableSelection from '@/components/Tables';
 import { useRouter } from 'next/router';
+import { showNotification } from '@mantine/notifications';
 
 interface ModalProps {
   modal: boolean;
@@ -151,6 +152,10 @@ function CustomerForm({
           values.profile = data.url;
         }
         await onSubmit(values);
+        showNotification({
+          title: 'New Customer',
+          message: 'Created successfully',
+        });
         setSubmitting(false);
         resetForm();
       }}

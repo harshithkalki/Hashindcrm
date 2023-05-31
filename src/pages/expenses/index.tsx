@@ -25,6 +25,7 @@ import type { z } from 'zod';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -103,6 +104,10 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
           validationSchema={toFormikValidationSchema(ZExpenseCreateInput)}
           onSubmit={async (values) => {
             await onSubmit(values);
+            showNotification({
+              title: 'New Expense',
+              message: 'Created successfully',
+            });
             onClose();
           }}
         >
@@ -192,6 +197,10 @@ const EditExpense = ({
               _id,
               ...values,
               category: values.category?.toString(),
+            });
+            showNotification({
+              title: 'New Expense',
+              message: 'Edited successfully',
             });
             onClose();
           }}
