@@ -15,7 +15,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  console.log('locale', locale);
   return {
     props: {
       ...(await serverSideTranslations(locale ?? 'en', ['common'])),
