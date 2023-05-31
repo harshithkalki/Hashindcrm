@@ -11,8 +11,8 @@ const config = {
   swcMinify: true,
   output: "standalone",
   i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+    locales: ['en', 'fr'],
+    defaultLocale: 'en',
   },
 };
 export default config;

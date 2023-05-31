@@ -11,6 +11,7 @@ import {
   NotificationsProvider,
   showNotification,
 } from '@mantine/notifications';
+import { appWithTranslation } from 'next-i18next'
 
 const HASHIND_COLORPALETTE: [
   string,
@@ -173,4 +174,4 @@ function NoNetworkErrorPlugin() {
   return null;
 }
 
-export default trpc.withTRPC(App);
+export default trpc.withTRPC(appWithTranslation(App));
