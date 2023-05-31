@@ -15,7 +15,7 @@ This is a CRM for Hashind. It is built using the [T3 Stack](https://create.t3.gg
 - [Redux Toolkit](https://redux-toolkit.js.org/) state management.
 - [Zod](https://zod.dev/) schema validation.
 
-## Installation
+## Getting Started
 
 1. Clone the repository
 2. Run `yarn install`
