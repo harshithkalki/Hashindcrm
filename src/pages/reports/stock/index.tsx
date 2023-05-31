@@ -8,6 +8,8 @@ import {
   Table,
   Center,
   Pagination,
+  Flex,
+  ScrollArea,
 } from '@mantine/core';
 import { IconSearch } from '@tabler/icons';
 import React, { useState } from 'react';
@@ -169,73 +171,83 @@ const Index = () => {
 
   return (
     <Layout>
-      <Group mb={'xl'}>
-        <Title fw={400}>Stock Summary</Title>
-      </Group>
-      <TextInput
-        placeholder='Search by any field'
-        mb='md'
-        icon={<IconSearch size={14} stroke={1.5} />}
-        value={search}
-        onChange={handleSearchChange}
-      />
-      <Center>
-        <Table w={'90%'} verticalSpacing='sm'>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Item Code
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Category
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Brand
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Purchase Price
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Sale Price
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Current Stock
-              </th>
-              <th
-                style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
-                colSpan={2}
-              >
-                Stock Value
-              </th>
-            </tr>
-            <tr>
-              <th
-                style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
-                colSpan={7}
-              ></th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Purchase
-              </th>
-              <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                Sale
-              </th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
-      </Center>
-      <Center>
-        {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
-          ?.totalPages ?? 0) > 1 && (
-          <Pagination
-            total={stockReport.data?.pages.length ?? 0}
-            initialPage={1}
-            page={page}
-            onChange={setPage}
+      <Flex
+        style={{
+          flexDirection: 'column',
+          height: '100%',
+        }}
+      >
+        <ScrollArea>
+          <Group mb={'xl'}>
+            <Title fw={400}>Stock Summary</Title>
+          </Group>
+          <TextInput
+            placeholder='Search by any field'
+            mb='md'
+            icon={<IconSearch size={14} stroke={1.5} />}
+            value={search}
+            onChange={handleSearchChange}
           />
-        )}
-      </Center>
+          <Center>
+            <Table w={'90%'} verticalSpacing='sm'>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Item Code
+                  </th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Category
+                  </th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Brand
+                  </th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Purchase Price
+                  </th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Sale Price
+                  </th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Current Stock
+                  </th>
+                  <th
+                    style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
+                    colSpan={2}
+                  >
+                    Stock Value
+                  </th>
+                </tr>
+                <tr>
+                  <th
+                    style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
+                    colSpan={7}
+                  ></th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Purchase
+                  </th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+                    Sale
+                  </th>
+                </tr>
+              </thead>
+              <tbody>{rows}</tbody>
+            </Table>
+          </Center>
+          <Center>
+            {(stockReport.data?.pages.find(
+              (pageData) => pageData?.page === page
+            )?.totalPages ?? 0) > 1 && (
+              <Pagination
+                total={stockReport.data?.pages.length ?? 0}
+                initialPage={1}
+                page={page}
+                onChange={setPage}
+              />
+            )}
+          </Center>
+        </ScrollArea>
+      </Flex>
     </Layout>
   );
 };
