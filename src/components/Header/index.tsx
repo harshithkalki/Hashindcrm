@@ -19,6 +19,7 @@ import {
   IconChevronDown,
   IconChevronsRight,
   IconMenu2,
+  IconUserCircle,
 } from '@tabler/icons';
 import InfiniteSelect from '../Custom/InfiniteSelect';
 import { trpc } from '@/utils/trpc';
@@ -233,6 +234,7 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
                   Settings
                 </Menu.Item>
                 <Menu.Item
+                  icon={<IconUserCircle size={14} stroke={1.5} />}
                   onClick={() => {
                     push('/settings/profile');
                   }}
