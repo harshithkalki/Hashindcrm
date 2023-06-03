@@ -120,11 +120,6 @@ const ReportDate: NavData['links'] = [
     permissionName: 'REPORT',
   },
   {
-    label: 'UserReports',
-    link: '/reports/userreports',
-    permissionName: 'REPORT',
-  },
-  {
     label: 'Profit & Loss',
     link: '/reports/profitandloss',
     permissionName: 'REPORT',
