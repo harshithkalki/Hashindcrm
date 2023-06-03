@@ -1,6 +1,6 @@
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
-import { trpc } from '@/utils/trpc';
+import { client, trpc } from '@/utils/trpc';
 import {
   Group,
   Title,
@@ -8,6 +8,8 @@ import {
   Pagination,
   Center,
   Container,
+  Modal,
+  ActionIcon,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
@@ -16,6 +18,79 @@ import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
 import _ from 'lodash';
 import SaleReturnForm from '@/components/SReturnFrom';
+import FormDate from '@/components/FormikCompo/FormikDate';
+import { exportCSVFile } from '@/utils/jsonTocsv';
+import { IconArrowDown, IconEye } from '@tabler/icons';
+import { Formik, Form } from 'formik';
+
+interface DownloadModalProps {
+  modal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  // const getAllSales = client.saleRouter.getAllSales
+  return (
+    <>
+      <Modal
+        opened={modal}
+        onClose={() => setModal(false)}
+        title='Download Sales'
+      >
+        <Formik
+          initialValues={{
+            startDate: '',
+            endDate: '',
+          }}
+          onSubmit={async (values) => {
+            const startDate = values.startDate;
+            const endDate = values.endDate;
+            console.log(startDate, endDate);
+            const data = await client.saleRouter.getAllSales.query({
+              startDate,
+              endDate,
+            });
+            const headers: Record<string, string> = {};
+            if (data.length === 0) return;
+            Object.keys(data[0]!).forEach((key) => {
+              headers[key as keyof (typeof data)[number]] = key;
+            });
+            exportCSVFile(headers, data, 'Sales');
+          }}
+        >
+          {({ values, handleChange, handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <FormDate
+                label='Start Date'
+                placeholder='Start Date'
+                name='startDate'
+                // value={values.startDate}
+                // onChange={handleChange}
+              />
+              <Center mt={'sm'}>
+                <IconArrowDown />
+              </Center>
+
+              <FormDate
+                label='End Date'
+                placeholder='End Date'
+                name='endDate'
+                // value={values.endDate}
+                // onChange={handleChange}
+              />
+
+              <Center mt={'md'}>
+                <Button size='xs' mr={'md'} type='submit'>
+                  Download Sales
+                </Button>
+              </Center>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
+  );
+}
 
 const Index = () => {
   const [modal, setModal] = useState(false);
@@ -28,9 +103,9 @@ const Index = () => {
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
 
-  const invoice = trpc.saleRouter.getInvoice.useQuery(
+  const invoice = trpc.saleReturnRouter.getInvoice.useQuery(
     {
-      _id: invoiceId,
+      id: invoiceId,
     },
     { enabled: Boolean(invoiceId), cacheTime: 0 }
   );
@@ -39,6 +114,7 @@ const Index = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  const [downloadM, setDownloadM] = useState(false);
 
   useEffect(() => {
     if (invoice.data) {
@@ -73,6 +149,7 @@ const Index = () => {
         <Container
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
+          <DownloadModal modal={downloadM} setModal={setDownloadM} />
           <SaleReturnForm
             modal={modal}
             setModal={setModal}
@@ -109,6 +186,22 @@ const Index = () => {
               },
               total: {
                 label: 'Total Amount',
+              },
+              _id: {
+                label: 'Show Invoice',
+                Component: ({ data }) => (
+                  <Group position='center'>
+                    <ActionIcon
+                      color={'blue'}
+                      variant='filled'
+                      onClick={() => {
+                        setInvoiceId(data._id);
+                      }}
+                    >
+                      <IconEye size='1.125rem' />
+                    </ActionIcon>
+                  </Group>
+                ),
               },
             }}
           />

@@ -6,6 +6,9 @@ import Product from '@/models/Product';
 import { z } from 'zod';
 import mongoose from 'mongoose';
 import Customer from '@/models/Customer';
+import type { Company } from '@/zobjs/company';
+import type { Product as ProductType } from '@/zobjs/product';
+import WarehouseModel from '@/models/Warehouse';
 
 export const saleReturnRouter = router({
   create: protectedProcedure
@@ -100,4 +103,55 @@ export const saleReturnRouter = router({
         docs: brandsWithCustomer,
       };
     }),
+
+  getInvoice: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'SALES',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        "You don't have permission to read sales"
+      );
+
+      const saleReturn = await SaleReturn.findOne({
+        _id: input.id,
+        company: client.company,
+      }).populate<{
+        company: Company;
+        products: {
+          _id: ProductType & { _id: string };
+          price: number;
+          quantity: number;
+        }[];
+      }>('products._id company').lean();
+
+      if (!saleReturn) {
+        throw new Error('Sale return not found');
+      }
+
+      const warehouse = (await WarehouseModel.findById(saleReturn.warehouse).lean()) ?? undefined;
+
+
+      return {
+        ...saleReturn, warehouse,
+        products: saleReturn.products.map((product) => ({
+          ...product,
+          ...product._id,
+          quantity: product.quantity,
+        })),
+        customer: mongoose.isValidObjectId(saleReturn?.customer)
+          ? await Customer.findOne({
+            _id: saleReturn?.customer,
+          }).lean()
+          : 'Walk in Customer',
+      };
+    }
+    ),
 });
