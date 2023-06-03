@@ -1,7 +1,7 @@
 import Layout from '@/components/Layout';
 import TransferForm from '@/components/StockTransferForm';
 import TableSelection from '@/components/Tables';
-import { trpc } from '@/utils/trpc';
+import { client, trpc } from '@/utils/trpc';
 import {
   Group,
   Title,
@@ -10,13 +10,86 @@ import {
   Pagination,
   Center,
   Container,
+  Modal,
 } from '@mantine/core';
 import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { IconEye } from '@tabler/icons';
+import { IconArrowDown, IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import FormDate from '@/components/FormikCompo/FormikDate';
+import { exportCSVFile } from '@/utils/jsonTocsv';
+import { Formik, Form } from 'formik';
+
+interface DownloadModalProps {
+  modal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  // const getAllSales = client.saleRouter.getAllSales
+  return (
+    <>
+      <Modal
+        opened={modal}
+        onClose={() => setModal(false)}
+        title='Download Sales'
+      >
+        <Formik
+          initialValues={{
+            startDate: '',
+            endDate: '',
+          }}
+          onSubmit={async (values) => {
+            const startDate = values.startDate;
+            const endDate = values.endDate;
+            console.log(startDate, endDate);
+            const data = await client.saleRouter.getAllSales.query({
+              startDate,
+              endDate,
+            });
+            const headers: Record<string, string> = {};
+            if (data.length === 0) return;
+            Object.keys(data[0]!).forEach((key) => {
+              headers[key as keyof (typeof data)[number]] = key;
+            });
+            exportCSVFile(headers, data, 'Sales');
+          }}
+        >
+          {({ values, handleChange, handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <FormDate
+                label='Start Date'
+                placeholder='Start Date'
+                name='startDate'
+                // value={values.startDate}
+                // onChange={handleChange}
+              />
+              <Center mt={'sm'}>
+                <IconArrowDown />
+              </Center>
+
+              <FormDate
+                label='End Date'
+                placeholder='End Date'
+                name='endDate'
+                // value={values.endDate}
+                // onChange={handleChange}
+              />
+
+              <Center mt={'md'}>
+                <Button size='xs' mr={'md'} type='submit'>
+                  Download Sales
+                </Button>
+              </Center>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
+  );
+}
 
 const Index = () => {
   const [modal, setModal] = useState(false);
@@ -30,10 +103,25 @@ const Index = () => {
     }
   );
 
+  const invoice = trpc.stockTransferRouter.getInvoice.useQuery(
+    {
+      _id: invoiceId,
+    },
+    { enabled: Boolean(invoiceId), cacheTime: 0 }
+  );
+
   const componentRef = useRef<HTMLDivElement>(null);
+  const [downloadM, setDownloadM] = useState(false);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
+  useEffect(() => {
+    if (invoice.data) {
+      handlePrint();
+      setInvoiceId('');
+    }
+  }, [handlePrint, invoice.data]);
 
   useEffect(() => {
     if (!transfers.data?.pages.find((pageData) => pageData.page === page)) {
@@ -45,7 +133,13 @@ const Index = () => {
 
   return (
     <Layout>
+      {invoice.data && (
+        <div style={{ display: 'none' }}>
+          <Invoice invoiceRef={componentRef} data={invoice.data as any} />
+        </div>
+      )}
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
+        <DownloadModal modal={downloadM} setModal={setDownloadM} />
         <TransferForm
           modal={modal}
           setModal={setModal}

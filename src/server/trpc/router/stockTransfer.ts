@@ -9,6 +9,9 @@ import {
 } from '@/zobjs/stockTransfer';
 import Count from '@/models/Count';
 import type { ProductCreateInput } from '@/zobjs/product';
+import type { Company } from '@/zobjs/company';
+import type { Product as ProductType } from '@/zobjs/product';
+import Warehouse from '@/models/Warehouse';
 
 export const stockTransferRouter = router({
   create: protectedProcedure
@@ -241,4 +244,54 @@ export const stockTransferRouter = router({
 
       return stocktransfer;
     }),
+
+  getInvoice: protectedProcedure
+    .input(
+      z.object({
+        _id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'STOCKTRANSFER',
+        {
+          read: true,
+        },
+        ctx.clientId,
+        'You are not permitted to get stocktransfer'
+      );
+
+      const stocktransfer = await StockTransferModel.findById(input._id).populate<{
+        company: Company;
+        products: {
+          product: ProductType & { _id: string };
+          price: number;
+          quantity: number;
+        }[];
+      }>('products.product company')
+        .lean();
+
+      if (!stocktransfer) {
+        throw new Error('Sale return not found');
+      }
+
+      const warehouse = (await Warehouse.findById(stocktransfer.warehouse).lean()) ?? undefined;
+
+
+      const invoice = {
+        ...stocktransfer,
+        warehouse,
+        products: stocktransfer.products.map((product) => ({
+          ...product,
+          ...product.product,
+          quantity: product.quantity,
+        })),
+        customer: 'Walk in Customer',
+        date: stocktransfer.createdAt,
+      }
+
+      return invoice;
+    }
+    ),
+
 });
