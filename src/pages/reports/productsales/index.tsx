@@ -5,26 +5,11 @@ import { Group, Title, Center, Pagination, Container } from '@mantine/core';
 import React from 'react';
 
 const Index = () => {
+  const stockReport = trpc.reports.stockReport.useQuery();
   const [page, setPage] = React.useState(1);
 
-  const stockReport = trpc.reports.stockReport.useInfiniteQuery(
-    { limit: 10 },
-    {
-      getNextPageParam: () => page,
-      refetchOnWindowFocus: false,
-    }
-  );
-
-  React.useEffect(() => {
-    if (!stockReport.data?.pages.find((pageData) => pageData?.page === page)) {
-      stockReport.fetchNextPage();
-    }
-  }, [stockReport, page]);
-
   const data = React.useMemo(() => {
-    const pageData = stockReport.data?.pages.find(
-      (pageData) => pageData?.page === page
-    );
+    const pageData = stockReport.data;
 
     const products: {
       name: string;
@@ -33,7 +18,7 @@ const Index = () => {
       _id: string;
     }[] = [];
 
-    pageData?.docs.forEach((doc) => {
+    pageData?.forEach((doc) => {
       doc.products.forEach((product) => {
         const currentProduct = products.find(
           (productData) =>
@@ -58,7 +43,7 @@ const Index = () => {
     });
 
     return products;
-  }, [stockReport.data, page]);
+  }, [stockReport.data]);
 
   return (
     <Layout>
@@ -73,7 +58,7 @@ const Index = () => {
           }}
         >
           <TableSelection
-            data={data}
+            data={data?.slice((page - 1) * 10, page * 10) ?? []}
             colProps={{
               name: {
                 label: 'Name',
@@ -88,14 +73,9 @@ const Index = () => {
           />
         </Center>
         <Center>
-          {(stockReport.data?.pages.find((pageData) => pageData?.page === page)
-            ?.totalPages ?? 0) > 1 && (
+          {(data?.length ?? 0) > 1 && (
             <Pagination
-              total={
-                stockReport.data?.pages.find(
-                  (pageData) => pageData?.page === page
-                )?.totalPages ?? 0
-              }
+              total={Math.floor((data?.length ?? 0) / 10)}
               initialPage={1}
               page={page}
               onChange={setPage}

@@ -29,34 +29,21 @@ type StockReport = {
 };
 
 const Index = () => {
+  const stockReport = trpc.reports.stockReport.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
   const [page, setPage] = React.useState(1);
 
-  const stockReport = trpc.reports.stockReport.useInfiniteQuery(
-    { limit: 10 },
-    {
-      getNextPageParam: () => page,
-      refetchOnWindowFocus: false,
-    }
-  );
-
-  React.useEffect(() => {
-    if (!stockReport.data?.pages.find((pageData) => pageData?.page === page)) {
-      stockReport.fetchNextPage();
-    }
-  }, [stockReport, page]);
-
   const data = React.useMemo(() => {
-    const pageData = stockReport.data?.pages.find(
-      (pageData) => pageData?.page === page
-    );
-
+    const pageData = stockReport.data;
     if (!pageData) {
       return [];
     }
 
     const product = new Map<string, StockReport>();
 
-    pageData.docs.forEach((doc) => {
+    pageData.forEach((doc) => {
       doc.products.forEach((productDoc) => {
         const id = (
           productDoc._id as unknown as { _id: string }
@@ -102,8 +89,7 @@ const Index = () => {
     const data = Array.from(product.values());
 
     return data;
-  }, [stockReport.data, page]);
-  console.log(stockReport.data);
+  }, [stockReport.data]);
 
   const [filteredData, setFilteredData] = useState(data);
   const [search, setSearch] = useState('');
@@ -127,7 +113,7 @@ const Index = () => {
     setFilteredData(data);
   }, [data]);
 
-  const rows = filteredData.map((item) => {
+  const rows = filteredData.slice((page - 1) * 10, page * 10).map((item) => {
     return (
       <tr key={item.id}>
         <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
@@ -235,11 +221,9 @@ const Index = () => {
             </Table>
           </Center>
           <Center>
-            {(stockReport.data?.pages.find(
-              (pageData) => pageData?.page === page
-            )?.totalPages ?? 0) > 1 && (
+            {(data?.length ?? 0) > 1 && (
               <Pagination
-                total={stockReport.data?.pages.length ?? 0}
+                total={Math.floor((data?.length ?? 0) / 10)}
                 initialPage={1}
                 page={page}
                 onChange={setPage}

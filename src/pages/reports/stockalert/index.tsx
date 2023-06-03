@@ -26,7 +26,6 @@ const Index = () => {
       stockalerts.fetchNextPage();
     }
   }, [stockalerts, page]);
-  // console.log(stockalerts.data);
 
   return (
     <Layout>

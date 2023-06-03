@@ -114,7 +114,6 @@ const ReportDate: NavData['links'] = [
   { label: 'sales', link: '/reports/sales', permissionName: 'REPORT' },
 
   { label: 'Stock Reports', link: '/reports/stock', permissionName: 'REPORT' },
-  { label: 'Rate List', link: '/reports/ratelist', permissionName: 'REPORT' },
   {
     label: 'Product Sales',
     link: '/reports/productsales',

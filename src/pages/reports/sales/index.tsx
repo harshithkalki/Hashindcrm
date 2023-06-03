@@ -26,7 +26,6 @@ const Index = () => {
       sales.fetchNextPage();
     }
   }, [sales, page]);
-  console.log(sales.data);
   return (
     <Layout>
       <Flex

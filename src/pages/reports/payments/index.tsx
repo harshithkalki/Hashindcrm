@@ -3,28 +3,16 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 import { Center, Container, Group, Pagination, Title } from '@mantine/core';
+import dayjs from 'dayjs';
 import React from 'react';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
-  const paymentReport = trpc.reports.paymentsReport.useInfiniteQuery(
-    { limit: 10 },
-    {
-      getNextPageParam: () => page,
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { data, isLoading } = trpc.reports.paymentsReport.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
-  React.useEffect(() => {
-    if (
-      !paymentReport.data?.pages.find((pageData) => pageData?.page === page)
-    ) {
-      paymentReport.fetchNextPage();
-    }
-  }, [paymentReport, page]);
-
-  if (paymentReport.isLoading) return <LoadingScreen />;
-  console.log(paymentReport.data);
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <Layout>
@@ -35,18 +23,18 @@ const Index = () => {
 
         <TableSelection
           data={
-            paymentReport.data?.pages
-              .find((pageData) => pageData?.page === page)
-              ?.docs.map((doc) => ({
-                ...doc,
-                _id: doc._id.toString(),
-              })) || []
+            data?.slice((page - 1) * 10, page * 10)?.map((doc) => ({
+              ...doc,
+              _id: doc._id.toString(),
+            })) || []
           }
           colProps={{
             paymentDate: {
               label: 'Payment Date',
+              Component: (props) => (
+                <>{dayjs(props.data.paymentDate).format('MMMM DD, YYYY')}</>
+              ),
             },
-
             referenceNo: {
               label: 'Reference Number',
             },
@@ -56,7 +44,6 @@ const Index = () => {
             user: {
               label: 'User',
             },
-
             type: {
               label: 'Type',
             },
@@ -66,11 +53,9 @@ const Index = () => {
           }}
         />
         <Center>
-          {(paymentReport.data?.pages.find(
-            (pageData) => pageData?.page === page
-          )?.totalPages ?? 0) > 1 && (
+          {(data?.length ?? 0) > 1 && (
             <Pagination
-              total={paymentReport.data?.pages.length ?? 0}
+              total={Math.floor((data?.length ?? 0) / 10)}
               initialPage={1}
               page={page}
               onChange={setPage}

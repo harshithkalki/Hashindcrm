@@ -8,13 +8,7 @@ import Expense from '@/models/Expense';
 
 export const reports = router({
   paymentsReport: protectedProcedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        limit: z.number().optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx, }) => {
       const client = await checkPermission(
         'REPORT',
         { read: true },
@@ -22,15 +16,7 @@ export const reports = router({
         'You are not permitted to read reports'
       );
 
-      const { cursor: page = 1, limit = 10 } = input || {};
 
-      if (page === null) return null;
-
-      const options = {
-        page: page ?? 1,
-        limit: limit,
-        sort: { createdAt: -1 },
-      };
 
       const query = {
         company: client.company,
@@ -46,18 +32,10 @@ export const reports = router({
         type: 'sale' | 'purchase' | 'expense';
       }[] = [];
 
-      const sales = await Sale.paginate(query, {
-        ...options,
-        limit: options.limit / 3,
-        populate: [
-          {
-            path: 'customer',
-            select: 'name',
-          },
-        ],
-      });
+      const sales = await Sale.find(query).populate('customer', 'name');
 
-      sales.docs.forEach((sale) => {
+
+      sales?.forEach((sale) => {
         report.push({
           _id: sale._id.toString(),
           paymentDate: sale.createdAt.toISOString(),
@@ -69,18 +47,14 @@ export const reports = router({
         });
       });
 
-      const purchases = await Purchase.paginate(query, {
-        ...options,
-        limit: options.limit / 3,
-        populate: [
-          {
-            path: 'supplier',
-            select: 'name',
-          },
-        ],
-      });
+      const purchases = await Purchase.find(query).populate(
+        'supplier',
+        'name'
+      );
 
-      purchases.docs.forEach((purchase) => {
+
+
+      purchases.forEach((purchase) => {
         report.push({
           _id: purchase._id.toString(),
           paymentDate: purchase.createdAt.toISOString(),
@@ -92,12 +66,9 @@ export const reports = router({
         });
       });
 
-      const expenses = await Expense.paginate(query, {
-        ...options,
-        limit: options.limit / 3,
-      });
+      const expenses = await Expense.find(query);
 
-      expenses.docs.forEach((expense) => {
+      expenses?.forEach((expense) => {
         report.push({
           _id: expense._id.toString(),
           paymentDate: expense.createdAt.toISOString(),
@@ -109,26 +80,7 @@ export const reports = router({
         });
       });
 
-      return {
-        docs: report,
-        totalDocs: sales.totalDocs + purchases.totalDocs + expenses.totalDocs,
-        limit: options.limit,
-        totalPages:
-          sales.totalPages + purchases.totalPages + expenses.totalPages,
-        page: options.page,
-        nextPage:
-          page * limit <
-          sales.totalDocs + purchases.totalDocs + expenses.totalDocs
-            ? page + 1
-            : null,
-        prevPage:
-          page > 1
-            ? page >
-              sales.totalPages + purchases.totalPages + expenses.totalPages
-              ? sales.totalPages + purchases.totalPages + expenses.totalPages
-              : page - 1
-            : null,
-      };
+      return report;
     }),
 
   stockAlerts: protectedProcedure
@@ -210,14 +162,7 @@ export const reports = router({
     }),
 
   stockReport: protectedProcedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        limit: z.number().optional(),
-        search: z.string().optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       const client = await checkPermission(
         'REPORT',
         { read: true },
@@ -225,69 +170,20 @@ export const reports = router({
         'You are not permitted to read reports'
       );
 
-      const { cursor: page = 1, limit = 10, search } = input || {};
-
-      const options = {
-        page: page ?? 1,
-        limit: limit,
-        sort: { createdAt: -1 },
-        populate: [
-          {
-            path: 'products._id',
-          },
-        ],
-      };
 
       const query = {
-        company: client.company,
-        ...(search && { name: { $regex: search, $options: 'i' } }),
+        company: client.company
       };
 
-      const sales = await Sale.paginate(
-        { ...query },
-        {
-          ...options,
-          populate: [
-            {
-              path: 'customer',
-              select: 'name',
-            },
-            ...options.populate,
-          ],
-        }
-      );
-      const purchases = await Purchase.paginate(
-        { ...query },
-        {
-          ...options,
-          populate: [
-            {
-              path: 'supplier',
-              select: 'name',
-            },
-            ...options.populate,
-          ],
-        }
+      const sales = await Sale.find({ ...query }).populate(
+        'products._id customer',
+
       );
 
-      return {
-        docs: [...sales.docs, ...purchases.docs],
-        totalDocs: sales.totalDocs + purchases.totalDocs,
-        limit: options.limit,
-        totalPages:
-          sales.totalPages > purchases.totalPages
-            ? sales.totalPages
-            : purchases.totalPages,
-        page: options.page,
-        nextPage:
-          sales.totalPages > purchases.totalPages
-            ? sales.nextPage
-            : purchases.nextPage,
-        prevPage:
-          sales.totalPages > purchases.totalPages
-            ? sales.prevPage
-            : purchases.prevPage,
-      };
+      const purchases = await Purchase.find({ ...query }).populate('supplier products._id', 'name');
+
+
+      return [...sales, ...purchases]
     }),
 
   productSales: protectedProcedure
