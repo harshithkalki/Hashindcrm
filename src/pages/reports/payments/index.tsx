@@ -49,6 +49,7 @@ const Index = () => {
             },
             amount: {
               label: 'Amount',
+              Component: (props) => <>{Math.round(props.data.amount)}</>,
             },
           }}
         />

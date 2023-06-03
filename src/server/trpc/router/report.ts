@@ -5,6 +5,8 @@ import checkPermission from '@/utils/checkPermission';
 import Sale from '@/models/Sale';
 import Purchase from '@/models/Purchase';
 import Expense from '@/models/Expense';
+import Category from '@/models/Category';
+import Brand from '@/models/Brand';
 
 export const reports = router({
   paymentsReport: protectedProcedure
@@ -176,14 +178,50 @@ export const reports = router({
       };
 
       const sales = await Sale.find({ ...query }).populate(
-        'products._id customer',
+        'products._id customer').lean();
 
-      );
+      const purchases = await Purchase.find({ ...query }).populate('supplier products._id').lean()
 
-      const purchases = await Purchase.find({ ...query }).populate('supplier products._id', 'name');
+      await Promise.all(sales.map(async (sale) => {
+        await Promise.all(sale.products.map(async (product) => {
+          if (!product._id) return { ...product, _id: "" };
+          const productDetails = product._id as unknown as { category: string, name: string, _id: string, brand: string };
+          const category = await Category.findById(productDetails.category).lean();
+          const brand = await Brand.findById(productDetails.brand).lean();
+          product._id = {
+            ...productDetails,
+            category: category?.name ?? "",
+            name: productDetails.name,
+            brand: brand?.name ?? "",
+          } as unknown as string;
 
+          return null;
+        }));
 
-      return [...sales, ...purchases]
+        return sale;
+      }))
+
+      await Promise.all(purchases.map(async (purchase) => {
+        await Promise.all(purchase.products.map(async (product) => {
+          if (!product._id) return { ...product, _id: "" };
+          const productDetails = product._id as unknown as { category: string, name: string, _id: string, brand: string };
+          const category = await Category.findById(productDetails.category).lean();
+          const brand = await Brand.findById(productDetails.brand).lean();
+
+          product._id = {
+            ...productDetails,
+            category: category?.name ?? "",
+            name: productDetails.name,
+            brand: brand?.name ?? "",
+          } as unknown as string;
+
+          return null;
+        }));
+
+        return purchase;
+      }))
+
+      return [...sales, ...purchases];
     }),
 
   productSales: protectedProcedure
@@ -212,6 +250,7 @@ export const reports = router({
           {
             path: 'products._id',
           },
+
         ],
       };
 

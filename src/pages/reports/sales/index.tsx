@@ -9,6 +9,7 @@ import {
   ScrollArea,
   Title,
 } from '@mantine/core';
+import dayjs from 'dayjs';
 import React from 'react';
 
 const Index = () => {
@@ -53,6 +54,11 @@ const Index = () => {
             colProps={{
               createdAt: {
                 label: 'Payment Date',
+                Component: (props) => (
+                  <>
+                    {<>{dayjs(props.data.createdAt).format('MMMM DD, YYYY')}</>}
+                  </>
+                ),
               },
               invoiceId: {
                 label: 'Reference No',
@@ -62,6 +68,7 @@ const Index = () => {
               },
               total: {
                 label: 'Amount',
+                Component: (props) => <>{Math.round(props.data.total)}</>,
               },
               status: {
                 label: 'Payment Status',

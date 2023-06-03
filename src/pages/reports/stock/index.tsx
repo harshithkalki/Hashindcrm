@@ -8,8 +8,8 @@ import {
   Table,
   Center,
   Pagination,
-  Flex,
   ScrollArea,
+  Container,
 } from '@mantine/core';
 import { IconSearch } from '@tabler/icons';
 import React, { useState } from 'react';
@@ -157,25 +157,26 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex
+      <Container
         style={{
+          display: 'flex',
           flexDirection: 'column',
           height: '100%',
         }}
       >
-        <ScrollArea>
-          <Group mb={'xl'}>
-            <Title fw={400}>Stock Summary</Title>
-          </Group>
-          <TextInput
-            placeholder='Search by any field'
-            mb='md'
-            icon={<IconSearch size={14} stroke={1.5} />}
-            value={search}
-            onChange={handleSearchChange}
-          />
-          <Center>
-            <Table w={'90%'} verticalSpacing='sm'>
+        <Group my='lg' style={{ justifyContent: 'space-between' }}>
+          <Title fw={400}>Stock Summary</Title>
+        </Group>
+
+        <TextInput
+          placeholder='Search by any field'
+          icon={<IconSearch size={14} stroke={1.5} />}
+          value={search}
+          onChange={handleSearchChange}
+        />
+        <ScrollArea style={{ flex: 1 }} w='100%'>
+          <Container h='100%' w={'100%'}>
+            <Table>
               <thead>
                 <tr>
                   <th>Name</th>
@@ -219,19 +220,19 @@ const Index = () => {
               </thead>
               <tbody>{rows}</tbody>
             </Table>
-          </Center>
-          <Center>
-            {(data?.length ?? 0) > 1 && (
-              <Pagination
-                total={Math.floor((data?.length ?? 0) / 10)}
-                initialPage={1}
-                page={page}
-                onChange={setPage}
-              />
-            )}
-          </Center>
+          </Container>
         </ScrollArea>
-      </Flex>
+        <Center>
+          {(data?.length ?? 0) > 1 && (
+            <Pagination
+              total={Math.floor((data?.length ?? 0) / 10)}
+              initialPage={1}
+              page={page}
+              onChange={setPage}
+            />
+          )}
+        </Center>
+      </Container>
     </Layout>
   );
 };
