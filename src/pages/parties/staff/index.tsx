@@ -22,8 +22,11 @@ import {
 import { showNotification } from '@mantine/notifications';
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
@@ -77,6 +80,7 @@ const WarehousesSelect = () => {
     { refetchOnWindowFocus: false }
   );
   const { push } = useRouter();
+  const { t } = useTranslation('common');
 
   return (
     <div>
@@ -86,7 +90,7 @@ const WarehousesSelect = () => {
           fontWeight: 500,
         }}
       >
-        Warehouse <span style={{ color: 'red' }}>*</span>
+        {t('warehouse')} <span style={{ color: 'red' }}>*</span>
       </label>
       <Group spacing={2}>
         <FormikSelect
@@ -118,13 +122,14 @@ const WarehousesSelect = () => {
 
 const RolesSelect = () => {
   const [search, setSearch] = useState('');
+  const { t } = useTranslation('common');
   const roles = trpc.roleRouter.roles.useQuery(
     { search: search },
     { refetchOnWindowFocus: false }
   );
   return (
     <FormikSelect
-      label='Role'
+      label={`${t('role')}}`}
       data={
         roles.data?.docs?.map((brand) => ({
           label: brand.name,
@@ -155,6 +160,7 @@ const StaffForm = ({
   const allStaffs = trpc.staffRouter.all.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
+  const { t } = useTranslation('common');
 
   const staffOptions = useMemo(
     () =>
@@ -235,25 +241,25 @@ const StaffForm = ({
             <WarehousesSelect />
             <RolesSelect />
             <FormikInput
-              label='Name'
+              label={`${t('name')}`}
               placeholder='Name'
               name='name'
               withAsterisk
             />
             <FormikInput
-              label='Email'
+              label={`${t('email')}`}
               placeholder='Email'
               name='email'
               withAsterisk
             />
             <FormikInput
-              label='Phone'
+              label={`${t('phone')}`}
               placeholder='Phone'
               name='phoneNumber'
               withAsterisk
             />
             <FormikSelect
-              label='Status'
+              label={`${t('status')}`}
               data={[
                 { label: 'Active', value: 'Active' },
                 { label: 'Inactive', value: 'Inactive' },
@@ -265,13 +271,13 @@ const StaffForm = ({
               withAsterisk
             />
             <FormInput
-              label='Password'
+              label={`${t('password')}`}
               placeholder='Password'
               name='password'
               withAsterisk
             />
             <FormikSelect
-              label='Report To'
+              label={`${t('report to')}`}
               placeholder='Report To'
               name='reportTo'
               withAsterisk
@@ -279,7 +285,7 @@ const StaffForm = ({
             />
           </SimpleGrid>
           <Formiktextarea
-            label='Address'
+            label={`${t('address')}`}
             placeholder='Address'
             name='address'
             // withAsterisk
@@ -288,7 +294,7 @@ const StaffForm = ({
 
           <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
             <Button type='submit' size='xs'>
-              Create
+              {t('create')}
             </Button>
             <Button
               size='xs'
@@ -296,7 +302,7 @@ const StaffForm = ({
                 setModal(false);
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
           </Group>
           {/* {JSON.stringify(errors, null, 2)} */}
@@ -392,6 +398,7 @@ const Index = () => {
   }, [staffs, page]);
 
   // console.log(id);
+  const { t } = useTranslation('common');
 
   return (
     <Layout>
@@ -399,9 +406,9 @@ const Index = () => {
       {id && <UpdateCustomer id={id} setId={setId} />}
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my={'lg'} style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Staff Members</Title>
+          <Title fw={400}>{t('staff members')}</Title>
           <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-            Add Staff Member
+            {t('Add new staff')}
           </Button>
         </Group>
         <TableSelection
@@ -415,13 +422,13 @@ const Index = () => {
             // email: 'Email',
             // status: 'Status',
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
             email: {
-              label: 'Email',
+              label: `${t('email')}`,
             },
             status: {
-              label: 'Status',
+              label: `${t('status')}`,
             },
           }}
           onEdit={(id) => {
@@ -449,3 +456,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

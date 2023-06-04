@@ -20,6 +20,9 @@ import type { ZExpenseCategoryCreateInput } from '@/zobjs/expenseCategory';
 import { useRouter } from 'next/router';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 type CreateExpenseCategory = z.infer<typeof ZExpenseCategoryCreateInput>;
 
@@ -31,6 +34,7 @@ interface modalProps {
 }
 
 const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
+  const { t } = useTranslation('common');
   return (
     <>
       <Modal
@@ -59,20 +63,20 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
             <Form>
               <FormInput
                 name='name'
-                label='Expense Category Name'
+                label={`${t('name')}`}
                 placeholder='Enter Expense Category Name'
                 withAsterisk
                 mb={'sm'}
               />
               <Formiktextarea
                 name='description'
-                label='Description'
+                label={`${t('description')}`}
                 placeholder='Enter Description'
                 mb={'xl'}
               />
               <Group position='center'>
                 <Button type='submit' size='xs'>
-                  Submit
+                  {t('submit')}
                 </Button>
                 <Button
                   bg={'gray'}
@@ -81,7 +85,7 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
                     setModal(false);
                   }}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </Group>
             </Form>
@@ -101,6 +105,7 @@ const EditExpenseCategory = ({
 }) => {
   const updateExpenseCategory = trpc.expenseCategoryRouter.update.useMutation();
   const expenseCategory = trpc.expenseCategoryRouter.get.useQuery({ _id: _id });
+  const { t } = useTranslation('common');
 
   return (
     <Modal
@@ -132,20 +137,20 @@ const EditExpenseCategory = ({
             <Form>
               <FormInput
                 name='name'
-                label='Expense Category Name'
+                label={`${t('name')}`}
                 placeholder='Enter Expense Category Name'
                 withAsterisk
                 mb={'sm'}
               />
               <Formiktextarea
                 name='description'
-                label='Description'
+                label={`${t('description')}`}
                 placeholder='Enter Description'
                 mb={'xl'}
               />
               <Group position='center'>
                 <Button type='submit' size='xs'>
-                  Submit
+                  {t('submit')}
                 </Button>
                 <Button
                   bg={'gray'}
@@ -154,7 +159,7 @@ const EditExpenseCategory = ({
                     onClose();
                   }}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </Group>
             </Form>
@@ -180,6 +185,7 @@ const Index = () => {
 
   const [editId, setEditId] = useState<string>('');
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (
@@ -217,7 +223,7 @@ const Index = () => {
       )}
       <Container>
         <Group my={'lg'} style={{ justifyContent: 'space-between' }}>
-          <Title fw={300}>Expenses Category</Title>
+          <Title fw={300}>{t('expense category')}</Title>
           <Button
             size='xs'
             mr={'md'}
@@ -225,7 +231,7 @@ const Index = () => {
               setModal(true);
             }}
           >
-            Add Category
+            {t('add category')}
           </Button>
         </Group>
 
@@ -240,10 +246,10 @@ const Index = () => {
           }
           colProps={{
             name: {
-              label: 'Expense Category Name',
+              label: `${t('name')}`,
             },
             description: {
-              label: 'Description',
+              label: `${t('description')}`,
             },
           }}
           key='_id'
@@ -278,3 +284,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

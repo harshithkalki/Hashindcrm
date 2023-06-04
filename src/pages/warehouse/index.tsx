@@ -28,6 +28,9 @@ import ArrayInput from '@/components/FormikCompo/ArrayInput';
 import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
 
@@ -88,6 +91,7 @@ const WarehouseForm = ({
 }) => {
   const { classes, theme, cx } = useStyles();
   const fileRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation('common');
 
   return (
     <Formik
@@ -109,13 +113,13 @@ const WarehouseForm = ({
               ]}
             >
               <FormInput
-                label='Warehouse Name'
+                label={`${t('name')}`}
                 placeholder='Warehouse Name'
                 name='name'
                 withAsterisk
               />
               <FormInput
-                label='email'
+                label={`${t('email')}`}
                 placeholder='email'
                 name='email'
                 withAsterisk
@@ -131,7 +135,7 @@ const WarehouseForm = ({
                         fontWeight: 500,
                       }}
                     >
-                      Mobile
+                      {`${t('mobile')}`}
                     </label>
                     <Stack spacing='xs'>
                       {values.numbers.map((num, index) => (
@@ -139,7 +143,7 @@ const WarehouseForm = ({
                           <Group spacing={0}>
                             <ArrayInput
                               name={`numbers.${index}`}
-                              placeholder='mobile'
+                              placeholder={`${t('mobile')}`}
                               style={{
                                 flex: 1,
                               }}
@@ -239,7 +243,7 @@ const WarehouseForm = ({
                 >
                   <Grid.Col lg={1} sm={3}>
                     <FormInput
-                      label='cin'
+                      label={`${t('cin')}`}
                       placeholder='cin'
                       name='cinNo'
                       withAsterisk
@@ -247,14 +251,18 @@ const WarehouseForm = ({
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
                     <FormInput
-                      label='gst'
+                      label={`${t('gst')}`}
                       placeholder='gst'
                       name='gstNo'
                       withAsterisk
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
-                    <FormInput label='pan' placeholder='pan' name='pan' />
+                    <FormInput
+                      label={`${t('pan')} `}
+                      placeholder='pan'
+                      name='pan'
+                    />
                   </Grid.Col>
                 </Grid>
               </Grid.Col>
@@ -300,11 +308,11 @@ const WarehouseForm = ({
               columns={4}
             >
               <Grid.Col>
-                <Title order={4}>Bank Info</Title>
+                <Title order={4}>{t('bank info')}</Title>
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='Bank Name'
+                  label={`${t('bank name')}`}
                   placeholder='Bank Name'
                   name='bankName'
                   withAsterisk
@@ -312,7 +320,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='Account Number'
+                  label={`${t('account number')}`}
                   placeholder='Account Number'
                   name='accountNumber'
                   withAsterisk
@@ -320,7 +328,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='IFSC Code'
+                  label={`${t('ifsc')}`}
                   placeholder='IFSC Code'
                   name='ifscCode'
                   withAsterisk
@@ -328,7 +336,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='Branch Name'
+                  label={`${t('branch')}`}
                   placeholder='Branch Name'
                   name='branchName'
                   withAsterisk
@@ -345,11 +353,11 @@ const WarehouseForm = ({
               columns={4}
             >
               <Grid.Col>
-                <Title order={4}>Address Info</Title>
+                <Title order={4}>{t('address info')}</Title>
               </Grid.Col>
               <Grid.Col lg={2} sm={4}>
                 <FormInput
-                  label='Address line 1'
+                  label={`${t('address line 1')}`}
                   placeholder='Address line 1'
                   name='addressline1'
                   withAsterisk
@@ -357,7 +365,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={2} sm={4}>
                 <FormInput
-                  label='Address line 2'
+                  label={`${t('address line 2')}`}
                   placeholder='Address line 2'
                   name='addressline2'
                   withAsterisk
@@ -365,7 +373,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='city'
+                  label={`${t('city')}`}
                   placeholder='city'
                   name='city'
                   withAsterisk
@@ -373,7 +381,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='state'
+                  label={`${t('state')}`}
                   placeholder='state'
                   name='state'
                   withAsterisk
@@ -381,7 +389,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='country'
+                  label={`${t('country')}`}
                   placeholder='country'
                   name='country'
                   withAsterisk
@@ -389,7 +397,7 @@ const WarehouseForm = ({
               </Grid.Col>
               <Grid.Col lg={1} sm={2}>
                 <FormInput
-                  label='pincode'
+                  label={`${t('pincode')}`}
                   placeholder='pincode'
                   name='pincode'
                   withAsterisk
@@ -406,7 +414,7 @@ const WarehouseForm = ({
               <Grid.Col>
                 <Group>
                   <Button type='submit' loading={isSubmitting} size={'xs'}>
-                    Save
+                    {t('save')}
                   </Button>
                   <Button
                     onClick={() => {
@@ -414,7 +422,7 @@ const WarehouseForm = ({
                     }}
                     size={'xs'}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </Group>
               </Grid.Col>
@@ -515,6 +523,8 @@ export default function Warehouse() {
     }
   }, [warehouses, page]);
 
+  const { t } = useTranslation('common');
+
   return (
     <>
       <Layout>
@@ -528,9 +538,9 @@ export default function Warehouse() {
         )}
         <Container>
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
-            <Title fw={400}>Warehouses</Title>
+            <Title fw={400}>{t('warehouses')}</Title>
             <Button size='xs' onClick={() => setOpen(true)}>
-              Add Warehouse
+              {t('add warehouse')}
             </Button>
           </Group>
           <Divider mt={'xl'} />
@@ -546,7 +556,7 @@ export default function Warehouse() {
             }
             colProps={{
               name: {
-                label: 'Name',
+                label: `${t('name')}`,
               },
             }}
             onEdit={(id) => setEditId(id)}
@@ -577,3 +587,10 @@ export default function Warehouse() {
     </>
   );
 }
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

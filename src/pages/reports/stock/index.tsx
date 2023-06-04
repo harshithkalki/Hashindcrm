@@ -12,7 +12,10 @@ import {
   Container,
 } from '@mantine/core';
 import { IconSearch } from '@tabler/icons';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type StockReport = {
   id: string;
@@ -155,6 +158,8 @@ const Index = () => {
     );
   });
 
+  const { t } = useTranslation('common');
+
   return (
     <Layout>
       <Container
@@ -165,7 +170,7 @@ const Index = () => {
         }}
       >
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Stock Summary</Title>
+          <Title fw={400}>{t('stock summary')}</Title>
         </Group>
 
         <TextInput
@@ -179,30 +184,30 @@ const Index = () => {
             <Table>
               <thead>
                 <tr>
-                  <th>Name</th>
+                  <th>{t('name')}</th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Item Code
+                    {t('item code')}
                   </th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Category
+                    {t('category')}
                   </th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Brand
+                    {t('brand')}
                   </th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Purchase Price
+                    {t('purchase price')}
                   </th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Sale Price
+                    {t('sale price')}
                   </th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Current Stock
+                    {t('current stock')}
                   </th>
                   <th
                     style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
                     colSpan={2}
                   >
-                    Stock Value
+                    {t('stock value')}
                   </th>
                 </tr>
                 <tr>
@@ -211,10 +216,10 @@ const Index = () => {
                     colSpan={7}
                   ></th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Purchase
+                    {t('purchase')}
                   </th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-                    Sale
+                    {t('sales')}
                   </th>
                 </tr>
               </thead>
@@ -238,3 +243,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

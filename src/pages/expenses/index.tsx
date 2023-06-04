@@ -26,6 +26,9 @@ import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -64,9 +67,10 @@ const ExpenseCategorySelect = () => {
     { search: search },
     { refetchOnWindowFocus: false }
   );
+  const { t } = useTranslation('common');
   return (
     <FormikSelect
-      label='Expense Category'
+      label={`${t('expense category')}`}
       data={
         categorys.data?.docs?.map((category) => ({
           label: category.name,
@@ -86,6 +90,7 @@ const ExpenseCategorySelect = () => {
 const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
   const { classes, cx } = useStyles();
   // const AddExpense = trpc.expenseRouter.create.useMutation();
+  const { t } = useTranslation('common');
   return (
     <>
       <Modal
@@ -126,13 +131,13 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
 
                 <FormDate
                   name='date'
-                  label='Date'
+                  label={`${t('date')}`}
                   placeholder='Select Date'
                   withAsterisk
                 />
                 <FormInput
                   name='amount'
-                  label='Amount'
+                  label={`${t('amount')}`}
                   placeholder='Enter Amount'
                   withAsterisk
                   type={'number'}
@@ -140,13 +145,13 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
               </SimpleGrid>
               <Formiktextarea
                 name='notes'
-                label='Notes'
+                label={`${t('notes')}`}
                 placeholder='Enter Notes'
                 mb={'xl'}
               />
               <Group position='center'>
                 <Button type='submit' size='xs'>
-                  Submit
+                  {t('submit')}
                 </Button>
                 <Button
                   bg={'gray'}
@@ -155,7 +160,7 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
                     setModal(false);
                   }}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </Group>
             </Form>
@@ -176,6 +181,7 @@ const EditExpense = ({
   const { classes, cx } = useStyles();
   const updateExpense = trpc.expenseRouter.update.useMutation();
   const Expense = trpc.expenseRouter.get.useQuery({ _id: _id });
+  const { t } = useTranslation('common');
 
   return (
     <Modal opened={Boolean(_id)} onClose={() => onClose()} title='Edit Expense'>
@@ -220,13 +226,13 @@ const EditExpense = ({
 
                 <FormDate
                   name='date'
-                  label='Date'
+                  label={`${t('Date')}`}
                   placeholder='Select Date'
                   withAsterisk
                 />
                 <FormInput
                   name='amount'
-                  label='Amount'
+                  label={`${t('Amount')}`}
                   placeholder='Enter Amount'
                   withAsterisk
                   type={'number'}
@@ -234,13 +240,13 @@ const EditExpense = ({
               </SimpleGrid>
               <Formiktextarea
                 name='notes'
-                label='Notes'
+                label={`${t('Notes')}`}
                 placeholder='Enter Notes'
                 mb={'xl'}
               />
               <Group position='center'>
                 <Button type='submit' size='xs'>
-                  Submit
+                  {t('Submit')}
                 </Button>
                 <Button
                   bg={'gray'}
@@ -249,7 +255,7 @@ const EditExpense = ({
                     onClose();
                   }}
                 >
-                  Cancel
+                  {t('Cancel')}
                 </Button>
               </Group>
             </Form>
@@ -271,6 +277,7 @@ const Index = () => {
   const deleteExpense = trpc.expenseRouter.delete.useMutation();
   const [editId, setEditId] = useState<string>('');
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!Expenses.data?.pages.find((pageData) => pageData.page === page)) {
@@ -313,7 +320,7 @@ const Index = () => {
         style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       >
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Expenses</Title>
+          <Title fw={400}>{t('expenses')}</Title>
           <Button
             size='xs'
             mr={'md'}
@@ -321,7 +328,7 @@ const Index = () => {
               setModal(true);
             }}
           >
-            Add Expense
+            {t('add expense')}
           </Button>
         </Group>
 
@@ -338,16 +345,16 @@ const Index = () => {
           }
           colProps={{
             category: {
-              label: 'Expense Category',
+              label: `${t('expense category')}`,
             },
             amount: {
-              label: 'Amount',
+              label: `${t('amount')}`,
             },
             date: {
-              label: 'Date',
+              label: `${t('date')}`,
             },
             notes: {
-              label: 'Notes',
+              label: `${t('notes')}`,
             },
           }}
           deletable={true}
@@ -379,3 +386,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

@@ -31,6 +31,9 @@ import { IconArrowLeft } from '@tabler/icons';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -64,9 +67,10 @@ const CustomerSelect = () => {
     label: customer.name,
     value: customer._id.toString(),
   }));
+  const { t } = useTranslation('common');
   return (
     <FormikSelect
-      label='Customer'
+      label={`${t('customer')}`}
       data={[{ label: 'walkin', value: 'walkin' }, ...(customerData || [])]}
       searchable
       searchValue={search}
@@ -108,6 +112,7 @@ const CarsForm = ({
   onClose: () => void;
 }) => {
   const { classes, cx } = useStyles();
+  const { t } = useTranslation('common');
   return (
     <Flex style={{ flexDirection: 'column' }}>
       <ScrollArea style={{ height: '80vh' }}>
@@ -132,7 +137,7 @@ const CarsForm = ({
                 >
                   <FormikSelect
                     name='make'
-                    label='Make'
+                    label={`${t('make')}`}
                     placeholder='Make'
                     data={[
                       { label: 'Audi', value: 'Audi' },
@@ -147,7 +152,7 @@ const CarsForm = ({
                   />
                   <FormikSelect
                     name='model'
-                    label='Model'
+                    label={`${t('model')}`}
                     placeholder='Model'
                     data={[
                       { label: 'Lxi', value: 'Lxi' },
@@ -159,19 +164,19 @@ const CarsForm = ({
                   <CustomerSelect />
                   <FormInput
                     name='registrationNumber'
-                    label='Registration Number'
+                    label={`${t('registration num')}`}
                     placeholder='Registration Number'
                     type='text'
                   />
                   <FormDate
                     name='purchaseDate'
-                    label='Purchase Date'
+                    label={`${t('purchase date')}`}
                     placeholder='Purchase Date'
                     type='text'
                   />
                   <FormikSelect
                     name='vehicleType'
-                    label='Vehicle Type'
+                    label={`${t('vehicle type')}`}
                     placeholder='Vehicle Type'
                     data={[
                       { label: 'Hatchback', value: 'hatchback' },
@@ -186,7 +191,7 @@ const CarsForm = ({
                   />
                   <FormInput
                     name='meterReading'
-                    label='Meter Reading'
+                    label={`${t('meter reading')}`}
                     placeholder='Meter Reading'
                     type='text'
                   />
@@ -199,19 +204,19 @@ const CarsForm = ({
                   columns={3}
                 >
                   <Grid.Col>
-                    <Title order={3}>Color</Title>
+                    <Title order={3}>{t('color')}</Title>
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
                     <FormikColor
                       name='interiorColor'
-                      label='Interior Color'
+                      label={`${t('interior color')}`}
                       placeholder='Interior Color'
                     />
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
                     <FormikColor
                       name='exteriorColor'
-                      label='Exterior Color'
+                      label={`${t('exterior color')}`}
                       placeholder='Exterior Color'
                     />
                   </Grid.Col>
@@ -224,12 +229,12 @@ const CarsForm = ({
                   columns={3}
                 >
                   <Grid.Col>
-                    <Title order={3}>Specifications</Title>
+                    <Title order={3}>{t('specifications')}</Title>
                   </Grid.Col>
                   <Grid.Col lg={1} sm={3}>
                     <FormikSelect
                       name='wheelDriveType'
-                      label='Wheel Drive Type'
+                      label={`${t('wheel drive type')}`}
                       placeholder='Wheel Drive Type'
                       data={[
                         { label: '2WD', value: '2WD' },
@@ -240,7 +245,7 @@ const CarsForm = ({
                   <Grid.Col lg={1} sm={3}>
                     <FormikSelect
                       name='fuelType'
-                      label='Fuel Type'
+                      label={`${t('fuel type')}`}
                       placeholder='Fuel Type'
                       data={['petrol', 'Diesel', 'CNG']}
                     />
@@ -248,7 +253,7 @@ const CarsForm = ({
                   <Grid.Col lg={1} sm={3}>
                     <FormikSelect
                       name='transmissionType'
-                      label='Transmission Type'
+                      label={`${t('transmission type')}`}
                       placeholder='Transmission Type'
                       data={['Automatic', 'Manual']}
                     />
@@ -256,7 +261,7 @@ const CarsForm = ({
                   <Grid.Col lg={1} sm={3}>
                     <FormikSelect
                       name='emissionType'
-                      label='Emission Type'
+                      label={`${t('emission type')}`}
                       placeholder='Emission Type'
                       data={['BSV', 'BSVI', 'Other']}
                     />
@@ -265,7 +270,7 @@ const CarsForm = ({
                   <Grid.Col lg={1} sm={3}>
                     <FormDate
                       name='insuranceDate'
-                      label='Insurance Date'
+                      label={`${t('insurance date')}`}
                       placeholder='Insurance Date'
                       type='text'
                     />
@@ -273,7 +278,7 @@ const CarsForm = ({
                   <Grid.Col lg={1} sm={3}>
                     <FormInput
                       name='insurancePeriod'
-                      label='Insurance Period'
+                      label={`${t('insurance period')}`}
                       placeholder='Insurance Period'
                       type='number'
                     />
@@ -288,7 +293,7 @@ const CarsForm = ({
                     /> */}
                     <FormInput
                       name='renewalDate'
-                      label='Renewal Date'
+                      label={`${t('renewal date')}`}
                       placeholder='Renewal Date'
                       type='text'
                       value={dayjs(
@@ -302,8 +307,8 @@ const CarsForm = ({
                   </Grid.Col>
                 </Grid>
                 <Group>
-                  <Button type='submit'>Submit</Button>
-                  <Button onClick={() => onClose()}>Cancel</Button>
+                  <Button type='submit'>{t('submit')}</Button>
+                  <Button onClick={() => onClose()}>{t('cancel')}</Button>
                 </Group>
               </Form>
             )}
@@ -378,6 +383,7 @@ const Index = () => {
   const router = useRouter();
 
   const deleteCar = trpc.carRouter.delete.useMutation();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!CarsData.data?.pages.find((pageData) => pageData.page === page)) {
@@ -402,10 +408,10 @@ const Index = () => {
             <ActionIcon onClick={() => router.back()} size='lg'>
               <IconArrowLeft />
             </ActionIcon>
-            <Title fw={400}>Cars</Title>
+            <Title fw={400}>{t('cars')}</Title>
           </Group>
           <Button size='xs' onClick={() => setOpen(true)}>
-            Add CAR
+            {t('add car')}
           </Button>
         </Group>
         <Divider mt={'sm'} />
@@ -422,19 +428,19 @@ const Index = () => {
           }
           colProps={{
             customer: {
-              label: 'Customer',
+              label: `${t('customer')}`,
             },
             make: {
-              label: 'Make',
+              label: `${t('make')}`,
             },
             model: {
-              label: 'Model',
+              label: `${t('model')}`,
             },
             registrationNumber: {
-              label: 'Registration Number',
+              label: `${t('registration num')}`,
             },
             vehicleType: {
-              label: 'Vehicle Type',
+              label: `${t('vehicle type')}`,
             },
           }}
           onEdit={(id) => setEditId(id)}
@@ -465,3 +471,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

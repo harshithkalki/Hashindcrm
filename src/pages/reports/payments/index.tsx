@@ -3,8 +3,11 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 import { Center, Container, Group, Pagination, Title } from '@mantine/core';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dayjs from 'dayjs';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
@@ -12,13 +15,24 @@ const Index = () => {
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading) return <LoadingScreen />;
+  React.useEffect(() => {
+    if (
+      !paymentReport.data?.pages.find((pageData) => pageData?.page === page)
+    ) {
+      paymentReport.fetchNextPage();
+    }
+  }, [paymentReport, page]);
+
+  const { t } = useTranslation('common');
+
+  if (paymentReport.isLoading) return <LoadingScreen />;
+  console.log(paymentReport.data);
 
   return (
     <Layout>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my='lg'>
-          <Title fw={400}>Payments</Title>
+          <Title fw={400}>{t('payments')}</Title>
         </Group>
 
         <TableSelection
@@ -30,25 +44,25 @@ const Index = () => {
           }
           colProps={{
             paymentDate: {
-              label: 'Payment Date',
+              label: `${t('date')}`,
               Component: (props) => (
                 <>{dayjs(props.data.paymentDate).format('MMMM DD, YYYY')}</>
               ),
             },
             referenceNo: {
-              label: 'Reference Number',
+              label: `${t('reference no')}`,
             },
             paymentType: {
-              label: 'Payment Type',
+              label: `${t('payment type')}`,
             },
             user: {
-              label: 'User',
+              label: `${t('user')}`,
             },
             type: {
-              label: 'Type',
+              label: `${t('type')}`,
             },
             amount: {
-              label: 'Amount',
+              label: `${t('amount')}`,
               Component: (props) => <>{Math.round(props.data.amount)}</>,
             },
           }}
@@ -69,3 +83,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

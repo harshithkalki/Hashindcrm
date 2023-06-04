@@ -9,7 +9,10 @@ import {
   Pagination,
   Container,
 } from '@mantine/core';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
@@ -21,6 +24,8 @@ const Index = () => {
     }
   );
 
+  const { t } = useTranslation('common');
+
   React.useEffect(() => {
     if (!stockalerts.data?.pages.find((pageData) => pageData.page === page)) {
       stockalerts.fetchNextPage();
@@ -31,7 +36,7 @@ const Index = () => {
     <Layout>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my={'lg'}>
-          <Title fw={400}>Stock Alert</Title>
+          <Title fw={400}>{t('stock alert')}</Title>
         </Group>
         <TableSelection
           data={
@@ -44,7 +49,7 @@ const Index = () => {
           }
           colProps={{
             logo: {
-              label: 'Logo',
+              label: `${t('logo')}`,
               Component: ({ data: { logo } }) => (
                 <Group spacing='xs' position='center'>
                   <Image
@@ -58,16 +63,16 @@ const Index = () => {
               ),
             },
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
             itemCode: {
-              label: 'Item Code',
+              label: `${t('item code')}`,
             },
             quantity: {
-              label: 'Current Stock',
+              label: `${t('current stock')}`,
             },
             quantityAlert: {
-              label: 'Quantity Alert',
+              label: `${t('quantity alert')}`,
             },
           }}
         />
@@ -89,3 +94,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

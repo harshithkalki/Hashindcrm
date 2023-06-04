@@ -21,8 +21,11 @@ import {
 import { showNotification } from '@mantine/notifications';
 import { IconPlus, IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 
 interface modalProps {
@@ -76,6 +79,7 @@ const WarehousesSelect = () => {
     { refetchOnWindowFocus: false }
   );
   const { push } = useRouter();
+  const { t } = useTranslation('common');
 
   return (
     <div>
@@ -85,7 +89,7 @@ const WarehousesSelect = () => {
           fontWeight: 500,
         }}
       >
-        Warehouse <span style={{ color: 'red' }}>*</span>
+        {t('warehouse')} <span style={{ color: 'red' }}>*</span>
       </label>
       <Group spacing={2}>
         <FormikSelect
@@ -126,6 +130,7 @@ const Supplierform = ({
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes } = useStyles();
+  const { t } = useTranslation('common');
   return (
     <Formik
       onSubmit={(values, { resetForm }) => {
@@ -192,25 +197,25 @@ const Supplierform = ({
             </Container>
             <WarehousesSelect />
             <FormikInput
-              label='Name'
+              label={`${t('name')}`}
               placeholder='Name'
               name='name'
               withAsterisk
             />
             <FormikInput
-              label='Email'
+              label={`${t('email')}`}
               placeholder='Email'
               name='email'
               // withAsterisk
             />
             <FormikInput
-              label='Phone'
+              label={`${t('phone')}`}
               placeholder='Phone'
               name='phone'
               withAsterisk
             />
             <FormikSelect
-              label='Status'
+              label={`${t('status')}`}
               data={[
                 { label: 'Active', value: 'active' },
                 { label: 'Inactive', value: 'inactive' },
@@ -222,49 +227,49 @@ const Supplierform = ({
               withAsterisk
             />
             <FormikInput
-              label='Tax Number'
+              label={`${t('tax number')}`}
               placeholder='Tax Number'
               name='taxNumber'
               // withAsterisk
             />
             <FormikInput
               type={'number'}
-              label='Opening Balance'
+              label={`${t('opening balance')}`}
               placeholder='Opening Balance'
               name='openingBalance'
               // withAsterisk
             />
             <FormikInput
               type={'number'}
-              label='Credit Limit'
+              label={`${t('credit limit')}`}
               placeholder='Credit Limit'
               name='creditLimit'
               // withAsterisk
             />
             <FormikInput
               type={'number'}
-              label='Credit Period'
+              label={`${t('credit period')}`}
               placeholder='Credit Period'
               name='creditPeriod'
               // withAsterisk
             />
           </SimpleGrid>
           <Formiktextarea
-            label='Billing Address'
+            label={`${t('billing address')}`}
             placeholder='Billing Address'
             name='billingAddress'
             withAsterisk
             mb={'md'}
           />
           <Formiktextarea
-            label='Shipping Address'
+            label={`${t('shipping address')}`}
             placeholder='Shipping Address'
             name='shippingAddress'
             withAsterisk
           />
           <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
             <Button type='submit' size='xs'>
-              Create
+              {t('create')}
             </Button>
             <Button
               size='xs'
@@ -272,7 +277,7 @@ const Supplierform = ({
                 setModal(false);
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
           </Group>
         </Form>
@@ -368,15 +373,17 @@ const Index = () => {
     setId(null);
     suppliers.refetch();
   };
+
+  const { t } = useTranslation();
   return (
     <Layout>
       <AddSupplier modal={modal} setModal={setModal} onClose={onClose} />
       {id && <UpdateSupplier id={id} setId={setId} onClose={onClose} />}
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Suppliers</Title>
+          <Title fw={400}>{t('supplier')}</Title>
           <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-            Add Supplier
+            {t('Add new supplier')}
           </Button>
         </Group>
         <TableSelection
@@ -393,13 +400,13 @@ const Index = () => {
             // email: 'Email',
             // status: 'Status',
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
             email: {
-              label: 'Email',
+              label: `${t('email')}`,
             },
             status: {
-              label: 'Status',
+              label: `${t('status')}`,
             },
           }}
           onEdit={(id) => {
@@ -427,3 +434,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

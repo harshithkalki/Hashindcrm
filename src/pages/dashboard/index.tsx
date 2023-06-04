@@ -13,6 +13,8 @@ import type { DefaultMantineColor } from '@mantine/core';
 import { Flex, Grid, ScrollArea, useMantineTheme } from '@mantine/core';
 import React from 'react';
 import dayjs from 'dayjs';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const colorsNames: DefaultMantineColor[] = [
   'blue',
@@ -166,3 +168,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

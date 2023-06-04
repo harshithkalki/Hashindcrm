@@ -2,11 +2,30 @@ import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
 import { trpc } from '@/utils/trpc';
 import { Group, Title, Center, Pagination, Container } from '@mantine/core';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const stockReport = trpc.reports.stockReport.useQuery();
   const [page, setPage] = React.useState(1);
+
+  const stockReport = trpc.reports.stockReport.useInfiniteQuery(
+    { limit: 10 },
+    {
+      getNextPageParam: () => page,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const { t } = useTranslation('common');
+
+  React.useEffect(() => {
+    if (!stockReport.data?.pages.find((pageData) => pageData?.page === page)) {
+      stockReport.fetchNextPage();
+    }
+  }, [stockReport, page]);
 
   const data = React.useMemo(() => {
     const pageData = stockReport.data;
@@ -49,7 +68,7 @@ const Index = () => {
     <Layout>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my={'lg'}>
-          <Title fw={400}>Product Sales Summary</Title>
+          <Title fw={400}>{t('product sales summary')}</Title>
         </Group>
         <Center
           style={{
@@ -61,13 +80,13 @@ const Index = () => {
             data={data?.slice((page - 1) * 10, page * 10) ?? []}
             colProps={{
               name: {
-                label: 'Name',
+                label: `${t('name')}`,
               },
               itemCode: {
-                label: 'Item Code',
+                label: `${t('item code')}`,
               },
               unitsSold: {
-                label: 'Units Sold',
+                label: `${t('units sold')}`,
               },
             }}
           />
@@ -88,3 +107,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

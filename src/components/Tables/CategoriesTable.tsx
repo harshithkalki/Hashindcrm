@@ -10,6 +10,8 @@ import {
   Image,
 } from '@mantine/core';
 
+import common from '../../../public/locales/en/common.json';
+
 import {
   IconMinus,
   IconPencil,
@@ -18,6 +20,9 @@ import {
   IconTrash,
 } from '@tabler/icons';
 import { trpc } from '@/utils/trpc';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -139,6 +144,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
 
     return rows;
   }
+  const { t } = useTranslation('common');
 
   const rows = rowdatamap(filteredData);
   return (
@@ -158,9 +164,9 @@ export function TableSort({ data, onEdit }: TableSortProps) {
         <thead>
           <tr>
             <th style={{ width: '10%' }}></th>
-            <th>Logo</th>
-            <th>Name</th>
-            <th>Actions</th>
+            <th>{t('logo')}</th>
+            <th>{t('name')}</th>
+            <th>{t('actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -182,3 +188,11 @@ export function TableSort({ data, onEdit }: TableSortProps) {
 }
 
 export default TableSort;
+
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+//     },
+//   };
+// };

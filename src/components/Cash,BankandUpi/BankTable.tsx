@@ -10,6 +10,7 @@ import {
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import TableSelection from '../Tables';
+import { useTranslation } from 'react-i18next';
 
 const CardTable = () => {
   const [page, setPage] = React.useState(1);
@@ -22,6 +23,7 @@ const CardTable = () => {
       CardData.fetchNextPage();
     }
   }, [CardData, page]);
+  const { t } = useTranslation('common');
 
   console.log(CardData.data);
   return (
@@ -45,22 +47,22 @@ const CardTable = () => {
               }
               colProps={{
                 date: {
-                  label: 'Date',
+                  label: `${t('date')}`,
                 },
                 invoiceId: {
-                  label: 'Invoice Id',
+                  label: `${t('invoice id')}`,
                 },
                 customer: {
-                  label: 'Customer',
+                  label: `${t('customer')}`,
                 },
                 discount: {
-                  label: 'Discount',
+                  label: `${t('discount')}`,
                 },
                 shipping: {
-                  label: 'Shipping',
+                  label: `${t('shipping')}`,
                 },
                 total: {
-                  label: 'Total',
+                  label: `${t('total')}`,
                 },
               }}
             />

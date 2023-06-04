@@ -19,7 +19,10 @@ import {
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { Form, Formik } from 'formik';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
@@ -134,6 +137,7 @@ const Index = () => {
 
   const createAdjustment = trpc.stockAdjustRouter.create.useMutation();
 
+  const { t } = useTranslation('common');
   if (stockadjustments.isLoading) return <LoadingScreen />;
 
   return (
@@ -153,14 +157,14 @@ const Index = () => {
       </Modal>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Stock Adjustment</Title>
+          <Title fw={400}>{t('stock adjustment')}</Title>
           <Button
             size='xs'
             onClick={() => {
               setModal(true);
             }}
           >
-            Add Adjustment
+            `${t('add adjustment')}`
           </Button>
         </Group>
         <TableSelection
@@ -175,13 +179,13 @@ const Index = () => {
           }
           colProps={{
             product: {
-              label: 'Product',
+              label: `${t('product')}`,
             },
             quantity: {
-              label: 'Quantity',
+              label: `${t('quantity')}`,
             },
             operation: {
-              label: 'Operation',
+              label: `${t('operation')}`,
             },
           }}
         />
@@ -207,3 +211,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

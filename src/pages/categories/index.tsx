@@ -25,6 +25,9 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { MIME_TYPES } from '@mantine/dropzone';
 import csvtojson from 'csvtojson';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const initialValues: CategoryCreateInput = {
   logo: '',
@@ -226,6 +229,7 @@ const Index = () => {
   }, [rootCategories, page]);
 
   const [editId, setEditId] = React.useState<string | null>(null);
+  const { t } = useTranslation('common');
 
   if (rootCategories.isLoading) return <LoadingScreen />;
 
@@ -250,10 +254,10 @@ const Index = () => {
       )}
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group style={{ justifyContent: 'space-between' }} my='lg'>
-          <Title fw={400}>Categories</Title>
+          <Title fw={400}>{t('categories')}</Title>
           <Group>
             <Button size='xs' onClick={() => setModal(true)}>
-              Add Categories
+              {t('add category')}
             </Button>
             <Button
               size='xs'
@@ -270,7 +274,7 @@ const Index = () => {
                 exportCSVFile(headers, data, 'categories');
               }}
             >
-              Download CSV
+              {t('export csv')}
             </Button>
             <FileButton
               onChange={(file) => {
@@ -298,7 +302,7 @@ const Index = () => {
             >
               {(props) => (
                 <Button {...props} size='xs'>
-                  Upload CSV
+                  {t('upload csv')}
                 </Button>
               )}
             </FileButton>
@@ -337,3 +341,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

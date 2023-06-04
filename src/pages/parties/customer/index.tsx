@@ -32,6 +32,9 @@ import FormikArray from '@/components/FormikCompo/FormikArray';
 import TableSelection from '@/components/Tables';
 import { useRouter } from 'next/router';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface ModalProps {
   modal: boolean;
@@ -93,12 +96,13 @@ function WarehouseSelect() {
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
   const dispatch = useDispatch();
+  const { t } = useTranslation('common');
 
   return (
     <FormikInfiniteSelect
       name='warehouse'
       placeholder='Pick one warehouse'
-      label='Warehouse'
+      label={`${t('warehouse')}`}
       data={
         warehouses.data?.pages
           .flatMap((page) => page.docs)
@@ -140,6 +144,7 @@ function CustomerForm({
   const { classes } = useStyles();
   const [profile, setProfile] = useState<File | null>(null);
   const profileref = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation('common');
 
   return (
     <Formik
@@ -218,13 +223,13 @@ function CustomerForm({
               </Container>
               <WarehouseSelect />
               <FormikInput
-                label='Name'
+                label={`${t('name')}`}
                 placeholder='Name'
                 name='name'
                 withAsterisk
               />
               <FormikInput
-                label='Email'
+                label={`${t('email')}`}
                 placeholder='Email'
                 name='email'
                 // withAsterisk
@@ -234,13 +239,13 @@ function CustomerForm({
                 render={(arrayHelpers) => (
                   <FormikArray
                     arrayHelpers={arrayHelpers}
-                    label='Phone'
+                    label={`${t('phone')}`}
                     placeholder='Phone'
                   />
                 )}
               />
               <FormikSelect
-                label='Status'
+                label={`${t('status')}`}
                 data={[
                   { label: 'Active', value: 'active' },
                   { label: 'Inactive', value: 'inactive' },
@@ -252,49 +257,49 @@ function CustomerForm({
                 withAsterisk
               />
               <FormikInput
-                label='Tax Number'
+                label={`${t('tax number')}`}
                 placeholder='Tax Number'
                 name='taxNumber'
                 // withAsterisk
               />
               <FormikInput
                 type={'number'}
-                label='Opening Balance'
+                label={`${t('opening balance')}`}
                 placeholder='Opening Balance'
                 name='openingBalance'
                 // withAsterisk
               />
               <FormikInput
                 type={'number'}
-                label='Credit Limit'
+                label={`${t('credit limit')}`}
                 placeholder='Credit Limit'
                 name='creditLimit'
                 // withAsterisk
               />
               <FormikInput
                 type={'number'}
-                label='Credit Period'
+                label={`${t('credit period')}`}
                 placeholder='Credit Period'
                 name='creditPeriod'
                 // withAsterisk
               />
             </SimpleGrid>
             <Formiktextarea
-              label='Billing Address'
+              label={`${t('billing address')}`}
               placeholder='Billing Address'
               name='billingAddress'
               // withAsterisk
               mb={'md'}
             />
             <Formiktextarea
-              label='Shipping Address'
+              label={`${t('shipping address')}`}
               placeholder='Shipping Address'
               name='shippingAddress'
               // withAsterisk
             />
             <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
               <Button type='submit' size='xs' loading={props.isSubmitting}>
-                Create
+                {t('create')}
               </Button>
             </Group>
             {/* <pre>{JSON.stringify(props, null, 2)}</pre> */}
@@ -307,12 +312,13 @@ function CustomerForm({
 
 const AddCustomer = ({ modal, setModal, onClose }: ModalProps) => {
   const create = trpc.customerRouter.create.useMutation();
+  const { t } = useTranslation('common');
   return (
     <>
       <Modal
         opened={modal}
         onClose={() => onClose()}
-        title='Add New Customer'
+        title={`${t('Add new customer')}`}
         size={'60%'}
       >
         <CustomerForm
@@ -342,6 +348,7 @@ const UpdateCustomer = ({
     { refetchOnWindowFocus: false, enabled: Boolean(id) }
   );
   const update = trpc.customerRouter.update.useMutation();
+  const { t } = useTranslation('common');
   if (customer.isLoading)
     return (
       <center>
@@ -353,7 +360,7 @@ const UpdateCustomer = ({
     <Modal
       opened={Boolean(id)}
       onClose={() => onClose()}
-      title='Update Customer'
+      title={`${t('update customer')}`}
       size={'60%'}
     >
       <CustomerForm
@@ -390,6 +397,7 @@ const Index = () => {
   };
 
   const router = useRouter();
+  const { t } = useTranslation('common');
   return (
     <Layout>
       <AddCustomer modal={modal} setModal={setModal} onClose={onClose} />
@@ -397,7 +405,7 @@ const Index = () => {
       {id && <UpdateCustomer id={id} setId={setId} onClose={onClose} />}
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my={'lg'} style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Customers</Title>
+          <Title fw={400}>{t('customer')}</Title>
           <Group>
             <Button
               size='xs'
@@ -406,11 +414,11 @@ const Index = () => {
                 router.push('customer/cars');
               }}
             >
-              Show Customer Cars
+              {t('show customer cars')}
             </Button>
 
             <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-              Add Customer
+              {t('Add new customer')}
             </Button>
           </Group>
         </Group>
@@ -425,13 +433,13 @@ const Index = () => {
           }
           colProps={{
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
             email: {
-              label: 'Email',
+              label: `${t('email')}`,
             },
             status: {
-              label: 'Status',
+              label: `${t('status')}`,
             },
           }}
           onEdit={(id) => {
@@ -459,3 +467,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

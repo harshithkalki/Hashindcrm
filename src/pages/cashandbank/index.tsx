@@ -15,9 +15,13 @@ import {
   Title,
 } from '@mantine/core';
 import { IconBrandCashapp, IconBuildingBank } from '@tabler/icons';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
+  const { t } = useTranslation('common');
   return (
     <Layout>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
@@ -27,7 +31,7 @@ const Index = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Title fw={400}>Cash, Bank & UPI</Title>
+          <Title fw={400}>{t('cash, bank, upi')}</Title>
           <Group position='apart' align='center'>
             <Button
               size='xs'
@@ -41,7 +45,7 @@ const Index = () => {
                 exportCSVFile(headers, data, 'cashSales');
               }}
             >
-              Cash Csv
+              {t('cash csv')}
             </Button>
             <Button
               size='xs'
@@ -55,7 +59,7 @@ const Index = () => {
                 exportCSVFile(headers, data, 'BankSales');
               }}
             >
-              Bank Csv
+              {t('bank csv')}
             </Button>
 
             <Button
@@ -70,7 +74,7 @@ const Index = () => {
                 exportCSVFile(headers, data, 'upiSales');
               }}
             >
-              UPI Csv
+              {t('upi csv')}
             </Button>
           </Group>
         </Group>
@@ -78,13 +82,13 @@ const Index = () => {
         <Tabs defaultValue='cash'>
           <Tabs.List>
             <Tabs.Tab value='cash' icon={<IconBrandCashapp size={14} />}>
-              Cash
+              {t('cash')}
             </Tabs.Tab>
             <Tabs.Tab value='bank' icon={<IconBuildingBank size={14} />}>
-              Bank
+              {t('bank')}
             </Tabs.Tab>
             <Tabs.Tab value='upi' icon={<IconBuildingBank size={14} />}>
-              UPI
+              {t('upi')}
             </Tabs.Tab>
           </Tabs.List>
           <Tabs.Panel value='cash' mt={'lg'}>
@@ -103,3 +107,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

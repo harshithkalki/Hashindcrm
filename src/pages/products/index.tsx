@@ -17,6 +17,9 @@ import { Container } from '@mantine/core';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { MIME_TYPES } from '@mantine/dropzone';
 import csvtojson from 'csvtojson';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export interface ProductFormType {
   name: string;
@@ -54,6 +57,7 @@ const Index = () => {
   const deleteProduct = trpc.productRouter.delete.useMutation();
   const createManyProducts = trpc.productRouter.createMany.useMutation();
   const [file, setFile] = React.useState<File | null>(null);
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!products.data?.pages.find((pageData) => pageData.page === page)) {
@@ -73,7 +77,7 @@ const Index = () => {
         }}
       >
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Products</Title>
+          <Title fw={400}>{t('products')}</Title>
           <Group>
             <Button
               size='xs'
@@ -81,7 +85,7 @@ const Index = () => {
                 router.push('/products/add');
               }}
             >
-              Add Product
+              {t('add product')}
             </Button>
             <Button
               size='xs'
@@ -95,7 +99,7 @@ const Index = () => {
                 exportCSVFile(headers, data, 'products');
               }}
             >
-              Download CSV
+              {t('export csv')}
             </Button>
             <FileButton
               onChange={(file) => {
@@ -127,7 +131,7 @@ const Index = () => {
                   size='xs'
                   loading={createManyProducts.isLoading}
                 >
-                  Upload CSV
+                  {t('upload csv')}
                 </Button>
               )}
             </FileButton>
@@ -151,7 +155,7 @@ const Index = () => {
           }}
           colProps={{
             logo: {
-              label: 'Logo',
+              label: `${t('logo')}`,
               Component: ({ data: { logo } }) => (
                 <Group spacing='xs'>
                   <Image
@@ -165,31 +169,31 @@ const Index = () => {
               ),
             },
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
             warehouse: {
-              label: 'Warehouse',
+              label: `${t('warehouse')}`,
             },
             category: {
-              label: 'Category',
+              label: `${t('category')}`,
             },
             brand: {
-              label: 'Brand',
+              label: `${t('brand')}`,
             },
             mrp: {
-              label: 'MRP',
+              label: `${t('mrp')}`,
             },
             purchasePrice: {
-              label: 'Purchase Price',
+              label: `${t('purchase price')}`,
             },
             salePrice: {
-              label: 'Sale Price',
+              label: `${t('sale price')}`,
             },
             quantity: {
-              label: 'Quantity',
+              label: `${t('quantity')}`,
             },
             quantityAlert: {
-              label: 'Quantity Alert',
+              label: `${t('quantity alert')}`,
             },
           }}
           deletable
@@ -226,3 +230,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

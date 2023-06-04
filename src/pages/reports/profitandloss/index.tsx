@@ -1,15 +1,19 @@
 import Layout from '@/components/Layout';
 import { trpc } from '@/utils/trpc';
 import { Group, Table, Title } from '@mantine/core';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const index = () => {
+const Index = () => {
   const { data } = trpc.reports.profitAndLoss.useQuery();
+  const { t } = useTranslation('common');
 
   return (
     <Layout>
       <Group>
-        <Title fw={400}>Profit and Loss</Title>
+        <Title fw={400}>{t('profit & loss')}</Title>
       </Group>
 
       <Table
@@ -26,33 +30,33 @@ const index = () => {
       >
         <thead>
           <tr>
-            <th style={{ textAlign: 'left' }}>Particulars</th>
-            <th>Amount</th>
+            <th style={{ textAlign: 'left' }}>{t('particulars')}</th>
+            <th> {t('amount')} </th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Sales</td>
+            <td>{t('sales')}</td>
             <td>{data?.salesTotal.toFixed(2)}</td>
           </tr>
           <tr>
-            <td>Purchases</td>
+            <td>{t('purchase')}</td>
             <td>{data?.purchasesTotal.toFixed(2)}</td>
           </tr>
           <tr>
-            <td>Expenses</td>
+            <td>{t('expenses')}</td>
             <td>{data?.expensesTotal.toFixed(2)}</td>
           </tr>
           <tr>
-            <td>Profit</td>
+            <td>{t('profit')}</td>
             <td>{data?.profit.toFixed(2)}</td>
           </tr>
           <tr>
-            <td>Purchase Return</td>
+            <td>{t('purchase return')}</td>
             <td>{0}</td>
           </tr>
           <tr>
-            <td>Sales Return</td>
+            <td>{t('sales returns')}</td>
             <td>{0}</td>
           </tr>
         </tbody>
@@ -61,4 +65,12 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

@@ -20,6 +20,9 @@ import { useReactToPrint } from 'react-to-print';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface DownloadModalProps {
   modal: boolean;
@@ -27,6 +30,7 @@ interface DownloadModalProps {
 }
 
 function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  const { t } = useTranslation('common');
   // const getAllSales = client.saleRouter.getAllSales
   return (
     <>
@@ -60,7 +64,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
           {({ values, handleChange, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <FormDate
-                label='Start Date'
+                label={`${t('start date')}`}
                 placeholder='Start Date'
                 name='startDate'
                 // value={values.startDate}
@@ -71,7 +75,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
               </Center>
 
               <FormDate
-                label='End Date'
+                label={`${t('end date')}`}
                 placeholder='End Date'
                 name='endDate'
                 // value={values.endDate}
@@ -80,7 +84,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
 
               <Center mt={'md'}>
                 <Button size='xs' mr={'md'} type='submit'>
-                  Download Sales
+                  {t('download')}
                 </Button>
               </Center>
             </Form>
@@ -96,6 +100,7 @@ const Index = () => {
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [downloadM, setDownloadM] = useState(false);
   const [page, setPage] = useState(1);
+  const { t } = useTranslation('common');
 
   const purchases = trpc.purchaseRouter.purchases.useInfiniteQuery(
     {
@@ -146,13 +151,13 @@ const Index = () => {
             title={'Sales'}
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
-            <Title fw={400}>Purchases</Title>
+            <Title fw={400}>{t('purchase')}</Title>
             <Group>
               <Button size='xs' mr={'md'} onClick={() => setDownloadM(true)}>
-                Download
+                {t('download')}
               </Button>
               <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-                Add Purchase
+                {t('add purchase')}
               </Button>
             </Group>
           </Group>
@@ -169,22 +174,22 @@ const Index = () => {
             }
             colProps={{
               invoiceId: {
-                label: 'Invoice ID',
+                label: `${t('show invoice')}`,
               },
               date: {
-                label: 'Date',
+                label: `${t('date')}`,
               },
               supplier: {
-                label: 'Supplier',
+                label: `${t('supplier')}`,
               },
               status: {
-                label: 'Payment Status',
+                label: `${t('payment status')}`,
               },
               total: {
-                label: 'Total Amount',
+                label: `${t('total')}`,
               },
               _id: {
-                label: 'Show Invoice',
+                label: `${t('show invoice')}`,
                 Component: ({ data: { _id } }) => (
                   <Group position='center'>
                     <ActionIcon
@@ -223,3 +228,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

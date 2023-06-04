@@ -18,6 +18,9 @@ import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
 import _ from 'lodash';
 import SaleReturnForm from '@/components/SReturnFrom';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { IconArrowDown, IconEye } from '@tabler/icons';
@@ -116,6 +119,8 @@ const Index = () => {
   });
   const [downloadM, setDownloadM] = useState(false);
 
+  const { t } = useTranslation('common');
+
   useEffect(() => {
     if (invoice.data) {
       handlePrint();
@@ -157,9 +162,9 @@ const Index = () => {
             title={'Sales'}
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
-            <Title fw={400}>Sales Return</Title>
+            <Title fw={400}>{t('sales returns')}</Title>
             <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-              Add Return
+              {t('add return')}
             </Button>
           </Group>
           <TableSelection
@@ -176,16 +181,16 @@ const Index = () => {
             }
             colProps={{
               date: {
-                label: 'Date',
+                label: `${t('date')}`,
               },
               customer: {
-                label: 'Customer',
+                label: `${t('customer')}`,
               },
               status: {
-                label: 'Payment Status',
+                label: `${t('status')}`,
               },
               total: {
-                label: 'Total Amount',
+                label: `${t('total')}`,
               },
               _id: {
                 label: 'Show Invoice',
@@ -226,3 +231,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

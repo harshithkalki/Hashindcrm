@@ -18,6 +18,9 @@ import { IconArrowDown, IconEye } from '@tabler/icons';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { Formik, Form } from 'formik';
@@ -115,6 +118,7 @@ const Index = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (invoice.data) {
@@ -146,9 +150,9 @@ const Index = () => {
           title={'Stock Transfer'}
         />
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Stock Transfer</Title>
+          <Title fw={400}>{t('stock transfer')}</Title>
           <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-            Add Transfer
+            {t('add transfer')}
           </Button>
         </Group>
         <TableSelection
@@ -165,19 +169,19 @@ const Index = () => {
           }
           colProps={{
             invoiceId: {
-              label: 'Invoice ID',
+              label: `${t('invoice id')} `,
             },
             openingStockDate: {
-              label: 'Opening Stock Date',
+              label: `${t('date')}`,
             },
             status: {
-              label: 'Payment Status',
+              label: `${t('payment status')}`,
             },
             total: {
-              label: 'Total Amount',
+              label: `${t('total')}`,
             },
             _id: {
-              label: 'Show Invoice',
+              label: `${t('show invoice')}`,
               Component: ({ data }) => (
                 <Group position='center'>
                   <ActionIcon
@@ -214,3 +218,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

@@ -24,6 +24,9 @@ import { ZBrandCreateInput } from '@/zobjs/brand';
 import type { z } from 'zod';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { showNotification } from '@mantine/notifications';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'react-i18next';
 
 const initialValues: BrandCreateInput = {
   name: '',
@@ -41,6 +44,7 @@ const BrandForm = ({
   onClose: () => void;
 }) => {
   const [logo, setLogo] = useState<File | null>(null);
+  const { t } = useTranslation('common');
 
   return (
     <Formik
@@ -170,6 +174,7 @@ const Brand = () => {
   );
 
   const [editId, setEditId] = useState<string>('');
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!brands.data?.pages.find((pageData) => pageData.page === page)) {
@@ -193,9 +198,9 @@ const Brand = () => {
       )}
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
-          <Title fw={400}>Brands</Title>
+          <Title fw={400}>{t('brands')}</Title>
           <Button size='xs' onClick={() => setModal(true)}>
-            Add Brand
+            {t('add brand')}
           </Button>
         </Group>
         <TableSelection
@@ -210,7 +215,7 @@ const Brand = () => {
           onEdit={(id) => setEditId(id)}
           colProps={{
             logo: {
-              label: 'Logo',
+              label: `${t('logo')}`,
               Component: ({ data: { logo } }) => (
                 <Group spacing='xs' position='center'>
                   <Image
@@ -224,7 +229,7 @@ const Brand = () => {
               ),
             },
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
           }}
           editable
@@ -251,3 +256,11 @@ const Brand = () => {
 };
 
 export default Brand;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

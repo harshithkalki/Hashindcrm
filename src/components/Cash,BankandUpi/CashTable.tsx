@@ -3,6 +3,7 @@ import { Center, Flex, Pagination, ScrollArea } from '@mantine/core';
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import TableSelection from '../Tables';
+import { useTranslation } from 'react-i18next';
 
 const CashTable = () => {
   const [page, setPage] = React.useState(1);
@@ -15,6 +16,7 @@ const CashTable = () => {
       cashData.fetchNextPage();
     }
   }, [cashData, page]);
+  const { t } = useTranslation('common');
 
   console.log(cashData.data);
   return (
@@ -33,22 +35,22 @@ const CashTable = () => {
             }
             colProps={{
               date: {
-                label: 'Date',
+                label: `${t('date')}`,
               },
               invoiceId: {
-                label: 'Invoice Id',
+                label: `${t('invoice id')}`,
               },
               customer: {
-                label: 'Customer',
+                label: `${t('customer')}`,
               },
               discount: {
-                label: 'Discount',
+                label: `${t('discount')}`,
               },
               shipping: {
-                label: 'Shipping',
+                label: `${t('shipping')}`,
               },
               total: {
-                label: 'Amount Paid',
+                label: `${t('total')}`,
               },
             }}
           />

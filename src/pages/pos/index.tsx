@@ -41,6 +41,9 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import type { SaleCreateInput } from '@/zobjs/sale';
 import { ZSaleCreateInput } from '@/zobjs/sale';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const useStyles = createStyles((theme) => ({
   products: {
@@ -322,6 +325,7 @@ function ProductsSelect({
 
 const StaffMemSelect = () => {
   const [search, setSearch] = useState('');
+  const { t } = useTranslation('common');
   const staffMem = trpc.staffRouter.all.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
@@ -334,7 +338,7 @@ const StaffMemSelect = () => {
 
   return (
     <FormikSelect
-      label='Staff Member'
+      label={`${t('staff members')}`}
       data={data}
       searchable
       searchValue={search}
@@ -356,10 +360,11 @@ const CustomerSelect = () => {
     label: customer.name,
     value: customer._id.toString(),
   }));
+  const { t } = useTranslation('common');
 
   return (
     <FormikSelect
-      label='Customer'
+      label={`${t('customer')}`}
       data={[
         { label: 'Walk In Customer', value: 'walkInCustomer' },
         ...(customerData || []),
@@ -448,6 +453,7 @@ const Index = () => {
       setInvoiceId('');
     }
   }, [handlePrint, invoice.data]);
+  const { t } = useTranslation('common');
 
   return (
     <Layout>
@@ -514,7 +520,7 @@ const Index = () => {
           >
             <div>
               <Group style={{ justifyContent: 'space-between' }}>
-                <Title fw={400}>POS</Title>
+                <Title fw={400}>{t('pos')}</Title>
                 <StaffMemSelect />
               </Group>
               <Divider mt={'md'} />
@@ -568,7 +574,7 @@ const Index = () => {
                   <Container w={'100%'}>
                     <CustomerSelect />
                     <Select
-                      label='Products'
+                      label={t('products')}
                       data={
                         searchProducts.data?.map((item) => ({
                           label: item.name,
@@ -666,7 +672,7 @@ const Index = () => {
                               textAlign: 'center',
                             }}
                           >
-                            Product
+                            {t('product')}
                           </th>
                           <th
                             style={{
@@ -674,7 +680,7 @@ const Index = () => {
                               textAlign: 'center',
                             }}
                           >
-                            Quantity
+                            {t('quantity')}
                           </th>
                           <th style={{ whiteSpace: 'nowrap' }}>Tax</th>
                           <th
@@ -683,7 +689,7 @@ const Index = () => {
                               textAlign: 'center',
                             }}
                           >
-                            Subtotal
+                            {t('subtotal')}
                           </th>
                           <th
                             style={{
@@ -691,7 +697,7 @@ const Index = () => {
                               textAlign: 'center',
                             }}
                           >
-                            Action
+                            {t('actions')}
                           </th>
                         </tr>
                       </thead>
@@ -796,7 +802,7 @@ const Index = () => {
                   <Group w={'100%'}>
                     <FormInput
                       name='discount'
-                      label='Order Discount'
+                      label={`${t('discount')}`}
                       placeholder='Order Discount'
                       w={'30%'}
                       size='sm'
@@ -805,7 +811,7 @@ const Index = () => {
                     />
                     <FormInput
                       name='shipping'
-                      label='Shipping'
+                      label={`${t('shipping')}`}
                       placeholder='Shipping'
                       w={'30%'}
                       size='sm'
@@ -814,7 +820,7 @@ const Index = () => {
                     />
                     <FormikSelect
                       name='paymentMode'
-                      label='Payment Method'
+                      label={`${t('payment method')}`}
                       data={[
                         { label: 'Cash', value: 'cash' },
                         { label: 'Card', value: 'card' },
@@ -828,7 +834,7 @@ const Index = () => {
                   </Group>
                   <Group w={'100%'} align={'end'}>
                     <TextInput
-                      label='Total'
+                      label={`${t('total')}`}
                       w={'30%'}
                       placeholder='Total'
                       size='sm'
@@ -853,7 +859,7 @@ const Index = () => {
                         !(Boolean(values.staffMem) && inlineProducts.size !== 0)
                       }
                     >
-                      Save & Print
+                      {t('save & print')}
                     </Button>
                     <Button
                       w={'30%'}
@@ -863,7 +869,7 @@ const Index = () => {
                       }}
                       type='reset'
                     >
-                      Reset
+                      {t('reset')}
                     </Button>
                   </Group>
                 </div>
@@ -877,3 +883,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

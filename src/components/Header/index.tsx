@@ -11,6 +11,7 @@ import {
   Image,
   Loader,
   ActionIcon,
+  Select,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -173,7 +174,8 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
   );
-  const { push } = useRouter();
+  const { push, locale } = useRouter();
+  const [language, setLanguage] = useState(locale);
 
   return (
     <div className={classes.header}>
@@ -195,6 +197,26 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
 
           <Group>
             {!client?.isSuperAdmin && <WarehouseSelect />}
+            {!client?.isSuperAdmin && (
+              <Select
+                data={[
+                  { label: 'English', value: 'en' },
+                  { label: 'Tamil', value: 'fr' },
+                ]}
+                onChange={(value) => {
+                  if (value === 'en') {
+                    push('/', `/`, { locale: 'en' });
+                    setLanguage('en');
+                  } else if (value === 'fr') {
+                    push('/', '/', { locale: 'fr' });
+                    setLanguage('fr');
+                  }
+                }}
+                value={language}
+                defaultValue={locale}
+                size='xs'
+              />
+            )}
             <Menu
               width={200}
               position='bottom-end'

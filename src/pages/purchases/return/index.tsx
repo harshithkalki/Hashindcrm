@@ -17,11 +17,15 @@ import { useReactToPrint } from 'react-to-print';
 import EditSales from '@/components/EditSales';
 import _ from 'lodash';
 import PurchaseReturnForm from '@/components/PReturnForm';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Index = () => {
   const [modal, setModal] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [page, setPage] = useState(1);
+  const { t } = useTranslation('common');
   const sales = trpc.purchaseReturnRouter.purchaseReturns.useInfiniteQuery(
     {
       limit: 10,
@@ -81,9 +85,9 @@ const Index = () => {
             title={'Sales'}
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
-            <Title fw={400}>Purchase Return</Title>
+            <Title fw={400}>{t('purchase return')}</Title>
             <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-              Add Return
+              {t('add return')}
             </Button>
           </Group>
           <TableSelection
@@ -100,16 +104,16 @@ const Index = () => {
             }
             colProps={{
               date: {
-                label: 'Date',
+                label: `${t('date')}`,
               },
               supplier: {
-                label: 'Supplier',
+                label: `${t('supplier')}`,
               },
               status: {
-                label: 'Payment Status',
+                label: `${t('status')}`,
               },
               total: {
-                label: 'Total Amount',
+                label: `${t('total')}`,
               },
             }}
           />
@@ -134,3 +138,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

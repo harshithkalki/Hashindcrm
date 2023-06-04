@@ -12,10 +12,16 @@ import {
   Title,
 } from '@mantine/core';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { useTranslation } from 'react-i18next';
+import type { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
   const roles = trpc.roleRouter.roles.useQuery({ page: page, limit: 10 });
+  const { t } = useTranslation('common');
+  // const {}=useTranslation('client');
+  // const { cl}=useTranslation('client');
 
   const router = useRouter();
 
@@ -33,14 +39,14 @@ const Index = () => {
         }}
       >
         <Group mb={'lg'} mt='lg' position='apart'>
-          <Title fw={400}>Roles</Title>
+          <Title fw={400}>{t('roles')}</Title>
           <Button
             size='xs'
             onClick={() => {
               router.push('/roles/add');
             }}
           >
-            Add Role
+            {t('add role')}
           </Button>
         </Group>
         <TableSelection
@@ -52,13 +58,13 @@ const Index = () => {
           }
           colProps={{
             _id: {
-              label: 'S.NO',
+              label: `${t('sno')}`,
               Component: ({ index }) => {
                 return <>{index + 1}</>;
               },
             },
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
           }}
           editable
@@ -82,3 +88,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

@@ -9,8 +9,11 @@ import {
   ScrollArea,
   Title,
 } from '@mantine/core';
+import type { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dayjs from 'dayjs';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
@@ -21,6 +24,8 @@ const Index = () => {
       refetchOnWindowFocus: false,
     }
   );
+
+  const { t } = useTranslation('common');
 
   React.useEffect(() => {
     if (!sales.data?.pages.find((pageData) => pageData?.page === page)) {
@@ -37,7 +42,7 @@ const Index = () => {
       >
         <ScrollArea>
           <Group mb={'lg'}>
-            <Title fw={400}>Sales Report</Title>
+            <Title fw={400}>{t('sales report')}</Title>
           </Group>
           <TableSelection
             data={
@@ -54,27 +59,21 @@ const Index = () => {
             colProps={{
               createdAt: {
                 label: 'Payment Date',
-                Component: (props) => (
-                  <>
-                    {<>{dayjs(props.data.createdAt).format('MMMM DD, YYYY')}</>}
-                  </>
-                ),
               },
               invoiceId: {
-                label: 'Reference No',
+                label: `${t('reference no')}`,
               },
               customer: {
-                label: 'User',
+                label: `${t('user')}`,
               },
               total: {
                 label: 'Amount',
-                Component: (props) => <>{Math.round(props.data.total)}</>,
               },
               status: {
-                label: 'Payment Status',
+                label: `${t('payment status')}`,
               },
               staffMem: {
-                label: 'Created By',
+                label: `${t('created by')}`,
               },
             }}
           />
@@ -99,3 +98,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

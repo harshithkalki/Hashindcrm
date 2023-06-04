@@ -19,6 +19,9 @@ import { trpc } from '@/utils/trpc';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
+import { useTranslation } from 'react-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetServerSideProps } from 'next';
 
 const LinkStatus = ({
   modalProps,
@@ -217,21 +220,22 @@ const Index = () => {
   const [link, setLink] = useState(false);
   const [remove, setRemove] = useState(false);
   const [open, setOpen] = React.useState(false);
+  const { t } = useTranslation('common');
 
   return (
     <Layout>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my='lg' position='apart'>
-          <Title fw={400}>WorkFlow</Title>
+          <Title fw={400}>{t('workflow')}</Title>
           <Group position='apart'>
             <Button size='xs' onClick={() => setOpen(true)}>
-              Add status
+              {t('add status')}
             </Button>
             <Button size='xs' onClick={() => setLink(true)}>
-              Link status
+              {t('link status')}
             </Button>
             <Button size='xs' onClick={() => setRemove(true)}>
-              Remove Link
+              {t('remove link')}
             </Button>
           </Group>
         </Group>
@@ -239,16 +243,16 @@ const Index = () => {
           data={workflow.data ?? []}
           colProps={{
             name: {
-              label: 'Name',
+              label: `${t('name')}`,
             },
             initialStatus: {
-              label: 'Initial Status',
+              label: `${t('initial status')}`,
               Component: ({ data }) => {
                 return <Badge>{data.initialStatus ? 'Yes' : 'No'}</Badge>;
               },
             },
             linkedStatuses: {
-              label: 'Linked',
+              label: `${t('linked')}`,
               Component: ({ data }) => {
                 return (
                   <form>
@@ -301,3 +305,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

@@ -22,6 +22,9 @@ import _ from 'lodash';
 import { Form, Formik } from 'formik';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface DownloadModalProps {
   modal: boolean;
@@ -29,6 +32,7 @@ interface DownloadModalProps {
 }
 
 function DownloadModal({ modal, setModal }: DownloadModalProps) {
+  const { t } = useTranslation('common');
   // const getAllSales = client.saleRouter.getAllSales
   return (
     <>
@@ -61,7 +65,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
           {({ values, handleChange, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <FormDate
-                label='Start Date'
+                label={`${t('start date')}`}
                 placeholder='Start Date'
                 name='startDate'
                 // value={values.startDate}
@@ -72,7 +76,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
               </Center>
 
               <FormDate
-                label='End Date'
+                label={`${t('end date')}`}
                 placeholder='End Date'
                 name='endDate'
                 // value={values.endDate}
@@ -81,7 +85,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
 
               <Center mt={'md'}>
                 <Button size='xs' mr={'md'} type='submit'>
-                  Download Sales
+                  {t('download sales')}
                 </Button>
               </Center>
             </Form>
@@ -94,6 +98,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
 
 const Index = () => {
   const [modal, setModal] = useState(false);
+  const { t } = useTranslation('common');
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [page, setPage] = useState(1);
   const [downloadM, setDownloadM] = useState(false);
@@ -157,13 +162,13 @@ const Index = () => {
             title={'Sales'}
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
-            <Title fw={400}>Sales</Title>
+            <Title fw={400}>{t('sales')}</Title>
             <Group>
               <Button size='xs' mr={'md'} onClick={() => setDownloadM(true)}>
-                Download
+                {t('download')}
               </Button>
               <Button size='xs' mr={'md'} onClick={() => setModal(true)}>
-                Add Sales
+                {t('add sales')}
               </Button>
             </Group>
           </Group>
@@ -181,22 +186,22 @@ const Index = () => {
             }
             colProps={{
               invoiceId: {
-                label: 'Invoice ID',
+                label: `${t('invoice id')}`,
               },
               date: {
-                label: 'Date',
+                label: `${t('date')}`,
               },
               customer: {
-                label: 'Customer',
+                label: `${t('customer')}`,
               },
               status: {
-                label: 'Payment Status',
+                label: `${t('status')}`,
               },
               total: {
-                label: 'Total Amount',
+                label: `${t('total')}`,
               },
               _id: {
-                label: 'Show Invoice',
+                label: `${t('show invoice')}`,
                 Component: ({ data }) => (
                   <Group position='center'>
                     <ActionIcon
@@ -238,3 +243,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

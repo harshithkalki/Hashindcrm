@@ -32,6 +32,9 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { Accordion } from '@mantine/core';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const uploadFiles = async (files: FileWithPath[]) => {
   const formData = new FormData();
@@ -573,6 +576,7 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
       tickets.fetchNextPage();
     }
   }, [tickets, page]);
+  const { t } = useTranslation('common');
 
   return (
     <div
@@ -596,19 +600,19 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
         }
         colProps={{
           _id: {
-            label: 'Id',
+            label: `${t('ticket')}`,
           },
           name: {
-            label: 'Todo',
+            label: `${t('todo')}`,
           },
           createdAt: {
-            label: 'Created',
+            label: `${t('created at')}`,
             Component: ({ data: { createdAt } }) => (
               <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
             ),
           },
           status: {
-            label: 'Status',
+            label: `${t('status')}`,
             Component: ({ data: { status, _id, assignedTo } }) => (
               <StatusSelect
                 statusId={status._id.toString() as string}
@@ -618,7 +622,7 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
             ),
           },
           assignedTo: {
-            label: 'Assigned',
+            label: `${t('assigned')}`,
             Component: ({ data: { assignedTo, _id } }) => (
               <AssignableSelect
                 ticketId={_id.toString()}
@@ -689,6 +693,7 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
       tickets.fetchNextPage();
     }
   }, [tickets, page]);
+  const { t } = useTranslation('common');
 
   return (
     <div
@@ -712,19 +717,19 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
         }
         colProps={{
           _id: {
-            label: 'Id',
+            label: `${t('ticket')}`,
           },
           name: {
-            label: 'Todo',
+            label: `${t('todo')}`,
           },
           createdAt: {
-            label: 'Created',
+            label: `${t('created at')}`,
             Component: ({ data: { createdAt } }) => (
               <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
             ),
           },
           status: {
-            label: 'Status',
+            label: `${t('status')}`,
             Component: ({ data: { status, _id, assignedTo } }) => (
               <StatusSelect
                 statusId={status._id.toString() as string}
@@ -734,7 +739,7 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
             ),
           },
           assignedTo: {
-            label: 'Assigned',
+            label: `${t('assigned')}`,
             Component: ({ data: { assignedTo, _id } }) => (
               <AssignableSelect
                 ticketId={_id.toString()}
@@ -814,6 +819,7 @@ const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
       tickets.fetchNextPage();
     }
   }, [tickets, page]);
+  const { t } = useTranslation('common');
 
   return (
     <div
@@ -837,19 +843,19 @@ const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
         }
         colProps={{
           _id: {
-            label: 'Id',
+            label: `${t('ticket')}`,
           },
           name: {
-            label: 'Todo',
+            label: `${t('todo')}`,
           },
           createdAt: {
-            label: 'Created',
+            label: `${t('created at')}`,
             Component: ({ data: { createdAt } }) => (
               <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
             ),
           },
           status: {
-            label: 'Status',
+            label: `${t('status')}`,
             Component: ({ data: { status, _id, assignedTo } }) => (
               <StatusSelect
                 statusId={status._id.toString() as string}
@@ -859,7 +865,7 @@ const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
             ),
           },
           assignedTo: {
-            label: 'Assigned',
+            label: `${t('assigned')}`,
             Component: ({ data: { assignedTo, _id } }) => (
               <AssignableSelect
                 ticketId={_id.toString()}
@@ -916,6 +922,7 @@ const Index = () => {
   const [ticket, setTicket] = React.useState<TicketCustom | null>(null);
   const theme = useMantineTheme();
 
+  const { t } = useTranslation('common');
   if (!user) return null;
 
   return (
@@ -939,8 +946,8 @@ const Index = () => {
             paddingBottom: theme.spacing.lg,
           }}
         >
-          <Title fw={400}>Tickets</Title>
-          <Button onClick={() => setModal(true)}>Add</Button>
+          <Title fw={400}>{`${'tickets'}`}</Title>
+          <Button onClick={() => setModal(true)}>{`${'add ticket'}`}</Button>
         </Group>
         <Divider mt={'xl'} />
         <div
@@ -979,3 +986,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};
