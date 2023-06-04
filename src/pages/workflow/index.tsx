@@ -169,6 +169,7 @@ const AddStatus = ({
   data?: RouterOutputs['workflowRouter']['getWorkflow'];
 }) => {
   const createStatus = trpc.workflowRouter.createStatus.useMutation();
+  const { t } = useTranslation('common');
 
   return (
     <Modal {...modalProps}>
@@ -196,17 +197,17 @@ const AddStatus = ({
           <Form>
             <FormInput
               name='name'
-              label='Name'
+              label={`${t('name')}`}
               placeholder='Enter Name'
               withAsterisk
             />
             <FormikSwitch
               name='initial'
-              label='Initial State'
+              label={`${t('initial state')}`}
               mt={'sm'}
             ></FormikSwitch>
             <Button type='submit' size='xs' mt={'md'} loading={isSubmitting}>
-              save
+              {t('save')}
             </Button>
           </Form>
         )}

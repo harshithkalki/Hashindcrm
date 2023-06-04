@@ -23,6 +23,7 @@ import axios from 'axios';
 import { ZProductCreateInput } from '@/zobjs/product';
 import { useRouter } from 'next/router';
 import { showNotification } from '@mantine/notifications';
+import { useTranslation } from 'react-i18next';
 
 const barcodeSymbologyOptions = [
   { label: 'Code 39', value: 'code39' },
@@ -68,9 +69,10 @@ const BrandsSelect = () => {
     { search: search },
     { refetchOnWindowFocus: false }
   );
+  const { t } = useTranslation('common');
   return (
     <FormikSelect
-      label='Brand'
+      label={`${t('brand')}`}
       data={
         brands.data?.docs?.map((brand) => ({
           label: brand.name,
@@ -96,6 +98,7 @@ const WarehousesSelect = () => {
     { refetchOnWindowFocus: false }
   );
   const { push } = useRouter();
+  const { t } = useTranslation('common');
 
   return (
     <div>
@@ -105,7 +108,7 @@ const WarehousesSelect = () => {
           fontWeight: 500,
         }}
       >
-        Warehouse <span style={{ color: 'red' }}>*</span>
+        {t('warehouse')} <span style={{ color: 'red' }}>*</span>
       </label>
       <Group spacing={2}>
         <FormikSelect
@@ -142,6 +145,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
   });
   const router = useRouter();
   const [logo, setLogo] = useState<File | null>(null);
+  const { t } = useTranslation('common');
 
   return (
     <Formik
@@ -179,7 +183,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               ]}
             >
               <FileInput
-                label='Logo'
+                label={`${t('logo')}`}
                 onChange={setLogo}
                 name='logo'
                 placeholder='Select Logo'
@@ -187,28 +191,28 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               />
               <WarehousesSelect />
               <FormInput
-                label='Name'
+                label={`${t('name')}`}
                 placeholder='Name'
                 name='name'
                 w={'100%'}
                 withAsterisk
               />
-              <FormInput label='Slug' placeholder='Slug' name='slug' />
+              <FormInput label={`${'slug'}`} placeholder='Slug' name='slug' />
               <FormInput
-                label='Quantity'
+                label={`${t('quantity')}`}
                 placeholder='Quantity'
                 type={'number'}
                 name='quantity'
                 withAsterisk
               />
               <FormInput
-                label='Quantity Alert'
+                label={`${t('quantity alert')}`}
                 type={'number'}
                 placeholder='Quantity Alert'
                 name='quantityAlert'
               />
               <FormikSelect
-                label='Category'
+                label={`${t('category')}`}
                 data={
                   categories.data?.map((category) => ({
                     label: category.name,
@@ -221,25 +225,25 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               />
               <BrandsSelect />
               <FormikSelect
-                label='Barcode Symbology'
+                label={`${t('barcode symbology')}`}
                 data={barcodeSymbologyOptions}
                 placeholder='Pick one barcode symbology'
                 name='barcodeSymbology'
               />
               <FormInput
-                label='HSN Code / Item Code'
+                label={`${t('hsn code / item code')}`}
                 placeholder='HSN Code / Item Code'
                 name='itemCode'
               />
               <FormInput
-                label='Opening Stock'
+                label={`${t('opening stock')}`}
                 type={'number'}
                 placeholder='Opening Stock'
                 name='openingStock'
                 withAsterisk
               />
               <FormDate
-                label='Opening Stock Date'
+                label={`${t('opening stock date')}`}
                 placeholder='Opening Stock Date'
                 name='openingStockDate'
                 withAsterisk
@@ -253,11 +257,11 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               columns={4}
             >
               <Grid.Col>
-                <Title order={4}>Price & Tax</Title>
+                <Title order={4}>{t('price & tax')}</Title>
               </Grid.Col>
               <Grid.Col lg={1} sm={4}>
                 <FormInput
-                  label='MRP'
+                  label={`${t('mrp')}`}
                   type={'number'}
                   placeholder='MRP'
                   name='mrp'
@@ -266,7 +270,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               </Grid.Col>
               <Grid.Col lg={1} sm={4}>
                 <FormInput
-                  label='Purchase Price'
+                  label={`${t('purchase price')}`}
                   type={'number'}
                   placeholder='Purchase Price'
                   name='purchasePrice'
@@ -275,7 +279,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               </Grid.Col>
               <Grid.Col lg={1} sm={4}>
                 <FormInput
-                  label='Sale Price'
+                  label={`${t('sale price')}`}
                   type={'number'}
                   placeholder='Sale Price'
                   name='salePrice'
@@ -284,7 +288,7 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               </Grid.Col>
               <Grid.Col lg={1} sm={4}>
                 <FormInput
-                  label='Tax'
+                  label={`${t('tax')}`}
                   placeholder='Tax'
                   name='tax'
                   withAsterisk
@@ -301,18 +305,18 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               columns={4}
             >
               <Grid.Col>
-                <Title order={4}>Custom Fields</Title>
+                <Title order={4}>{t('custom fields')}</Title>
               </Grid.Col>
               <Grid.Col lg={1} sm={4}>
                 <FormDate
-                  label='Expire Date'
+                  label={`${t('expire date')}`}
                   placeholder='Expire Date'
                   name='expireDate'
                 />
               </Grid.Col>
               <Grid.Col lg={3} sm={4}>
                 <Formiktextarea
-                  label='Description'
+                  label={`${t('description')}`}
                   placeholder='Description'
                   name='description'
                 />
@@ -328,14 +332,14 @@ const ProductForm = ({ formInputs, onSubmit }: Props) => {
               <Grid.Col>
                 <Group spacing={'md'}>
                   <Button type='submit' loading={isSubmitting}>
-                    Save
+                    {t('save')}
                   </Button>
                   <Button
                     onClick={() => {
                       router.back();
                     }}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </Group>
               </Grid.Col>

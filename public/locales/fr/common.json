@@ -201,5 +201,13 @@
   "total sale items": "மொத்த விற்பனை பொருட்கள்",
   "total purchase items": "மொத்த வாங்க பெறும் பொருட்கள்",
   "total sale returns": "மொத்த விற்பனை திருப்புகள்",
-  "total purchase returns": "மொத்த வாங்க திருப்புகள்"
+  "total purchase returns": "மொத்த வாங்க திருப்புகள்",
+  "slug": "ஸ்லக்",
+  "barcode symbology": "பார்கோடு செம்பொருளியல்",
+  "hsn code / item code": "எச்.எஸ்.என் குறியீடு / பொருள் குறியீடு",
+  "opening stock date": "தொடக்க பங்கு தேதி",
+  "price & tax": "விலை மற்றும் வரி",
+  "custom fields": "தனிப்பட்ட புலங்கள்",
+  "expire date": "காலாவதி தேதி",
+  "parent category": "பெற்றோர் வகை"
 }

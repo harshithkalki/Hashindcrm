@@ -71,20 +71,20 @@ const BrandForm = ({
         <Form>
           <FormInput
             name={'name'}
-            label='Name'
+            label={`${t('name')}`}
             placeholder='Enter Name'
             withAsterisk
             mt={'md'}
           />
           <FormInput
             name='slug'
-            label='Slug'
+            label={`${t('slug')}`}
             placeholder='Enter Slug'
             withAsterisk
             mt={'xs'}
           />
           <FileInput
-            label='Logo'
+            label={`${t('logo')}`}
             onChange={setLogo}
             name='logo'
             mt={'md'}
@@ -93,10 +93,10 @@ const BrandForm = ({
           />
           <Group mt={'md'} mb={'xs'} spacing={'md'}>
             <Button type='submit' mt={'md'} loading={isSubmitting} size={'sm'}>
-              Submit
+              {t('submit')}
             </Button>
             <Button type='button' mt={'md'} size={'sm'} onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
           </Group>
         </Form>

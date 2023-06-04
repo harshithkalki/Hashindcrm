@@ -201,5 +201,22 @@
   "total sale items": "Total Sale Items",
   "total purchase items": "Total Purchase Items",
   "total sale returns": "Total Sale Returns",
-  "total purchase returns": "Total Purchase Returns"
+  "total purchase returns": "Total Purchase Returns",
+  "slug": "Slug",
+  "barcode symbology": "Barcode Symbology",
+  "hsn code / item code": "HSN Code / Item Code",
+  "opening stock date": "Opening Stock Date",
+  "price & tax": "Price & Tax",
+  "custom fields": "Custom Fields",
+  "expire date": "Expire Date",
+  "parent category": "Parent Category",
+  "initial state": "Initial State",
+  "issue type": "Issue Type",
+  "product name": "Product Name",
+  "adjustment": "Adjustment",
+  "invoice number": "Invoice Number",
+  "from warehouse": "From Warehouse",
+  "to warehouse": "To Warehouse",
+  "terms & conditions": "Terms & Conditions",
+  "order tax": "Order Tax"
 }

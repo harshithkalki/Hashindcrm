@@ -39,6 +39,7 @@ function StockAdjustmentForm({
   onSubmit: (values: typeof initialValues) => Promise<void>;
 }) {
   const products = trpc.productRouter.getAllProducts.useQuery();
+  const { t } = useTranslation('common');
 
   return (
     <Formik
@@ -59,7 +60,7 @@ function StockAdjustmentForm({
           <FormikSelect
             mt={'md'}
             name='product'
-            label='Product Name'
+            label={`${t('product name')}`}
             searchable
             creatable
             data={
@@ -78,12 +79,12 @@ function StockAdjustmentForm({
                   (product) => product._id.toString() === values.product
                 )?.quantity || 0
               }
-              label='Current Stock'
+              label={`${t('current stock')}`}
               disabled
             />
             <FormInput
               name='quantity'
-              label='Quantity'
+              label={`${t('quantity')}`}
               placeholder='Quantity'
               type='number'
               withAsterisk
@@ -91,7 +92,7 @@ function StockAdjustmentForm({
           </Group>
           <FormikSelect
             name='operation'
-            label='Adjustment'
+            label={`${t('adjustment')}`}
             mt={'md'}
             data={[
               { label: 'Add', value: 'add' },
@@ -102,13 +103,13 @@ function StockAdjustmentForm({
           />
           <Formiktextarea
             name='note'
-            label='Note'
+            label={`${t('notes')}`}
             placeholder='Note'
             mt={'md'}
           />
           <Group style={{ justifyContent: 'end' }}>
             <Button type='submit' mt={'lg'} size={'xs'} loading={isSubmitting}>
-              Submit
+              {t('submit')}
             </Button>
           </Group>
         </Form>

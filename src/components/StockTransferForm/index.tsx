@@ -36,6 +36,7 @@ import FormikSelect from '../FormikCompo/FormikSelect';
 import Formiktextarea from '../FormikCompo/FormikTextarea';
 import FormikInfiniteSelect from '../FormikCompo/InfiniteSelect';
 import Invoice from '../Invoice';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -122,10 +123,11 @@ function FromWarehouseSelect() {
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
   const dispatch = useDispatch();
+  const { t } = useTranslation('common');
 
   return (
     <InfiniteSelect
-      label='From Warehouse'
+      label={`${t('from warehouse')}`}
       placeholder='Select warehouse'
       data={
         warehouses.data?.pages
@@ -163,9 +165,10 @@ const WarehouseSelect = () => {
     { search: search },
     { refetchOnWindowFocus: false }
   );
+  const { t } = useTranslation('common');
   return (
     <FormikSelect
-      label='To Warehouse'
+      label={`${t('to warehouse')}`}
       data={
         warehouses.data?.docs?.map((warehouse) => ({
           label: warehouse.name,
@@ -219,6 +222,8 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
       initialValues.fromWarehouse = warehouse;
     }
   }, [warehouse]);
+
+  const { t } = useTranslation('common');
 
   return (
     <>
@@ -295,7 +300,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   style={{ alignItems: 'end' }}
                 >
                   <FormInput
-                    label='Invoice Number'
+                    label={`${t('invoice number')}`}
                     name='invoicenum'
                     placeholder='Invoice Number'
                     description='Leave blank to auto generate'
@@ -305,14 +310,14 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   <WarehouseSelect />
 
                   <FormDate
-                    label='openingStockDate'
+                    label={`${t('opening stock date')}`}
                     placeholder='openingStockDate'
                     name='openingStockDate'
                     withAsterisk
                   />
                 </SimpleGrid>
                 <Select
-                  label='Products'
+                  label={`${t('products')}`}
                   data={
                     searchProducts.data?.map((item) => ({
                       label: item.name,
@@ -403,7 +408,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Product
+                            {t('product')}
                           </th>
                           <th
                             style={{
@@ -411,7 +416,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Quantity
+                            {t('quantity')}
                           </th>
                           <th
                             style={{
@@ -419,7 +424,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Price
+                            {t('price')}
                           </th>
                           <th
                             style={{
@@ -427,7 +432,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Tax
+                            {t('tax')}
                           </th>
                           <th
                             style={{
@@ -435,7 +440,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Subtotal
+                            {t('subtotal')}
                           </th>
                           <th
                             style={{
@@ -443,7 +448,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Action
+                            {t('actions')}
                           </th>
                         </tr>
                       </thead>
@@ -564,14 +569,14 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 >
                   <div>
                     <Textarea
-                      label={'Terms & Conditions'}
+                      label={`${t('terms & conditions')}`}
                       value={terms}
                       readOnly
                     />
                     <Formiktextarea
                       mt={'md'}
                       placeholder={'Notes'}
-                      label={'Notes'}
+                      label={`${t('notes')}`}
                       name='note'
                     />
                   </div>
@@ -579,7 +584,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   <div>
                     <Group w={'100%'}>
                       <FormikSelect
-                        label={'Status'}
+                        label={`${t('status')}`}
                         placeholder={'Select Status'}
                         name={'status'}
                         w={'46%'}
@@ -591,14 +596,14 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       />
                       <FormikSelect
                         name='paymentMode'
-                        label='Payment Mode'
+                        label={`${t('payment Method')}`}
                         w={'46%'}
                         data={[
                           { label: 'Cash', value: 'cash' },
                           { label: 'Card', value: 'card' },
                           { label: 'UPI', value: 'upi' },
                         ]}
-                        placeholder='Payment Mode'
+                        placeholder='Payment Method'
                         searchable
                         size='sm'
                       />
@@ -607,14 +612,14 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       <FormInput
                         w={'46%'}
                         type={'number'}
-                        label={'Shipping'}
+                        label={`${t('shipping')}`}
                         placeholder={'Shipping'}
                         name={'shipping'}
                       />
                       <FormInput
                         w={'46%'}
                         type={'number'}
-                        label={'Discount'}
+                        label={`${t('discount')}`}
                         placeholder={'Discount'}
                         name={'discount'}
                       />
@@ -622,7 +627,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     <Group w={'100%'} mt={'sm'}>
                       <FormInput
                         w={'46%'}
-                        label={'Order Tax'}
+                        label={`${t('order tax')}`}
                         placeholder={'Order Tax'}
                         name={'orderTax'}
                         value={[...inlineProducts.values()]
@@ -635,7 +640,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       />
                       <TextInput
                         w={'46%'}
-                        label={'Total'}
+                        label={`${t('total')}`}
                         placeholder={'Total'}
                         readOnly
                         value={(
@@ -659,7 +664,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     loading={isSubmitting}
                     disabled={inlineProducts.size === 0}
                   >
-                    Submit
+                    {t('submit')}
                   </Button>
                   <Button
                     size='sm'
@@ -668,7 +673,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     }}
                     mb={'md'}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </Group>
                 {/* {<pre>{JSON.stringify(props, null, 2)}</pre>} */}

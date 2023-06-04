@@ -6,6 +6,8 @@ import { trpc } from '@/utils/trpc';
 import { useRouter } from 'next/router';
 import type { z } from 'zod';
 import type { ZProductCreateInput } from '@/zobjs/product';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Index = () => {
   const createProduct = trpc.productRouter.create.useMutation();
@@ -53,3 +55,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

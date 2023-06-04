@@ -4,6 +4,8 @@ import ProductForm from '@/components/ProductForm';
 import { ScrollArea } from '@mantine/core';
 import { trpc } from '@/utils/trpc';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Edit = () => {
   //   const createProduct = trpc.productRouter.create.useMutation();
@@ -53,3 +55,11 @@ const Edit = () => {
 };
 
 export default Edit;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

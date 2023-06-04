@@ -52,6 +52,7 @@ const CategoryForm = ({
     }
   );
   const [logo, setLogo] = React.useState<File | null>(null);
+  const { t } = useTranslation('common');
 
   return (
     <Formik
@@ -86,14 +87,14 @@ const CategoryForm = ({
         <Form>
           <FormInput
             name='name'
-            label='Name'
+            label={`${t('name')}`}
             placeholder='Enter Name'
             withAsterisk
             mt={'md'}
           />
           <FormikSelect
             name='parentCategory'
-            label='Parent Category'
+            label={`${t('parent category')}`}
             data={
               allCategories.data
                 ?.filter((val) => val._id.toString() !== values?._id)
@@ -107,13 +108,13 @@ const CategoryForm = ({
 
           <FormInput
             name='slug'
-            label='Slug'
+            label={`${t('slug')}`}
             placeholder='Enter Slug'
             withAsterisk
             mt={'xs'}
           />
           <FileInput
-            label='Logo'
+            label={`${t('logo')}`}
             name='logo'
             mt={'md'}
             placeholder='Select Logo'
@@ -122,10 +123,10 @@ const CategoryForm = ({
           />
           <Group mt={'md'} mb={'xs'} spacing={'md'}>
             <Button type='submit' mt={'md'} loading={isSubmitting} size={'sm'}>
-              Submit
+              {t('submit')}
             </Button>
             <Button type='button' mt={'md'} size={'sm'} onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
           </Group>
         </Form>

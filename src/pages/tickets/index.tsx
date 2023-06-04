@@ -97,6 +97,7 @@ const AddnewTicket = ({
   const { classes } = useStyles();
   const [fileUploadLoading, setFileUploadLoading] = useState(false);
   const utils = trpc.useContext();
+  const { t } = useTranslation('common');
 
   return (
     <Modal title='Add Ticket' {...modalProps} size={'xl'}>
@@ -141,7 +142,7 @@ const AddnewTicket = ({
             >
               <FormikSelect
                 name='issueType'
-                label='Issue Type'
+                label={`${t('issue type')}`}
                 placeholder='Select Issue Type'
                 data={[
                   { value: 'bug', label: 'Bug' },
@@ -155,14 +156,14 @@ const AddnewTicket = ({
               />
               <FormInput
                 name='name'
-                label='Name'
+                label={`${t('name')}}`}
                 placeholder='Enter Name'
                 withAsterisk
               />
               <FormikSelect
                 mt={'xs'}
                 name='status'
-                label='Initial Status'
+                label={`${t('initial status')}`}
                 placeholder='Status'
                 data={data.map((val) => ({
                   value: val._id.toString(),
@@ -172,7 +173,7 @@ const AddnewTicket = ({
             </SimpleGrid>
             <Formiktextarea
               name='description'
-              label='Description'
+              label={`${t('description')}`}
               placeholder='Enter Description'
               withAsterisk
               mb={'md'}
@@ -204,7 +205,7 @@ const AddnewTicket = ({
               </div>
             ))}
             <Button type='submit' mt={'md'} loading={isSubmitting}>
-              submit
+              {t('submit')}
             </Button>
           </Form>
         )}
@@ -946,8 +947,8 @@ const Index = () => {
             paddingBottom: theme.spacing.lg,
           }}
         >
-          <Title fw={400}>{`${'tickets'}`}</Title>
-          <Button onClick={() => setModal(true)}>{`${'add ticket'}`}</Button>
+          <Title fw={400}>{`${t('tickets')}`}</Title>
+          <Button onClick={() => setModal(true)}>{`${t('add ticket')}`}</Button>
         </Group>
         <Divider mt={'xl'} />
         <div
