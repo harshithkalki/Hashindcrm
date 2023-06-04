@@ -10,6 +10,7 @@ import {
   Container,
 } from '@mantine/core';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [page, setPage] = React.useState(1);
@@ -27,10 +28,12 @@ const Index = () => {
     }
   }, [stockalerts, page]);
 
+  const { t } = useTranslation('common');
+
   return (
     <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
       <Group my={'lg'}>
-        <Title fw={400}>Stock Alert</Title>
+        <Title fw={400}>{t('stock alert')}</Title>
       </Group>
       <TableSelection
         data={
@@ -43,16 +46,16 @@ const Index = () => {
         }
         colProps={{
           name: {
-            label: 'Name',
+            label: `${t('name')}`,
           },
           itemCode: {
-            label: 'Item Code',
+            label: `${t('item code')}`,
           },
           quantity: {
-            label: 'Current Stock',
+            label: `${t('current stock')}`,
           },
           quantityAlert: {
-            label: 'Quantity Alert',
+            label: `${t('quantity alert')}`,
           },
         }}
         searchable={false}

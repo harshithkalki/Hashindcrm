@@ -7,6 +7,7 @@ import {
   Paper,
   SimpleGrid,
 } from '@mantine/core';
+import { useTranslation } from 'next-i18next';
 // import { IconArrowUpRight, IconDeviceAnalytics } from '@tabler/icons';
 
 const useStyles = createStyles((theme) => ({
@@ -93,10 +94,12 @@ export function StatsSegments({ data }: StatsSegmentsProps) {
     </Box>
   ));
 
+  const { t } = useTranslation('common');
+
   return (
     <Paper withBorder p='md' radius='md'>
       <Text color='dimmed' size='sm'>
-        Total selling products
+        {t('top selling products')}
       </Text>
 
       <Progress

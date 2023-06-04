@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Bar,
   BarChart,
@@ -15,7 +16,8 @@ type data = {
   sale: string;
 }[];
 
-const index = ({ data }: { data: data }) => {
+const Index = ({ data }: { data: data }) => {
+  const { t } = useTranslation('common');
   return (
     <ResponsiveContainer width='100%' height='100%'>
       <BarChart
@@ -40,4 +42,4 @@ const index = ({ data }: { data: data }) => {
   );
 };
 
-export default index;
+export default Index;

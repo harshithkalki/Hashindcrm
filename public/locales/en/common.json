@@ -188,5 +188,18 @@
   "sales report": "Sales Report",
   "stock summary": "Stock Summary",
   "product sales summary": "Product Sales Summary",
-  "particulars": "Particulars"
+  "particulars": "Particulars",
+  "role name": "Role Name",
+  "display name": "Display Name",
+  "go directly on": "Go directly on",
+  "permissions": "Permissions",
+  "edit role": "Edit Role",
+  "total sales": "Total Sales",
+  "total expenses": "Total Expenses",
+  "payments sent": "Payments Sent",
+  "top selling products": "Top Selling Products",
+  "total sale items": "Total Sale Items",
+  "total purchase items": "Total Purchase Items",
+  "total sale returns": "Total Sale Returns",
+  "total purchase returns": "Total Purchase Returns"
 }

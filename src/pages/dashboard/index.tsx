@@ -15,6 +15,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'react-i18next';
 
 const colorsNames: DefaultMantineColor[] = [
   'blue',
@@ -33,6 +34,7 @@ const Index = () => {
     }
   );
   const { colors } = useMantineTheme();
+  const { t } = useTranslation('common');
 
   const top5SellingProducts = React.useMemo(() => {
     if (!data) return null;
@@ -82,17 +84,17 @@ const Index = () => {
           <StatsGroup
             data={[
               {
-                title: 'UPI',
+                title: `${t('upi')}`,
                 stats: data.salesByPaymentMode.totalSalesUpi.toFixed(0),
                 description: 'Upi Monthly turnover',
               },
               {
-                title: 'Bank',
+                title: `${t('bank')}`,
                 stats: data.salesByPaymentMode.totalSalesCash.toFixed(0),
                 description: 'Bank Monthly turnover',
               },
               {
-                title: 'Cash',
+                title: `${t('upi')}`,
                 stats: data.salesByPaymentMode.totalSalesBank.toFixed(0),
                 description: 'Cash Monthly turnover',
               },
@@ -102,17 +104,17 @@ const Index = () => {
           <StatsGrid
             data={[
               {
-                title: 'Total Sales',
+                title: `${t('total sales')}`,
                 icon: 'sales',
                 value: Rupee + ' ' + data.totalSales.toFixed(0),
               },
               {
-                title: 'Total Expenses',
+                title: `${t('total expenses')}`,
                 icon: 'expenses',
                 value: Rupee + ' ' + data.totalExpense.toFixed(0),
               },
               {
-                title: 'Payments Sent',
+                title: `${t('payments sent')}`,
                 icon: 'payments',
                 value: Rupee + ' ' + data.totalPurchase.toFixed(0),
               },
@@ -136,19 +138,19 @@ const Index = () => {
               <StatsHistroy
                 data={[
                   {
-                    title: 'Total sale items',
+                    title: `${t('total sale items')}`,
                     value: data.totalSaleItems.toFixed(0),
                   },
                   {
-                    title: 'Total sale return items',
+                    title: `${t('total sale returns')}`,
                     value: data.totalSaleReturnItems.toFixed(0),
                   },
                   {
-                    title: 'Total purchase items',
+                    title: `${t('total purchase items')}`,
                     value: data.totalPurchaseItems.toFixed(0),
                   },
                   {
-                    title: 'Total purchase return items',
+                    title: `${t('total purchase returns')}`,
                     value: data.totalPurchaseReturnItems.toFixed(0),
                   },
                 ]}

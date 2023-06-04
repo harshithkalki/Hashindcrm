@@ -5,6 +5,9 @@ import type { Permissions } from '@/constants';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { ScrollArea } from '@mantine/core';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'react-i18next';
 
 // const permissionsDemo: Permission = [
 //   {
@@ -39,6 +42,7 @@ const App = () => {
     { refetchOnWindowFocus: false }
   );
   const role = getRole.data;
+  const { t } = useTranslation('common');
 
   return (
     <Layout>
@@ -61,7 +65,7 @@ const App = () => {
                   console.log(res);
                 });
               }}
-              title='Edit Role'
+              title={`${t('edit role')}`}
             />
           </ScrollArea>
         </div>
@@ -71,3 +75,11 @@ const App = () => {
 };
 
 export default App;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

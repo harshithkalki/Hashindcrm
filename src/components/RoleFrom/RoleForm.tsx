@@ -13,11 +13,12 @@ import { ZRoleCreateInput } from '@/zobjs/role';
 import { useRouter } from 'next/router';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import { navData } from '../Navbar';
+import { useTranslation } from 'react-i18next';
 
 type CreateRole = z.infer<typeof ZRoleCreateInput>;
 
 type Permission = {
-  permissionName: typeof Permissions[number];
+  permissionName: (typeof Permissions)[number];
   crud: {
     read?: boolean;
     update?: boolean;
@@ -36,6 +37,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
   const matches = useMediaQuery('(max-width: 800px)');
   const formpermissions: Permission = formInputs.permissions;
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   const PermissonsValues = Permissions.map((permission) => {
     const permissionIndex = formpermissions.findIndex(
@@ -70,21 +72,21 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
           {({ isSubmitting }) => (
             <Form>
               <FormInput
-                label='Role Name'
+                label={`${t('role name')}`}
                 placeholder='Role name'
                 name='name'
                 withAsterisk
                 mb={'sm'}
               />
               <FormInput
-                label='Display Name'
+                label={`${t('display name')}`}
                 placeholder='Display name'
                 name='displayName'
                 withAsterisk
                 mb={'sm'}
               />
               <FormikSelect
-                label='Go directly on'
+                label={`${t('go directly on')}`}
                 placeholder='Go directly on'
                 name='defaultRedirect'
                 withAsterisk
@@ -104,13 +106,13 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                 })}
               />
               <Formiktextarea
-                label='Description'
+                label={`${t('description')}`}
                 placeholder='Description'
                 name='description'
                 mb={'sm'}
               />
 
-              <Text>Permissions</Text>
+              <Text>{t('permissions')}</Text>
               {formInputs.permissions.map((permission, index) => {
                 return (
                   <div key={permission.permissionName}>
@@ -155,7 +157,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
               })}
               <Group spacing={'xs'} mt={'md'} mb={'xl'}>
                 <Button disabled={isSubmitting} type='submit' size={'xs'}>
-                  Save
+                  {t('save')}
                 </Button>
                 <Button
                   size='xs'
@@ -163,7 +165,7 @@ const RoleForm = ({ formInputs, onSubmit, title }: props) => {
                     router.back();
                   }}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </Group>
             </Form>

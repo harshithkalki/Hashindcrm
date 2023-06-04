@@ -4,9 +4,12 @@ import React from 'react';
 import { Permissions } from '@/constants';
 import Layout from '@/components/Layout';
 import { ScrollArea } from '@mantine/core';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'react-i18next';
 
 type Permission = {
-  permissionName: typeof Permissions[number];
+  permissionName: (typeof Permissions)[number];
   crud: {
     read?: boolean;
     update?: boolean;
@@ -24,7 +27,8 @@ const permissionsDemo: Permission = Permissions.map((val) => ({
   },
 }));
 
-const app = () => {
+const App = () => {
+  const { t } = useTranslation('common');
   const AddRole = trpc.roleRouter.create.useMutation();
   return (
     <Layout>
@@ -41,11 +45,19 @@ const app = () => {
               console.log(res);
             });
           }}
-          title='Add Role'
+          title={`${t('add role')}`}
         />
       </ScrollArea>
     </Layout>
   );
 };
 
-export default app;
+export default App;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

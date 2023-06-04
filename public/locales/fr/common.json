@@ -188,5 +188,18 @@
   "sales report": "விற்பனை அறிக்கை",
   "stock summary": "பங்கு சுருக்கம்",
   "product sales summary": "தயாரிப்பு விற்பனை சுருக்கம்",
-  "particulars": "விவரங்கள்"
+  "particulars": "விவரங்கள்",
+  "role name": "பங்கு பெயர்",
+  "display name": "காட்சி பெயர்",
+  "go directly on": "நேரடியாக போகும்",
+  "permissions": "அனுமதிகள்",
+  "edit role": "பங்குகளைத் திருத்து",
+  "total sales": "மொத்த விற்பனை",
+  "total expenses": "மொத்த செலவுகள்",
+  "payments sent": "அனுப்பிய கொடுப்பனவுகள்",
+  "top selling products": "சிறந்த விற்பனை பொருட்கள்",
+  "total sale items": "மொத்த விற்பனை பொருட்கள்",
+  "total purchase items": "மொத்த வாங்க பெறும் பொருட்கள்",
+  "total sale returns": "மொத்த விற்பனை திருப்புகள்",
+  "total purchase returns": "மொத்த வாங்க திருப்புகள்"
 }
