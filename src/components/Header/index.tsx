@@ -29,6 +29,7 @@ import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -175,7 +176,9 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
     (state) => state.clientState.client
   );
   const { push, locale } = useRouter();
+  const router = useRouter();
   const [language, setLanguage] = useState(locale);
+  const { i18n } = useTranslation();
 
   return (
     <div className={classes.header}>
@@ -205,11 +208,23 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
                 ]}
                 onChange={(value) => {
                   if (value === 'en') {
-                    push('/', `/`, { locale: 'en' });
+                    push('/', `${router.pathname}`, { locale: 'en' }).then(
+                      () => {
+                        router.reload();
+                      }
+                    );
                     setLanguage('en');
+                    // router.reload();
+                    // i18n.changeLanguage('en');
                   } else if (value === 'fr') {
-                    push('/', '/', { locale: 'fr' });
+                    push('/', `${router.pathname}`, { locale: 'fr' }).then(
+                      () => {
+                        router.reload();
+                      }
+                    );
+
                     setLanguage('fr');
+                    // i18n.changeLanguage('fr');
                   }
                 }}
                 value={language}
