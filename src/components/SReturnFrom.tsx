@@ -39,6 +39,7 @@ import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import Formiktextarea from '@/components/FormikCompo/FormikTextarea';
 import FormikInfiniteSelect from '@/components/FormikCompo/InfiniteSelect';
 import Invoice from '@/components/Invoice';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -125,12 +126,13 @@ function WarehouseSelect() {
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
   const dispatch = useDispatch();
+  const { t } = useTranslation('common');
 
   return (
     <FormikInfiniteSelect
       name='warehouse'
       placeholder='Pick one warehouse'
-      label='Warehouse'
+      label={`${t('warehouse')}`}
       data={
         warehouses.data?.pages
           .flatMap((page) => page.docs)
@@ -171,10 +173,11 @@ const CustomerSelect = () => {
     label: customer.name,
     value: customer._id.toString(),
   }));
+  const { t } = useTranslation('common');
 
   return (
     <FormikSelect
-      label='Customer'
+      label={`${t('customer')}}`}
       data={[
         { label: 'Walk In Customer', value: 'walkInCustomer' },
         ...(customerData || []),
@@ -228,6 +231,8 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
       setInvoiceId('');
     }
   }, [handlePrint, invoice.data]);
+
+  const { t } = useTranslation('common');
 
   return (
     <>
@@ -305,14 +310,14 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
 
                 <CustomerSelect />
                 <FormDate
-                  label='Date'
+                  label={`${t('date')}`}
                   placeholder='Date'
                   name='date'
                   withAsterisk
                 />
               </SimpleGrid>
               <Select
-                label='Products'
+                label={`${t('products')}`}
                 data={
                   searchProducts.data?.map((item) => ({
                     label: item.name,
@@ -402,7 +407,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                             textAlign: 'center',
                           }}
                         >
-                          Product
+                          {t('product')}
                         </th>
                         <th
                           style={{
@@ -410,7 +415,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                             textAlign: 'center',
                           }}
                         >
-                          Quantity
+                          {t('quantity')}
                         </th>
                         <th
                           style={{
@@ -418,7 +423,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                             textAlign: 'center',
                           }}
                         >
-                          Price
+                          {t('price')}
                         </th>
                         <th
                           style={{
@@ -426,7 +431,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                             textAlign: 'center',
                           }}
                         >
-                          Tax
+                          {t('tax')}
                         </th>
                         <th
                           style={{
@@ -434,7 +439,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                             textAlign: 'center',
                           }}
                         >
-                          Subtotal
+                          {t('subtotal')}
                         </th>
                         <th
                           style={{
@@ -442,7 +447,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                             textAlign: 'center',
                           }}
                         >
-                          Action
+                          {t('actions')}
                         </th>
                       </tr>
                     </thead>
@@ -575,14 +580,14 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
               >
                 <div>
                   <Textarea
-                    label={'Terms & Conditions'}
+                    label={`${t('terms & conditions')}`}
                     value={terms}
                     readOnly
                   />
                   <Formiktextarea
                     mt={'md'}
                     placeholder={'Notes'}
-                    label={'Notes'}
+                    label={`${t('notes')}`}
                     name='note'
                   />
                 </div>
@@ -590,7 +595,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 <div>
                   <Group w={'100%'}>
                     <FormikSelect
-                      label={'Status'}
+                      label={`${t('status')}`}
                       placeholder={'Select Status'}
                       name={'status'}
                       w={'46%'}
@@ -602,7 +607,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     />
                     <FormikSelect
                       name='paymentMode'
-                      label='Payment Mode'
+                      label={`${t('payment Method')}`}
                       w={'46%'}
                       data={[
                         { label: 'Cash', value: 'cash' },
@@ -618,7 +623,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     <FormInput
                       w={'46%'}
                       type={'number'}
-                      label={'Shipping'}
+                      label={`${t('shipping')}`}
                       placeholder={'Shipping'}
                       name={'shipping'}
                       icon={<IconCurrencyRupee />}
@@ -626,7 +631,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     <FormInput
                       w={'46%'}
                       type={'number'}
-                      label={'Discount'}
+                      label={`${t('discount')}`}
                       placeholder={'Discount'}
                       name={'discount'}
                       rightSection={<IconPercentage />}
@@ -635,7 +640,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   <Group w={'100%'} mt={'sm'}>
                     <FormInput
                       w={'46%'}
-                      label={'Order Tax'}
+                      label={`${t('order tax')}`}
                       placeholder={'Order Tax'}
                       name={'orderTax'}
                       value={[...inlineProducts.values()].reduce(
@@ -648,7 +653,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                     />
                     <TextInput
                       w={'46%'}
-                      label={'Total'}
+                      label={`${t('total')}`}
                       placeholder={'Total'}
                       readOnly
                       value={(
@@ -668,7 +673,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
               </SimpleGrid>
               <Group w={'100%'} style={{ justifyContent: 'center' }}>
                 <Button type='submit' mb={'md'} loading={isSubmitting}>
-                  Submit
+                  {t('submit')}
                 </Button>
                 <Button
                   size='sm'
@@ -677,7 +682,7 @@ const SaleReturnForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   }}
                   mb={'md'}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </Group>
             </Form>

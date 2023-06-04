@@ -148,7 +148,7 @@ const Index = () => {
             modal={modal}
             setModal={setModal}
             isCustomer={true}
-            title={'Sales'}
+            title={'Purchase'}
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
             <Title fw={400}>{t('purchase')}</Title>

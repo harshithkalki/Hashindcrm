@@ -209,5 +209,14 @@
   "price & tax": "விலை மற்றும் வரி",
   "custom fields": "தனிப்பட்ட புலங்கள்",
   "expire date": "காலாவதி தேதி",
-  "parent category": "பெற்றோர் வகை"
+  "parent category": "பெற்றோர் வகை",
+  "initial state": "தொடக்க நிலை",
+  "issue type": "பிரச்சினை வகை",
+  "product name": "தயாரிப்பு பெயர்",
+  "adjustment": "உறுதிப்படுத்தல்",
+  "invoice number": "விலைப்பட்டியல் எண்",
+  "from warehouse": "இருப்பிடம் இருந்து",
+  "to warehouse": "இருப்பிடம் வரை",
+  "terms & conditions": "விதிகளும் நிபந்தனைகளும்",
+  "order tax": "ஆர்டர் வரி"
 }
