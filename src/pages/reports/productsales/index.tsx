@@ -11,21 +11,7 @@ const Index = () => {
   const stockReport = trpc.reports.stockReport.useQuery();
   const [page, setPage] = React.useState(1);
 
-  const stockReport = trpc.reports.stockReport.useInfiniteQuery(
-    { limit: 10 },
-    {
-      getNextPageParam: () => page,
-      refetchOnWindowFocus: false,
-    }
-  );
-
   const { t } = useTranslation('common');
-
-  React.useEffect(() => {
-    if (!stockReport.data?.pages.find((pageData) => pageData?.page === page)) {
-      stockReport.fetchNextPage();
-    }
-  }, [stockReport, page]);
 
   const data = React.useMemo(() => {
     const pageData = stockReport.data;

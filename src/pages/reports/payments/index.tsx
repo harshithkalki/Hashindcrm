@@ -15,18 +15,9 @@ const Index = () => {
     refetchOnWindowFocus: false,
   });
 
-  React.useEffect(() => {
-    if (
-      !paymentReport.data?.pages.find((pageData) => pageData?.page === page)
-    ) {
-      paymentReport.fetchNextPage();
-    }
-  }, [paymentReport, page]);
-
   const { t } = useTranslation('common');
 
-  if (paymentReport.isLoading) return <LoadingScreen />;
-  console.log(paymentReport.data);
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <Layout>
