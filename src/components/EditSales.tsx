@@ -39,6 +39,7 @@ import FormikSelect from './FormikCompo/FormikSelect';
 import Formiktextarea from './FormikCompo/FormikTextarea';
 import FormikInfiniteSelect from './FormikCompo/InfiniteSelect';
 import Invoice from './Invoice';
+import { useTranslation } from 'react-i18next';
 // import { useQueryClient } from 'react-query';
 
 const useStyles = createStyles((theme) => ({
@@ -101,6 +102,7 @@ type InlineProduct = {
 
 function WarehouseSelect() {
   const [searchValue, onSearchChange] = useState('');
+  const { t } = useTranslation('common');
   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
     {
       search: searchValue,
@@ -120,7 +122,7 @@ function WarehouseSelect() {
     <FormikInfiniteSelect
       name='warehouse'
       placeholder='Pick one warehouse'
-      label='Warehouse'
+      label={`${t('warehouse')}`}
       data={
         warehouses.data?.pages
           .flatMap((page) => page.docs)
@@ -268,6 +270,8 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
     }
   }, [List]);
 
+  const { t } = useTranslation('common');
+
   return (
     <>
       <Modal opened={true} onClose={onClose} title={'EDIT SALE'} size='90%'>
@@ -334,26 +338,26 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                   style={{ alignItems: 'end' }}
                 >
                   <FormInput
-                    label='Invoice Number'
+                    label={`${t('invoice number')}`}
                     name='id'
                     placeholder='Invoice Number'
                     description='Leave blank to auto generate'
                   />
                   <WarehouseSelect />
                   <FormInput
-                    label='Customer Name'
+                    label={`${t('customer')}`}
                     name='customer'
                     placeholder='Customer Name'
                   />
                   <FormDate
-                    label='Date'
+                    label={`${t('date')}`}
                     placeholder='Date'
                     name='date'
                     withAsterisk
                   />
                 </SimpleGrid>
                 <Select
-                  label='Products'
+                  label={`${t('products')}`}
                   data={
                     searchProducts.data?.map((item) => ({
                       label: item.name,
@@ -443,7 +447,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Product
+                            {t('product')}
                           </th>
                           <th
                             style={{
@@ -451,7 +455,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Quantity
+                            {t('quantity')}
                           </th>
                           <th
                             style={{
@@ -459,7 +463,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Price
+                            {t('price')}
                           </th>
                           <th
                             style={{
@@ -467,7 +471,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Tax
+                            {t('tax')}
                           </th>
                           <th
                             style={{
@@ -475,7 +479,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Subtotal
+                            {t('subtotal')}
                           </th>
                           <th
                             style={{
@@ -483,7 +487,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                               textAlign: 'center',
                             }}
                           >
-                            Action
+                            {t('actions')}
                           </th>
                         </tr>
                       </thead>
@@ -615,14 +619,14 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                 >
                   <div>
                     <Textarea
-                      label={'Terms & Conditions'}
+                      label={`${t('terms & conditions')}`}
                       value={terms}
                       readOnly
                     />
                     <Formiktextarea
                       mt={'md'}
                       placeholder={'Notes'}
-                      label={'Notes'}
+                      label={`${t('notes')}`}
                       name='note'
                     />
                   </div>
@@ -630,7 +634,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                   <div>
                     <Group w={'100%'}>
                       <FormikSelect
-                        label={'Status'}
+                        label={`${t('status')}`}
                         placeholder={'Select Status'}
                         name={'status'}
                         w={'46%'}
@@ -642,7 +646,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                       />
                       <FormikSelect
                         name='paymentMode'
-                        label='Payment Mode'
+                        label={`${t('payment Method')}`}
                         w={'46%'}
                         data={[
                           { label: 'Cash', value: 'cash' },
@@ -658,7 +662,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                       <FormInput
                         w={'46%'}
                         type={'number'}
-                        label={'Shipping'}
+                        label={`${t('shipping')}`}
                         placeholder={'Shipping'}
                         name={'shipping'}
                         icon={<IconCurrencyRupee />}
@@ -666,7 +670,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                       <FormInput
                         w={'46%'}
                         type={'number'}
-                        label={'Discount'}
+                        label={`${t('discount')}`}
                         placeholder={'Discount'}
                         name={'discount'}
                         rightSection={<IconPercentage />}
@@ -675,7 +679,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                     <Group w={'100%'} mt={'sm'}>
                       <FormInput
                         w={'46%'}
-                        label={'Order Tax'}
+                        label={`${t('order tax')}`}
                         placeholder={'Order Tax'}
                         name={'orderTax'}
                         value={[...inlineProducts.values()].reduce(
@@ -688,7 +692,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                       />
                       <TextInput
                         w={'46%'}
-                        label={'Total'}
+                        label={`${t('total')}`}
                         placeholder={'Total'}
                         readOnly
                         value={(
@@ -708,7 +712,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                 </SimpleGrid>
                 <Group w={'100%'} style={{ justifyContent: 'center' }}>
                   <Button type='submit' mb={'md'} loading={isSubmitting}>
-                    Submit
+                    {t('submit')}
                   </Button>
                   <Button
                     size='sm'
@@ -717,7 +721,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                     }}
                     mb={'md'}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </Group>
               </Form>

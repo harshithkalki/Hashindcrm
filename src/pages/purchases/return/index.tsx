@@ -66,7 +66,7 @@ const Index = () => {
         </div>
       )}
       <Layout>
-        {editId && (
+        {/* {editId && (
           <EditSales
             _id={editId}
             onClose={() => {
@@ -74,7 +74,7 @@ const Index = () => {
               sales.refetch();
             }}
           />
-        )}
+        )} */}
         <Container
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
@@ -82,7 +82,7 @@ const Index = () => {
             modal={modal}
             setModal={setModal}
             isCustomer={true}
-            title={'Sales'}
+            title={'Purchase Return'}
           />
           <Group my='lg' style={{ justifyContent: 'space-between' }}>
             <Title fw={400}>{t('purchase return')}</Title>
