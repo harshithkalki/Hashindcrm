@@ -35,6 +35,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { useTranslation } from 'react-i18next';
 import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { showNotification } from '@mantine/notifications';
 
 const uploadFiles = async (files: FileWithPath[]) => {
   const formData = new FormData();
@@ -120,6 +121,11 @@ const AddnewTicket = ({
             });
 
             utils.ticketRouter.openTickets.invalidate();
+            showNotification({
+              message: 'Ticket Created',
+              color: 'teal',
+            });
+
             modalProps.onClose();
             setSubmitting(false);
           };
