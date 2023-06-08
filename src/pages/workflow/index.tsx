@@ -9,7 +9,7 @@ import {
   Title,
 } from '@mantine/core';
 import React, { useState } from 'react';
-import { z } from 'zod';
+import { util, z } from 'zod';
 import { Form, Formik } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import FormInput from '@/components/FormikCompo/FormikInput';
@@ -21,7 +21,8 @@ import Layout from '@/components/Layout';
 import TableSelection from '@/components/Tables';
 import { useTranslation } from 'react-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
+import { showNotification } from '@mantine/notifications';
 
 const LinkStatus = ({
   modalProps,
@@ -31,6 +32,7 @@ const LinkStatus = ({
   data?: RouterOutputs['workflowRouter']['getWorkflow'];
 }) => {
   const createLink = trpc.workflowRouter.createLink.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <Modal {...modalProps} title='Link Status'>
@@ -45,6 +47,11 @@ const LinkStatus = ({
             .then(() => {
               setSubmitting(false);
               modalProps.onClose();
+              utils.workflowRouter.getWorkflow.invalidate();
+              showNotification({
+                title: 'Status Linked',
+                message: 'Status linked successfully',
+              });
             });
         }}
         validationSchema={toFormikValidationSchema(
@@ -103,6 +110,7 @@ const RemoveLink = ({
   data?: RouterOutputs['workflowRouter']['getWorkflow'];
 }) => {
   const createLink = trpc.workflowRouter.removeLink.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <Modal {...modalProps} title='Remove Link'>
@@ -117,6 +125,11 @@ const RemoveLink = ({
             .then(() => {
               setSubmitting(false);
               modalProps.onClose();
+              showNotification({
+                title: 'Status Removed',
+                message: 'Status unlinked successfully',
+              });
+              utils.workflowRouter.getWorkflow.invalidate();
             });
         }}
         validationSchema={toFormikValidationSchema(
@@ -170,6 +183,7 @@ const AddStatus = ({
 }) => {
   const createStatus = trpc.workflowRouter.createStatus.useMutation();
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
 
   return (
     <Modal {...modalProps}>
@@ -183,8 +197,13 @@ const AddStatus = ({
             })
             .then((res) => {
               setSubmitting(false);
-              console.log(res);
+              modalProps.onClose();
+              showNotification({
+                title: 'Status Created',
+                message: `Status "${res.name}" created successfully`,
+              });
             });
+          utils.workflowRouter.getWorkflow.invalidate();
         }}
         validationSchema={toFormikValidationSchema(
           z.object({
