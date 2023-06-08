@@ -13,6 +13,8 @@ import { useSelector } from 'react-redux';
 import type { z } from 'zod';
 import type { ZRole } from '@/zobjs/role';
 import { useRouter } from 'next/router';
+import i18n from '../../../i18n';
+import { useTranslation } from 'react-i18next';
 
 const allLinks = [
   '/company',
@@ -238,6 +240,165 @@ interface Props {
 
 export default function NavbarNested({ hide, setNavOpen }: Props) {
   const { classes } = useStyles();
+  const { t } = useTranslation('common');
+
+  const CompanyData: NavData['links'] = [
+    { label: 'Manage companies', link: '/company' },
+    { label: 'Create company', link: '/company/new' },
+  ];
+
+  const ProductManagerData: NavData['links'] = [
+    { label: t('products'), link: '/products', permissionName: 'PRODUCT' },
+    { label: t('brands'), link: '/brands', permissionName: 'BRAND' },
+    { label: t('categories'), link: '/categories', permissionName: 'CATEGORY' },
+    // { label: 'Create Role', link: '/roles/new' },
+  ];
+  const Stockdata: NavData['links'] = [
+    {
+      label: t('stock adjustment'),
+      link: '/stockadjustment',
+      permissionName: 'STOCKADJUST',
+    },
+    {
+      label: t('stock transfer'),
+      link: '/stocktransfer',
+      permissionName: 'STOCKTRANSFER',
+    },
+  ];
+  const PartiesData: NavData['links'] = [
+    {
+      label: t('supplier'),
+      link: '/parties/supplier',
+      permissionName: 'SUPPLIER',
+    },
+    {
+      label: t('staff members'),
+      link: '/parties/staff',
+      permissionName: 'STAFFMEM',
+    },
+    {
+      label: t('customer'),
+      link: '/parties/customer',
+      permissionName: 'CUSTOMER',
+    },
+  ];
+  const SalesData: NavData['links'] = [
+    { label: t('sales'), link: '/sales', permissionName: 'SALES' },
+    {
+      label: t('sales returns'),
+      link: '/sales/return',
+      permissionName: 'SALES',
+    },
+  ];
+  const PurchaseData: NavData['links'] = [
+    { label: t('purchase'), link: '/purchases', permissionName: 'PURCHASE' },
+    {
+      label: t('purchase return'),
+      link: '/purchases/return',
+      permissionName: 'PURCHASE',
+    },
+  ];
+  const ExpensesData: NavData['links'] = [
+    { label: t('expenses'), link: '/expenses', permissionName: 'EXPENSE' },
+    {
+      label: t('expense category'),
+      link: '/expenses/categories',
+      permissionName: 'EXPENSE',
+    },
+  ];
+  const ReportDate: NavData['links'] = [
+    {
+      label: t('payment report'),
+      link: '/reports/payments',
+      permissionName: 'REPORT',
+    },
+    {
+      label: t('stock alert'),
+      link: '/reports/stockalert',
+      permissionName: 'REPORT',
+    },
+    { label: t('sales'), link: '/reports/sales', permissionName: 'REPORT' },
+
+    {
+      label: t('stock report'),
+      link: '/reports/stock',
+      permissionName: 'REPORT',
+    },
+    {
+      label: t('product sale'),
+      link: '/reports/productsales',
+      permissionName: 'REPORT',
+    },
+    {
+      label: t('profit & loss'),
+      link: '/reports/profitandloss',
+      permissionName: 'REPORT',
+    },
+  ];
+
+  const navData: NavData[] = [
+    {
+      label: t('roles'),
+      links: '/roles',
+      permissionName: 'ROLE',
+      icon: IconReceipt2,
+    },
+    {
+      links: '/dashboard',
+      label: t('dashboard'),
+      icon: IconFileAnalytics,
+      permissionName: 'DASHBOARD',
+    },
+    {
+      links: CompanyData,
+      label: t('companies'),
+      icon: IconBuildingStore,
+    },
+
+    {
+      links: ProductManagerData,
+      label: t('product manager'),
+      icon: IconReceipt2,
+    },
+    {
+      links: '/workflow',
+      label: t('workflow'),
+      icon: IconFileAnalytics,
+      permissionName: 'WORKFLOW',
+    },
+    {
+      links: '/tickets',
+      label: t('tickets'),
+      icon: IconReceipt2,
+      permissionName: 'TICKET',
+    },
+    { links: Stockdata, label: t('stock'), icon: IconReceipt2 },
+    {
+      links: '/pos',
+      label: t('pos'),
+      icon: IconReceipt2,
+      permissionName: 'POS',
+    },
+    { links: PartiesData, label: t('parties'), icon: IconReceipt2 },
+    { links: SalesData, label: t('sales'), icon: IconReceipt2 },
+    { links: PurchaseData, label: t('purchase'), icon: IconReceipt2 },
+    {
+      links: '/cashandbank',
+      label: t('cash, bank, upi'),
+      icon: IconReceipt2,
+      permissionName: 'CASHANDBANK',
+    },
+    { links: ExpensesData, label: t('expenses'), icon: IconReceipt2 },
+    { links: ReportDate, label: t('reports'), icon: IconReceipt2 },
+    { label: t('admin'), icon: IconReceipt2, links: '/admin' },
+    {
+      label: t('warehouse'),
+      icon: IconReceipt2,
+      links: '/warehouse',
+      permissionName: 'WAREHOUSE',
+    },
+    { links: '/logs', label: 'Audit Logs', icon: IconFileAnalytics },
+  ];
 
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
