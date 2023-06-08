@@ -6,11 +6,20 @@ import dayjs from 'dayjs';
 
 import _ from 'lodash';
 
-const Index = () => {
+const Index = ({
+  date,
+}: {
+  date: {
+    from: Date | null;
+    to: Date | null;
+  };
+}) => {
   const [page, setPage] = useState(1);
   const sales = trpc.saleReturnRouter.returns.useInfiniteQuery(
     {
       limit: 6,
+      startDate: date.from?.toISOString() ?? undefined,
+      endDate: date.to?.toISOString() ?? undefined,
     },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );

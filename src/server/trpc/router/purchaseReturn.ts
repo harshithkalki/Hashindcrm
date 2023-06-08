@@ -49,6 +49,8 @@ export const purchaseReturnRouter = router({
       z.object({
         cursor: z.number().optional(),
         limit: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -73,6 +75,12 @@ export const purchaseReturnRouter = router({
 
       const query = {
         company: client.company,
+        ...((input.startDate || input.endDate) && {
+          createdAt: {
+            ...(input.startDate && { $gte: new Date(input.startDate) }),
+            ...(input.endDate && { $lt: new Date(input.endDate) }),
+          },
+        }),
       };
 
       const purchaseReturns = await PurchaseReturn.paginate(query, {

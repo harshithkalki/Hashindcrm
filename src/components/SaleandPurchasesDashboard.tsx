@@ -7,7 +7,14 @@ import PurchasesReturnTab from './DashBoard/PurchasesReturnsTab';
 import SalesReturnsTab from './DashBoard/SalesReturnsTab';
 import { useTranslation } from 'react-i18next';
 
-const SaleandPurchasesDashboard = () => {
+const SaleandPurchasesDashboard = ({
+  date,
+}: {
+  date: {
+    from: Date | null;
+    to: Date | null;
+  };
+}) => {
   const { t } = useTranslation('common');
   return (
     <>
@@ -19,16 +26,16 @@ const SaleandPurchasesDashboard = () => {
           <Tabs.Tab value='purchasesReturns'>{t('purchase return')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='sales'>
-          <SalesTableTab />
+          <SalesTableTab date={date} />
         </Tabs.Panel>
         <Tabs.Panel value='purchases'>
-          <PurchasesTableTab />
+          <PurchasesTableTab date={date} />
         </Tabs.Panel>
         <Tabs.Panel value='salesReturns'>
-          <SalesReturnsTab />
+          <SalesReturnsTab date={date} />
         </Tabs.Panel>
         <Tabs.Panel value='purchasesReturns'>
-          <PurchasesReturnTab />
+          <PurchasesReturnTab date={date} />
         </Tabs.Panel>
       </Tabs>
     </>

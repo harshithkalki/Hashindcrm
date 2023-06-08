@@ -4,12 +4,21 @@ import { Pagination, Center, Container } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
-const Index = () => {
+const Index = ({
+  date,
+}: {
+  date: {
+    from: Date | null;
+    to: Date | null;
+  };
+}) => {
   const [page, setPage] = useState(1);
 
   const purchases = trpc.purchaseRouter.purchases.useInfiniteQuery(
     {
       limit: 6,
+      startDate: date.from?.toISOString() ?? undefined,
+      endDate: date.to?.toISOString() ?? undefined,
     },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
