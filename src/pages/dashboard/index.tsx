@@ -9,13 +9,14 @@ import { StatsSegments } from '@/components/StatsSegment';
 import StockAlertDashboard from '@/components/StockAlertDashboard';
 import { Rupee } from '@/constants';
 import { trpc } from '@/utils/trpc';
-import type { DefaultMantineColor } from '@mantine/core';
+import { DefaultMantineColor, Group } from '@mantine/core';
 import { Flex, Grid, ScrollArea, useMantineTheme } from '@mantine/core';
 import React from 'react';
 import dayjs from 'dayjs';
 import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
+import { DatePicker } from '@mantine/dates';
 
 const colorsNames: DefaultMantineColor[] = [
   'blue',
@@ -27,8 +28,18 @@ const colorsNames: DefaultMantineColor[] = [
 ];
 
 const Index = () => {
+  const [{ from, to }, setDates] = React.useState<{
+    from: Date | null;
+    to: Date | null;
+  }>({
+    from: null,
+    to: null,
+  });
   const { data, isLoading } = trpc.daashboardRouter.dashboard.useQuery(
-    {},
+    {
+      startDate: from?.toISOString() ?? undefined,
+      endDate: to?.toISOString() ?? undefined,
+    },
     {
       refetchOnWindowFocus: false,
     }
@@ -80,6 +91,18 @@ const Index = () => {
           height: '100%',
         }}
       >
+        <Group mb='lg'>
+          <DatePicker
+            value={from}
+            onChange={(from) => setDates((prev) => ({ ...prev, from }))}
+            placeholder='From'
+          />
+          <DatePicker
+            value={to}
+            onChange={(to) => setDates((prev) => ({ ...prev, to }))}
+            placeholder='To'
+          />
+        </Group>
         <ScrollArea>
           <StatsGroup
             data={[
