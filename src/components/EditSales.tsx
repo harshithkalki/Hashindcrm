@@ -147,6 +147,9 @@ function WarehouseSelect() {
       searchValue={searchValue}
       w={'100%'}
       searchable
+      onClick={() => {
+        onSearchChange('');
+      }}
     />
   );
 }
@@ -374,6 +377,9 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                   }}
                   searchValue={search}
                   onSearchChange={setSearch}
+                  onClick={() => {
+                    setSearch('');
+                  }}
                 />
                 <div style={{ height: '30vh' }}>
                   <ScrollArea

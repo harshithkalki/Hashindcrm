@@ -163,6 +163,7 @@ function WarehouseSelect() {
       onSearchChange={onSearchChange}
       searchValue={searchValue}
       searchable
+      onClick={() => onSearchChange('')}
     />
   );
 }

@@ -130,6 +130,7 @@ function WarehouseSelect() {
       w={'100%'}
       searchable
       withAsterisk
+      onClick={() => onSearchChange('')}
     />
   );
 }

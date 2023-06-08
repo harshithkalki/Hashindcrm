@@ -105,6 +105,7 @@ const WarehousesSelect = () => {
           placeholder='Pick one warehouse'
           name='warehouse'
           style={{ flex: 1 }}
+          onClick={() => setSearch('')}
         />
         <ActionIcon
           onClick={() => push('/warehouse')}

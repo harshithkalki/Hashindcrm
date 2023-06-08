@@ -153,6 +153,7 @@ function FromWarehouseSelect() {
       searchValue={searchValue}
       searchable
       withAsterisk
+      onClick={() => onSearchChange('')}
     />
   );
 }
@@ -179,6 +180,7 @@ const WarehouseSelect = () => {
       placeholder='Pick one'
       name='toWarehouse'
       withAsterisk
+      onClick={() => setSearch('')}
     />
   );
 };
@@ -372,6 +374,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   }}
                   searchValue={search}
                   onSearchChange={setSearch}
+                  onClick={() => setSearch('')}
                 />
                 <div style={{ height: '30vh' }}>
                   <ScrollArea

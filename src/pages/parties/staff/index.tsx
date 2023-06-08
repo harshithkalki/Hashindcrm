@@ -106,6 +106,7 @@ const WarehousesSelect = () => {
           placeholder='Pick one warehouse'
           name='warehouse'
           style={{ flex: 1 }}
+          onClick={() => setSearch('')}
         />
         <ActionIcon
           onClick={() => push('/warehouse')}
@@ -142,6 +143,7 @@ const RolesSelect = () => {
       placeholder='Pick one'
       name='role'
       withAsterisk
+      onClick={() => setSearch('')}
     />
   );
 };

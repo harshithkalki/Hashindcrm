@@ -77,6 +77,7 @@ const CustomerSelect = () => {
       onSearchChange={setSearch}
       placeholder='Pick one'
       name='customer'
+      onClick={() => setSearch('')}
     />
   );
 };

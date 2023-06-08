@@ -83,6 +83,7 @@ const ExpenseCategorySelect = () => {
       placeholder='Pick one'
       name='category'
       withAsterisk
+      onClick={() => setSearch('')}
     />
   );
 };

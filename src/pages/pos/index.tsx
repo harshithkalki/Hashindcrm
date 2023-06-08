@@ -346,6 +346,7 @@ const StaffMemSelect = () => {
       onSearchChange={setSearch}
       placeholder='Pick one'
       name='staffMem'
+      onClick={() => setSearch('')}
     />
   );
 };
@@ -374,6 +375,7 @@ const CustomerSelect = () => {
       onSearchChange={setSearch}
       placeholder='Pick one'
       name='customer'
+      onClick={() => setSearch('')}
     />
   );
 };
@@ -642,6 +644,7 @@ const Index = () => {
                       }}
                       searchValue={search}
                       onSearchChange={setSearch}
+                      onClick={() => setSearch('')}
                     />
                   </Container>
                 </div>

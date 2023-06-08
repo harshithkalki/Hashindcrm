@@ -84,6 +84,7 @@ function Company() {
       }
       withAsterisk
       searchable
+      onClick={() => onSearchChange('')}
     />
   );
 }
