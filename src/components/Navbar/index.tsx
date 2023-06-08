@@ -7,13 +7,12 @@ import {
 } from '@tabler/icons';
 import type { NavData } from '../CollapsibleLink';
 import LinksGroup from '../CollapsibleLink';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import type { z } from 'zod';
 import type { ZRole } from '@/zobjs/role';
 import { useRouter } from 'next/router';
-import i18n from '../../../i18n';
 import { useTranslation } from 'react-i18next';
 
 const allLinks = [
@@ -403,7 +402,7 @@ export default function NavbarNested({ hide, setNavOpen }: Props) {
   const client = useSelector<RootState, RootState['clientState']['client']>(
     (state) => state.clientState.client
   );
-  const { pathname: path } = useRouter();
+  const { pathname: path, push } = useRouter();
 
   const links = useMemo(() => {
     if (client && !client.isSuperAdmin) {
@@ -435,6 +434,22 @@ export default function NavbarNested({ hide, setNavOpen }: Props) {
 
     return [];
   }, [client]);
+
+  useEffect(() => {
+    if (!client?.isSuperAdmin) {
+      const isValid = links.some((item) => {
+        if (typeof item.links === 'string') {
+          return path.includes(item.links);
+        } else {
+          return item.links.some((link) => path.includes(link.link));
+        }
+      });
+
+      if (!isValid) {
+        push(client?.role.defaultRedirect ?? '/');
+      }
+    }
+  }, [client, links, path, push]);
 
   return (
     <Navbar

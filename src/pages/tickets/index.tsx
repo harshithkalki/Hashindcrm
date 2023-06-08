@@ -33,7 +33,7 @@ import fileDownload from 'js-file-download';
 import { Accordion } from '@mantine/core';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const uploadFiles = async (files: FileWithPath[]) => {
@@ -156,14 +156,14 @@ const AddnewTicket = ({
               />
               <FormInput
                 name='name'
-                label={`${t('name')}}`}
-                placeholder='Enter Name'
+                label={`${t('Short description')}`}
+                placeholder='Enter Short Description'
                 withAsterisk
               />
               <FormikSelect
                 mt={'xs'}
                 name='status'
-                label={`${t('initial status')}`}
+                label={`${t('Status')}`}
                 placeholder='Status'
                 data={data.map((val) => ({
                   value: val._id.toString(),
@@ -173,7 +173,7 @@ const AddnewTicket = ({
             </SimpleGrid>
             <Formiktextarea
               name='description'
-              label={`${t('description')}`}
+              label={`${t('Long Description')}`}
               placeholder='Enter Description'
               withAsterisk
               mb={'md'}

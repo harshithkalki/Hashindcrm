@@ -221,5 +221,8 @@
   "order tax": "Order Tax",
   "compaines": "Companies",
   "reports": "Reports",
-  "admin": "Admin"
+  "admin": "Admin",
+  "Short description": "Short Description",
+  "Status": "Status",
+  "Long Description": "Long Description"
 }
