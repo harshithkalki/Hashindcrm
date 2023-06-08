@@ -186,8 +186,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
     RootState,
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
-
-  console.log(warehouse);
+  const utils = trpc.useContext();
 
   const searchProducts = trpc.productRouter.searchProducts.useQuery({
     search: search,
@@ -236,7 +235,6 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(ZPurchaseCreateInput)}
           onSubmit={(values, { setSubmitting, resetForm }) => {
-            console.log(inlineProducts);
             values.products = Array.from(inlineProducts.values());
             values.orderTax =
               [...inlineProducts.values()].reduce(
@@ -258,8 +256,8 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 message: 'Created successfully',
               });
               setSubmitting(false);
-              console.log(res._id);
               setInvoiceId(res._id as unknown as string);
+              utils.purchaseRouter.purchases.invalidate();
             });
 
             resetForm();

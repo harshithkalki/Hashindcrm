@@ -2,7 +2,6 @@ import type { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
 import type { RouterOutputs } from '@/utils/trpc';
 import { trpc } from '@/utils/trpc';
-import { ZSaleCreateInput } from '@/zobjs/sale';
 import { ZStockTransferCreateInput } from '@/zobjs/stockTransfer';
 import {
   Modal,
@@ -27,15 +26,14 @@ import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useReactToPrint } from 'react-to-print';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import InfiniteSelect from '../Custom/InfiniteSelect';
 import FormDate from '../FormikCompo/FormikDate';
 import FormInput from '../FormikCompo/FormikInput';
 import FormikSelect from '../FormikCompo/FormikSelect';
 import Formiktextarea from '../FormikCompo/FormikTextarea';
-import FormikInfiniteSelect from '../FormikCompo/InfiniteSelect';
-import Invoice from '../Invoice';
+
 import { useTranslation } from 'react-i18next';
 
 const useStyles = createStyles((theme) => ({
@@ -216,6 +214,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  const utils = trpc.useContext();
 
   useEffect(() => {
     if (warehouse) {
@@ -238,8 +237,7 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
         <Formik
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(ZStockTransferCreateInput)}
-          onSubmit={(values, { setSubmitting, resetForm }) => {
-            console.log(inlineProducts);
+          onSubmit={(values, { setSubmitting }) => {
             values.products = Array.from(inlineProducts.values());
             values.orderTax =
               [...inlineProducts.values()].reduce(
@@ -256,20 +254,14 @@ const TransferForm = ({ modal, setModal, title, ...props }: modalProps) => {
               ) + values.shipping || 0;
 
             transferSubmit.mutateAsync(values).then((res) => {
-              showNotification({
-                title: 'New Sale',
-                message: 'Sale created successfully',
-              });
               setSubmitting(false);
-
               setModal(false);
             });
             showNotification({
               title: 'New Transfer',
               message: 'Created successfully',
             });
-
-            resetForm();
+            utils.stockTransferRouter.stockTransfers.invalidate();
             setInlineProducts(new Map());
           }}
           //  onSubmit={(values, { setSubmitting, resetForm }) => {

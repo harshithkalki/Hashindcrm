@@ -24,7 +24,7 @@ import { ZBrandCreateInput } from '@/zobjs/brand';
 import type { z } from 'zod';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { showNotification } from '@mantine/notifications';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
 
@@ -113,6 +113,7 @@ const AddBrand = ({
   onClose: () => void;
 }) => {
   const createBrand = trpc.brandRouter.create.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <Modal opened={opened} onClose={onClose} title='Add Brand'>
@@ -121,6 +122,7 @@ const AddBrand = ({
           await createBrand.mutateAsync({
             ...values,
           });
+          utils.brandRouter.brands.invalidate();
 
           onClose();
         }}
@@ -133,6 +135,7 @@ const AddBrand = ({
 const EditBrand = ({ onClose, _id }: { _id: string; onClose: () => void }) => {
   const update = trpc.brandRouter.update.useMutation();
   const brand = trpc.brandRouter.get.useQuery({ _id });
+  const utils = trpc.useContext();
 
   return (
     <Modal opened={Boolean(_id)} onClose={onClose} title='Edit Brand'>
@@ -151,6 +154,7 @@ const EditBrand = ({ onClose, _id }: { _id: string; onClose: () => void }) => {
             }
 
             await update.mutateAsync(data);
+            utils.brandRouter.brands.invalidate();
 
             onClose();
           }}

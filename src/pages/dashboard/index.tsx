@@ -13,7 +13,7 @@ import type { DefaultMantineColor } from '@mantine/core';
 import { Flex, Grid, ScrollArea, useMantineTheme } from '@mantine/core';
 import React from 'react';
 import dayjs from 'dayjs';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
 

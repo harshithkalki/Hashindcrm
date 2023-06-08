@@ -11,7 +11,6 @@ import {
   Center,
   Container,
   Group,
-  Loader,
   Modal,
   Pagination,
   TextInput,
@@ -19,7 +18,7 @@ import {
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { Form, Formik } from 'formik';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +39,7 @@ function StockAdjustmentForm({
 }) {
   const products = trpc.productRouter.getAllProducts.useQuery();
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
 
   return (
     <Formik
@@ -52,6 +52,7 @@ function StockAdjustmentForm({
         });
         resetForm();
         setSubmitting(false);
+        utils.stockAdjustRouter.stockadjusts.invalidate();
       }}
       validationSchema={toFormikValidationSchema(ZStockAdjustCreateInput)}
     >

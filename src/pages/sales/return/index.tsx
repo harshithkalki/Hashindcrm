@@ -19,7 +19,7 @@ import EditSales from '@/components/EditSales';
 import _ from 'lodash';
 import SaleReturnForm from '@/components/SReturnFrom';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
@@ -118,6 +118,7 @@ const Index = () => {
     content: () => componentRef.current,
   });
   const [downloadM, setDownloadM] = useState(false);
+  const utils = trpc.useContext();
 
   const { t } = useTranslation('common');
 
@@ -147,7 +148,7 @@ const Index = () => {
             _id={editId}
             onClose={() => {
               setEditId(null);
-              sales.refetch();
+              utils.saleReturnRouter.returns.invalidate();
             }}
           />
         )}

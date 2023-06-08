@@ -161,6 +161,7 @@ const StaffForm = ({
     refetchOnWindowFocus: false,
   });
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
 
   const staffOptions = useMemo(
     () =>
@@ -177,11 +178,8 @@ const StaffForm = ({
     <Formik
       onSubmit={(values, { resetForm }) => {
         onSubmit(values);
-        showNotification({
-          title: 'New Staff',
-          message: 'Created successfully',
-        });
         resetForm();
+        utils.staffRouter.staffs.invalidate();
       }}
       initialValues={formvalues}
       validationSchema={toFormikValidationSchema(ZStaffMemCreateInput)}
@@ -326,6 +324,10 @@ const AddCustomer = ({ modal, setModal }: modalProps) => {
         onSubmit={(values) => {
           createStaff.mutateAsync(values);
           setModal(false);
+          showNotification({
+            title: 'New Staff',
+            message: 'Created successfully',
+          });
         }}
         setModal={setModal}
       />
@@ -371,6 +373,10 @@ const UpdateCustomer = ({
           updateStaff.mutateAsync({
             ...values,
             _id: id as string,
+          });
+          showNotification({
+            title: 'Staff',
+            message: 'Updated successfully',
           });
           setId(null);
         }}

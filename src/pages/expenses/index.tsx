@@ -91,6 +91,7 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
   const { classes, cx } = useStyles();
   // const AddExpense = trpc.expenseRouter.create.useMutation();
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
   return (
     <>
       <Modal
@@ -113,6 +114,7 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
               title: 'New Expense',
               message: 'Created successfully',
             });
+            utils.expenseRouter.expenses.invalidate();
             onClose();
           }}
         >
@@ -182,6 +184,7 @@ const EditExpense = ({
   const updateExpense = trpc.expenseRouter.update.useMutation();
   const Expense = trpc.expenseRouter.get.useQuery({ _id: _id });
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
 
   return (
     <Modal opened={Boolean(_id)} onClose={() => onClose()} title='Edit Expense'>
@@ -205,10 +208,11 @@ const EditExpense = ({
               category: values.category?.toString(),
             });
             showNotification({
-              title: 'New Expense',
+              title: 'Edit Expense',
               message: 'Edited successfully',
             });
             onClose();
+            utils.expenseRouter.expenses.invalidate();
           }}
         >
           {({ handleSubmit }) => (

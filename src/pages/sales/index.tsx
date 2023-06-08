@@ -23,7 +23,7 @@ import { Form, Formik } from 'formik';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface DownloadModalProps {
@@ -120,6 +120,7 @@ const Index = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  const utils = trpc.useContext();
 
   useEffect(() => {
     if (invoice.data) {
@@ -147,7 +148,7 @@ const Index = () => {
             _id={editId}
             onClose={() => {
               setEditId(null);
-              sales.refetch();
+              utils.saleRouter.sales.invalidate();
             }}
           />
         )}

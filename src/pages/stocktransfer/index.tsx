@@ -19,7 +19,7 @@ import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
@@ -119,6 +119,7 @@ const Index = () => {
     content: () => componentRef.current,
   });
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
 
   useEffect(() => {
     if (invoice.data) {

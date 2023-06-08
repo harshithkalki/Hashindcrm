@@ -1,6 +1,7 @@
-import { RootState } from '@/store';
+import type { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
-import { RouterOutputs, trpc } from '@/utils/trpc';
+import type { RouterOutputs } from '@/utils/trpc';
+import { trpc } from '@/utils/trpc';
 import { ZSaleCreateInput } from '@/zobjs/sale';
 import {
   Modal,
@@ -223,6 +224,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  const utils = trpc.useContext();
 
   useEffect(() => {
     if (invoice.data) {
@@ -269,17 +271,12 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 message: 'Sale created successfully',
               });
               setSubmitting(false);
-              console.log(res._id);
               setInvoiceId(res._id as unknown as string);
-
-              // const invoice = trpc.saleRouter.getInvoice.useQuery({
-              //   _id: res._id as string,
-              // });
+              utils.saleRouter.sales.invalidate();
             });
 
             resetForm();
             setInlineProducts(new Map());
-            console.log(values);
           }}
         >
           {({ values, handleSubmit, isSubmitting }) => (

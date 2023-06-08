@@ -157,10 +157,6 @@ function CustomerForm({
           values.profile = data.url;
         }
         await onSubmit(values);
-        showNotification({
-          title: 'New Customer',
-          message: 'Created successfully',
-        });
         setSubmitting(false);
         resetForm();
       }}
@@ -313,6 +309,7 @@ function CustomerForm({
 const AddCustomer = ({ modal, setModal, onClose }: ModalProps) => {
   const create = trpc.customerRouter.create.useMutation();
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
   return (
     <>
       <Modal
@@ -325,6 +322,11 @@ const AddCustomer = ({ modal, setModal, onClose }: ModalProps) => {
           onSubmit={async (values) => {
             await create.mutateAsync(values);
             onClose();
+            utils.customerRouter.customers.invalidate();
+            showNotification({
+              title: 'New Customer',
+              message: 'Created successfully',
+            });
           }}
         />
       </Modal>
@@ -349,6 +351,7 @@ const UpdateCustomer = ({
   );
   const update = trpc.customerRouter.update.useMutation();
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
   if (customer.isLoading)
     return (
       <center>
@@ -366,7 +369,12 @@ const UpdateCustomer = ({
       <CustomerForm
         onSubmit={async (values) => {
           await update.mutateAsync({ _id: id as string, ...values });
+          utils.customerRouter.customers.invalidate();
           onClose();
+          showNotification({
+            title: 'New Customer',
+            message: 'Created successfully',
+          });
         }}
         values={
           customer.data && {

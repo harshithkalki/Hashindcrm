@@ -226,6 +226,7 @@ const PurchaseReturnForm = ({
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  const utils = trpc.useContext();
 
   useEffect(() => {
     if (invoice.data) {
@@ -270,16 +271,11 @@ const PurchaseReturnForm = ({
 
             returnSubmit.mutateAsync(values).then((res) => {
               showNotification({
-                title: 'New Sale',
+                title: 'New Purchase Return',
                 message: 'Return created successfully',
               });
               setSubmitting(false);
-              console.log(res._id);
-              //   setInvoiceId(res._id as unknown as string);
-
-              // const invoice = trpc.saleRouter.getInvoice.useQuery({
-              //   _id: res._id as string,
-              // });
+              utils.purchaseReturnRouter.purchaseReturns.invalidate();
             });
 
             resetForm();

@@ -26,7 +26,7 @@ import { MIME_TYPES } from '@mantine/dropzone';
 import csvtojson from 'csvtojson';
 import { showNotification } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const initialValues: CategoryCreateInput = {
@@ -143,6 +143,7 @@ const AddCategory = ({
   opened: boolean;
 }) => {
   const createCategory = trpc.categoryRouter.create.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <>
@@ -152,7 +153,7 @@ const AddCategory = ({
             await createCategory.mutateAsync({
               ...values,
             });
-
+            utils.categoryRouter.getrootCategories.invalidate();
             onClose();
           }}
           onClose={onClose}
@@ -178,6 +179,7 @@ const EditCategory = ({
     }
   );
   const updateCategory = trpc.categoryRouter.update.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <Modal opened={Boolean(_id)} onClose={onClose} title='Edit Categories'>
@@ -191,6 +193,7 @@ const EditCategory = ({
               ...values,
             });
             onClose();
+            utils.categoryRouter.getrootCategories.invalidate();
           }}
           values={
             category.data
@@ -291,10 +294,15 @@ const Index = () => {
                       slug: 'string',
                     },
                   }).fromString(csv as string);
-                  createManyCategories.mutateAsync(data);
-                  utils.categoryRouter.getrootCategories.invalidate({
-                    limit: 10,
-                    cursor: 0,
+                  createManyCategories.mutateAsync(data).then(() => {
+                    utils.categoryRouter.getrootCategories.invalidate({
+                      limit: 10,
+                      cursor: 0,
+                    });
+                    showNotification({
+                      title: 'Categories Created',
+                      message: `Categories created successfully`,
+                    });
                   });
                 };
                 reader.readAsText(file);

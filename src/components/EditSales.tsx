@@ -1,6 +1,5 @@
-import { RootState } from '@/store';
+import type { RootState } from '@/store';
 import { setWarehouse } from '@/store/clientSlice';
-import { RouterOutputs, trpc } from '@/utils/trpc';
 import { ZSaleCreateInput } from '@/zobjs/sale';
 import {
   Modal,
@@ -38,9 +37,8 @@ import FormInput from './FormikCompo/FormikInput';
 import FormikSelect from './FormikCompo/FormikSelect';
 import Formiktextarea from './FormikCompo/FormikTextarea';
 import FormikInfiniteSelect from './FormikCompo/InfiniteSelect';
-import Invoice from './Invoice';
 import { useTranslation } from 'react-i18next';
-// import { useQueryClient } from 'react-query';
+import { trpc } from '@/utils/trpc';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -167,30 +165,9 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
     },
     { enabled: Boolean(_id) }
   );
-  // const initialValues = {
-  //   id: '',
-  //   customer: '',
-  //   products: [],
-  //   notes: '',
-  //   total: 0,
-  //   status: 'approved',
-  //   shipping: 0,
-  //   orderTax: 0,
-  //   discount: 0,
-  //   date: '',
-  //   warehouse: '',
-  //   invoiceId: '',
-  //   paymentMode: '',
-  // };
-
-  // const [inlineProducts, setInlineProducts] = useState<
-  //   Map<string, InlineProduct>
-  // >(new Map());
 
   const Data = ProductData.data;
   let totalProductsCost = 0;
-
-  // const [ProductsList, setProductsList] = useState<InlineProduct[]>([]);
 
   const initialValues: InitialValues = {
     id: Data?._id as unknown as string,
@@ -237,30 +214,13 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
     Map<string, InlineProduct>
   >(new Map(List?.map((product) => [product._id, product]) || []));
 
-  // const [invoiceId, setInvoiceId] = useState<string>('');
-  // const [products, setProducts] = useState<
-  //   RouterOutputs['productRouter']['getProducts']['docs']
-  // >([]);
-
   const salesSubmit = trpc.saleRouter.update.useMutation();
 
-  // const invoice = trpc.saleRouter.getInvoice.useQuery(
-  //   {
-  //     _id: invoiceId,
-  //   },
-  //   { enabled: Boolean(invoiceId) }
-  // );
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-
-  // useEffect(() => {
-  //   if (invoice.data) {
-  //     handlePrint();
-  //     setInvoiceId('');
-  //   }
-  // }, [handlePrint, invoice.data]);
+  const utils = trpc.useContext();
 
   useEffect(() => {
     if (List && inlineProducts.size === 0) {
@@ -305,12 +265,10 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
               salesSubmit.mutateAsync(values).then((res) => {
                 ProductData.refetch();
                 showNotification({
-                  title: 'New Sale',
-                  message: 'Sale created successfully',
+                  title: 'Edit Sale',
+                  message: 'Sale Edited Successfully',
                 });
-                console.log(res);
                 setSubmitting(false);
-
                 onClose();
               });
 
@@ -406,10 +364,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                         name: product.name,
                         quantity: 1,
                         subtotal: product.salePrice,
-                        // discountedPrice:
-                        //   product.salePrice -
-                        //   (totalPrice * (values.orderdiscount / 100)) /
-                        //     (inlineProducts.size + 1),
+
                         price: product.salePrice,
                         tax: product.tax,
                         taxPrice: 0,

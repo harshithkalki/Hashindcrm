@@ -6,7 +6,6 @@ import {
   Title,
   Button,
   Pagination,
-  ScrollArea,
   Center,
   Container,
 } from '@mantine/core';
@@ -14,11 +13,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import Invoice from '@/components/Invoice';
 import { useReactToPrint } from 'react-to-print';
-import EditSales from '@/components/EditSales';
 import _ from 'lodash';
 import PurchaseReturnForm from '@/components/PReturnForm';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Index = () => {
@@ -66,15 +64,6 @@ const Index = () => {
         </div>
       )}
       <Layout>
-        {/* {editId && (
-          <EditSales
-            _id={editId}
-            onClose={() => {
-              setEditId(null);
-              sales.refetch();
-            }}
-          />
-        )} */}
         <Container
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >

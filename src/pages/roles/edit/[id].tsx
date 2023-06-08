@@ -1,37 +1,12 @@
 import RoleForm from '@/components/RoleFrom/RoleForm';
 import { trpc } from '@/utils/trpc';
 import React from 'react';
-import type { Permissions } from '@/constants';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { ScrollArea } from '@mantine/core';
-import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
-
-// const permissionsDemo: Permission = [
-//   {
-//     permissionName: "COMPANY",
-//     crud: {
-//       read: false,
-//       update: false,
-//       delete: false,
-//       create: false,
-//     },
-//   },
-//   {
-//     permissionName: "USER",
-//     crud: {
-//       read: false,
-//       update: false,
-//       delete: false,
-//       create: false,
-//     },
-//   },
-// ];
-
-// https://decision-tree-lxlo.vercel.app/
-// https://decision-tree-lxlo.vercel.app/workspace
+import type { GetServerSideProps } from 'next';
 
 const App = () => {
   const UpdateRole = trpc.roleRouter.update.useMutation();

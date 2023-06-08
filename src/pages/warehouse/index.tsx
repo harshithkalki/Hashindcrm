@@ -29,7 +29,7 @@ import { IconMinus, IconPlus, IconUpload } from '@tabler/icons';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { showNotification } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 type WarehouseInput = z.infer<typeof ZWarehouseCreateInput>;
@@ -456,7 +456,7 @@ const AddWarehouse = ({
             title: 'New Warehouse',
             message: 'Created successfully',
           });
-          utils.warehouseRouter.warehouses.refetch();
+          utils.warehouseRouter.warehouses.invalidate();
         }}
         onClose={onClose}
       />
@@ -473,7 +473,7 @@ const EditWarehouse = ({
 }) => {
   const updateWarehouse = trpc.warehouseRouter.update.useMutation();
   const warehouse = trpc.warehouseRouter.get.useQuery({ _id });
-  console.log(warehouse);
+  const utils = trpc.useContext();
 
   return (
     <Modal
@@ -492,9 +492,10 @@ const EditWarehouse = ({
               _id,
             });
             showNotification({
-              title: 'New warehouse',
+              title: 'Edited warehouse',
               message: 'Edited successfully',
             });
+            utils.warehouseRouter.warehouses.invalidate();
             onClose();
           }}
           values={warehouse.data}

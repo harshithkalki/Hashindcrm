@@ -21,8 +21,9 @@ import FormDate from '@/components/FormikCompo/FormikDate';
 import { exportCSVFile } from '@/utils/jsonTocsv';
 import { Formik, Form } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { showNotification } from '@mantine/notifications';
 
 interface DownloadModalProps {
   modal: boolean;
@@ -47,7 +48,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
           onSubmit={async (values) => {
             const startDate = values.startDate;
             const endDate = values.endDate;
-            console.log(startDate, endDate);
+
             const data = await client.purchaseRouter.getAllPurchases.query({
               startDate,
               endDate,
@@ -59,9 +60,14 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
             });
             exportCSVFile(headers, data, 'Purchases');
             // setModal(false);
+            showNotification({
+              title: 'Downloaded',
+              message: 'Downloaded Successfully',
+              color: 'teal',
+            });
           }}
         >
-          {({ values, handleChange, handleSubmit }) => (
+          {({ handleSubmit, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
               <FormDate
                 label={`${t('start date')}`}
@@ -83,7 +89,12 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
               />
 
               <Center mt={'md'}>
-                <Button size='xs' mr={'md'} type='submit'>
+                <Button
+                  size='xs'
+                  mr={'md'}
+                  type='submit'
+                  loading={isSubmitting}
+                >
                   {t('download')}
                 </Button>
               </Center>

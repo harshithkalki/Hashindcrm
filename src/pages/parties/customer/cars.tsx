@@ -32,7 +32,7 @@ import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import { showNotification } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const useStyles = createStyles((theme) => ({
@@ -322,6 +322,7 @@ const CarsForm = ({
 const AddCar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const createCar = trpc.carRouter.create.useMutation();
   // const { classes } = useStyles();
+  const utils = trpc.useContext();
   return (
     <Modal opened={open} title={'ADD CAR DATA'} onClose={onClose} size={'50'}>
       <CarsForm
@@ -333,6 +334,7 @@ const AddCar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
             message: 'Successfully',
           });
           onClose();
+          utils.carRouter.cars.invalidate();
         }}
       />
     </Modal>
@@ -342,6 +344,7 @@ const AddCar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
 const Editcar = ({ _id, onClose }: { _id: string; onClose: () => void }) => {
   const car = trpc.carRouter.get.useQuery({ _id });
   const updateCar = trpc.carRouter.update.useMutation();
+  const utils = trpc.useContext();
 
   return (
     <Modal opened={true} title={'EDIT CAR DATA'} onClose={onClose} size={'50'}>
@@ -361,6 +364,7 @@ const Editcar = ({ _id, onClose }: { _id: string; onClose: () => void }) => {
               message: 'Successfully',
             });
             onClose();
+            utils.carRouter.cars.invalidate();
           }}
         />
       )}

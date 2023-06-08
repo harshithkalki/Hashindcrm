@@ -131,15 +131,13 @@ const Supplierform = ({
   const fileRef = useRef<HTMLInputElement>(null);
   const { classes } = useStyles();
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
   return (
     <Formik
       onSubmit={(values, { resetForm }) => {
         onSubmit(values);
-        showNotification({
-          title: 'New Supplier',
-          message: 'Created successfully',
-        });
         resetForm();
+        utils.supplierRouter.suppliers.invalidate();
       }}
       initialValues={formvalues}
     >
@@ -303,6 +301,10 @@ const AddSupplier = ({ modal, setModal, onClose }: modalProps) => {
             await createSupplier.mutateAsync(values);
             onClose();
             setModal(false);
+            showNotification({
+              title: 'New Supplier',
+              message: 'Created successfully',
+            });
           }}
         />
       </Modal>
@@ -345,6 +347,10 @@ const UpdateSupplier = ({
         onSubmit={async (values) => {
           await update.mutateAsync({ ...values, _id: id as string });
           onClose();
+          showNotification({
+            title: 'Supplier',
+            message: 'Updated successfully',
+          });
         }}
         setModal={() => setId(null)}
       />

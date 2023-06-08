@@ -21,7 +21,7 @@ import { useRouter } from 'next/router';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { showNotification } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 type CreateExpenseCategory = z.infer<typeof ZExpenseCategoryCreateInput>;
@@ -35,6 +35,7 @@ interface modalProps {
 
 const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
   return (
     <>
       <Modal
@@ -57,6 +58,7 @@ const AddExpense = ({ modal, setModal, onSubmit, onClose }: modalProps) => {
               message: 'Created successfully',
             });
             onClose();
+            utils.expenseCategoryRouter.expenseCategories.invalidate();
           }}
         >
           {({ handleSubmit }) => (
@@ -106,6 +108,7 @@ const EditExpenseCategory = ({
   const updateExpenseCategory = trpc.expenseCategoryRouter.update.useMutation();
   const expenseCategory = trpc.expenseCategoryRouter.get.useQuery({ _id: _id });
   const { t } = useTranslation('common');
+  const utils = trpc.useContext();
 
   return (
     <Modal
@@ -127,9 +130,10 @@ const EditExpenseCategory = ({
               ...values,
             });
             showNotification({
-              title: 'New Expense Category',
+              title: 'Edit Expense Category',
               message: 'Edited successfully',
             });
+            utils.expenseCategoryRouter.expenseCategories.invalidate();
             onClose();
           }}
         >
