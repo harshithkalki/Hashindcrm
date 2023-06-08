@@ -118,7 +118,7 @@ const Index = () => {
                 description: 'Bank Monthly turnover',
               },
               {
-                title: `${t('upi')}`,
+                title: `${t('cash')}`,
                 stats: data.salesByPaymentMode.totalSalesBank.toFixed(0),
                 description: 'Cash Monthly turnover',
               },

@@ -162,6 +162,9 @@ function WarehouseSelect() {
       rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
       onSearchChange={onSearchChange}
       searchValue={searchValue}
+      onClick={() => {
+        onSearchChange('');
+      }}
       searchable
       onClick={() => onSearchChange('')}
     />

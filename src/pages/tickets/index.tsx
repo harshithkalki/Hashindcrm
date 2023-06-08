@@ -169,7 +169,7 @@ const AddnewTicket = ({
               <FormikSelect
                 mt={'xs'}
                 name='status'
-                label={`${t('Status')}`}
+                label={`${t('status')}`}
                 placeholder='Status'
                 data={data.map((val) => ({
                   value: val._id.toString(),
