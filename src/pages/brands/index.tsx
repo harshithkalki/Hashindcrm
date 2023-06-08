@@ -211,13 +211,18 @@ const Brand = () => {
           data={
             brands.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.map((doc) => ({
+              ?.docs.map((doc, index) => ({
                 ...doc,
                 _id: doc._id.toString(),
+                index: index + 10 * (page - 1) + 1,
               })) || []
           }
           onEdit={(id) => setEditId(id)}
           colProps={{
+            index: {
+              label: `${t('sno')}`,
+            },
+
             logo: {
               label: `${t('logo')}`,
               Component: ({ data: { logo } }) => (

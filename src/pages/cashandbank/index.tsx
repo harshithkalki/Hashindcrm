@@ -25,82 +25,84 @@ const Index = () => {
   return (
     <Layout>
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
-        <Group
-          my='lg'
-          style={{
-            justifyContent: 'space-between',
-          }}
-        >
-          <Title fw={400}>{t('cash, bank, upi')}</Title>
-          <Group position='apart' align='center'>
-            <Button
-              size='xs'
-              onClick={async () => {
-                const data = await client.saleRouter.getAllCashSales.query();
-                const headers: Record<string, string> = {};
-                if (data.length === 0) return;
-                Object.keys(data[0]!).forEach((key) => {
-                  headers[key as keyof (typeof data)[number]] = key;
-                });
-                exportCSVFile(headers, data, 'cashSales');
-              }}
-            >
-              {t('cash csv')}
-            </Button>
-            <Button
-              size='xs'
-              onClick={async () => {
-                const data = await client.saleRouter.getAllCardSales.query();
-                const headers: Record<string, string> = {};
-                if (data.length === 0) return;
-                Object.keys(data[0]!).forEach((key) => {
-                  headers[key as keyof (typeof data)[number]] = key;
-                });
-                exportCSVFile(headers, data, 'BankSales');
-              }}
-            >
-              {t('bank csv')}
-            </Button>
+        <ScrollArea type='never'>
+          <Group
+            my='lg'
+            style={{
+              justifyContent: 'space-between',
+            }}
+          >
+            <Title fw={400}>{t('cash, bank, upi')}</Title>
+            <Group position='apart' align='center'>
+              <Button
+                size='xs'
+                onClick={async () => {
+                  const data = await client.saleRouter.getAllCashSales.query();
+                  const headers: Record<string, string> = {};
+                  if (data.length === 0) return;
+                  Object.keys(data[0]!).forEach((key) => {
+                    headers[key as keyof (typeof data)[number]] = key;
+                  });
+                  exportCSVFile(headers, data, 'cashSales');
+                }}
+              >
+                {t('cash csv')}
+              </Button>
+              <Button
+                size='xs'
+                onClick={async () => {
+                  const data = await client.saleRouter.getAllCardSales.query();
+                  const headers: Record<string, string> = {};
+                  if (data.length === 0) return;
+                  Object.keys(data[0]!).forEach((key) => {
+                    headers[key as keyof (typeof data)[number]] = key;
+                  });
+                  exportCSVFile(headers, data, 'BankSales');
+                }}
+              >
+                {t('bank csv')}
+              </Button>
 
-            <Button
-              size='xs'
-              onClick={async () => {
-                const data = await client.saleRouter.getAllUPISales.query();
-                const headers: Record<string, string> = {};
-                if (data.length === 0) return;
-                Object.keys(data[0]!).forEach((key) => {
-                  headers[key as keyof (typeof data)[number]] = key;
-                });
-                exportCSVFile(headers, data, 'upiSales');
-              }}
-            >
-              {t('upi csv')}
-            </Button>
+              <Button
+                size='xs'
+                onClick={async () => {
+                  const data = await client.saleRouter.getAllUPISales.query();
+                  const headers: Record<string, string> = {};
+                  if (data.length === 0) return;
+                  Object.keys(data[0]!).forEach((key) => {
+                    headers[key as keyof (typeof data)[number]] = key;
+                  });
+                  exportCSVFile(headers, data, 'upiSales');
+                }}
+              >
+                {t('upi csv')}
+              </Button>
+            </Group>
           </Group>
-        </Group>
 
-        <Tabs defaultValue='cash'>
-          <Tabs.List>
-            <Tabs.Tab value='cash' icon={<IconBrandCashapp size={14} />}>
-              {t('cash')}
-            </Tabs.Tab>
-            <Tabs.Tab value='bank' icon={<IconBuildingBank size={14} />}>
-              {t('bank')}
-            </Tabs.Tab>
-            <Tabs.Tab value='upi' icon={<IconBuildingBank size={14} />}>
-              {t('upi')}
-            </Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel value='cash' mt={'lg'}>
-            <CashTable />
-          </Tabs.Panel>
-          <Tabs.Panel value='bank' mt={'lg'}>
-            <CardTable />
-          </Tabs.Panel>
-          <Tabs.Panel value='upi' mt={'lg'}>
-            <UPITable />
-          </Tabs.Panel>
-        </Tabs>
+          <Tabs defaultValue='cash'>
+            <Tabs.List>
+              <Tabs.Tab value='cash' icon={<IconBrandCashapp size={14} />}>
+                {t('cash')}
+              </Tabs.Tab>
+              <Tabs.Tab value='bank' icon={<IconBuildingBank size={14} />}>
+                {t('bank')}
+              </Tabs.Tab>
+              <Tabs.Tab value='upi' icon={<IconBuildingBank size={14} />}>
+                {t('upi')}
+              </Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='cash' mt={'lg'}>
+              <CashTable />
+            </Tabs.Panel>
+            <Tabs.Panel value='bank' mt={'lg'}>
+              <CardTable />
+            </Tabs.Panel>
+            <Tabs.Panel value='upi' mt={'lg'}>
+              <UPITable />
+            </Tabs.Panel>
+          </Tabs>
+        </ScrollArea>
       </Container>
     </Layout>
   );

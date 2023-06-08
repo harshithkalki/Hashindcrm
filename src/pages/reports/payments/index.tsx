@@ -31,9 +31,13 @@ const Index = () => {
             data?.slice((page - 1) * 10, page * 10)?.map((doc) => ({
               ...doc,
               _id: doc._id.toString(),
+              index: data.indexOf(doc) + 1,
             })) || []
           }
           colProps={{
+            index: {
+              label: `${t('sno')}`,
+            },
             paymentDate: {
               label: `${t('date')}`,
               Component: (props) => (

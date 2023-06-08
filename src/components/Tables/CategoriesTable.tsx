@@ -107,6 +107,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
               </ActionIcon>
             )}
           </td>
+
           <td>
             <Image
               src={parent.logo}
@@ -164,6 +165,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
         <thead>
           <tr>
             <th style={{ width: '10%' }}></th>
+            {/* <th>{t('sno')}</th> */}
             <th>{t('logo')}</th>
             <th>{t('name')}</th>
             <th>{t('actions')}</th>

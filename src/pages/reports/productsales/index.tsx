@@ -63,8 +63,16 @@ const Index = () => {
           }}
         >
           <TableSelection
-            data={data?.slice((page - 1) * 10, page * 10) ?? []}
+            data={
+              data?.slice((page - 1) * 10, page * 10)?.map((doc, index) => ({
+                ...doc,
+                index: index + 10 * (page - 1) + 1,
+              })) ?? []
+            }
             colProps={{
+              index: {
+                label: `${t('sno')}`,
+              },
               name: {
                 label: `${t('name')}`,
               },

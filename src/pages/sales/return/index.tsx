@@ -172,15 +172,20 @@ const Index = () => {
             data={
               sales.data?.pages
                 .find((pageData) => pageData.page === page)
-                ?.docs.map((val) => ({
+                ?.docs.map((val, index) => ({
                   ...val,
                   _id: val._id.toString(),
                   date: dayjs(val.date).format('DD MMMM YYYY'),
                   customer: _.get(val, 'customer.name', 'Walk-in Customer'),
                   total: val.total.toFixed(),
+                  index: index + 10 * (page - 1) + 1,
                 })) ?? []
             }
             colProps={{
+              index: {
+                label: `${t('sno')}`,
+              },
+
               date: {
                 label: `${t('date')}`,
               },

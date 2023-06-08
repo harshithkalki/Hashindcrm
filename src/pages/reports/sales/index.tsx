@@ -48,15 +48,19 @@ const Index = () => {
             data={
               sales.data?.pages
                 .find((pageData) => pageData?.page === page)
-                ?.docs.map((doc) => ({
+                ?.docs.map((doc, index) => ({
                   ...doc,
                   _id: doc._id.toString(),
                   customer: (doc.customer as unknown as { name: string }).name,
                   staffMem:
                     (doc.staffMem as unknown as { name: string })?.name ?? '',
+                  index: index + 10 * (page - 1) + 1,
                 })) || []
             }
             colProps={{
+              index: {
+                label: `${t('sno')}`,
+              },
               createdAt: {
                 label: 'Payment Date',
               },

@@ -423,12 +423,19 @@ const Index = () => {
           data={
             staffs.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.map((val) => ({ ...val, _id: val._id.toString() })) ?? []
+              ?.docs.map((val, index) => ({
+                ...val,
+                _id: val._id.toString(),
+                index: index + 10 * (page - 1) + 1,
+              })) ?? []
           }
           colProps={{
             // name: 'Name',
             // email: 'Email',
             // status: 'Status',
+            index: {
+              label: `${t('sno')}`,
+            },
             name: {
               label: `${t('name')}`,
             },

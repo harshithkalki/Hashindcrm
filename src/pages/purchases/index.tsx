@@ -176,14 +176,19 @@ const Index = () => {
             data={
               purchases.data?.pages
                 .find((pageData) => pageData.page === page)
-                ?.docs.map((val) => ({
+                ?.docs.map((val, index) => ({
                   ...val,
                   _id: val._id.toString(),
                   date: dayjs(val.date).format('DD MMMM YYYY'),
                   supplier: (val.supplier as unknown as { name: string }).name,
+                  index: index + 10 * (page - 1) + 1,
                 })) || []
             }
             colProps={{
+              index: {
+                label: `${t('sno')}`,
+              },
+
               invoiceId: {
                 label: `${t('show invoice')}`,
               },

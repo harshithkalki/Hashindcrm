@@ -51,17 +51,19 @@ const Index = () => {
         </Group>
         <TableSelection
           data={
-            roles.data?.docs.map((val) => ({
+            roles.data?.docs.map((val, index) => ({
               ...val,
               _id: val._id.toString(),
+              index: index + 10 * (page - 1) + 1,
             })) ?? []
           }
           colProps={{
-            _id: {
+            index: {
               label: `${t('sno')}`,
-              Component: ({ index }) => {
-                return <>{index + 1}</>;
-              },
+              // Component: ({ index }) => {
+              //   console.log(index);
+              //   return <>{index + 1}</>;
+              // },
             },
             name: {
               label: `${t('name')}`,

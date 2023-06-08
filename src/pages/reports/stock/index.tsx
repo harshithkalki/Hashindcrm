@@ -116,47 +116,52 @@ const Index = () => {
     setFilteredData(data);
   }, [data]);
 
-  const rows = filteredData.slice((page - 1) * 10, page * 10).map((item) => {
-    return (
-      <tr key={item.id}>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          <Group spacing='xs'>
-            <Image
-              src={item.logo}
-              alt={item.name}
-              radius='lg'
-              style={{ width: 25, height: 25 }}
-            />
-            {item.name}
-          </Group>
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.itemCode}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.category}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.brand}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.purchasePrice}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.salesPrice}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.currentStock}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.stockvaluebypurchase}
-        </td>
-        <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
-          {item.stockvaluebysales}
-        </td>
-      </tr>
-    );
-  });
+  const rows = filteredData
+    .slice((page - 1) * 10, page * 10)
+    .map((item, index) => {
+      return (
+        <tr key={item.id}>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {index + 10 * (page - 1) + 1}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            <Group spacing='xs'>
+              <Image
+                src={item.logo}
+                alt={item.name}
+                radius='lg'
+                style={{ width: 25, height: 25 }}
+              />
+              {item.name}
+            </Group>
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.itemCode}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.category}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.brand}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.purchasePrice}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.salesPrice}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.currentStock}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.stockvaluebypurchase}
+          </td>
+          <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
+            {item.stockvaluebysales}
+          </td>
+        </tr>
+      );
+    });
 
   const { t } = useTranslation('common');
 
@@ -184,6 +189,7 @@ const Index = () => {
             <Table>
               <thead>
                 <tr>
+                  <th>{t('sno')}</th>
                   <th>{t('name')}</th>
                   <th style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>
                     {t('item code')}

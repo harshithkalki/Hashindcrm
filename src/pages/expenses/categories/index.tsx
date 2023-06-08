@@ -243,12 +243,16 @@ const Index = () => {
           data={
             expenseCategories?.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.map((val) => ({
+              ?.docs.map((val, index) => ({
                 ...val,
                 _id: val._id.toString(),
+                index: index + 10 * (page - 1) + 1,
               })) ?? []
           }
           colProps={{
+            index: {
+              label: `${t('sno')}`,
+            },
             name: {
               label: `${t('name')}`,
             },

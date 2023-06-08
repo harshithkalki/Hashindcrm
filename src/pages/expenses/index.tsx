@@ -341,14 +341,18 @@ const Index = () => {
           data={
             Expenses.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.map((val) => ({
+              ?.docs.map((val, index) => ({
                 ...val,
                 _id: val._id.toString(),
                 category: (val.category as unknown as { name: string }).name,
                 date: dayjs(val.date).format('DD MMMM YYYY'),
+                index: index + 10 * (page - 1) + 1,
               })) || []
           }
           colProps={{
+            index: {
+              label: `${t('sno')}`,
+            },
             category: {
               label: `${t('expense category')}`,
             },

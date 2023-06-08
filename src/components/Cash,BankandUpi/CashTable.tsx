@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 const CashTable = () => {
   const [page, setPage] = React.useState(1);
   const cashData = trpc.saleRouter.getCashSales.useInfiniteQuery(
-    { limit: 8 },
+    { limit: 10 },
     { getNextPageParam: () => page, refetchOnWindowFocus: false }
   );
   useEffect(() => {
@@ -27,13 +27,17 @@ const CashTable = () => {
             data={
               cashData.data?.pages
                 .find((pageData) => pageData.page === page)
-                ?.docs.map((doc) => ({
+                ?.docs.map((doc, index) => ({
                   ...doc,
                   _id: doc._id.toString(),
                   date: dayjs(doc.date).format('DD MMMM YYYY'),
+                  index: index + 10 * (page - 1) + 1,
                 })) || []
             }
             colProps={{
+              index: {
+                label: `${t('sno')}`,
+              },
               date: {
                 label: `${t('date')}`,
               },

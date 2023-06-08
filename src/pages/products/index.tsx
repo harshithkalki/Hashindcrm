@@ -141,19 +141,23 @@ const Index = () => {
           data={
             products.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.map((val) => ({
+              ?.docs.map((val, index) => ({
                 ...val,
                 _id: val._id.toString(),
                 warehouse: (val.warehouse as unknown as { name: string }).name,
                 category: (val.category as unknown as { name: string }).name,
                 brand: (val.brand as unknown as { name: string })
                   .name as unknown as string,
+                index: index + 10 * (page - 1) + 1,
               })) ?? []
           }
           onEdit={(id) => {
             router.push(`/products/edit/${id}`);
           }}
           colProps={{
+            index: {
+              label: `${t('sno')}`,
+            },
             logo: {
               label: `${t('logo')}`,
               Component: ({ data: { logo } }) => (

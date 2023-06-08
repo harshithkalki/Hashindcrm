@@ -160,15 +160,19 @@ const Index = () => {
           data={
             transfers.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.map((doc) => ({
+              ?.docs.map((doc, index) => ({
                 ...doc,
                 _id: doc._id.toString(),
                 openingStockDate: dayjs(doc.openingStockDate).format(
                   'DD MMMM YYYY'
                 ),
+                index: index + 10 * (page - 1) + 1,
               })) || []
           }
           colProps={{
+            index: {
+              label: `${t('sno')}`,
+            },
             invoiceId: {
               label: `${t('invoice id')} `,
             },
