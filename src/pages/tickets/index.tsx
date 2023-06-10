@@ -615,7 +615,7 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
           createdAt: {
             label: `${t('created at')}`,
             Component: ({ data: { createdAt } }) => (
-              <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
+              <div>{dayjs(createdAt).format('DD/MM/YYYY')}</div>
             ),
           },
           status: {
@@ -732,7 +732,7 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
           createdAt: {
             label: `${t('created at')}`,
             Component: ({ data: { createdAt } }) => (
-              <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
+              <div>{dayjs(createdAt).format('DD/MM/YYYY')}</div>
             ),
           },
           status: {
@@ -858,7 +858,7 @@ const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
           createdAt: {
             label: `${t('created at')}`,
             Component: ({ data: { createdAt } }) => (
-              <>{dayjs(createdAt).format('DD/MM/YYYY')}</>
+              <div>{dayjs(createdAt).format('DD/MM/YYYY')}</div>
             ),
           },
           status: {

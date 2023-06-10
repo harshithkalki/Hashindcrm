@@ -41,7 +41,9 @@ const Index = () => {
             paymentDate: {
               label: `${t('date')}`,
               Component: (props) => (
-                <>{dayjs(props.data.paymentDate).format('MMMM DD, YYYY')}</>
+                <div>
+                  {dayjs(props.data.paymentDate).format('MMMM DD, YYYY')}
+                </div>
               ),
             },
             referenceNo: {
