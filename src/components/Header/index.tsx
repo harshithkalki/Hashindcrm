@@ -166,7 +166,6 @@ function WarehouseSelect() {
         onSearchChange('');
       }}
       searchable
-      onClick={() => onSearchChange('')}
     />
   );
 }
