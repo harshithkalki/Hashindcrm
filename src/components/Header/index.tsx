@@ -7,7 +7,6 @@ import {
   Group,
   Text,
   Menu,
-  Burger,
   Image,
   Loader,
   ActionIcon,
@@ -18,7 +17,6 @@ import {
   IconLogout,
   IconSettings,
   IconChevronDown,
-  IconChevronsRight,
   IconMenu2,
   IconUserCircle,
 } from '@tabler/icons';
@@ -207,7 +205,7 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
               <Select
                 data={[
                   { label: 'English', value: 'en' },
-                  { label: 'Tamil', value: 'fr' },
+                  { label: 'Tamil', value: 'ta' },
                 ]}
                 onChange={(value) => {
                   if (value === 'en') {
@@ -217,17 +215,13 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
                       }
                     );
                     setLanguage('en');
-                    // router.reload();
-                    // i18n.changeLanguage('en');
-                  } else if (value === 'fr') {
-                    push('/', `${router.pathname}`, { locale: 'fr' }).then(
+                  } else if (value === 'ta') {
+                    push('/', `${router.pathname}`, { locale: 'ta' }).then(
                       () => {
                         router.reload();
                       }
                     );
-
-                    setLanguage('fr');
-                    // i18n.changeLanguage('fr');
+                    setLanguage('ta');
                   }
                 }}
                 value={language}
@@ -290,19 +284,6 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
                 >
                   Logout
                 </Menu.Item>
-
-                {/* <Menu.Divider /> */}
-
-                {/* <Menu.Label>Danger zone</Menu.Label>
-                <Menu.Item icon={<IconPlayerPause size={14} stroke={1.5} />}>
-                  Pause subscription
-                </Menu.Item>
-                <Menu.Item
-                  color='red'
-                  icon={<IconTrash size={14} stroke={1.5} />}
-                >
-                  Delete account
-                </Menu.Item> */}
               </Menu.Dropdown>
             </Menu>
           </Group>
