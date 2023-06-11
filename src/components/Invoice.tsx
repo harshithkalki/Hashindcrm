@@ -476,8 +476,8 @@ export default function Invoice({
               )
               .toFixed(2)}`}</Text>
 
-            <Text weight={400}>{`Amount Chargeable : ${data.products
-              .reduce(
+            <Text weight={400}>{`Amount Chargeable : ${Math.round(
+              data.products.reduce(
                 (acc, curr) =>
                   acc +
                   curr.salePrice -
@@ -487,7 +487,7 @@ export default function Invoice({
                     (curr.tax / 100),
                 0
               )
-              .toFixed(2)}`}</Text>
+            )}`}</Text>
           </div>
           <div>
             <Text weight={400}>
@@ -515,7 +515,4 @@ export default function Invoice({
       </Flex>
     </div>
   );
-}
-function convert(otherNumbers: string) {
-  throw new Error('Function not implemented.');
 }
