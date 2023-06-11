@@ -7,6 +7,7 @@ import { ScrollArea } from '@mantine/core';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
 import type { GetServerSideProps } from 'next';
+import { showNotification } from '@mantine/notifications';
 
 const App = () => {
   const UpdateRole = trpc.roleRouter.update.useMutation();
@@ -36,8 +37,12 @@ const App = () => {
                 return UpdateRole.mutateAsync({
                   _id: id as string,
                   ...inputs,
-                }).then((res) => {
-                  console.log(res);
+                }).then(() => {
+                  showNotification({
+                    title: 'Role update',
+                    message: 'Role updated successfully',
+                    color: 'green',
+                  });
                 });
               }}
               title={`${t('edit role')}`}

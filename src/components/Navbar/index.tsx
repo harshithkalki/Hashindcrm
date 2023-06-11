@@ -436,7 +436,7 @@ export default function NavbarNested({ hide, setNavOpen }: Props) {
   }, [client]);
 
   useEffect(() => {
-    if (!client?.isSuperAdmin) {
+    if (!client?.isSuperAdmin && links.length > 0) {
       const isValid = links.some((item) => {
         if (typeof item.links === 'string') {
           return path.includes(item.links);
