@@ -391,7 +391,7 @@ export default function NavbarNested({ hide, setNavOpen }: Props) {
     { links: ReportDate, label: t('reports'), icon: IconReceipt2 },
     { label: t('admin'), icon: IconReceipt2, links: '/admin' },
     {
-      label: t('warehouse'),
+      label: t('warehouses'),
       icon: IconReceipt2,
       links: '/warehouse',
       permissionName: 'WAREHOUSE',

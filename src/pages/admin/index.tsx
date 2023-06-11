@@ -464,11 +464,17 @@ const Index = () => {
           data={
             admins.data?.pages
               .find((pageData) => pageData.page === page)
-              ?.docs.sort((a, b) => a.name.localeCompare(b.name)) ??
+              ?.docs.sort((a, b) => a.name.localeCompare(b.name))
+              .map((doc, index) => {
+                return { ...doc, index: index + 10 * (page - 1) + 1 };
+              }) ??
             [] ??
             []
           }
           colProps={{
+            index: {
+              label: 'Sno',
+            },
             name: {
               label: 'Name',
             },

@@ -259,14 +259,14 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Label>Menu</Menu.Label>
-                <Menu.Item
+                {/* <Menu.Item
                   icon={<IconSettings size={14} stroke={1.5} />}
                   onClick={() => {
                     push('/settings/paymentmodes');
                   }}
                 >
                   Settings
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item
                   icon={<IconUserCircle size={14} stroke={1.5} />}
                   onClick={() => {
