@@ -110,17 +110,17 @@ const Index = () => {
               {
                 title: `${t('upi')}`,
                 stats: data.salesByPaymentMode.totalSalesUpi.toFixed(0),
-                description: 'Upi Monthly turnover',
+                description: '',
               },
               {
                 title: `${t('bank')}`,
                 stats: data.salesByPaymentMode.totalSalesCash.toFixed(0),
-                description: 'Bank Monthly turnover',
+                description: '',
               },
               {
                 title: `${t('cash')}`,
                 stats: data.salesByPaymentMode.totalSalesBank.toFixed(0),
-                description: 'Cash Monthly turnover',
+                description: '',
               },
             ]}
           />
