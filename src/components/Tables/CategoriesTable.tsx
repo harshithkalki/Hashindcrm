@@ -53,21 +53,32 @@ export function TableSort({ data, onEdit }: TableSortProps) {
     setFilteredData(data);
   }, [data]);
 
-  function RowMap({ data: parent, index }: { data: Category; index: number }) {
+  function RowMap({
+    data: parent,
+    index,
+    ischild,
+  }: {
+    data: Category;
+    index: number;
+    ischild: number | boolean;
+  }) {
     const children = trpc.categoryRouter.getChildCategories.useQuery({
       _id: parent._id,
     });
     const childrenRows = children.data
-      ? rowdatamap(
-          children.data.map((val) => ({ ...val, _id: val._id.toString() }))
-        )
+      ? rowdatamap({
+          data: children.data.map((val) => ({
+            ...val,
+            _id: val._id.toString(),
+          })),
+          isChild: index,
+        })
       : null;
     const [hide, setHide] = useState(true);
 
     return (
       <>
         <tr>
-          <td>{index + 1}</td>
           <td>
             {children && (children.data?.length ?? 0) > 0 && (
               <ActionIcon onClick={() => setHide(!hide)}>
@@ -79,6 +90,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
               </ActionIcon>
             )}
           </td>
+          <td>{!ischild ? index + 1 : ''}</td>
 
           <td>
             <Image
@@ -110,16 +122,25 @@ export function TableSort({ data, onEdit }: TableSortProps) {
     );
   }
 
-  function rowdatamap(data: Category[]): JSX.Element[] {
+  function rowdatamap({
+    data,
+    isChild,
+  }: {
+    data: Category[];
+    isChild: number | boolean;
+  }): JSX.Element[] {
     const rows = data.map((row, index) => {
-      return <RowMap index={index} data={row} key={index} />;
+      return <RowMap index={index} data={row} key={index} ischild={isChild} />;
     });
 
     return rows;
   }
   const { t } = useTranslation('common');
 
-  const rows = rowdatamap(filteredData);
+  const rows = rowdatamap({
+    data: filteredData,
+    isChild: false,
+  });
   return (
     <ScrollArea>
       <TextInput
@@ -136,6 +157,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
       >
         <thead>
           <tr>
+            <th></th>
             <th>{t('sno')}</th>
             <th>{t('logo')}</th>
             <th>{t('name')}</th>
