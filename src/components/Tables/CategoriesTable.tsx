@@ -9,9 +9,6 @@ import {
   ActionIcon,
   Image,
 } from '@mantine/core';
-
-import common from '../../../public/locales/en/common.json';
-
 import {
   IconMinus,
   IconPencil,
@@ -21,32 +18,6 @@ import {
 } from '@tabler/icons';
 import { trpc } from '@/utils/trpc';
 import { useTranslation } from 'react-i18next';
-import { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-
-const useStyles = createStyles((theme) => ({
-  th: {
-    padding: '0 !important',
-  },
-
-  control: {
-    width: '100%',
-    padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
-
-    '&:hover': {
-      backgroundColor:
-        theme.colorScheme === 'dark'
-          ? theme.colors.dark[6]
-          : theme.colors.gray[0],
-    },
-  },
-
-  icon: {
-    width: 21,
-    height: 21,
-    borderRadius: 21,
-  },
-}));
 
 interface Category {
   _id: string;
@@ -82,7 +53,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
     setFilteredData(data);
   }, [data]);
 
-  function RowMap({ data: parent }: { data: Category }) {
+  function RowMap({ data: parent, index }: { data: Category; index: number }) {
     const children = trpc.categoryRouter.getChildCategories.useQuery({
       _id: parent._id,
     });
@@ -96,6 +67,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
     return (
       <>
         <tr>
+          <td>{index + 1}</td>
           <td>
             {children && (children.data?.length ?? 0) > 0 && (
               <ActionIcon onClick={() => setHide(!hide)}>
@@ -140,7 +112,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
 
   function rowdatamap(data: Category[]): JSX.Element[] {
     const rows = data.map((row, index) => {
-      return <RowMap data={row} key={index} />;
+      return <RowMap index={index} data={row} key={index} />;
     });
 
     return rows;
@@ -164,8 +136,7 @@ export function TableSort({ data, onEdit }: TableSortProps) {
       >
         <thead>
           <tr>
-            <th style={{ width: '10%' }}></th>
-            {/* <th>{t('sno')}</th> */}
+            <th>{t('sno')}</th>
             <th>{t('logo')}</th>
             <th>{t('name')}</th>
             <th>{t('actions')}</th>
@@ -190,11 +161,3 @@ export function TableSort({ data, onEdit }: TableSortProps) {
 }
 
 export default TableSort;
-
-// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-//   return {
-//     props: {
-//       ...(await serverSideTranslations(locale ?? 'en', ['common'])),
-//     },
-//   };
-// };

@@ -32,13 +32,13 @@ interface DownloadModalProps {
 
 function DownloadModal({ modal, setModal }: DownloadModalProps) {
   const { t } = useTranslation('common');
-  // const getAllSales = client.saleRouter.getAllSales
+
   return (
     <>
       <Modal
         opened={modal}
         onClose={() => setModal(false)}
-        title='Download Sales'
+        title='Download Purchases'
       >
         <Formik
           initialValues={{
@@ -59,7 +59,7 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
               headers[key as keyof (typeof data)[number]] = key;
             });
             exportCSVFile(headers, data, 'Purchases');
-            // setModal(false);
+            setModal(false);
             showNotification({
               title: 'Downloaded',
               message: 'Downloaded Successfully',
@@ -73,8 +73,6 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
                 label={`${t('start date')}`}
                 placeholder='Start Date'
                 name='startDate'
-                // value={values.startDate}
-                // onChange={handleChange}
               />
               <Center mt={'sm'}>
                 <IconArrowDown />
@@ -84,8 +82,6 @@ function DownloadModal({ modal, setModal }: DownloadModalProps) {
                 label={`${t('end date')}`}
                 placeholder='End Date'
                 name='endDate'
-                // value={values.endDate}
-                // onChange={handleChange}
               />
 
               <Center mt={'md'}>
