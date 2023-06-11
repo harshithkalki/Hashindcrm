@@ -18,7 +18,6 @@ const CashTable = () => {
   }, [cashData, page]);
   const { t } = useTranslation('common');
 
-  console.log(cashData.data);
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column' }}>

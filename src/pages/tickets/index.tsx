@@ -419,7 +419,7 @@ const TicketDetails = ({
             })
             .then(() => {
               setSubmitting(false);
-              utils.ticketRouter.tickets.invalidate();
+              utils.ticketRouter.invalidate();
               onClose();
             });
         }}
