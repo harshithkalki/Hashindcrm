@@ -324,6 +324,7 @@ const Index = () => {
               ?.docs.map((doc) => ({
                 ...doc,
                 _id: doc._id.toString(),
+                parentCategory: doc.parentCategory?.toString(),
               })) || []
           }
           onEdit={setEditId}

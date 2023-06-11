@@ -25,6 +25,7 @@ interface Category {
   slug: string;
   logo?: string;
   children?: Category[];
+  parentCategory?: string | undefined;
 }
 
 interface TableSortProps {
@@ -70,8 +71,8 @@ export function TableSort({ data, onEdit }: TableSortProps) {
           data: children.data.map((val) => ({
             ...val,
             _id: val._id.toString(),
+            parentCategory: val.parentCategory?.toString(),
           })),
-          isChild: index,
         })
       : null;
     const [hide, setHide] = useState(true);
@@ -124,13 +125,18 @@ export function TableSort({ data, onEdit }: TableSortProps) {
 
   function rowdatamap({
     data,
-    isChild,
-  }: {
+  }: // isChild,
+  {
     data: Category[];
-    isChild: number | boolean;
+    // isChild: number | boolean;
   }): JSX.Element[] {
     const rows = data.map((row, index) => {
-      return <RowMap index={index} data={row} key={index} ischild={isChild} />;
+      console.log(row.children);
+      if (row.parentCategory) {
+        return <RowMap index={index} data={row} key={index} ischild={true} />;
+      } else {
+        return <RowMap index={index} data={row} key={index} ischild={false} />;
+      }
     });
 
     return rows;
@@ -139,8 +145,9 @@ export function TableSort({ data, onEdit }: TableSortProps) {
 
   const rows = rowdatamap({
     data: filteredData,
-    isChild: false,
+    // isChild: false,
   });
+  console.log(filteredData);
   return (
     <ScrollArea>
       <TextInput

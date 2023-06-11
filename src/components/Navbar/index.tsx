@@ -316,7 +316,7 @@ export default function NavbarNested({ hide, setNavOpen }: Props) {
       link: '/reports/stockalert',
       permissionName: 'REPORT',
     },
-    { label: t('sales'), link: '/reports/sales', permissionName: 'REPORT' },
+    // { label: t('sales'), link: '/reports/sales', permissionName: 'REPORT' },
 
     {
       label: t('stock report'),
