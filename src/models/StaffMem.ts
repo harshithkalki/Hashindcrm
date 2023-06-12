@@ -63,6 +63,22 @@ StaffMemSchema.pre('save', async function encryptPassword(next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
+StaffMemSchema.pre('updateOne', async function encryptPassword(next) {
+  const update = this.getUpdate();
+
+  if (!update) {
+    next();
+  }
+
+  if (update && (update as StaffMemDocument).password) {
+    (update as StaffMemDocument).password = await bcrypt.hash((update as StaffMemDocument).password, 10);
+    // this.setUpdate({
+    //   $set: update,
+    // });
+  }
+
+});
+
 StaffMemSchema.method('getJWTToken', function getJWTToken() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
     expiresIn: process.env.JWT_EXPIRE,

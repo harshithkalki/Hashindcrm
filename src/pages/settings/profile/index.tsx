@@ -1,6 +1,5 @@
 import FormInput from '@/components/FormikCompo/FormikInput';
 import Layout from '@/components/Layout';
-import SettingsNav from '@/components/SettingsNav';
 import {
   Button,
   Container,
@@ -12,9 +11,20 @@ import {
 import { IconUpload } from '@tabler/icons';
 import { Form, Formik } from 'formik';
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
+import { trpc } from '@/utils/trpc';
+import axios from 'axios';
 
 const Index = () => {
   const [logo, setLogo] = useState<File | null>(null);
+  const client = useSelector<RootState, RootState['clientState']['client']>(
+    (state) => state.clientState.client
+  );
+  const { mutateAsync } = trpc.profileRouter.update.useMutation();
+
+  if (!client) return null;
+
   return (
     <Layout>
       <Container>
@@ -23,17 +33,32 @@ const Index = () => {
         </Group>
         <Formik
           initialValues={{
-            name: '',
-            email: '',
+            name: client?.name || '',
+            email: client?.email || '',
             password: '',
-            phone: '',
-            profile: '',
+            phone: client?.phoneNumber || '',
+            profile: client?.profile || '',
           }}
-          onSubmit={(values) => {
-            console.log(values);
+          onSubmit={async (values, { setSubmitting }) => {
+            setSubmitting(true);
+            if (logo) {
+              const form = new FormData();
+              form.append('file', logo);
+              const { data } = await axios.post('/api/upload-file', form);
+              values.profile = data.url;
+            }
+            await mutateAsync({
+              name: values.name,
+              email: values.email,
+              password: values.password,
+              phone: values.phone,
+              profile: values.profile,
+            });
+
+            setSubmitting(false);
           }}
         >
-          {({ values }) => (
+          {({ values, isSubmitting }) => (
             <Form>
               <SimpleGrid cols={2} spacing='xl'>
                 <FormInput
@@ -55,7 +80,7 @@ const Index = () => {
                   value={values.password}
                   description='leave blank if you dont want to change.'
                 />
-                {/* <Flex> */}
+
                 <FileInput
                   label='Profile'
                   onChange={setLogo}
@@ -64,7 +89,7 @@ const Index = () => {
                   icon={<IconUpload size={14} />}
                   description='leave blank if you dont want to change. '
                 />
-                {/* </Flex> */}
+
                 <FormInput
                   name='phone'
                   label='Phone'
@@ -72,7 +97,7 @@ const Index = () => {
                   value={values.phone}
                 />
               </SimpleGrid>
-              <Button type='submit' mt={'lg'}>
+              <Button type='submit' mt={'lg'} loading={isSubmitting}>
                 Update
               </Button>
             </Form>
