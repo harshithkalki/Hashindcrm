@@ -110,7 +110,6 @@ const AddnewTicket = ({
               setFileUploadLoading(true);
               const uploadedFiles = await uploadFiles(files);
               setFileUploadLoading(false);
-
               values.files = uploadedFiles.files;
             };
 
@@ -134,7 +133,7 @@ const AddnewTicket = ({
         }}
         validationSchema={toFormikValidationSchema(ZTicketCreateInput)}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue, values }) => (
           <Form>
             <SimpleGrid
               m={'md'}
@@ -175,6 +174,13 @@ const AddnewTicket = ({
                   value: val._id.toString(),
                   label: val.name,
                 }))}
+              />
+              <AssignableSelect
+                assigned={values.assignedTo ?? ''}
+                ticketId=''
+                onSubmited={(id) => {
+                  setFieldValue('assignedTo', id);
+                }}
               />
             </SimpleGrid>
             <Formiktextarea
@@ -290,9 +296,11 @@ const StatusSelect = ({
 const AssignableSelect = ({
   ticketId,
   assigned,
+  onSubmited,
 }: {
   ticketId: string;
   assigned: string;
+  onSubmited?: (id: string) => Promise<void> | void;
 }) => {
   const { data } = trpc.ticketRouter.getAssignableUsers.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -332,7 +340,13 @@ const AssignableSelect = ({
       initialValues={{
         assignTo: assigned,
       }}
-      onSubmit={(values, { setSubmitting }) => {
+      onSubmit={async (values, { setSubmitting }) => {
+        if (onSubmited) {
+          await onSubmited(values.assignTo);
+          setSubmitting(false);
+          return;
+        }
+
         assignTicket
           .mutateAsync({
             ticketId,
@@ -354,7 +368,6 @@ const AssignableSelect = ({
                 itemComponent={SelectUserItem}
                 data={userOptions ?? []}
                 name='reportTo'
-                variant='unstyled'
                 placeholder='Select Assignee'
                 onChange={(val) => {
                   setFieldValue('assignTo', val);
