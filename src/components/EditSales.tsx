@@ -154,6 +154,35 @@ function WarehouseSelect() {
   );
 }
 
+const CustomerSelect = () => {
+  const [search, setSearch] = useState('');
+  const customers = trpc.customerRouter.customers.useQuery(
+    { search: search },
+    { refetchOnWindowFocus: false }
+  );
+  const customerData = customers.data?.docs?.map((customer) => ({
+    label: customer.name,
+    value: customer._id.toString(),
+  }));
+  const { t } = useTranslation('common');
+
+  return (
+    <FormikSelect
+      label={`${t('customer')}`}
+      data={[
+        { label: 'Walk In Customer', value: 'walkInCustomer' },
+        ...(customerData || []),
+      ]}
+      searchable
+      searchValue={search}
+      onSearchChange={setSearch}
+      placeholder='Pick one'
+      name='customer'
+      onClick={() => setSearch('')}
+    />
+  );
+};
+
 const SalesForm = ({ _id, onClose }: modalProps) => {
   const { classes, cx } = useStyles();
   // const products = trpc.productRouter.getAllProducts.useQuery();
@@ -219,12 +248,6 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
 
   const salesSubmit = trpc.saleRouter.update.useMutation();
 
-  const componentRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
-  const utils = trpc.useContext();
-
   useEffect(() => {
     if (List && inlineProducts.size === 0) {
       setInlineProducts(
@@ -247,7 +270,6 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
             initialValues={initialValues}
             validationSchema={toFormikValidationSchema(ZSaleCreateInput)}
             onSubmit={(values, { setSubmitting, resetForm }) => {
-              console.log(inlineProducts);
               setSubmitting(true);
               values.products = Array.from(inlineProducts.values());
               values.orderTax =
@@ -265,28 +287,30 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                   0
                 ) + values.shipping || 0;
 
-              salesSubmit.mutateAsync(values).then((res) => {
-                ProductData.refetch();
-                showNotification({
-                  title: 'Edit Sale',
-                  message: 'Sale Edited Successfully',
+              salesSubmit
+                .mutateAsync({
+                  ...values,
+                  customer:
+                    values.customer === 'walkInCustomer'
+                      ? undefined
+                      : values.customer,
+                })
+                .then(() => {
+                  ProductData.refetch();
+                  showNotification({
+                    title: 'Edit Sale',
+                    message: 'Sale Edited Successfully',
+                  });
+                  setSubmitting(false);
+                  onClose();
                 });
-                setSubmitting(false);
-                onClose();
-              });
 
               resetForm();
               setInlineProducts(new Map());
-              console.log(values);
             }}
           >
             {({ values, handleSubmit, isSubmitting }) => (
               <Form onSubmit={handleSubmit}>
-                {/* {invoice.data && (
-                  <div style={{ display: 'none' }}>
-                    <Invoice invoiceRef={componentRef} data={invoice.data} />
-                  </div>
-                )} */}
                 <SimpleGrid
                   m={'md'}
                   cols={3}
@@ -305,11 +329,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                     description='Leave blank to auto generate'
                   />
                   <WarehouseSelect />
-                  <FormInput
-                    label={`${t('customer')}`}
-                    name='customer'
-                    placeholder='Customer Name'
-                  />
+                  <CustomerSelect />
                   <FormDate
                     label={`${t('date')}`}
                     placeholder='Date'
@@ -462,11 +482,11 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                             (totalPrice * (values.discount / 100)) /
                               inlineProducts.size;
                           item.discountedPrice = discountedPrice;
-                          // console.log(item);
+
                           const taxedPrice =
                             item.discountedPrice * (item.tax / 100);
                           item.taxPrice = taxedPrice;
-                          // item.subtotal = item.discountedPrice + taxedPrice;
+
                           return (
                             <tr key={item._id}>
                               <td
@@ -495,12 +515,9 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                                   size='sm'
                                   value={item.quantity}
                                   onChange={(value) => {
-                                    // console.log(item);
                                     if (!value) return;
                                     item.quantity = value;
 
-                                    // item.discountedPrice =
-                                    //   item.discountedPrice * value;
                                     setInlineProducts(new Map(inlineProducts));
                                   }}
                                   min={1}
@@ -555,18 +572,7 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                   </ScrollArea>
                 </div>
                 <Divider mt={'lg'} />
-                {/* <Group style={{ justifyContent: 'end' }} w={'95%'}>
-                <TextInput
-                  label={'Total'}
-                  value={
-                    values.products.reduce(
-                      (acc, item) => acc + item.subtotal,
-                      0
-                    ) || 0
-                  }
-                  readOnly
-                />
-              </Group> */}
+
                 <SimpleGrid
                   m={'md'}
                   cols={2}
@@ -576,7 +582,6 @@ const SalesForm = ({ _id, onClose }: modalProps) => {
                     { maxWidth: 'sm', cols: 2, spacing: 'sm' },
                     { maxWidth: 'xs', cols: 1, spacing: 'sm' },
                   ]}
-                  // style={{ alignItems: 'end' }}
                 >
                   <div>
                     <Textarea

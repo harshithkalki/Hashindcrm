@@ -3,7 +3,13 @@ import mongoose, { Schema } from 'mongoose';
 import type { SaleCreateInput } from '@/zobjs/sale';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-export type ISale = ModifyDeep<SaleCreateInput, { date: Date }> & {
+export type ISale = ModifyDeep<SaleCreateInput, {
+  date: Date,
+  customer: {
+    _id?: mongoose.Types.ObjectId;
+    name: string;
+  }
+}> & {
   company: mongoose.Types.ObjectId;
   createdAt: Date;
   invoiceId: string;
@@ -15,7 +21,11 @@ type SaleModel = Model<ISale, Record<string, never>>;
 
 const SaleSchema: Schema = new Schema<ISale, SaleModel>(
   {
-    customer: { type: String, required: true },
+    customer: {
+      _id: { type: Schema.Types.ObjectId, ref: 'Customer', required: false },
+      name: { type: String, required: true },
+    },
+
     date: { type: Date, required: true },
     products: [
       {

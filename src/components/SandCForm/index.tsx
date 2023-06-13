@@ -267,15 +267,23 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 0
               ) + values.shipping || 0;
 
-            salesSubmit.mutateAsync(values).then((res) => {
-              showNotification({
-                title: 'New Sale',
-                message: 'Sale created successfully',
+            salesSubmit
+              .mutateAsync({
+                ...values,
+                customer:
+                  values.customer === 'walkInCustomer'
+                    ? undefined
+                    : values.customer,
+              })
+              .then((res) => {
+                showNotification({
+                  title: 'New Sale',
+                  message: 'Sale created successfully',
+                });
+                setSubmitting(false);
+                setInvoiceId(res._id as unknown as string);
+                utils.saleRouter.sales.invalidate();
               });
-              setSubmitting(false);
-              setInvoiceId(res._id as unknown as string);
-              utils.saleRouter.sales.invalidate();
-            });
 
             resetForm();
             setInlineProducts(new Map());
@@ -306,11 +314,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   description='Leave blank to auto generate'
                 />
                 <WarehouseSelect />
-                {/* <FormInput
-                  label='Customer Name'
-                  name='customer'
-                  placeholder='Customer Name'
-                /> */}
+
                 <CustomerSelect />
                 <FormDate
                   label={`${t('date')}`}
@@ -369,10 +373,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       name: product.name,
                       quantity: 1,
                       subtotal: product.salePrice,
-                      // discountedPrice:
-                      //   product.salePrice -
-                      //   (totalPrice * (values.orderdiscount / 100)) /
-                      //     (inlineProducts.size + 1),
+
                       price: product.salePrice,
                       tax: product.tax,
                       taxPrice: 0,
@@ -559,18 +560,7 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 </ScrollArea>
               </div>
               <Divider mt={'lg'} />
-              {/* <Group style={{ justifyContent: 'end' }} w={'95%'}>
-                <TextInput
-                  label={'Total'}
-                  value={
-                    values.products.reduce(
-                      (acc, item) => acc + item.subtotal,
-                      0
-                    ) || 0
-                  }
-                  readOnly
-                />
-              </Group> */}
+
               <SimpleGrid
                 m={'md'}
                 cols={2}
@@ -580,7 +570,6 @@ const SalesForm = ({ modal, setModal, title, ...props }: modalProps) => {
                   { maxWidth: 'sm', cols: 2, spacing: 'sm' },
                   { maxWidth: 'xs', cols: 1, spacing: 'sm' },
                 ]}
-                // style={{ alignItems: 'end' }}
               >
                 <div>
                   <Textarea

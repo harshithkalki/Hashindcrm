@@ -83,11 +83,25 @@ export const saleRouter = router({
         })
       );
 
+      const customer: { name: string } = { name: "Walk in Customer" };
+      if (input.customer) {
+        const { _id, name } = await Customer.findOne({
+          _id: input.customer,
+        }) ?? {};
+        if (_id && name) {
+          customer.name = name;
+        }
+      }
+
+
       const sale = await Sale.create({
         ...input,
         company: client.company,
         invoiceId,
-        customer: !input.customer ? 'Walk in Customer' : input.customer,
+        customer: {
+          ...(input.customer && { _id: input.customer }),
+          name: customer.name,
+        }
       });
 
       return sale;
@@ -222,6 +236,7 @@ export const saleRouter = router({
         sort: {
           createdAt: -1,
         },
+
       };
 
       const query = {
@@ -240,15 +255,15 @@ export const saleRouter = router({
       });
 
       const salesWithCustomer = await Promise.all(
-        sales.docs.map(async (brand) => {
-          if (mongoose.isValidObjectId(brand.customer)) {
-            const customer = await Customer.findOne({
-              _id: brand.customer,
-            }).lean();
-            return { ...brand, customer: customer ?? 'Walk in Customer' };
-          }
+        sales.docs.map(async (sale) => {
 
-          return { ...brand, customer: 'Walk in Customer' };
+          return {
+            ...sale, customer: sale.customer._id
+              ? await Customer.findOne({
+                _id: sale?.customer._id,
+              }).lean()
+              : 'Walk in Customer',
+          };
         })
       );
 
@@ -268,21 +283,7 @@ export const saleRouter = router({
       async ({
         input,
         ctx,
-        // }): Promise<
-        //   ModifyDeep<
-        //     Omit<z.infer<typeof ZSale>, 'products' | 'warehouse'>,
-        //     {
-        //       company?: Company;
-        //       // warehouse?: Warehouse;
-        //       products: {
-        //         _id: string;
-        //         name: string;
-        //         price: number;
-        //         quantity: number;
-        //       }[];
-        //     }
-        //   >
-        // > => {
+
       }) => {
         const client = await checkPermission(
           'SALES',
@@ -311,6 +312,8 @@ export const saleRouter = router({
         const warehouse =
           (await WarehouseModel.findById(sale.warehouse).lean()) ?? undefined;
 
+
+
         return {
           ...sale,
           warehouse,
@@ -319,9 +322,9 @@ export const saleRouter = router({
             ...product._id,
             quantity: product.quantity,
           })),
-          customer: mongoose.isValidObjectId(sale?.customer)
+          customer: sale.customer._id
             ? await Customer.findOne({
-              _id: sale?.customer,
+              _id: sale?.customer._id,
             }).lean()
             : 'Walk in Customer',
         };
@@ -350,6 +353,13 @@ export const saleRouter = router({
       const options = {
         page: page ?? 1,
         limit: limit,
+        populate: {
+          path: 'customer',
+          select: 'name',
+        },
+        sort: {
+          createdAt: -1,
+        },
       };
 
       const query = {
@@ -384,6 +394,9 @@ export const saleRouter = router({
       const options = {
         page: page ?? 1,
         limit: limit,
+        sort: {
+          createdAt: -1,
+        },
       };
 
       const query = {
@@ -418,6 +431,9 @@ export const saleRouter = router({
       const options = {
         page: page ?? 1,
         limit: limit,
+        sort: {
+          createdAt: -1,
+        },
       };
 
       const query = {
@@ -449,7 +465,7 @@ export const saleRouter = router({
       return {
         Date: sale.date.toISOString(),
         invoiceId: sale.invoiceId,
-        Customer: sale.customer,
+        Customer: sale.customer.name,
         Discount: sale.discount,
         Shipping: sale.shipping,
         Amount: sale.total,
@@ -477,7 +493,7 @@ export const saleRouter = router({
       return {
         Date: sale.date.toString(),
         invoiceId: sale.invoiceId,
-        Customer: sale.customer,
+        Customer: sale.customer.name,
         Discount: sale.discount,
         Shipping: sale.shipping,
         Amount: sale.total,
@@ -505,7 +521,7 @@ export const saleRouter = router({
       return {
         Date: sale.date.toString(),
         invoiceId: sale.invoiceId,
-        Customer: sale.customer,
+        Customer: sale.customer.name,
         Discount: sale.discount,
         Shipping: sale.shipping,
         Amount: sale.total,

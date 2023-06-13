@@ -31,6 +31,7 @@ const CashTable = () => {
                   _id: doc._id.toString(),
                   date: dayjs(doc.date).format('DD MMMM YYYY'),
                   index: index + 10 * (page - 1) + 1,
+                  customer: doc.customer?.name ?? 'N/A',
                 })) || []
             }
             colProps={{

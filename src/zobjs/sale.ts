@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZSaleCreateInput = z.object({
-  customer: z.string(),
+  customer: z.string().optional(),
   date: z.string(),
   products: z.array(
     z.object({
