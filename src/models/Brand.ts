@@ -19,7 +19,7 @@ const BrandSchema: Schema = new Schema<IBrand, BrandModel>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true },
-    logo: { type: String, required: true },
+    logo: { type: String, required: false },
     company: { type: Schema.Types.ObjectId, ref: 'Company' },
   },
   {

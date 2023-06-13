@@ -9,6 +9,7 @@ import {
   Pagination,
   Title,
   Image,
+  FileButton,
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import FormInput from '@/components/FormikCompo/FormikInput';
@@ -27,6 +28,9 @@ import { showNotification } from '@mantine/notifications';
 import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
+import { exportCSVFile } from '@/utils/jsonTocsv';
+import { MIME_TYPES } from '@mantine/dropzone';
+import csvtojson from 'csvtojson';
 
 const initialValues: BrandCreateInput = {
   name: '',
@@ -176,6 +180,8 @@ const Brand = () => {
       refetchOnWindowFocus: false,
     }
   );
+  const createManyBrands = trpc.brandRouter.createMany.useMutation();
+  const utils = trpc.useContext();
 
   const [editId, setEditId] = useState<string>('');
   const { t } = useTranslation('common');
@@ -203,9 +209,58 @@ const Brand = () => {
       <Container h='100%' style={{ display: 'flex', flexDirection: 'column' }}>
         <Group my='lg' style={{ justifyContent: 'space-between' }}>
           <Title fw={400}>{t('brands')}</Title>
-          <Button size='xs' onClick={() => setModal(true)}>
-            {t('add brand')}
-          </Button>
+          <Group>
+            <Button size='xs' onClick={() => setModal(true)}>
+              {t('add brand')}
+            </Button>
+            <Button
+              size='xs'
+              onClick={() => {
+                const header = {
+                  name: 'name',
+                  slug: 'slug',
+                };
+                exportCSVFile(header, [header], 'brands-upload-schema');
+              }}
+            >
+              Download Schema
+            </Button>
+            <FileButton
+              onChange={(file) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                  const csv = e.target?.result;
+                  if (!csv) return;
+                  const data = await csvtojson({
+                    colParser: {
+                      name: 'string',
+                      slug: 'string',
+                    },
+                  }).fromString(csv as string);
+                  createManyBrands.mutateAsync(data).then(() => {
+                    utils.brandRouter.brands.invalidate();
+                    showNotification({
+                      title: 'Brands Created',
+                      message: `Brands created successfully`,
+                    });
+                  });
+                };
+                reader.readAsText(file);
+              }}
+              accept={MIME_TYPES.csv}
+            >
+              {(props) => (
+                <Button
+                  size='xs'
+                  {...props}
+                  loading={createManyBrands.isLoading}
+                >
+                  {t('upload csv')}
+                </Button>
+              )}
+            </FileButton>
+          </Group>
         </Group>
         <TableSelection
           data={
@@ -253,7 +308,6 @@ const Brand = () => {
                   ?.totalPages ?? 0
               }
               initialPage={1}
-              // {...pagination}
               page={page}
               onChange={setPage}
             />

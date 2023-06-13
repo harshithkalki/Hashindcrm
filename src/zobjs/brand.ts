@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const ZBrandCreateInput = z.object({
   name: z.string(),
   slug: z.string(),
-  logo: z.string(),
+  logo: z.string().optional(),
 });
 
 export type BrandCreateInput = z.infer<typeof ZBrandCreateInput>;

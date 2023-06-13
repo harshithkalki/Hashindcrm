@@ -7,7 +7,6 @@ import {
   FileInput,
   Group,
   Loader,
-  Menu,
   Modal,
   Pagination,
   Title,
@@ -15,7 +14,7 @@ import {
 import React from 'react';
 import FormInput from '@/components/FormikCompo/FormikInput';
 import { Formik, Form } from 'formik';
-import { IconDownload, IconFileUpload, IconUpload } from '@tabler/icons';
+import { IconUpload } from '@tabler/icons';
 import FormikSelect from '@/components/FormikCompo/FormikSelect';
 import { client, trpc } from '@/utils/trpc';
 import axios from 'axios';
@@ -281,63 +280,59 @@ const Index = () => {
             >
               {t('export csv')}
             </Button>
-            <Menu shadow='md' width={180}>
-              <Menu.Target>
-                <Button size='xs'> {t('upload csv')}</Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>Upload Prodcts</Menu.Label>
-                <Menu.Item
-                  icon={<IconDownload size={14} />}
-                  onClick={() => {
-                    const header = {
-                      name: 'name',
-                      parentCategory: 'parentCategory',
-                      slug: 'slug',
-                    };
+            <FileButton
+              onChange={(file) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                  const csv = e.target?.result;
+                  if (!csv) return;
+                  const data = await csvtojson({
+                    colParser: {
+                      name: 'string',
+                      parentCategory: 'string',
+                      slug: 'string',
+                    },
+                  }).fromString(csv as string);
+                  createManyCategories.mutateAsync(data).then(() => {
+                    utils.categoryRouter.getrootCategories.invalidate({
+                      limit: 10,
+                      cursor: 0,
+                    });
+                    showNotification({
+                      title: 'Categories Created',
+                      message: `Categories created successfully`,
+                    });
+                  });
+                };
+                reader.readAsText(file);
+              }}
+              accept={MIME_TYPES.csv}
+            >
+              {(props) => (
+                <Button
+                  {...props}
+                  loading={createManyCategories.isLoading}
+                  size='xs'
+                >
+                  {t('upload csv')}
+                </Button>
+              )}
+            </FileButton>
+            <Button
+              size='xs'
+              onClick={() => {
+                const header = {
+                  name: 'name',
+                  parentCategory: 'parentCategory',
+                  slug: 'slug',
+                };
 
-                    exportCSVFile(header, [header], 'products-upload-schema');
-                  }}
-                >
-                  Download Schema
-                </Menu.Item>
-                <FileButton
-                  onChange={(file) => {
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                      const csv = e.target?.result;
-                      if (!csv) return;
-                      const data = await csvtojson({
-                        colParser: {
-                          name: 'string',
-                          parentCategory: 'string',
-                          slug: 'string',
-                        },
-                      }).fromString(csv as string);
-                      createManyCategories.mutateAsync(data).then(() => {
-                        utils.categoryRouter.getrootCategories.invalidate({
-                          limit: 10,
-                          cursor: 0,
-                        });
-                        showNotification({
-                          title: 'Categories Created',
-                          message: `Categories created successfully`,
-                        });
-                      });
-                    };
-                    reader.readAsText(file);
-                  }}
-                  accept={MIME_TYPES.csv}
-                >
-                  {(props) => (
-                    <Menu.Item icon={<IconFileUpload size={14} />} {...props}>
-                      {t('upload csv')}
-                    </Menu.Item>
-                  )}
-                </FileButton>
-              </Menu.Dropdown>
-            </Menu>
+                exportCSVFile(header, [header], 'categories-upload-schema');
+              }}
+            >
+              Download Schema
+            </Button>
           </Group>
         </Group>
         <CategoriesTable

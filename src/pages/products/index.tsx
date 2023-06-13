@@ -6,7 +6,6 @@ import {
   Title,
   Image,
   FileButton,
-  Menu,
 } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -21,7 +20,6 @@ import csvtojson from 'csvtojson';
 import { useTranslation } from 'react-i18next';
 import type { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { IconDownload, IconFileUpload } from '@tabler/icons-react';
 
 export interface ProductFormType {
   name: string;
@@ -103,73 +101,69 @@ const Index = () => {
             >
               {t('export csv')}
             </Button>
-            <Menu shadow='md' width={180}>
-              <Menu.Target>
-                <Button size='xs'> {t('upload csv')}</Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>Upload Prodcts</Menu.Label>
-                <Menu.Item
-                  icon={<IconDownload size={14} />}
-                  onClick={() => {
-                    const header = {
-                      name: 'name',
-                      slug: 'slug',
-                      logo: 'logo',
-                      quantity: 'quantity',
-                      quantityAlert: 'quantityAlert',
-                      category: 'category',
-                      brand: 'brand',
-                      barcodeSymbology: 'barcodeSymbology',
-                      itemCode: 'itemCode',
-                      openingStock: 'openingStock',
-                      openingStockDate: 'openingStockDate',
-                      purchasePrice: 'purchasePrice',
-                      salePrice: 'salePrice',
-                      tax: 'tax',
-                      mrp: 'mrp',
-                      expiryDate: 'expiryDate',
-                      description: 'description',
-                      warehouse: 'warehouse',
-                    };
+            <Button
+              onClick={() => {
+                const header = {
+                  name: 'name',
+                  slug: 'slug',
+                  logo: 'logo',
+                  quantity: 'quantity',
+                  quantityAlert: 'quantityAlert',
+                  category: 'category',
+                  brand: 'brand',
+                  barcodeSymbology: 'barcodeSymbology',
+                  itemCode: 'itemCode',
+                  openingStock: 'openingStock',
+                  openingStockDate: 'openingStockDate',
+                  purchasePrice: 'purchasePrice',
+                  salePrice: 'salePrice',
+                  tax: 'tax',
+                  mrp: 'mrp',
+                  expiryDate: 'expiryDate',
+                  description: 'description',
+                  warehouse: 'warehouse',
+                };
 
-                    exportCSVFile(header, [header], 'products-upload-schema');
-                  }}
+                exportCSVFile(header, [header], 'products-upload-schema');
+              }}
+              size='xs'
+            >
+              Download Schema
+            </Button>
+            <FileButton
+              onChange={(file) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                  const csv = e.target?.result;
+                  if (!csv) return;
+                  const data = await csvtojson({
+                    colParser: {
+                      quantity: 'number',
+                      quantityAlert: 'number',
+                      openingStock: 'number',
+                      purchasePrice: 'number',
+                      salePrice: 'number',
+                      mrp: 'number',
+                      tax: 'number',
+                    },
+                  }).fromString(csv as string);
+                  createManyProducts.mutateAsync(data);
+                };
+                reader.readAsText(file);
+              }}
+              accept={MIME_TYPES.csv}
+            >
+              {(props) => (
+                <Button
+                  {...props}
+                  loading={createManyProducts.isLoading}
+                  size='xs'
                 >
-                  Download Schema
-                </Menu.Item>
-                <FileButton
-                  onChange={(file) => {
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                      const csv = e.target?.result;
-                      if (!csv) return;
-                      const data = await csvtojson({
-                        colParser: {
-                          quantity: 'number',
-                          quantityAlert: 'number',
-                          openingStock: 'number',
-                          purchasePrice: 'number',
-                          salePrice: 'number',
-                          mrp: 'number',
-                          tax: 'number',
-                        },
-                      }).fromString(csv as string);
-                      createManyProducts.mutateAsync(data);
-                    };
-                    reader.readAsText(file);
-                  }}
-                  accept={MIME_TYPES.csv}
-                >
-                  {(props) => (
-                    <Menu.Item icon={<IconFileUpload size={14} />} {...props}>
-                      {t('upload csv')}
-                    </Menu.Item>
-                  )}
-                </FileButton>
-              </Menu.Dropdown>
-            </Menu>
+                  {t('upload csv')}
+                </Button>
+              )}
+            </FileButton>
           </Group>
         </Group>
         <TableSelection

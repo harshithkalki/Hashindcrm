@@ -111,4 +111,24 @@ export const brandRouter = router({
 
       return brand;
     }),
+
+  createMany: protectedProcedure
+    .input(
+      z.array(
+        ZBrandCreateInput
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const client = await checkPermission(
+        'BRAND',
+        { create: true },
+        ctx.clientId,
+        'You are not permitted to create brand'
+      );
+
+      const brands = await BrandModel.insertMany(input.map((brand) => ({ ...brand, company: client.company })));
+
+      return brands;
+    }
+    )
 });
