@@ -145,7 +145,6 @@ function WarehouseSelect() {
       onChange={(value) => {
         if (value) dispatch(setWarehouse(value));
       }}
-      value={warehouse}
       nothingFound='No warehouses found'
       onWaypointEnter={() => {
         if (

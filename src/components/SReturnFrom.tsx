@@ -145,7 +145,6 @@ function WarehouseSelect() {
       onChange={(value) => {
         if (value) dispatch(setWarehouse(value));
       }}
-      value={warehouse}
       nothingFound='No warehouses found'
       onWaypointEnter={() => {
         if (
@@ -180,7 +179,7 @@ const CustomerSelect = () => {
 
   return (
     <FormikSelect
-      label={`${t('customer')}}`}
+      label={`${t('customer')}`}
       data={[
         { label: 'Walk In Customer', value: 'walkInCustomer' },
         ...(customerData || []),

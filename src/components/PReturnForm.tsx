@@ -31,7 +31,7 @@ import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useReactToPrint } from 'react-to-print';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import FormDate from '@/components/FormikCompo/FormikDate';
 import FormInput from '@/components/FormikCompo/FormikInput';
@@ -80,19 +80,6 @@ type InlineProduct = {
   tax: number;
 };
 
-// type InitialValues = {
-//   supplier: string;
-//   products: InlineProduct[];
-//   notes: string;
-//   total: number;
-//   status: 'approved' | 'pending' | 'rejected';
-//   shipping: number;
-//   orderTax: number;
-//   discount: number;
-//   date: string;
-//   warehouse: string;
-//   paymentMode: 'cash' | 'card' | 'upi';
-// };
 type InitialValues = z.infer<typeof ZPurchaseReturnCreateInput>;
 
 const initialValues: InitialValues = {
@@ -144,7 +131,6 @@ function WarehouseSelect() {
       onChange={(value) => {
         if (value) dispatch(setWarehouse(value));
       }}
-      value={warehouse}
       nothingFound='No warehouses found'
       onWaypointEnter={() => {
         if (

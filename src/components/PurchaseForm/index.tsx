@@ -117,7 +117,7 @@ function WarehouseSelect() {
     <FormikInfiniteSelect
       name='warehouse'
       placeholder='Pick one warehouse'
-      label={`${t('warehouse')}}`}
+      label={`${t('warehouse')}`}
       data={
         warehouses.data?.pages
           .flatMap((page) => page.docs)
@@ -130,7 +130,6 @@ function WarehouseSelect() {
       onChange={(value) => {
         if (value) dispatch(setWarehouse(value));
       }}
-      value={warehouse}
       nothingFound='No warehouses found'
       onWaypointEnter={() => {
         if (
@@ -348,10 +347,6 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                       name: product.name,
                       quantity: 1,
                       subtotal: product.salePrice,
-                      // discountedPrice:
-                      //   product.salePrice -
-                      //   (totalPrice * (values.orderdiscount / 100)) /
-                      //     (inlineProducts.size + 1),
                       price: product.salePrice,
                       tax: product.tax,
                       taxPrice: 0,

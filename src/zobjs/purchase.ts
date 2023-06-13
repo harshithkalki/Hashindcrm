@@ -16,7 +16,7 @@ export const ZPurchaseCreateInput = z.object({
   discount: z.number(),
   total: z.number(),
   notes: z.string().optional(),
-  warehouse: z.string().optional(),
+  warehouse: z.string(),
   paymentMode: z.enum(['cash', 'card', 'upi']),
 });
 
