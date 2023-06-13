@@ -21,7 +21,7 @@ import {
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconPlus, IconTrash } from '@tabler/icons';
-import { Formik, Form } from 'formik';
+import { Formik, Form, useFormikContext, FormikValues } from 'formik';
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -105,23 +105,88 @@ const initialValues: z.infer<typeof ZStockTransferCreateInput> = {
   toWarehouse: '',
 };
 
+// function FromWarehouseSelect() {
+//   const [searchValue, onSearchChange] = useState('');
+//   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
+//     {
+//       search: searchValue,
+//     },
+//     {
+//       refetchOnWindowFocus: false,
+//       getNextPageParam: (lastPage) => lastPage.nextPage,
+//     }
+//   );
+//   const warehouse = useSelector<
+//     RootState,
+//     RootState['clientState']['warehouse']
+//   >((state) => state.clientState.warehouse);
+//   const dispatch = useDispatch();
+//   const { t } = useTranslation('common');
+//   const { values } = useFormikContext();
+
+//   return (
+//     <InfiniteSelect
+//       label={`${t('from warehouse')}`}
+//       placeholder='Select warehouse'
+//       data={
+//         warehouses.data?.pages
+//           .flatMap((page) => page.docs)
+//           .map((warehouse, index) => ({
+//             label: warehouse.name,
+//             value: warehouse._id.toString(),
+//             index,
+//           })) ?? []
+//       }
+//       onChange={(value) => {
+//         if (value) dispatch(setWarehouse(value));
+//       }}
+//       value={warehouse}
+//       nothingFound='No warehouses found'
+//       onWaypointEnter={() => {
+//         if (
+//           warehouses.data?.pages[warehouses.data.pages.length - 1]?.hasNextPage
+//         ) {
+//           warehouses.fetchNextPage();
+//         }
+//       }}
+//       rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
+//       onSearchChange={onSearchChange}
+//       searchValue={searchValue}
+//       searchable
+//       withAsterisk
+//       onClick={() => onSearchChange('')}
+//     />
+//   );
+// }
+
 function FromWarehouseSelect() {
+  const { values, setFieldValue } = useFormikContext<FormikValues>();
   const [searchValue, onSearchChange] = useState('');
+
   const warehouses = trpc.warehouseRouter.warehouses.useInfiniteQuery(
     {
-      search: searchValue,
+      search: searchValue, // Pass the search value from the "From Warehouse" field
     },
     {
       refetchOnWindowFocus: false,
       getNextPageParam: (lastPage) => lastPage.nextPage,
     }
   );
+
   const warehouse = useSelector<
     RootState,
     RootState['clientState']['warehouse']
   >((state) => state.clientState.warehouse);
+
   const dispatch = useDispatch();
   const { t } = useTranslation('common');
+
+  // Disable the selected option in the "To Warehouse" based on the "From Warehouse" selection
+  // useEffect(() => {
+  //   if (values.fromWarehouse === values.toWarehouse) {
+  //     setFieldValue('toWarehouse', ''); // Reset the "To Warehouse" value when "From Warehouse" changes
+  //   }
+  // }, [values.fromWarehouse, setFieldValue]);
 
   return (
     <InfiniteSelect
@@ -134,9 +199,14 @@ function FromWarehouseSelect() {
             label: warehouse.name,
             value: warehouse._id.toString(),
             index,
-          })) ?? []
+            // disabled: warehouse._id.toString() === values.fromWarehouse, // Disable the option if it matches the "From Warehouse" value
+          }))
+          .filter((option) => {
+            return option.value != values.toWarehouse;
+          }) ?? []
       }
       onChange={(value) => {
+        // console.log(value);
         if (value) dispatch(setWarehouse(value));
       }}
       value={warehouse}
@@ -149,30 +219,39 @@ function FromWarehouseSelect() {
         }
       }}
       rightSection={warehouses.isLoading ? <Loader size={20} /> : undefined}
-      onSearchChange={onSearchChange}
-      searchValue={searchValue}
+      onSearchChange={(value) => {
+        setFieldValue('fromWarehouse', value); // Update the "From Warehouse" value on search change
+      }}
+      searchValue={values.fromWarehouse} // Use the "From Warehouse" value as the search value
       searchable
       withAsterisk
-      onClick={() => onSearchChange('')}
+      onClick={() => setFieldValue('fromWarehouse', '')} // Clear the "From Warehouse" value on click
     />
   );
 }
 
 const WarehouseSelect = () => {
   const [search, setSearch] = useState('');
+  const { values, setFieldValue } = useFormikContext<FormikValues>();
   const warehouses = trpc.warehouseRouter.warehouses.useQuery(
     { search: search },
     { refetchOnWindowFocus: false }
   );
   const { t } = useTranslation('common');
+  // console.log(values);
   return (
     <FormikSelect
       label={`${t('to warehouse')}`}
       data={
-        warehouses.data?.docs?.map((warehouse) => ({
-          label: warehouse.name,
-          value: warehouse._id.toString(),
-        })) || []
+        warehouses.data?.docs
+          ?.map((warehouse) => ({
+            label: warehouse.name,
+            value: warehouse._id.toString(),
+            // disabled: warehouse._id.toString() === values.fromWarehouse,
+          }))
+          .filter((option) => {
+            return option.label != values.fromWarehouse;
+          }) || []
       }
       searchable
       searchValue={search}
