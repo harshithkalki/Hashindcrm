@@ -33,8 +33,8 @@ const Index = () => {
     from: Date | null;
     to: Date | null;
   }>({
-    from: null,
-    to: null,
+    from: dayjs().startOf('month').toDate(),
+    to: new Date(),
   });
   const { data, isLoading } = trpc.daashboardRouter.dashboard.useQuery(
     {
