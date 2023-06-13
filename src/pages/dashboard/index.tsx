@@ -10,7 +10,7 @@ import StockAlertDashboard from '@/components/StockAlertDashboard';
 import { Rupee } from '@/constants';
 import { trpc } from '@/utils/trpc';
 import type { DefaultMantineColor } from '@mantine/core';
-import { Group } from '@mantine/core';
+import { Button, Group } from '@mantine/core';
 import { Flex, Grid, ScrollArea, useMantineTheme } from '@mantine/core';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -36,10 +36,18 @@ const Index = () => {
     from: dayjs().startOf('month').toDate(),
     to: new Date(),
   });
+  const [searchDates, setSearchDates] = React.useState<{
+    from: Date | null;
+    to: Date | null;
+  }>({
+    from: dayjs().startOf('month').toDate(),
+    to: new Date(),
+  });
+
   const { data, isLoading } = trpc.daashboardRouter.dashboard.useQuery(
     {
-      startDate: date.from?.toISOString() ?? undefined,
-      endDate: date.to?.toISOString() ?? undefined,
+      startDate: searchDates.from?.toString() ?? undefined,
+      endDate: searchDates.to?.toISOString() ?? undefined,
     },
     {
       refetchOnWindowFocus: false,
@@ -93,16 +101,26 @@ const Index = () => {
         }}
       >
         <Group mb='lg'>
-          <DatePicker
-            value={date.from}
-            onChange={(from) => setDates((prev) => ({ ...prev, from }))}
-            placeholder='From'
-          />
-          <DatePicker
-            value={date.to}
-            onChange={(to) => setDates((prev) => ({ ...prev, to }))}
-            placeholder='To'
-          />
+          <Group>
+            <DatePicker
+              value={date.from}
+              onChange={(from) => {
+                setDates((prev) => ({ ...prev, from }));
+              }}
+              placeholder='From'
+            />
+            <Button onClick={() => setSearchDates(date)}>Update</Button>
+          </Group>
+          <Group>
+            <DatePicker
+              value={date.to}
+              onChange={(to) => {
+                setDates((prev) => ({ ...prev, to }));
+              }}
+              placeholder='To'
+            />
+            <Button onClick={() => setSearchDates(date)}>Update</Button>
+          </Group>
         </Group>
         <ScrollArea>
           <StatsGroup
