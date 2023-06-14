@@ -42,6 +42,7 @@ export const ticketRouter = router({
         description: input.description,
         issueType: input.issueType,
         files: input.files,
+        assignedTo: input.assignedTo,
       });
 
       return ticket.toObject();

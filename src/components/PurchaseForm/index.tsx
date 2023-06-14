@@ -264,7 +264,7 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
             setInlineProducts(new Map());
           }}
         >
-          {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
+          {({ values, handleSubmit, isSubmitting, errors }) => (
             <Form onSubmit={handleSubmit}>
               {invoice.data && (
                 <div style={{ display: 'none' }}>
@@ -637,7 +637,15 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 </div>
               </SimpleGrid>
               <Group w={'100%'} style={{ justifyContent: 'center' }}>
-                <Button type='submit' mb={'md'} loading={isSubmitting}>
+                <Button
+                  type='submit'
+                  mb={'md'}
+                  loading={isSubmitting}
+                  disabled={
+                    Object.keys(errors).length > 0 ||
+                    values.products.length === 0
+                  }
+                >
                   {t('submit')}
                 </Button>
                 <Button

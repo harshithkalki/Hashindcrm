@@ -8,7 +8,7 @@ export const ZPurchaseCreateInput = z.object({
       _id: z.string(),
       quantity: z.number(),
       price: z.number(),
-    })
+    }),
   ),
   status: z.enum(['pending', 'approved', 'rejected']),
   orderTax: z.number(),
