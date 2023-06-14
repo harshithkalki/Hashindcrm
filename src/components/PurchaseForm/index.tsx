@@ -236,13 +236,14 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
           validationSchema={toFormikValidationSchema(ZPurchaseCreateInput)}
           onSubmit={(values, { setSubmitting, resetForm }) => {
             values.products = Array.from(inlineProducts.values());
-            values.orderTax =
+            values.orderTax = Math.round(
               [...inlineProducts.values()].reduce(
                 (acc, item) => acc + item.taxPrice * item.quantity,
                 0
               ) -
                 values.discount +
-                values.shipping || 0;
+                values.shipping || 0
+            );
             values.total =
               [...inlineProducts.values()].reduce(
                 (acc, item) =>
