@@ -637,13 +637,13 @@ const PurchaseForm = ({ modal, setModal, title, ...props }: modalProps) => {
                 </div>
               </SimpleGrid>
               <Group w={'100%'} style={{ justifyContent: 'center' }}>
+                {<>{console.log(errors)}</>}
                 <Button
                   type='submit'
                   mb={'md'}
                   loading={isSubmitting}
                   disabled={
-                    Object.keys(errors).length > 0 ||
-                    values.products.length === 0
+                    Object.keys(errors).length > 0 || inlineProducts.size === 0
                   }
                 >
                   {t('submit')}
