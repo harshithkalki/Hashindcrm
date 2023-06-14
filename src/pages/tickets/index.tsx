@@ -119,7 +119,7 @@ const AddnewTicket = ({
               ...values,
             });
 
-            utils.ticketRouter.openTickets.invalidate();
+            utils.ticketRouter.invalidate();
             showNotification({
               message: 'Ticket Created',
               color: 'teal',
