@@ -603,7 +603,7 @@ const AssignedToMe = ({ setTicketId }: { setTicketId: SetTicket }) => {
       style={{
         paddingTop: '1rem',
         paddingBottom: '1rem',
-        height: 'calc(100vh - 10rem)',
+        height: '50vh',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -720,7 +720,7 @@ const OpenTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
       style={{
         paddingTop: '1rem',
         paddingBottom: '1rem',
-        height: 'calc(100vh - 10rem)',
+        height: '50vh',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -846,7 +846,7 @@ const OtherTickets = ({ setTicketId }: { setTicketId: SetTicket }) => {
       style={{
         paddingTop: '1rem',
         paddingBottom: '1rem',
-        height: 'calc(100vh - 10rem)',
+        height: '50vh',
         display: 'flex',
         flexDirection: 'column',
       }}
