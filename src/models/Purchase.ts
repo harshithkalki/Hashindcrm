@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 import type { PurchaseCreateInput } from '@/zobjs/purchase';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-export type IPurchase = ModifyDeep<PurchaseCreateInput, { date: Date, supplier: mongoose.Types.ObjectId }> & {
+export type IPurchase = ModifyDeep<PurchaseCreateInput, { date: Date, supplier: mongoose.Types.ObjectId; warehouse: mongoose.Types.ObjectId; }> & {
   company: mongoose.Types.ObjectId;
   createdAt: Date;
   invoiceId: string;
