@@ -15,6 +15,9 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { trpc } from '@/utils/trpc';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Index = () => {
   const [logo, setLogo] = useState<File | null>(null);
@@ -23,13 +26,14 @@ const Index = () => {
   );
   const { mutateAsync } = trpc.profileRouter.update.useMutation();
 
+  const { t } = useTranslation('common');
   if (!client) return null;
 
   return (
     <Layout>
       <Container>
         <Group>
-          <Title fw={400}>Profile</Title>
+          <Title fw={400}>{t('profile')}</Title>
         </Group>
         <Formik
           initialValues={{
@@ -63,26 +67,26 @@ const Index = () => {
               <SimpleGrid cols={2} spacing='xl'>
                 <FormInput
                   name='name'
-                  label='Name'
+                  label={`${t('name')}`}
                   placeholder='Enter your name'
                   value={values.name}
                 />
                 <FormInput
                   name='email'
-                  label='Email'
+                  label={`${t('email')}`}
                   placeholder='Enter your email'
                   value={values.email}
                 />
                 <FormInput
                   name='password'
-                  label='Password'
+                  label={`${t('password')}`}
                   placeholder='Enter your password'
                   value={values.password}
                   description='leave blank if you dont want to change.'
                 />
 
                 <FileInput
-                  label='Profile'
+                  label={`${t('profile')}`}
                   onChange={setLogo}
                   name='profile'
                   placeholder='Select Profile'
@@ -92,13 +96,13 @@ const Index = () => {
 
                 <FormInput
                   name='phone'
-                  label='Phone'
+                  label={`${t('phone')}`}
                   placeholder='Enter your phone'
                   value={values.phone}
                 />
               </SimpleGrid>
               <Button type='submit' mt={'lg'} loading={isSubmitting}>
-                Update
+                {t('update')}
               </Button>
             </Form>
           )}
@@ -109,3 +113,11 @@ const Index = () => {
 };
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
+};

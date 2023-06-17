@@ -295,7 +295,19 @@ function CustomerForm({
               // withAsterisk
             />
             <Group w={'100%'} style={{ justifyContent: 'center' }} mt={'lg'}>
-              <Button type='submit' size='xs' loading={props.isSubmitting}>
+              <Button
+                type='submit'
+                size='xs'
+                loading={props.isSubmitting}
+                disabled={
+                  !(
+                    Boolean(values.warehouse) &&
+                    Boolean(values.name) &&
+                    Boolean(values.numbers) &&
+                    Boolean(values.status)
+                  )
+                }
+              >
                 {t('create')}
               </Button>
             </Group>

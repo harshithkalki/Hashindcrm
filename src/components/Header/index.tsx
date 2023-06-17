@@ -208,19 +208,16 @@ export function CustomHeader({ navopen, setNavOpen }: HeaderTabsProps) {
                   { label: 'Tamil', value: 'ta' },
                 ]}
                 onChange={(value) => {
+                  // console.log(router.asPath);
                   if (value === 'en') {
-                    push('/', `${router.pathname}`, { locale: 'en' }).then(
-                      () => {
-                        router.reload();
-                      }
-                    );
+                    push('/', `${router.asPath}`, { locale: 'en' }).then(() => {
+                      router.reload();
+                    });
                     setLanguage('en');
                   } else if (value === 'ta') {
-                    push('/', `${router.pathname}`, { locale: 'ta' }).then(
-                      () => {
-                        router.reload();
-                      }
-                    );
+                    push('/', `${router.asPath}`, { locale: 'ta' }).then(() => {
+                      router.reload();
+                    });
                     setLanguage('ta');
                   }
                 }}
